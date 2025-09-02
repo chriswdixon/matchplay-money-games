@@ -1,11 +1,23 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { MapPin, Users, DollarSign, Trophy } from "lucide-react";
+import { Link } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
+import { UserMenu } from "@/components/auth/UserMenu";
 import heroImage from "@/assets/hero-golf-course.jpg";
 
 const MatchPlayHero = () => {
+  const { user } = useAuth();
+  
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      {/* Navigation */}
+      {user && (
+        <div className="absolute top-6 right-6 z-20">
+          <UserMenu />
+        </div>
+      )}
+      
       {/* Hero Background */}
       <div className="absolute inset-0 z-0">
         <img 
@@ -56,19 +68,41 @@ const MatchPlayHero = () => {
         
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <Button 
-            size="lg" 
-            className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 px-8 py-4 text-lg font-semibold border-0"
-          >
-            Start Playing Now
-          </Button>
-          <Button 
-            variant="outline" 
-            size="lg"
-            className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 py-4 text-lg font-medium transition-smooth"
-          >
-            View Membership Plans
-          </Button>
+          {user ? (
+            <>
+              <Button 
+                size="lg" 
+                className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 px-8 py-4 text-lg font-semibold border-0"
+              >
+                Find Matches
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 py-4 text-lg font-medium transition-smooth"
+              >
+                View Dashboard
+              </Button>
+            </>
+          ) : (
+            <>
+              <Button 
+                size="lg" 
+                className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 px-8 py-4 text-lg font-semibold border-0"
+                asChild
+              >
+                <Link to="/auth">Join MatchPlay</Link>
+              </Button>
+              <Button 
+                variant="outline" 
+                size="lg"
+                className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 py-4 text-lg font-medium transition-smooth"
+                asChild
+              >
+                <Link to="/auth">Sign In</Link>
+              </Button>
+            </>
+          )}
         </div>
         
         {/* Trust Indicators */}
