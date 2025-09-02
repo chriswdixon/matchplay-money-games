@@ -80,8 +80,9 @@ const MatchPlayHero = () => {
                 variant="outline" 
                 size="lg"
                 className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 py-4 text-lg font-medium transition-smooth"
+                onClick={() => window.location.href = '/profile'}
               >
-                View Dashboard
+                View Profile
               </Button>
             </>
           ) : (
