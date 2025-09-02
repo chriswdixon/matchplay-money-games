@@ -14,6 +14,83 @@ export type Database = {
   }
   public: {
     Tables: {
+      match_participants: {
+        Row: {
+          id: string
+          joined_at: string
+          match_id: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          joined_at?: string
+          match_id: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          joined_at?: string
+          match_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_participants_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      matches: {
+        Row: {
+          buy_in_amount: number
+          course_name: string
+          created_at: string
+          created_by: string
+          format: string
+          handicap_max: number | null
+          handicap_min: number | null
+          id: string
+          location: string
+          max_participants: number
+          scheduled_time: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          buy_in_amount?: number
+          course_name: string
+          created_at?: string
+          created_by: string
+          format: string
+          handicap_max?: number | null
+          handicap_min?: number | null
+          id?: string
+          location: string
+          max_participants?: number
+          scheduled_time: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          buy_in_amount?: number
+          course_name?: string
+          created_at?: string
+          created_by?: string
+          format?: string
+          handicap_max?: number | null
+          handicap_min?: number | null
+          id?: string
+          location?: string
+          max_participants?: number
+          scheduled_time?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           created_at: string
@@ -52,7 +129,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_match_participant_count: {
+        Args: { match_id: string }
+        Returns: number
+      }
+      user_joined_match: {
+        Args: { match_id: string; user_id: string }
+        Returns: boolean
+      }
     }
     Enums: {
       [_ in never]: never
