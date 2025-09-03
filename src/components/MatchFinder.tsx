@@ -69,14 +69,11 @@ const MatchFinder = () => {
       filtered = filtered.filter(match => match.format === filters.format);
     }
 
-    // Distance filter - only apply if we have location data and user has set a custom distance
-    if (filters.maxDistance !== 30 && location) {
-      filtered = filtered.filter(match => {
-        // Only include matches that have distance data and are within the specified range
-        // Convert miles to kilometers for comparison (1 mile = 1.60934 km)
-        const maxDistanceKm = filters.maxDistance * 1.60934;
-        return match.distance_km !== undefined && match.distance_km <= maxDistanceKm;
-      });
+    // Distance filter
+    if (filters.maxDistance !== 30) {
+      filtered = filtered.filter(match => 
+        !match.distance_km || match.distance_km <= filters.maxDistance
+      );
     }
 
     // Buy-in filter
@@ -133,7 +130,7 @@ const MatchFinder = () => {
     }
 
     return filtered;
-  }, [matches, filters, location]);
+  }, [matches, filters]);
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
