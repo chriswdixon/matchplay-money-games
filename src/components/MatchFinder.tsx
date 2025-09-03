@@ -3,12 +3,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
 import CreateMatchDialog from "./CreateMatchDialog";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
+import PlayerRatingDialog from "./PlayerRatingDialog";
 import { format } from "date-fns";
 import { useState, useEffect, useMemo } from "react";
 
@@ -18,6 +19,8 @@ const MatchFinder = () => {
   const { location, requestLocation, formatDistance } = useLocation();
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+  const [selectedMatchForRating, setSelectedMatchForRating] = useState<any>(null);
   const [filters, setFilters] = useState<FilterType>({
     search: '',
     format: 'all',
@@ -183,6 +186,15 @@ const MatchFinder = () => {
     return (match.participant_count || 0) >= match.max_participants;
   };
 
+  const isMatchCompleted = (match: any) => {
+    return match.status === 'completed' || new Date(match.scheduled_time) < new Date();
+  };
+
+  const handleRatePlayersClick = (match: any) => {
+    setSelectedMatchForRating(match);
+    setRatingDialogOpen(true);
+  };
+
   return (
     <section className="py-20 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
@@ -314,28 +326,50 @@ const MatchFinder = () => {
                       </div>
                     </div>
                     
-                    <div className="pt-2">
+                    <div className="pt-2 space-y-2">
                       <Badge variant="outline" className="text-xs">
                         {formatMatchFormat(match.format)}
                       </Badge>
                     </div>
                     
-                    <Button 
-                      className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
-                      disabled={isFull || !user}
-                      onClick={() => handleMatchAction(match)}
-                    >
-                      {!user ? "Sign In to Join" : 
-                       isFull ? "Match Full" : 
-                       match.user_joined ? "Leave Match" : 
-                       "Join Match"}
-                    </Button>
+                    {/* Action Buttons */}
+                    <div className="space-y-2">
+                      {isMatchCompleted(match) && match.user_joined ? (
+                        <Button 
+                          variant="outline"
+                          className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                          onClick={() => handleRatePlayersClick(match)}
+                        >
+                          <Star className="w-4 h-4 mr-2" />
+                          Rate Players
+                        </Button>
+                      ) : (
+                        <Button 
+                          className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+                          disabled={isFull || !user}
+                          onClick={() => handleMatchAction(match)}
+                        >
+                          {!user ? "Sign In to Join" : 
+                           isFull ? "Match Full" : 
+                           match.user_joined ? "Leave Match" : 
+                           "Join Match"}
+                        </Button>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               );
             })
           )}
         </div>
+        
+        {/* Rating Dialog */}
+        <PlayerRatingDialog
+          open={ratingDialogOpen}
+          onOpenChange={setRatingDialogOpen}
+          matchId={selectedMatchForRating?.id || ''}
+          matchName={selectedMatchForRating?.course_name || ''}
+        />
         
         {/* How It Works */}
         <div className="bg-gradient-card rounded-2xl p-8 md:p-12">

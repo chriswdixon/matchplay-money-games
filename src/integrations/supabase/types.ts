@@ -100,8 +100,39 @@ export type Database = {
         }
         Relationships: []
       }
+      player_ratings: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          rated_player_id: string
+          rater_id: string
+          rating: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          rated_player_id: string
+          rater_id: string
+          rating: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          rated_player_id?: string
+          rater_id?: string
+          rating?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
+          average_rating: number | null
           created_at: string
           display_name: string | null
           handicap: number | null
@@ -112,6 +143,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          average_rating?: number | null
           created_at?: string
           display_name?: string | null
           handicap?: number | null
@@ -122,6 +154,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          average_rating?: number | null
           created_at?: string
           display_name?: string | null
           handicap?: number | null
@@ -142,6 +175,10 @@ export type Database = {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
       }
+      calculate_player_average_rating: {
+        Args: { player_user_id: string }
+        Returns: number
+      }
       get_match_participant_count: {
         Args: { match_id: string }
         Returns: number
@@ -157,6 +194,14 @@ export type Database = {
           id: string
           location: string
           scheduled_time: string
+        }[]
+      }
+      get_rateable_players_for_match: {
+        Args: { match_id: string; rater_user_id: string }
+        Returns: {
+          already_rated: boolean
+          display_name: string
+          user_id: string
         }[]
       }
       user_joined_match: {

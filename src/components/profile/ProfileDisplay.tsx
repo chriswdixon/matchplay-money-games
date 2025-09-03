@@ -2,7 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProfile } from '@/hooks/useProfile';
 import { useAuth } from '@/hooks/useAuth';
-import { User, Phone, Trophy, Calendar, Mail } from 'lucide-react';
+import { User, Phone, Trophy, Calendar, Mail, Star } from 'lucide-react';
+import StarRating from '@/components/StarRating';
 
 export function ProfileDisplay() {
   const { profile, loading } = useProfile();
@@ -94,6 +95,22 @@ export function ProfileDisplay() {
               <div>
                 <div className="text-sm font-medium">Handicap</div>
                 <div className="text-sm text-muted-foreground">{profile.handicap}</div>
+              </div>
+            </div>
+          )}
+
+          {profile?.average_rating && (
+            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+              <Star className="w-4 h-4 text-muted-foreground" />
+              <div>
+                <div className="text-sm font-medium">Player Rating</div>
+                <div className="flex items-center gap-2">
+                  <StarRating 
+                    rating={Number(profile.average_rating)} 
+                    size="sm" 
+                    className="justify-start" 
+                  />
+                </div>
               </div>
             </div>
           )}
