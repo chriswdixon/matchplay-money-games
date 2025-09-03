@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
@@ -28,92 +28,135 @@ export interface Match {
 export const useMatches = () => {
   const [matches, setMatches] = useState<Match[]>([]);
   const [loading, setLoading] = useState(true);
-  const [isRefetching, setIsRefetching] = useState(false);
   const { user } = useAuth();
+  
+  // Use refs to track ongoing requests and prevent race conditions
+  const isLoadingRef = useRef(false);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const fetchMatches = async (userLocation?: { latitude: number; longitude: number }) => {
+  const fetchMatches = useCallback(async (userLocation?: { latitude: number; longitude: number }, retryCount = 0) => {
     // Prevent multiple simultaneous calls
-    if (isRefetching) return;
+    if (isLoadingRef.current) {
+      console.log('Fetch already in progress, skipping...');
+      return;
+    }
+    
+    // Cancel any ongoing request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+    
+    // Clear any pending retry
+    if (retryTimeoutRef.current) {
+      clearTimeout(retryTimeoutRef.current);
+      retryTimeoutRef.current = null;
+    }
+
+    // Create new abort controller
+    abortControllerRef.current = new AbortController();
     
     try {
-      setIsRefetching(true);
-      if (!loading) setLoading(true);
+      isLoadingRef.current = true;
+      setLoading(true);
       
-      let matchesData;
+      console.log('Fetching matches...', { userLocation, retryCount });
       
-      console.log('Fetching matches with location:', userLocation);
+      let matchesData: any[] = [];
       
-      // If user location is provided, use GPS-based matching
-      if (userLocation) {
-        try {
-          const { data, error } = await supabase
-            .rpc('get_nearby_matches', {
-              user_lat: userLocation.latitude,
-              user_lon: userLocation.longitude,
-              radius_km: 30 // Changed from 50 to 30 miles
-            });
-          
-          if (error) {
-            console.error('GPS-based matching failed:', error);
-            throw error;
-          }
-          matchesData = data || [];
-        } catch (gpsError) {
-          console.log('GPS matching failed, falling back to regular matching');
-          // Fallback to regular matching if GPS fails
-          const { data, error } = await supabase
-            .from('matches')
-            .select('*')
-            .eq('status', 'open')
-            .order('scheduled_time', { ascending: true });
-
-          if (error) throw error;
-          matchesData = data || [];
-        }
-      } else {
-        // Regular matching
+      // Simple fallback-first approach - try basic query first
+      try {
         const { data, error } = await supabase
           .from('matches')
           .select('*')
           .eq('status', 'open')
-          .order('scheduled_time', { ascending: true });
+          .order('scheduled_time', { ascending: true })
+          .abortSignal(abortControllerRef.current.signal);
 
         if (error) throw error;
         matchesData = data || [];
+        console.log('Successfully fetched matches:', matchesData.length);
+      } catch (basicError) {
+        console.error('Basic query failed:', basicError);
+        
+        // If basic query fails due to network, don't try complex queries
+        if (basicError.name === 'AbortError') {
+          console.log('Request was aborted');
+          return;
+        }
+        
+        if (basicError.message?.includes('Failed to fetch')) {
+          console.log('Network error, will retry...');
+          if (retryCount < 3) {
+            const delay = Math.pow(2, retryCount) * 1000; // Exponential backoff
+            retryTimeoutRef.current = setTimeout(() => {
+              fetchMatches(userLocation, retryCount + 1);
+            }, delay);
+            return;
+          } else {
+            throw new Error('Network connection failed after multiple attempts');
+          }
+        }
+        throw basicError;
       }
 
-      console.log('Raw matches data:', matchesData);
+      // Only try location-based matching if we have location and basic query succeeded
+      if (userLocation && matchesData.length < 20) {
+        try {
+          console.log('Trying location-based matching...');
+          const { data: nearbyData, error: nearbyError } = await supabase
+            .rpc('get_nearby_matches', {
+              user_lat: userLocation.latitude,
+              user_lon: userLocation.longitude,
+              radius_km: 30
+            })
+            .abortSignal(abortControllerRef.current.signal);
+          
+          if (!nearbyError && nearbyData && nearbyData.length > 0) {
+            console.log('Found nearby matches:', nearbyData.length);
+            matchesData = nearbyData;
+          }
+        } catch (nearbyError) {
+          console.log('Location-based matching failed, using basic results:', nearbyError);
+          // Continue with basic results
+        }
+      }
 
-      // Get participant counts for each match with better error handling
-      const matchesWithCounts = await Promise.all(
-        matchesData.map(async (match) => {
+      // Process matches with participant info (simplified approach)
+      const processedMatches = await Promise.all(
+        matchesData.slice(0, 50).map(async (match) => { // Limit to 50 matches for performance
+          // Set defaults first
           let participantCount = 0;
           let userJoined = false;
 
+          // Try to get participant count, but don't fail if it errors
           try {
-            const { data: countData, error: countError } = await supabase
-              .rpc('get_match_participant_count', { match_id: match.id });
+            if (abortControllerRef.current?.signal.aborted) return null;
             
-            if (!countError && countData !== null) {
-              participantCount = countData;
-            }
+            const { data: countData } = await supabase
+              .rpc('get_match_participant_count', { match_id: match.id })
+              .abortSignal(abortControllerRef.current.signal);
+            
+            if (countData !== null) participantCount = countData;
           } catch (error) {
-            console.error(`Error getting participant count for match ${match.id}:`, error);
+            console.log(`Participant count failed for match ${match.id}, using default`);
           }
           
+          // Try to check if user joined, but don't fail if it errors
           if (user) {
             try {
-              const { data: joinedData, error: joinedError } = await supabase
+              if (abortControllerRef.current?.signal.aborted) return null;
+              
+              const { data: joinedData } = await supabase
                 .rpc('user_joined_match', { 
                   match_id: match.id, 
                   user_id: user.id 
-                });
+                })
+                .abortSignal(abortControllerRef.current.signal);
               
-              if (!joinedError && joinedData !== null) {
-                userJoined = joinedData;
-              }
+              if (joinedData !== null) userJoined = joinedData;
             } catch (error) {
-              console.error(`Error checking if user joined match ${match.id}:`, error);
+              console.log(`User joined check failed for match ${match.id}, using default`);
             }
           }
 
@@ -127,31 +170,43 @@ export const useMatches = () => {
         })
       );
 
-      console.log('Processed matches:', matchesWithCounts);
-      setMatches(matchesWithCounts);
+      // Filter out any null results from aborted requests
+      const validMatches = processedMatches.filter(Boolean) as Match[];
       
-      // Show info message if no matches found
-      if (matchesWithCounts.length === 0 && !loading) {
-        console.log('No matches found');
+      if (!abortControllerRef.current?.signal.aborted) {
+        console.log('Setting matches:', validMatches.length);
+        setMatches(validMatches);
+        
+        // Reset retry count on success
+        if (retryCount > 0) {
+          console.log('Successfully recovered after', retryCount, 'retries');
+        }
       }
       
     } catch (error) {
+      if (error.name === 'AbortError') {
+        console.log('Request was aborted, ignoring error');
+        return;
+      }
+      
       console.error('Error fetching matches:', error);
       
-      // Only show error toast if it's not a network connectivity issue
-      if (error?.message?.includes('Failed to fetch')) {
-        console.warn('Network connectivity issue, will retry...');
-        // Set empty array but don't show error toast for network issues
-        setMatches([]);
-      } else {
-        toast.error('Unable to load matches. Please try again.');
+      // Only show user-facing errors for non-network issues
+      if (!error.message?.includes('Failed to fetch') && !error.message?.includes('Network')) {
+        toast.error('Unable to load matches. Please refresh the page.');
+      }
+      
+      // Set empty matches on error (but only if not aborted)
+      if (!abortControllerRef.current?.signal.aborted) {
         setMatches([]);
       }
     } finally {
-      setLoading(false);
-      setIsRefetching(false);
+      if (!abortControllerRef.current?.signal.aborted) {
+        setLoading(false);
+      }
+      isLoadingRef.current = false;
     }
-  };
+  }, [user]);
 
   const createMatch = async (matchData: {
     course_name: string;
@@ -262,9 +317,27 @@ export const useMatches = () => {
     }
   };
 
+  // Cleanup function
   useEffect(() => {
-    fetchMatches();
-  }, [user]);
+    return () => {
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+      if (retryTimeoutRef.current) {
+        clearTimeout(retryTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  // Initial load
+  useEffect(() => {
+    // Small delay to prevent multiple rapid calls
+    const timer = setTimeout(() => {
+      fetchMatches();
+    }, 100);
+    
+    return () => clearTimeout(timer);
+  }, [fetchMatches]);
 
   return {
     matches,

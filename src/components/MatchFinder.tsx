@@ -34,14 +34,18 @@ const MatchFinder = () => {
     }
   }, [user, location, requestLocation]);
 
-  // Refetch matches when location changes
+  // Refetch matches when location changes (with debouncing)
   useEffect(() => {
-    if (location) {
-      refetch(location);
-    } else {
-      refetch();
-    }
-  }, [location, refetch, searchRadius]);
+    const timer = setTimeout(() => {
+      if (location) {
+        refetch(location);
+      } else {
+        refetch();
+      }
+    }, 300); // Debounce location changes
+
+    return () => clearTimeout(timer);
+  }, [location, searchRadius]); // Removed refetch from dependencies to prevent loops
 
   // Filter matches based on current filters
   const filteredMatches = useMemo(() => {
