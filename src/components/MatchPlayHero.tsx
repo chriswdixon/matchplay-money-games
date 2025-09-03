@@ -1,6 +1,6 @@
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Users, DollarSign, Trophy } from "lucide-react";
+import { MapPin, Users, DollarSign, Trophy, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserMenu } from "@/components/auth/UserMenu";
@@ -8,6 +8,13 @@ import heroImage from "@/assets/hero-golf-course.jpg";
 
 const MatchPlayHero = () => {
   const { user } = useAuth();
+
+  const handleScrollDown = () => {
+    const nextSection = document.querySelector('section:nth-of-type(2)');
+    if (nextSection) {
+      nextSection.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
   
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
@@ -125,6 +132,20 @@ const MatchPlayHero = () => {
           </div>
         </div>
       </div>
+
+      {/* Scroll Down Arrow */}
+      <button
+        onClick={handleScrollDown}
+        className="absolute bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors duration-300 animate-bounce cursor-pointer group"
+        aria-label="Scroll down to see more"
+      >
+        <div className="flex flex-col items-center gap-2">
+          <span className="text-sm font-medium group-hover:text-accent transition-colors">
+            Scroll Down
+          </span>
+          <ChevronDown className="w-6 h-6" />
+        </div>
+      </button>
     </section>
   );
 };
