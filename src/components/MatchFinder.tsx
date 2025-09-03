@@ -199,21 +199,11 @@ const MatchFinder = () => {
           </p>
           <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
             <CreateMatchDialog />
-            <div className="flex items-center gap-4">
-              <Button
-                variant="outline"
-                onClick={requestLocation}
-                className="flex items-center gap-2"
-              >
-                <Navigation className="w-4 h-4" />
-                {location ? 'Update Location' : 'Enable GPS'}
-              </Button>
-              {location && (
-                  <p className="text-sm text-muted-foreground">
-                    📍 Location enabled • Showing matches within {searchRadius}mi
-                  </p>
-              )}
-            </div>
+            {location && (
+              <p className="text-sm text-muted-foreground">
+                📍 Location enabled • Showing matches within {searchRadius}mi
+              </p>
+            )}
           </div>
         </div>
 
