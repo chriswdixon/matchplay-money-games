@@ -17,15 +17,20 @@ export const useGolfCourses = () => {
     try {
       setLoading(true);
       
+      // Convert miles to meters for the API
+      const radiusInMeters = radius * 1609.34;
+      
       // Using Overpass API to find golf courses near the location
       const overpassQuery = `
         [out:json][timeout:25];
         (
-          way["leisure"="golf_course"](around:${radius * 1609.34},${latitude},${longitude});
-          relation["leisure"="golf_course"](around:${radius * 1609.34},${latitude},${longitude});
+          way["leisure"="golf_course"](around:${radiusInMeters},${latitude},${longitude});
+          relation["leisure"="golf_course"](around:${radiusInMeters},${latitude},${longitude});
         );
         out center meta;
       `;
+      
+      console.log('Searching for golf courses with query:', overpassQuery);
       
       const response = await fetch('https://overpass-api.de/api/interpreter', {
         method: 'POST',
@@ -35,14 +40,18 @@ export const useGolfCourses = () => {
         body: `data=${encodeURIComponent(overpassQuery)}`
       });
 
+      console.log('Overpass API response status:', response.status);
+
       if (!response.ok) {
-        throw new Error('Failed to fetch golf courses');
+        console.error('Overpass API error:', response.status, response.statusText);
+        throw new Error(`API returned ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
+      console.log('Overpass API data:', data);
       
       const foundCourses: GolfCourse[] = data.elements
-        .map((element: any) => {
+        ?.map((element: any) => {
           const lat = element.type === 'way' ? element.center?.lat : element.lat;
           const lon = element.type === 'way' ? element.center?.lon : element.lon;
           
@@ -72,7 +81,9 @@ export const useGolfCourses = () => {
         })
         .filter((course: GolfCourse | null) => course !== null)
         .sort((a: GolfCourse, b: GolfCourse) => (a.distance || 0) - (b.distance || 0))
-        .slice(0, 20); // Limit to 20 courses
+        .slice(0, 20) || []; // Limit to 20 courses
+
+      console.log('Found courses:', foundCourses);
 
       // Add some popular courses if we don't find many
       if (foundCourses.length < 3) {
@@ -84,11 +95,18 @@ export const useGolfCourses = () => {
       return foundCourses;
     } catch (error) {
       console.error('Error fetching golf courses:', error);
-      toast.error('Failed to load nearby golf courses');
       
-      // Fallback to popular courses
+      // Always provide fallback popular courses
       const popularCourses = getPopularCourses(latitude, longitude);
       setCourses(popularCourses);
+      
+      // Only show error toast if we have no fallback courses
+      if (popularCourses.length === 0) {
+        toast.error('Failed to load nearby golf courses. Please try again or enter a course name manually.');
+      } else {
+        toast.info('Showing popular golf courses near you');
+      }
+      
       return popularCourses;
     } finally {
       setLoading(false);
