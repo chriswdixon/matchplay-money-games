@@ -41,6 +41,13 @@ export type Database = {
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "match_participants_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "public_matches"
+            referencedColumns: ["id"]
+          },
         ]
       }
       matches: {
@@ -130,6 +137,30 @@ export type Database = {
         }
         Relationships: []
       }
+      private_profile_data: {
+        Row: {
+          created_at: string
+          id: string
+          phone: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          phone?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profile_audit_log: {
         Row: {
           action: string
@@ -176,7 +207,6 @@ export type Database = {
           handicap: number | null
           id: string
           membership_tier: string | null
-          phone: string | null
           updated_at: string
           user_id: string
         }
@@ -187,7 +217,6 @@ export type Database = {
           handicap?: number | null
           id?: string
           membership_tier?: string | null
-          phone?: string | null
           updated_at?: string
           user_id: string
         }
@@ -198,7 +227,6 @@ export type Database = {
           handicap?: number | null
           id?: string
           membership_tier?: string | null
-          phone?: string | null
           updated_at?: string
           user_id?: string
         }
@@ -206,7 +234,63 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_matches: {
+        Row: {
+          address: string | null
+          buy_in_amount: number | null
+          course_name: string | null
+          created_at: string | null
+          format: string | null
+          handicap_max: number | null
+          handicap_min: number | null
+          id: string | null
+          is_creator: boolean | null
+          latitude: number | null
+          location: string | null
+          longitude: number | null
+          max_participants: number | null
+          scheduled_time: string | null
+          status: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          address?: never
+          buy_in_amount?: number | null
+          course_name?: string | null
+          created_at?: string | null
+          format?: string | null
+          handicap_max?: number | null
+          handicap_min?: number | null
+          id?: string | null
+          is_creator?: never
+          latitude?: never
+          location?: string | null
+          longitude?: never
+          max_participants?: number | null
+          scheduled_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          address?: never
+          buy_in_amount?: number | null
+          course_name?: string | null
+          created_at?: string | null
+          format?: string | null
+          handicap_max?: number | null
+          handicap_min?: number | null
+          id?: string | null
+          is_creator?: never
+          latitude?: never
+          location?: string | null
+          longitude?: never
+          max_participants?: number | null
+          scheduled_time?: string | null
+          status?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_distance: {
@@ -253,9 +337,17 @@ export type Database = {
         Args: { match_id: string }
         Returns: boolean
       }
+      is_match_participant: {
+        Args: { match_id: string; user_id: string }
+        Returns: boolean
+      }
       is_profile_owner: {
         Args: { profile_user_id: string }
         Returns: boolean
+      }
+      sanitize_text_input: {
+        Args: { input_text: string }
+        Returns: string
       }
       user_joined_match: {
         Args: { match_id: string; user_id: string }
