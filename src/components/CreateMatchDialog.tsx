@@ -158,6 +158,23 @@ const CreateMatchDialog = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="course_name">Golf Course</Label>
+            {!locationCoords && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGetCurrentLocation}
+                disabled={locationLoading}
+                className="w-full"
+              >
+                {locationLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <MapPin className="w-4 h-4 mr-2" />
+                )}
+                Find courses near me
+              </Button>
+            )}
             <Popover open={courseOpen} onOpenChange={setCourseOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -241,23 +258,6 @@ const CreateMatchDialog = () => {
                 </Command>
               </PopoverContent>
             </Popover>
-            {!locationCoords && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleGetCurrentLocation}
-                disabled={locationLoading}
-                className="w-full"
-              >
-                {locationLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <MapPin className="w-4 h-4 mr-2" />
-                )}
-                Find courses near me
-              </Button>
-            )}
           </div>
           
           <div className="space-y-2">
