@@ -33,6 +33,7 @@ const CreateMatchDialog = () => {
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [timeManuallySet, setTimeManuallySet] = useState(false);
+  const [hourDisplay, setHourDisplay] = useState('');
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
@@ -90,6 +91,7 @@ const CreateMatchDialog = () => {
     setSelectedCourse(null);
     setCourseOpen(false);
     setTimeManuallySet(false);
+    setHourDisplay('');
   };
 
   const handleDialogChange = (isOpen: boolean) => {
@@ -339,12 +341,13 @@ const CreateMatchDialog = () => {
                         min="1"
                         max="12"
                         placeholder="12"
-                        value={formData.scheduled_time ? (() => {
+                        value={hourDisplay || (formData.scheduled_time ? (() => {
                           const date = new Date(formData.scheduled_time);
                           const hours = date.getHours();
                           return hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-                        })() : ''}
+                        })() : '')}
                         onChange={(e) => {
+                          setHourDisplay(e.target.value);
                           const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
                           const inputHour = parseInt(e.target.value) || 1;
                           const isAM = currentDate.getHours() < 12;
@@ -356,6 +359,10 @@ const CreateMatchDialog = () => {
                           currentDate.setHours(hour24);
                           setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
                           setTimeManuallySet(true);
+                        }}
+                        onBlur={() => {
+                          // Clear display value on blur so it shows the formatted value
+                          setHourDisplay('');
                         }}
                         className="w-16 text-center"
                       />
