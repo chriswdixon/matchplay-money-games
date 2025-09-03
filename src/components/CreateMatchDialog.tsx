@@ -185,26 +185,28 @@ const CreateMatchDialog = () => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0 bg-background border shadow-lg z-50">
-                <Command className="bg-background">
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-background border shadow-lg z-[60]" align="start">
+                <Command className="bg-background border-0">
                   <CommandInput 
                     placeholder="Search golf courses..." 
                     onValueChange={handleCustomCourse}
+                    className="border-0 bg-background"
                   />
-                  <CommandEmpty>
+                  <CommandEmpty className="py-6 text-center">
                     {coursesLoading ? (
                       <div className="flex items-center justify-center py-4">
                         <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Loading nearby courses...
+                        <span className="text-muted-foreground">Loading nearby courses...</span>
                       </div>
                     ) : (
-                      <div className="py-4 text-center">
+                      <div className="py-4 text-center space-y-2">
                         <p className="text-sm text-muted-foreground mb-2">No courses found</p>
                         <Button
                           variant="outline"
                           size="sm"
                           onClick={handleGetCurrentLocation}
                           disabled={locationLoading}
+                          className="mx-auto"
                         >
                           <MapPin className="w-4 h-4 mr-2" />
                           Find nearby courses
@@ -212,12 +214,13 @@ const CreateMatchDialog = () => {
                       </div>
                     )}
                   </CommandEmpty>
-                  <CommandGroup className="max-h-60 overflow-auto">
+                  <CommandGroup className="max-h-60 overflow-auto p-1">
                     {courses.map((course) => (
                       <CommandItem
                         key={`${course.name}-${course.latitude}-${course.longitude}`}
                         onSelect={() => handleCourseSelect(course)}
-                        className="cursor-pointer"
+                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground"
+                        value={course.name}
                       >
                         <Check
                           className={cn(
@@ -225,7 +228,7 @@ const CreateMatchDialog = () => {
                             selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        <div className="flex flex-col">
+                        <div className="flex flex-col flex-1 gap-1">
                           <span className="font-medium">{course.name}</span>
                           <span className="text-xs text-muted-foreground">
                             {course.address}
