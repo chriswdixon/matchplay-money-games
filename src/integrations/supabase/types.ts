@@ -41,13 +41,6 @@ export type Database = {
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "match_participants_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "public_matches"
-            referencedColumns: ["id"]
-          },
         ]
       }
       matches: {
@@ -234,63 +227,7 @@ export type Database = {
       }
     }
     Views: {
-      public_matches: {
-        Row: {
-          address: string | null
-          buy_in_amount: number | null
-          course_name: string | null
-          created_at: string | null
-          format: string | null
-          handicap_max: number | null
-          handicap_min: number | null
-          id: string | null
-          is_creator: boolean | null
-          latitude: number | null
-          location: string | null
-          longitude: number | null
-          max_participants: number | null
-          scheduled_time: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          address?: never
-          buy_in_amount?: number | null
-          course_name?: string | null
-          created_at?: string | null
-          format?: string | null
-          handicap_max?: number | null
-          handicap_min?: number | null
-          id?: string | null
-          is_creator?: never
-          latitude?: never
-          location?: string | null
-          longitude?: never
-          max_participants?: number | null
-          scheduled_time?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          address?: never
-          buy_in_amount?: number | null
-          course_name?: string | null
-          created_at?: string | null
-          format?: string | null
-          handicap_max?: number | null
-          handicap_min?: number | null
-          id?: string | null
-          is_creator?: never
-          latitude?: never
-          location?: string | null
-          longitude?: never
-          max_participants?: number | null
-          scheduled_time?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       calculate_distance: {
@@ -311,6 +248,28 @@ export type Database = {
       get_match_participant_count: {
         Args: { match_id: string }
         Returns: number
+      }
+      get_match_with_location_filter: {
+        Args: { match_id: string }
+        Returns: {
+          address: string
+          buy_in_amount: number
+          course_name: string
+          created_at: string
+          format: string
+          handicap_max: number
+          handicap_min: number
+          id: string
+          is_creator: boolean
+          is_participant: boolean
+          latitude: number
+          location: string
+          longitude: number
+          max_participants: number
+          scheduled_time: string
+          status: string
+          updated_at: string
+        }[]
       }
       get_nearby_matches: {
         Args: { radius_km?: number; user_lat: number; user_lon: number }

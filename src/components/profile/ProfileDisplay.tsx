@@ -1,15 +1,17 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useProfile } from '@/hooks/useProfile';
+import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { User, Phone, Trophy, Calendar, Mail, Star } from 'lucide-react';
 import StarRating from '@/components/StarRating';
 
 export function ProfileDisplay() {
   const { profile, loading } = useProfile();
+  const { privateData, loading: privateLoading } = usePrivateProfile();
   const { user } = useAuth();
 
-  if (loading) {
+  if (loading || privateLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -79,12 +81,12 @@ export function ProfileDisplay() {
 
         {/* Profile Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {profile?.phone && (
+          {privateData?.phone && (
             <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
               <Phone className="w-4 h-4 text-muted-foreground" />
               <div>
                 <div className="text-sm font-medium">Phone</div>
-                <div className="text-sm text-muted-foreground">{profile.phone}</div>
+                <div className="text-sm text-muted-foreground">{privateData.phone}</div>
               </div>
             </div>
           )}
@@ -128,7 +130,7 @@ export function ProfileDisplay() {
         </div>
 
         {/* Empty State for Missing Info */}
-        {(!profile?.display_name && !profile?.phone && (profile?.handicap === null || profile?.handicap === undefined)) && (
+        {(!profile?.display_name && !privateData?.phone && (profile?.handicap === null || profile?.handicap === undefined)) && (
           <div className="text-center py-8 text-muted-foreground">
             <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
             <p>Complete your profile to get the most out of MatchPlay</p>

@@ -1,10 +1,11 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProfile } from '@/hooks/useProfile';
+import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { Save, User } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -12,18 +13,47 @@ type Profile = Tables<'profiles'>;
 
 export function ProfileForm() {
   const { profile, loading, updateProfile } = useProfile();
+  const { privateData, loading: privateLoading, updatePrivateData } = usePrivateProfile();
   const [saving, setSaving] = useState(false);
   const [formData, setFormData] = useState({
-    display_name: profile?.display_name || '',
-    phone: profile?.phone || '',
-    handicap: profile?.handicap?.toString() || '',
-    membership_tier: profile?.membership_tier || 'local',
+    display_name: '',
+    phone: '',
+    handicap: '',
+    membership_tier: 'local',
   });
 
+  // Update form data when profile loads
+  useEffect(() => {
+    if (profile) {
+      setFormData(prev => ({
+        ...prev,
+        display_name: profile.display_name || '',
+        handicap: profile.handicap?.toString() || '',
+        membership_tier: profile.membership_tier || 'local',
+      }));
+    }
+  }, [profile]);
+
+  // Update form data when private data loads
+  useEffect(() => {
+    if (privateData) {
+      setFormData(prev => ({
+        ...prev,
+        phone: privateData.phone || '',
+      }));
+    }
+  }, [privateData]);
+
   const handleInputChange = (field: string, value: string) => {
+    // Basic input sanitization for XSS prevention
+    const sanitizedValue = value
+      .replace(/<[^>]*>/g, '') // Remove HTML tags
+      .replace(/javascript:/gi, '') // Remove javascript: protocols
+      .replace(/on\w+\s*=/gi, ''); // Remove event handlers
+    
     setFormData(prev => ({
       ...prev,
-      [field]: value
+      [field]: sanitizedValue
     }));
   };
 
@@ -31,18 +61,32 @@ export function ProfileForm() {
     e.preventDefault();
     setSaving(true);
 
-    const updates: Partial<Profile> = {
-      display_name: formData.display_name || null,
-      phone: formData.phone || null,
-      handicap: formData.handicap ? parseFloat(formData.handicap) : null,
-      membership_tier: formData.membership_tier,
-    };
+    try {
+      // Update profile data (non-sensitive)
+      const profileUpdates: Partial<Profile> = {
+        display_name: formData.display_name?.trim() || null,
+        handicap: formData.handicap ? parseFloat(formData.handicap) : null,
+        membership_tier: formData.membership_tier,
+      };
 
-    await updateProfile(updates);
-    setSaving(false);
+      // Update private data (sensitive)
+      const privateUpdates = {
+        phone: formData.phone?.trim() || null,
+      };
+
+      // Update both profile and private data
+      await Promise.all([
+        updateProfile(profileUpdates),
+        updatePrivateData(privateUpdates)
+      ]);
+    } catch (error) {
+      console.error('Error updating profile:', error);
+    } finally {
+      setSaving(false);
+    }
   };
 
-  if (loading) {
+  if (loading || privateLoading) {
     return (
       <Card>
         <CardContent className="p-6">
