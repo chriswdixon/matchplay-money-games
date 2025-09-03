@@ -74,6 +74,28 @@ const CreateMatchDialog = () => {
     setSelectedCourse(null);
   };
 
+  const resetForm = () => {
+    setFormData({
+      course_name: '',
+      scheduled_time: '',
+      format: '',
+      buy_in_amount: '',
+      handicap_min: '',
+      handicap_max: '',
+      max_participants: '4'
+    });
+    setLocationCoords(null);
+    setSelectedCourse(null);
+    setCourseOpen(false);
+  };
+
+  const handleDialogChange = (isOpen: boolean) => {
+    setOpen(isOpen);
+    if (!isOpen) {
+      resetForm();
+    }
+  };
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,22 +123,12 @@ const CreateMatchDialog = () => {
     
     if (!error) {
       setOpen(false);
-      setFormData({
-        course_name: '',
-        scheduled_time: '',
-        format: '',
-        buy_in_amount: '',
-        handicap_min: '',
-        handicap_max: '',
-        max_participants: '4'
-      });
-      setLocationCoords(null);
-      setSelectedCourse(null);
+      resetForm();
     }
   };
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
+    <Dialog open={open} onOpenChange={handleDialogChange}>
       <DialogTrigger asChild>
         <Button 
           className="bg-gradient-primary text-primary-foreground hover:shadow-premium"
