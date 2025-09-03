@@ -2,15 +2,36 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap } from "lucide-react";
+import { Slider } from "@/components/ui/slider";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
+import { useLocation } from "@/hooks/useLocation";
 import CreateMatchDialog from "./CreateMatchDialog";
 import { format } from "date-fns";
+import { useState, useEffect } from "react";
 
 const MatchFinder = () => {
-  const { matches, loading, joinMatch, leaveMatch } = useMatches();
+  const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
+  const { location, requestLocation, formatDistance } = useLocation();
+  const [searchRadius, setSearchRadius] = useState(50);
+
+  // Request location on component mount
+  useEffect(() => {
+    if (user && !location) {
+      requestLocation();
+    }
+  }, [user, location, requestLocation]);
+
+  // Refetch matches when location changes
+  useEffect(() => {
+    if (location) {
+      refetch(location);
+    } else {
+      refetch();
+    }
+  }, [location, refetch, searchRadius]);
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
@@ -80,8 +101,23 @@ const MatchFinder = () => {
             No more playing alone. Connect with golfers in your area, book money matches, 
             and compete with confidence knowing every stroke counts.
           </p>
-          <div className="mt-8">
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
             <CreateMatchDialog />
+            <div className="flex items-center gap-4">
+              <Button
+                variant="outline"
+                onClick={requestLocation}
+                className="flex items-center gap-2"
+              >
+                <Navigation className="w-4 h-4" />
+                {location ? 'Update Location' : 'Enable GPS'}
+              </Button>
+              {location && (
+                <p className="text-sm text-muted-foreground">
+                  📍 Location enabled • Showing matches within {searchRadius}km
+                </p>
+              )}
+            </div>
           </div>
         </div>
 
@@ -136,6 +172,11 @@ const MatchFinder = () => {
                     <CardDescription className="flex items-center gap-2">
                       <MapPin className="w-4 h-4" />
                       {match.location}
+                      {match.distance_km && (
+                        <span className="text-primary font-medium">
+                          • {formatDistance(match.distance_km)}
+                        </span>
+                      )}
                     </CardDescription>
                   </CardHeader>
                   

@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus } from 'lucide-react';
+import { Plus, MapPin, Loader2 } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
+import { useLocation } from '@/hooks/useLocation';
 import { toast } from 'sonner';
 
 const CreateMatchDialog = () => {
@@ -15,6 +16,7 @@ const CreateMatchDialog = () => {
   const [formData, setFormData] = useState({
     course_name: '',
     location: '',
+    address: '',
     scheduled_time: '',
     format: '',
     buy_in_amount: '',
@@ -22,9 +24,36 @@ const CreateMatchDialog = () => {
     handicap_max: '',
     max_participants: '4'
   });
+  const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
+  const { getCurrentLocation, geocodeAddress, loading: locationLoading } = useLocation();
+
+  const handleGetCurrentLocation = async () => {
+    try {
+      const location = await getCurrentLocation();
+      setLocationCoords(location);
+      toast.success('Current location captured');
+    } catch (error) {
+      // Error is already handled by useLocation hook
+    }
+  };
+
+  const handleAddressChange = async (address: string) => {
+    setFormData({ ...formData, address });
+    
+    if (address.length > 10) {
+      try {
+        const coords = await geocodeAddress(address);
+        if (coords) {
+          setLocationCoords(coords);
+        }
+      } catch (error) {
+        console.error('Geocoding failed:', error);
+      }
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -37,6 +66,9 @@ const CreateMatchDialog = () => {
     const matchData = {
       course_name: formData.course_name,
       location: formData.location,
+      address: formData.address || undefined,
+      latitude: locationCoords?.latitude,
+      longitude: locationCoords?.longitude,
       scheduled_time: formData.scheduled_time,
       format: formData.format,
       buy_in_amount: parseInt(formData.buy_in_amount) * 100, // Convert to cents
@@ -52,6 +84,7 @@ const CreateMatchDialog = () => {
       setFormData({
         course_name: '',
         location: '',
+        address: '',
         scheduled_time: '',
         format: '',
         buy_in_amount: '',
@@ -59,6 +92,7 @@ const CreateMatchDialog = () => {
         handicap_max: '',
         max_participants: '4'
       });
+      setLocationCoords(null);
     }
   };
 
@@ -98,7 +132,7 @@ const CreateMatchDialog = () => {
           </div>
           
           <div className="space-y-2">
-            <Label htmlFor="location">Location</Label>
+            <Label htmlFor="location">City/Area</Label>
             <Input
               id="location"
               value={formData.location}
@@ -106,6 +140,37 @@ const CreateMatchDialog = () => {
               placeholder="e.g., Monterey, CA"
               required
             />
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="address">Course Address</Label>
+            <div className="flex gap-2">
+              <Input
+                id="address"
+                value={formData.address}
+                onChange={(e) => handleAddressChange(e.target.value)}
+                placeholder="123 Golf Course Dr, City, State"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={handleGetCurrentLocation}
+                disabled={locationLoading}
+                title="Use current location"
+              >
+                {locationLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <MapPin className="w-4 h-4" />
+                )}
+              </Button>
+            </div>
+            {locationCoords && (
+              <p className="text-xs text-muted-foreground">
+                📍 Location captured: {locationCoords.latitude.toFixed(4)}, {locationCoords.longitude.toFixed(4)}
+              </p>
+            )}
           </div>
           
           <div className="space-y-2">
