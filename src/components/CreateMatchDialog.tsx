@@ -8,7 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Plus, MapPin, Loader2, Check, ChevronsUpDown, Clock } from 'lucide-react';
+import { Plus, MapPin, Loader2, Check, ChevronsUpDown, Clock, X } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -20,6 +20,7 @@ import { format } from 'date-fns';
 const CreateMatchDialog = () => {
   const [open, setOpen] = useState(false);
   const [courseOpen, setCourseOpen] = useState(false);
+  const [dateTimeOpen, setDateTimeOpen] = useState(false);
   const [formData, setFormData] = useState({
     course_name: '',
     scheduled_time: '',
@@ -259,7 +260,7 @@ const CreateMatchDialog = () => {
           
           <div className="space-y-2">
             <Label htmlFor="scheduled_time">Date & Time</Label>
-            <Popover>
+            <Popover open={dateTimeOpen} onOpenChange={setDateTimeOpen}>
               <PopoverTrigger asChild>
                 <Button
                   variant="outline"
@@ -278,6 +279,17 @@ const CreateMatchDialog = () => {
               </PopoverTrigger>
               <PopoverContent className="w-auto p-0 bg-background border shadow-lg z-[100] pointer-events-auto" align="start">
                 <div className="p-4 space-y-4">
+                  <div className="flex items-center justify-between">
+                    <Label className="text-sm font-medium">Pick Date & Time</Label>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      className="h-6 w-6 p-0"
+                      onClick={() => setDateTimeOpen(false)}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Date</Label>
                     <Calendar
@@ -333,6 +345,16 @@ const CreateMatchDialog = () => {
                       }}
                       className="w-full"
                     />
+                  </div>
+                  <div className="flex justify-end pt-2">
+                    <Button 
+                      type="button"
+                      size="sm"
+                      onClick={() => setDateTimeOpen(false)}
+                      className="bg-gradient-primary text-primary-foreground"
+                    >
+                      Done
+                    </Button>
                   </div>
                 </div>
               </PopoverContent>
