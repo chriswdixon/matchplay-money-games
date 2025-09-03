@@ -99,21 +99,22 @@ export function ProfileDisplay() {
             </div>
           )}
 
-          {profile?.average_rating && (
-            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-              <Star className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <div className="text-sm font-medium">Player Rating</div>
-                <div className="flex items-center gap-2">
-                  <StarRating 
-                    rating={Number(profile.average_rating)} 
-                    size="sm" 
-                    className="justify-start" 
-                  />
-                </div>
+          <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
+            <Star className="w-4 h-4 text-muted-foreground" />
+            <div>
+              <div className="text-sm font-medium">Player Rating</div>
+              <div className="flex items-center gap-2">
+                <StarRating 
+                  rating={profile?.average_rating ? Number(profile.average_rating) : 0} 
+                  size="sm" 
+                  className="justify-start" 
+                />
+                {!profile?.average_rating && (
+                  <span className="text-xs text-muted-foreground">No ratings yet</span>
+                )}
               </div>
             </div>
-          )}
+          </div>
 
           <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
             <Calendar className="w-4 h-4 text-muted-foreground" />
