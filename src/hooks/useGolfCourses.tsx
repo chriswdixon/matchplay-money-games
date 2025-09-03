@@ -12,6 +12,8 @@ export interface GolfCourse {
 export const useGolfCourses = () => {
   const [courses, setCourses] = useState<GolfCourse[]>([]);
   const [loading, setLoading] = useState(false);
+  const [allCourses, setAllCourses] = useState<GolfCourse[]>([]);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 15) => {
     try {
@@ -92,6 +94,7 @@ export const useGolfCourses = () => {
       }
 
       setCourses(foundCourses);
+      setAllCourses(foundCourses);
       return foundCourses;
     } catch (error) {
       console.error('Error fetching golf courses:', error);
@@ -99,6 +102,7 @@ export const useGolfCourses = () => {
       // Always provide fallback popular courses
       const popularCourses = getPopularCourses(latitude, longitude);
       setCourses(popularCourses);
+      setAllCourses(popularCourses);
       
       // Only show error toast if we have no fallback courses
       if (popularCourses.length === 0) {
@@ -147,6 +151,73 @@ export const useGolfCourses = () => {
     })).sort((a, b) => a.distance - b.distance).slice(0, 5);
   };
 
+  const searchCoursesByName = (searchTermInput: string): GolfCourse[] => {
+    setSearchTerm(searchTermInput);
+    
+    if (!searchTermInput || searchTermInput.length < 2) {
+      const defaultCourses = allCourses.slice(0, 10);
+      setCourses(defaultCourses);
+      return defaultCourses;
+    }
+
+    const lowerSearchTerm = searchTermInput.toLowerCase();
+    
+    // Get all popular courses for broader search
+    const allPopularCourses = [
+      { name: "Pebble Beach Golf Links", address: "1700 17-Mile Drive, Pebble Beach, CA", lat: 36.5694, lon: -121.9469 },
+      { name: "Augusta National Golf Club", address: "2604 Washington Road, Augusta, GA", lat: 33.5028, lon: -82.0201 },
+      { name: "TPC Sawgrass", address: "110 Championship Way, Ponte Vedra Beach, FL", lat: 30.1958, lon: -81.3959 },
+      { name: "Bethpage Black Course", address: "99 Quaker Meeting House Rd, Farmingdale, NY", lat: 40.7456, lon: -73.4593 },
+      { name: "Torrey Pines Golf Course", address: "11480 N Torrey Pines Rd, La Jolla, CA", lat: 32.8998, lon: -117.2573 },
+      { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981 },
+      { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678 },
+      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364 },
+      { name: "Spyglass Hill Golf Course", address: "Spyglass Hill Rd, Pebble Beach, CA", lat: 36.5833, lon: -121.9500 },
+      { name: "TPC Stadium Course", address: "80080 Avenue 52, La Quinta, CA", lat: 33.6603, lon: -116.2733 },
+      { name: "Oakmont Country Club", address: "1233 Hulton Rd, Oakmont, PA", lat: 40.5214, lon: -79.8431 },
+      { name: "Winged Foot Golf Club", address: "851 Fenimore Rd, Mamaroneck, NY", lat: 40.9506, lon: -73.7632 },
+      { name: "Shinnecock Hills Golf Club", address: "200 Tuckahoe Rd, Southampton, NY", lat: 40.8922, lon: -72.4575 },
+      { name: "Chambers Bay", address: "6320 Grandview Dr W, University Place, WA", lat: 47.2089, lon: -122.5661 },
+      { name: "Congressional Country Club", address: "8500 River Rd, Bethesda, MD", lat: 38.9833, lon: -77.1167 }
+    ].map(course => ({
+      name: course.name,
+      address: course.address,
+      latitude: course.lat,
+      longitude: course.lon
+    }));
+
+    // Combine local courses and popular courses for search
+    const searchableCourses = [...allCourses, ...allPopularCourses];
+    
+    // Remove duplicates based on name
+    const uniqueCourses = searchableCourses.filter((course, index, array) => 
+      array.findIndex(c => c.name.toLowerCase() === course.name.toLowerCase()) === index
+    );
+
+    // Filter courses based on search term (name or address)
+    const filteredCourses = uniqueCourses.filter(course => 
+      course.name.toLowerCase().includes(lowerSearchTerm) ||
+      course.address.toLowerCase().includes(lowerSearchTerm)
+    );
+
+    // Sort by relevance (exact name matches first, then partial matches)
+    const sortedCourses = filteredCourses.sort((a, b) => {
+      const aNameMatch = a.name.toLowerCase().includes(lowerSearchTerm);
+      const bNameMatch = b.name.toLowerCase().includes(lowerSearchTerm);
+      const aExactMatch = a.name.toLowerCase().startsWith(lowerSearchTerm);
+      const bExactMatch = b.name.toLowerCase().startsWith(lowerSearchTerm);
+      
+      if (aExactMatch && !bExactMatch) return -1;
+      if (!aExactMatch && bExactMatch) return 1;
+      if (aNameMatch && !bNameMatch) return -1;
+      if (!aNameMatch && bNameMatch) return 1;
+      return a.name.localeCompare(b.name);
+    }).slice(0, 15); // Limit to 15 results
+    
+    setCourses(sortedCourses);
+    return sortedCourses;
+  };
+
   const formatDistance = (distanceMiles: number): string => {
     if (distanceMiles < 1) {
       return `${Math.round(distanceMiles * 5280)}ft`;
@@ -161,6 +232,7 @@ export const useGolfCourses = () => {
     courses,
     loading,
     searchNearbyCourses,
+    searchCoursesByName,
     formatDistance
   };
 };

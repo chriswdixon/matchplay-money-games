@@ -38,7 +38,7 @@ const CreateMatchDialog = () => {
   const { createMatch } = useMatches();
   const { user } = useAuth();
   const { getCurrentLocation, geocodeAddress, loading: locationLoading } = useLocation();
-  const { courses, loading: coursesLoading, searchNearbyCourses, formatDistance } = useGolfCourses();
+  const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
 
   // Search for nearby courses when location is available
   useEffect(() => {
@@ -46,6 +46,13 @@ const CreateMatchDialog = () => {
       searchNearbyCourses(locationCoords.latitude, locationCoords.longitude);
     }
   }, [locationCoords, courses.length, searchNearbyCourses]);
+
+  // Initialize search with all courses when dialog opens
+  useEffect(() => {
+    if (open && courses.length === 0) {
+      searchCoursesByName(''); // This will show popular courses
+    }
+  }, [open, courses.length, searchCoursesByName]);
 
   const handleGetCurrentLocation = async () => {
     try {
@@ -75,6 +82,9 @@ const CreateMatchDialog = () => {
   const handleCustomCourse = (courseName: string) => {
     setFormData({ ...formData, course_name: courseName });
     setSelectedCourse(null);
+    
+    // Trigger search for courses by name
+    searchCoursesByName(courseName);
   };
 
   const resetForm = () => {
