@@ -45,6 +45,7 @@ export type Database = {
       }
       matches: {
         Row: {
+          address: string | null
           buy_in_amount: number
           course_name: string
           created_at: string
@@ -53,13 +54,16 @@ export type Database = {
           handicap_max: number | null
           handicap_min: number | null
           id: string
+          latitude: number | null
           location: string
+          longitude: number | null
           max_participants: number
           scheduled_time: string
           status: string
           updated_at: string
         }
         Insert: {
+          address?: string | null
           buy_in_amount?: number
           course_name: string
           created_at?: string
@@ -68,13 +72,16 @@ export type Database = {
           handicap_max?: number | null
           handicap_min?: number | null
           id?: string
+          latitude?: number | null
           location: string
+          longitude?: number | null
           max_participants?: number
           scheduled_time: string
           status?: string
           updated_at?: string
         }
         Update: {
+          address?: string | null
           buy_in_amount?: number
           course_name?: string
           created_at?: string
@@ -83,7 +90,9 @@ export type Database = {
           handicap_max?: number | null
           handicap_min?: number | null
           id?: string
+          latitude?: number | null
           location?: string
+          longitude?: number | null
           max_participants?: number
           scheduled_time?: string
           status?: string
@@ -129,9 +138,26 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      calculate_distance: {
+        Args: { lat1: number; lat2: number; lon1: number; lon2: number }
+        Returns: number
+      }
       get_match_participant_count: {
         Args: { match_id: string }
         Returns: number
+      }
+      get_nearby_matches: {
+        Args: { radius_km?: number; user_lat: number; user_lon: number }
+        Returns: {
+          address: string
+          buy_in_amount: number
+          course_name: string
+          distance_km: number
+          format: string
+          id: string
+          location: string
+          scheduled_time: string
+        }[]
       }
       user_joined_match: {
         Args: { match_id: string; user_id: string }
