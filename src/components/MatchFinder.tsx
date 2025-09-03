@@ -16,12 +16,12 @@ const MatchFinder = () => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
-  const [searchRadius, setSearchRadius] = useState(50);
+  const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
   const [filters, setFilters] = useState<FilterType>({
     search: '',
     format: 'all',
-    maxDistance: 50,
+    maxDistance: 30,
     buyInRange: [0, 500] as [number, number],
     dateRange: 'all',
     spots: 'all'
@@ -63,7 +63,7 @@ const MatchFinder = () => {
     }
 
     // Distance filter
-    if (filters.maxDistance !== 50) {
+    if (filters.maxDistance !== 30) {
       filtered = filtered.filter(match => 
         !match.distance_km || match.distance_km <= filters.maxDistance
       );
@@ -205,9 +205,9 @@ const MatchFinder = () => {
                 {location ? 'Update Location' : 'Enable GPS'}
               </Button>
               {location && (
-                <p className="text-sm text-muted-foreground">
-                  📍 Location enabled • Showing matches within {searchRadius}km
-                </p>
+                  <p className="text-sm text-muted-foreground">
+                    📍 Location enabled • Showing matches within {searchRadius}mi
+                  </p>
               )}
             </div>
           </div>
@@ -257,7 +257,7 @@ const MatchFinder = () => {
                   <Button variant="outline" onClick={() => setFilters({
                     search: '',
                     format: 'all', 
-                    maxDistance: 50,
+                    maxDistance: 30,
                     buyInRange: [0, 500],
                     dateRange: 'all',
                     spots: 'all'

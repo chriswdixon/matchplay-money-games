@@ -112,7 +112,7 @@ export const useLocation = () => {
     lat2: number,
     lon2: number
   ): number => {
-    const R = 6371; // Earth's radius in kilometers
+    const R = 3959; // Earth's radius in miles
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -123,13 +123,13 @@ export const useLocation = () => {
     return R * c;
   };
 
-  const formatDistance = (distanceKm: number): string => {
-    if (distanceKm < 1) {
-      return `${Math.round(distanceKm * 1000)}m`;
-    } else if (distanceKm < 10) {
-      return `${distanceKm.toFixed(1)}km`;
+  const formatDistance = (distanceMiles: number): string => {
+    if (distanceMiles < 1) {
+      return `${Math.round(distanceMiles * 5280)}ft`;
+    } else if (distanceMiles < 10) {
+      return `${distanceMiles.toFixed(1)}mi`;
     } else {
-      return `${Math.round(distanceKm)}km`;
+      return `${Math.round(distanceMiles)}mi`;
     }
   };
 

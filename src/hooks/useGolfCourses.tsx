@@ -13,7 +13,7 @@ export const useGolfCourses = () => {
   const [courses, setCourses] = useState<GolfCourse[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 25) => {
+  const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 15) => {
     try {
       setLoading(true);
       
@@ -21,8 +21,8 @@ export const useGolfCourses = () => {
       const overpassQuery = `
         [out:json][timeout:25];
         (
-          way["leisure"="golf_course"](around:${radius * 1000},${latitude},${longitude});
-          relation["leisure"="golf_course"](around:${radius * 1000},${latitude},${longitude});
+          way["leisure"="golf_course"](around:${radius * 1609.34},${latitude},${longitude});
+          relation["leisure"="golf_course"](around:${radius * 1609.34},${latitude},${longitude});
         );
         out center meta;
       `;
@@ -96,7 +96,7 @@ export const useGolfCourses = () => {
   };
 
   const calculateDistance = (lat1: number, lon1: number, lat2: number, lon2: number): number => {
-    const R = 6371; // Earth's radius in kilometers
+    const R = 3959; // Earth's radius in miles
     const dLat = (lat2 - lat1) * Math.PI / 180;
     const dLon = (lon2 - lon1) * Math.PI / 180;
     const a = 
@@ -129,13 +129,13 @@ export const useGolfCourses = () => {
     })).sort((a, b) => a.distance - b.distance).slice(0, 5);
   };
 
-  const formatDistance = (distanceKm: number): string => {
-    if (distanceKm < 1) {
-      return `${Math.round(distanceKm * 1000)}m`;
-    } else if (distanceKm < 10) {
-      return `${distanceKm.toFixed(1)}km`;
+  const formatDistance = (distanceMiles: number): string => {
+    if (distanceMiles < 1) {
+      return `${Math.round(distanceMiles * 5280)}ft`;
+    } else if (distanceMiles < 10) {
+      return `${distanceMiles.toFixed(1)}mi`;
     } else {
-      return `${Math.round(distanceKm)}km`;
+      return `${Math.round(distanceMiles)}mi`;
     }
   };
 

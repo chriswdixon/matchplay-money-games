@@ -42,7 +42,7 @@ const MatchFilters = ({
     onFiltersChange({
       search: '',
       format: 'all',
-      maxDistance: 50,
+      maxDistance: 30,
       buyInRange: [0, 500],
       dateRange: 'all',
       spots: 'all'
@@ -52,7 +52,7 @@ const MatchFilters = ({
   const hasActiveFilters = 
     filters.search || 
     filters.format !== 'all' || 
-    filters.maxDistance !== 50 || 
+    filters.maxDistance !== 30 || 
     filters.buyInRange[0] !== 0 || 
     filters.buyInRange[1] !== 500 ||
     filters.dateRange !== 'all' ||
@@ -82,7 +82,7 @@ const MatchFilters = ({
             {hasActiveFilters && (
               <Badge variant="secondary" className="ml-1 px-1.5 py-0.5 text-xs">
                 {Object.values(filters).filter(v => 
-                  v !== '' && v !== 'all' && v !== 50 && !Array.isArray(v)
+                  v !== '' && v !== 'all' && v !== 30 && !Array.isArray(v)
                 ).length + (filters.buyInRange[0] !== 0 || filters.buyInRange[1] !== 500 ? 1 : 0)}
               </Badge>
             )}
@@ -193,19 +193,19 @@ const MatchFilters = ({
               <div className="space-y-3">
                 <Label className="flex items-center gap-2">
                   <MapPin className="h-4 w-4" />
-                  Max Distance: {filters.maxDistance}km
+                  Max Distance: {filters.maxDistance}mi
                 </Label>
                 <Slider
                   value={[filters.maxDistance]}
                   onValueChange={([value]) => updateFilter('maxDistance', value)}
-                  max={100}
-                  min={5}
-                  step={5}
+                  max={60}
+                  min={3}
+                  step={3}
                   className="w-full"
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
-                  <span>5km</span>
-                  <span>100km</span>
+                  <span>3mi</span>
+                  <span>60mi</span>
                 </div>
               </div>
 
