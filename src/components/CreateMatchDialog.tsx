@@ -271,9 +271,21 @@ const CreateMatchDialog = () => {
                       selected={formData.scheduled_time ? new Date(formData.scheduled_time) : undefined}
                       onSelect={(date) => {
                         if (date) {
-                          const currentTime = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                          const today = new Date();
+                          const selectedDate = new Date(date);
                           const newDateTime = new Date(date);
-                          newDateTime.setHours(currentTime.getHours(), currentTime.getMinutes());
+                          
+                          // Check if selected date is today
+                          const isToday = selectedDate.toDateString() === today.toDateString();
+                          
+                          if (isToday) {
+                            // Use current time for today
+                            newDateTime.setHours(today.getHours(), today.getMinutes());
+                          } else {
+                            // Default to 7am for future dates
+                            newDateTime.setHours(7, 0);
+                          }
+                          
                           setFormData({ ...formData, scheduled_time: newDateTime.toISOString().slice(0, 16) });
                         }
                       }}
