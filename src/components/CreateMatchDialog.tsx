@@ -22,8 +22,6 @@ const CreateMatchDialog = () => {
   const [courseOpen, setCourseOpen] = useState(false);
   const [formData, setFormData] = useState({
     course_name: '',
-    location: '',
-    address: '',
     scheduled_time: '',
     format: '',
     buy_in_amount: '',
@@ -62,8 +60,7 @@ const CreateMatchDialog = () => {
     setSelectedCourse(course);
     setFormData({ 
       ...formData, 
-      course_name: course.name,
-      address: course.address 
+      course_name: course.name
     });
     setLocationCoords({
       latitude: course.latitude,
@@ -77,20 +74,6 @@ const CreateMatchDialog = () => {
     setSelectedCourse(null);
   };
 
-  const handleAddressChange = async (address: string) => {
-    setFormData({ ...formData, address });
-    
-    if (address.length > 10) {
-      try {
-        const coords = await geocodeAddress(address);
-        if (coords) {
-          setLocationCoords(coords);
-        }
-      } catch (error) {
-        console.error('Geocoding failed:', error);
-      }
-    }
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,8 +85,8 @@ const CreateMatchDialog = () => {
 
     const matchData = {
       course_name: formData.course_name,
-      location: formData.location,
-      address: formData.address || undefined,
+      location: selectedCourse?.address?.split(',').slice(-2).join(',').trim() || formData.course_name,
+      address: selectedCourse?.address || undefined,
       latitude: locationCoords?.latitude,
       longitude: locationCoords?.longitude,
       scheduled_time: formData.scheduled_time,
@@ -120,8 +103,6 @@ const CreateMatchDialog = () => {
       setOpen(false);
       setFormData({
         course_name: '',
-        location: '',
-        address: '',
         scheduled_time: '',
         format: '',
         buy_in_amount: '',
@@ -259,48 +240,6 @@ const CreateMatchDialog = () => {
                 )}
                 Find courses near me
               </Button>
-            )}
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="location">City/Area</Label>
-            <Input
-              id="location"
-              value={formData.location}
-              onChange={(e) => setFormData({ ...formData, location: e.target.value })}
-              placeholder="e.g., Monterey, CA"
-              required
-            />
-          </div>
-          
-          <div className="space-y-2">
-            <Label htmlFor="address">Course Address</Label>
-            <div className="flex gap-2">
-              <Input
-                id="address"
-                value={formData.address}
-                onChange={(e) => handleAddressChange(e.target.value)}
-                placeholder="123 Golf Course Dr, City, State"
-              />
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={handleGetCurrentLocation}
-                disabled={locationLoading}
-                title="Use current location"
-              >
-                {locationLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin" />
-                ) : (
-                  <MapPin className="w-4 h-4" />
-                )}
-              </Button>
-            </div>
-            {locationCoords && (
-              <p className="text-xs text-muted-foreground">
-                📍 Location captured: {locationCoords.latitude.toFixed(4)}, {locationCoords.longitude.toFixed(4)}
-              </p>
             )}
           </div>
           
