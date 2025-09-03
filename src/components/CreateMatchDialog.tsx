@@ -7,13 +7,15 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { Plus, MapPin, Loader2, Check, ChevronsUpDown } from 'lucide-react';
+import { Calendar } from '@/components/ui/calendar';
+import { Plus, MapPin, Loader2, Check, ChevronsUpDown, Clock } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 const CreateMatchDialog = () => {
   const [open, setOpen] = useState(false);
@@ -299,13 +301,60 @@ const CreateMatchDialog = () => {
           
           <div className="space-y-2">
             <Label htmlFor="scheduled_time">Date & Time</Label>
-            <Input
-              id="scheduled_time"
-              type="datetime-local"
-              value={formData.scheduled_time}
-              onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
-              required
-            />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn(
+                    "w-full justify-start text-left font-normal",
+                    !formData.scheduled_time && "text-muted-foreground"
+                  )}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  {formData.scheduled_time ? (
+                    format(new Date(formData.scheduled_time), "PPP 'at' p")
+                  ) : (
+                    <span>Pick date and time</span>
+                  )}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0 bg-background border shadow-lg z-50" align="start">
+                <div className="p-4 space-y-4">
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Date</Label>
+                    <Calendar
+                      mode="single"
+                      selected={formData.scheduled_time ? new Date(formData.scheduled_time) : undefined}
+                      onSelect={(date) => {
+                        if (date) {
+                          const currentTime = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                          const newDateTime = new Date(date);
+                          newDateTime.setHours(currentTime.getHours(), currentTime.getMinutes());
+                          setFormData({ ...formData, scheduled_time: newDateTime.toISOString().slice(0, 16) });
+                        }
+                      }}
+                      disabled={(date) => date < new Date()}
+                      initialFocus
+                      className="pointer-events-auto"
+                    />
+                  </div>
+                  <div>
+                    <Label className="text-sm font-medium mb-2 block">Time</Label>
+                    <Input
+                      type="time"
+                      value={formData.scheduled_time ? new Date(formData.scheduled_time).toTimeString().slice(0, 5) : ''}
+                      onChange={(e) => {
+                        const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                        const [hours, minutes] = e.target.value.split(':');
+                        currentDate.setHours(parseInt(hours), parseInt(minutes));
+                        setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                      }}
+                      className="w-full"
+                    />
+                  </div>
+                </div>
+              </PopoverContent>
+            </Popover>
           </div>
           
           <div className="space-y-2">

@@ -8,14 +8,24 @@ import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
 import CreateMatchDialog from "./CreateMatchDialog";
+import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import { format } from "date-fns";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 
 const MatchFinder = () => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
   const [searchRadius, setSearchRadius] = useState(50);
+  const [showFilters, setShowFilters] = useState(false);
+  const [filters, setFilters] = useState<FilterType>({
+    search: '',
+    format: 'all',
+    maxDistance: 50,
+    buyInRange: [0, 500] as [number, number],
+    dateRange: 'all',
+    spots: 'all'
+  });
 
   // Request location on component mount
   useEffect(() => {
@@ -32,6 +42,88 @@ const MatchFinder = () => {
       refetch();
     }
   }, [location, refetch, searchRadius]);
+
+  // Filter matches based on current filters
+  const filteredMatches = useMemo(() => {
+    let filtered = [...matches];
+
+    // Search filter
+    if (filters.search) {
+      const searchLower = filters.search.toLowerCase();
+      filtered = filtered.filter(match => 
+        match.course_name.toLowerCase().includes(searchLower) ||
+        match.location.toLowerCase().includes(searchLower) ||
+        match.address?.toLowerCase().includes(searchLower)
+      );
+    }
+
+    // Format filter
+    if (filters.format !== 'all') {
+      filtered = filtered.filter(match => match.format === filters.format);
+    }
+
+    // Distance filter
+    if (filters.maxDistance !== 50) {
+      filtered = filtered.filter(match => 
+        !match.distance_km || match.distance_km <= filters.maxDistance
+      );
+    }
+
+    // Buy-in filter
+    const [minBuyIn, maxBuyIn] = filters.buyInRange;
+    filtered = filtered.filter(match => {
+      const buyInDollars = match.buy_in_amount / 100;
+      return buyInDollars >= minBuyIn && buyInDollars <= maxBuyIn;
+    });
+
+    // Date filter
+    if (filters.dateRange !== 'all') {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const tomorrow = new Date(today);
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      const weekEnd = new Date(today);
+      weekEnd.setDate(weekEnd.getDate() + 7);
+
+      filtered = filtered.filter(match => {
+        const matchDate = new Date(match.scheduled_time);
+        const matchDay = new Date(matchDate.getFullYear(), matchDate.getMonth(), matchDate.getDate());
+
+        switch (filters.dateRange) {
+          case 'today':
+            return matchDay.getTime() === today.getTime();
+          case 'tomorrow':
+            return matchDay.getTime() === tomorrow.getTime();
+          case 'week':
+            return matchDate >= today && matchDate <= weekEnd;
+          case 'weekend':
+            const dayOfWeek = matchDay.getDay();
+            return (dayOfWeek === 0 || dayOfWeek === 6) && matchDate >= today;
+          default:
+            return true;
+        }
+      });
+    }
+
+    // Spots filter
+    if (filters.spots !== 'all') {
+      filtered = filtered.filter(match => {
+        const availableSpots = match.max_participants - (match.participant_count || 0);
+        switch (filters.spots) {
+          case '1':
+            return availableSpots >= 1;
+          case '2+':
+            return availableSpots >= 2;
+          case '3+':
+            return availableSpots >= 3;
+          default:
+            return true;
+        }
+      });
+    }
+
+    return filtered;
+  }, [matches, filters]);
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
@@ -121,8 +213,17 @@ const MatchFinder = () => {
           </div>
         </div>
 
+        {/* Match Filters */}
+        <MatchFilters
+          filters={filters}
+          onFiltersChange={setFilters}
+          matchCount={filteredMatches.length}
+          showFilters={showFilters}
+          onToggleFilters={() => setShowFilters(!showFilters)}
+        />
+
         {/* Live Matches */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 mb-12">
+        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           {loading ? (
             // Loading skeletons
             Array.from({ length: 6 }, (_, index) => (
@@ -143,12 +244,31 @@ const MatchFinder = () => {
                 </CardContent>
               </Card>
             ))
-          ) : matches.length === 0 ? (
+          ) : filteredMatches.length === 0 ? (
             <div className="col-span-full text-center py-12">
-              <p className="text-muted-foreground text-lg">No matches found. Be the first to create one!</p>
+              {matches.length === 0 ? (
+                <div>
+                  <p className="text-muted-foreground text-lg mb-4">No matches found. Be the first to create one!</p>
+                  <CreateMatchDialog />
+                </div>
+              ) : (
+                <div>
+                  <p className="text-muted-foreground text-lg mb-4">No matches match your filters.</p>
+                  <Button variant="outline" onClick={() => setFilters({
+                    search: '',
+                    format: 'all', 
+                    maxDistance: 50,
+                    buyInRange: [0, 500],
+                    dateRange: 'all',
+                    spots: 'all'
+                  })}>
+                    Clear Filters
+                  </Button>
+                </div>
+              )}
             </div>
           ) : (
-            matches.map((match, index) => {
+            filteredMatches.map((match, index) => {
               const isFull = isMatchFull(match);
               const isCreatedRecently = new Date(match.created_at) > new Date(Date.now() - 5 * 60 * 1000); // Within 5 minutes
               
