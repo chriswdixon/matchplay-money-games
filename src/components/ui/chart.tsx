@@ -42,7 +42,9 @@ const ChartContainer = React.forwardRef<
   }
 >(({ id, className, children, config, ...props }, ref) => {
   const uniqueId = React.useId()
-  const chartId = `chart-${id || uniqueId.replace(/:/g, "")}`
+  // Sanitize id to prevent CSS injection - only allow alphanumeric characters and hyphens
+  const sanitizedId = id ? id.replace(/[^a-zA-Z0-9-]/g, '') : uniqueId.replace(/:/g, "")
+  const chartId = `chart-${sanitizedId}`
 
   return (
     <ChartContext.Provider value={{ config }}>
@@ -74,20 +76,36 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
     return null
   }
 
+  // Sanitize color values to prevent CSS injection
+  const sanitizeColor = (color: string): string => {
+    // Only allow valid CSS color formats (hex, hsl, rgb, named colors)
+    const colorRegex = /^(#[0-9a-fA-F]{3,8}|hsl\([\d\s,%.]+\)|rgb\([\d\s,%.]+\)|[a-zA-Z]+)$/
+    return colorRegex.test(color.trim()) ? color.trim() : 'transparent'
+  }
+
+  // Sanitize key names to prevent CSS injection
+  const sanitizeKey = (key: string): string => {
+    return key.replace(/[^a-zA-Z0-9-_]/g, '')
+  }
+
   return (
     <style
       dangerouslySetInnerHTML={{
         __html: Object.entries(THEMES)
           .map(
             ([theme, prefix]) => `
-${prefix} [data-chart=${id}] {
+${prefix} [data-chart="${id}"] {
 ${colorConfig
   .map(([key, itemConfig]) => {
     const color =
       itemConfig.theme?.[theme as keyof typeof itemConfig.theme] ||
       itemConfig.color
-    return color ? `  --color-${key}: ${color};` : null
+    if (!color) return null
+    const sanitizedColor = sanitizeColor(color)
+    const sanitizedKey = sanitizeKey(key)
+    return sanitizedColor !== 'transparent' ? `  --color-${sanitizedKey}: ${sanitizedColor};` : null
   })
+  .filter(Boolean)
   .join("\n")}
 }
 `
