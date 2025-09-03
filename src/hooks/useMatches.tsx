@@ -317,6 +317,25 @@ export const useMatches = () => {
     }
   };
 
+  const isMatchCreator = useCallback(async (matchId: string): Promise<boolean> => {
+    if (!user) return false;
+    
+    try {
+      const { data, error } = await supabase
+        .rpc('is_match_creator', { match_id: matchId });
+      
+      if (error) {
+        console.error('Error checking match creator:', error);
+        return false;
+      }
+      
+      return data || false;
+    } catch (error) {
+      console.error('Error checking match creator:', error);
+      return false;
+    }
+  }, [user]);
+
   // Cleanup function
   useEffect(() => {
     return () => {
@@ -345,6 +364,7 @@ export const useMatches = () => {
     createMatch,
     joinMatch,
     leaveMatch,
+    isMatchCreator,
     refetch: fetchMatches
   };
 };

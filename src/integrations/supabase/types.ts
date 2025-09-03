@@ -41,13 +41,6 @@ export type Database = {
             referencedRelation: "matches"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "match_participants_match_id_fkey"
-            columns: ["match_id"]
-            isOneToOne: false
-            referencedRelation: "public_matches"
-            referencedColumns: ["id"]
-          },
         ]
       }
       matches: {
@@ -175,63 +168,7 @@ export type Database = {
       }
     }
     Views: {
-      public_matches: {
-        Row: {
-          address: string | null
-          buy_in_amount: number | null
-          course_name: string | null
-          created_at: string | null
-          created_by: string | null
-          format: string | null
-          handicap_max: number | null
-          handicap_min: number | null
-          id: string | null
-          latitude: number | null
-          location: string | null
-          longitude: number | null
-          max_participants: number | null
-          scheduled_time: string | null
-          status: string | null
-          updated_at: string | null
-        }
-        Insert: {
-          address?: string | null
-          buy_in_amount?: number | null
-          course_name?: string | null
-          created_at?: string | null
-          created_by?: never
-          format?: string | null
-          handicap_max?: number | null
-          handicap_min?: number | null
-          id?: string | null
-          latitude?: number | null
-          location?: string | null
-          longitude?: number | null
-          max_participants?: number | null
-          scheduled_time?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          address?: string | null
-          buy_in_amount?: number | null
-          course_name?: string | null
-          created_at?: string | null
-          created_by?: never
-          format?: string | null
-          handicap_max?: number | null
-          handicap_min?: number | null
-          id?: string | null
-          latitude?: number | null
-          location?: string | null
-          longitude?: number | null
-          max_participants?: number | null
-          scheduled_time?: string | null
-          status?: string | null
-          updated_at?: string | null
-        }
-        Relationships: []
-      }
+      [_ in never]: never
     }
     Functions: {
       calculate_distance: {
