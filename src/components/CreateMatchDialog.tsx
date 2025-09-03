@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Plus } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
+import { toast } from 'sonner';
 
 const CreateMatchDialog = () => {
   const [open, setOpen] = useState(false);
@@ -29,6 +30,7 @@ const CreateMatchDialog = () => {
     e.preventDefault();
     
     if (!user) {
+      toast.error('Please sign in to create a match');
       return;
     }
 
@@ -60,16 +62,20 @@ const CreateMatchDialog = () => {
     }
   };
 
-  if (!user) {
-    return null;
-  }
-
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button className="bg-gradient-primary text-primary-foreground hover:shadow-premium">
+        <Button 
+          className="bg-gradient-primary text-primary-foreground hover:shadow-premium"
+          onClick={(e) => {
+            if (!user) {
+              e.preventDefault();
+              toast.error('Please sign in to create matches');
+            }
+          }}
+        >
           <Plus className="w-4 h-4 mr-2" />
-          Create Match
+          {user ? 'Create Match' : 'Sign In to Create Match'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
