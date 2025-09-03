@@ -333,18 +333,79 @@ const CreateMatchDialog = () => {
                   </div>
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Time</Label>
-                    <Input
-                      type="time"
-                      value={formData.scheduled_time ? new Date(formData.scheduled_time).toTimeString().slice(0, 5) : ''}
-                      onChange={(e) => {
-                        const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
-                        const [hours, minutes] = e.target.value.split(':');
-                        currentDate.setHours(parseInt(hours), parseInt(minutes));
-                        setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
-                        setTimeManuallySet(true); // Mark time as manually set
-                      }}
-                      className="w-full"
-                    />
+                    <div className="flex gap-2 items-center">
+                      <Input
+                        type="number"
+                        min="1"
+                        max="12"
+                        placeholder="12"
+                        value={formData.scheduled_time ? (() => {
+                          const date = new Date(formData.scheduled_time);
+                          const hours = date.getHours();
+                          return hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
+                        })() : ''}
+                        onChange={(e) => {
+                          const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                          const inputHour = parseInt(e.target.value) || 1;
+                          const isAM = currentDate.getHours() < 12;
+                          let hour24 = inputHour;
+                          
+                          if (isAM && inputHour === 12) hour24 = 0;
+                          else if (!isAM && inputHour !== 12) hour24 = inputHour + 12;
+                          
+                          currentDate.setHours(hour24);
+                          setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                          setTimeManuallySet(true);
+                        }}
+                        className="w-16 text-center"
+                      />
+                      <span className="text-muted-foreground">:</span>
+                      <Input
+                        type="number"
+                        min="0"
+                        max="59"
+                        placeholder="00"
+                        value={formData.scheduled_time ? new Date(formData.scheduled_time).getMinutes().toString().padStart(2, '0') : ''}
+                        onChange={(e) => {
+                          const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                          const minutes = parseInt(e.target.value) || 0;
+                          currentDate.setMinutes(minutes);
+                          setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                          setTimeManuallySet(true);
+                        }}
+                        className="w-16 text-center"
+                      />
+                      <Select 
+                        value={formData.scheduled_time ? (new Date(formData.scheduled_time).getHours() < 12 ? 'AM' : 'PM') : 'PM'}
+                        onValueChange={(value) => {
+                          const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                          const currentHours = currentDate.getHours();
+                          const isCurrentlyAM = currentHours < 12;
+                          const newIsAM = value === 'AM';
+                          
+                          if (isCurrentlyAM !== newIsAM) {
+                            if (newIsAM) {
+                              // Switch to AM
+                              currentDate.setHours(currentHours - 12);
+                            } else {
+                              // Switch to PM
+                              currentDate.setHours(currentHours + 12);
+                            }
+                          }
+                          
+                          setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                          setTimeManuallySet(true);
+                        }}
+                      >
+                        <SelectTrigger className="w-16">
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="AM">AM</SelectItem>
+                          <SelectItem value="PM">PM</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                   <div className="flex justify-end pt-2">
                     <Button 
