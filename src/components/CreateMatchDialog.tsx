@@ -347,18 +347,26 @@ const CreateMatchDialog = () => {
                           return hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
                         })() : '')}
                         onChange={(e) => {
-                          setHourDisplay(e.target.value);
-                          const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
-                          const inputHour = parseInt(e.target.value) || 1;
-                          const isAM = currentDate.getHours() < 12;
-                          let hour24 = inputHour;
+                          const value = e.target.value;
+                          const inputHour = parseInt(value);
                           
-                          if (isAM && inputHour === 12) hour24 = 0;
-                          else if (!isAM && inputHour !== 12) hour24 = inputHour + 12;
-                          
-                          currentDate.setHours(hour24);
-                          setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
-                          setTimeManuallySet(true);
+                          // Only allow values 1-12
+                          if (value === '' || (inputHour >= 1 && inputHour <= 12)) {
+                            setHourDisplay(value);
+                            
+                            if (inputHour >= 1 && inputHour <= 12) {
+                              const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
+                              const isAM = currentDate.getHours() < 12;
+                              let hour24 = inputHour;
+                              
+                              if (isAM && inputHour === 12) hour24 = 0;
+                              else if (!isAM && inputHour !== 12) hour24 = inputHour + 12;
+                              
+                              currentDate.setHours(hour24);
+                              setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                              setTimeManuallySet(true);
+                            }
+                          }
                         }}
                         onBlur={() => {
                           // Clear display value on blur so it shows the formatted value
