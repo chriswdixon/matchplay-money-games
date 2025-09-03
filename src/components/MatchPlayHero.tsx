@@ -137,15 +137,13 @@ const MatchPlayHero = () => {
       {/* Scroll Down Arrow */}
       <button
         onClick={handleScrollDown}
-        className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors duration-300 animate-bounce cursor-pointer group"
+        className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors duration-300 animate-bounce cursor-pointer group flex flex-col items-center"
         aria-label="Scroll down to see more"
       >
-        <div className="flex flex-col items-center gap-1 sm:gap-2">
-          <span className="text-xs sm:text-sm font-medium group-hover:text-accent transition-colors">
-            Scroll Down
-          </span>
-          <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6" />
-        </div>
+        <span className="text-xs sm:text-sm font-medium group-hover:text-accent transition-colors text-center">
+          Scroll Down
+        </span>
+        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 mt-1 sm:mt-2" />
       </button>
     </section>
   );
