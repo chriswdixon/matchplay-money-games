@@ -25,7 +25,7 @@ const CreateMatchDialog = () => {
     course_name: '',
     scheduled_time: '',
     format: '',
-    buy_in_amount: '',
+    buy_in_amount: '50',
     handicap_min: '',
     handicap_max: '',
     max_participants: '4'
@@ -82,7 +82,7 @@ const CreateMatchDialog = () => {
       course_name: '',
       scheduled_time: '',
       format: '',
-      buy_in_amount: '',
+      buy_in_amount: '50',
       handicap_min: '',
       handicap_max: '',
       max_participants: '4'
