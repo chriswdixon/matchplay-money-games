@@ -347,6 +347,7 @@ const CreateMatchDialog = () => {
               id="buy_in_amount"
               type="number"
               min="0"
+              max="500"
               value={formData.buy_in_amount}
               onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
               placeholder="50"
