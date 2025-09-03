@@ -121,7 +121,7 @@ const CreateMatchDialog = () => {
       max_participants: parseInt(formData.max_participants)
     };
 
-    const { error } = await createMatch(matchData);
+    const { error } = await createMatch(matchData, locationCoords || undefined);
     
     if (!error) {
       setOpen(false);

@@ -220,7 +220,7 @@ export const useMatches = () => {
     handicap_min?: number;
     handicap_max?: number;
     max_participants: number;
-  }) => {
+  }, userLocation?: { latitude: number; longitude: number }) => {
     if (!user) {
       toast.error('You must be logged in to create a match');
       return { error: 'Not authenticated' };
@@ -254,8 +254,8 @@ export const useMatches = () => {
 
       toast.success('Match created successfully!');
       
-      // Refresh the list with a small delay to ensure data consistency
-      setTimeout(() => fetchMatches(), 500);
+      // Refresh the list immediately with location if available
+      setTimeout(() => fetchMatches(userLocation), 100);
       return { data, error: null };
     } catch (error) {
       console.error('Error creating match:', error);
