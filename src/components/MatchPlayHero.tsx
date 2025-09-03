@@ -80,6 +80,7 @@ const MatchPlayHero = () => {
               <Button 
                 size="lg" 
                 className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 px-8 py-4 text-lg font-semibold border-0"
+                onClick={handleScrollDown}
               >
                 Find Matches
               </Button>
