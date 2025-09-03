@@ -31,6 +31,7 @@ const CreateMatchDialog = () => {
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
+  const [timeManuallySet, setTimeManuallySet] = useState(false);
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
@@ -87,6 +88,7 @@ const CreateMatchDialog = () => {
     setLocationCoords(null);
     setSelectedCourse(null);
     setCourseOpen(false);
+    setTimeManuallySet(false);
   };
 
   const handleDialogChange = (isOpen: boolean) => {
@@ -283,18 +285,29 @@ const CreateMatchDialog = () => {
                       selected={formData.scheduled_time ? new Date(formData.scheduled_time) : undefined}
                       onSelect={(date) => {
                         if (date) {
-                          const today = new Date();
-                          const selectedDate = new Date(date);
-                          const newDateTime = new Date(date);
+                          let newDateTime = new Date(date);
                           
-                          // Check if selected date is today
-                          const isToday = selectedDate.toDateString() === today.toDateString();
-                          
-                          if (isToday) {
-                            // Use current time for today
-                            newDateTime.setHours(today.getHours(), today.getMinutes());
+                          // Only set default time if user hasn't manually set time and no time exists
+                          if (!timeManuallySet && !formData.scheduled_time) {
+                            const today = new Date();
+                            const selectedDate = new Date(date);
+                            
+                            // Check if selected date is today
+                            const isToday = selectedDate.toDateString() === today.toDateString();
+                            
+                            if (isToday) {
+                              // Use current time for today
+                              newDateTime.setHours(today.getHours(), today.getMinutes());
+                            } else {
+                              // Default to 7am for future dates
+                              newDateTime.setHours(7, 0);
+                            }
+                          } else if (formData.scheduled_time) {
+                            // Preserve existing time when changing date
+                            const existingTime = new Date(formData.scheduled_time);
+                            newDateTime.setHours(existingTime.getHours(), existingTime.getMinutes());
                           } else {
-                            // Default to 7am for future dates
+                            // If no existing time, default to 7am
                             newDateTime.setHours(7, 0);
                           }
                           
@@ -316,6 +329,7 @@ const CreateMatchDialog = () => {
                         const [hours, minutes] = e.target.value.split(':');
                         currentDate.setHours(parseInt(hours), parseInt(minutes));
                         setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                        setTimeManuallySet(true); // Mark time as manually set
                       }}
                       className="w-full"
                     />
