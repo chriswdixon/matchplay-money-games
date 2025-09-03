@@ -254,8 +254,7 @@ export const useMatches = () => {
 
       toast.success('Match created successfully!');
       
-      // Refresh the list immediately with location if available
-      setTimeout(() => fetchMatches(userLocation), 100);
+      // Refresh will happen automatically via realtime subscription
       return { data, error: null };
     } catch (error) {
       console.error('Error creating match:', error);
@@ -347,6 +346,30 @@ export const useMatches = () => {
       }
     };
   }, []);
+
+  // Set up realtime subscription for match updates
+  useEffect(() => {
+    const channel = supabase
+      .channel('matches-changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'matches'
+        },
+        (payload) => {
+          console.log('Match change detected:', payload);
+          // Refresh matches when any change occurs
+          setTimeout(() => fetchMatches(), 500);
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [fetchMatches]);
 
   // Initial load
   useEffect(() => {
