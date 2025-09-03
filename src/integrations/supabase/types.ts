@@ -274,6 +274,10 @@ export type Database = {
           user_id: string
         }[]
       }
+      is_match_creator: {
+        Args: { match_id: string }
+        Returns: boolean
+      }
       user_joined_match: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
