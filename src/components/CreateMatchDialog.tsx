@@ -185,7 +185,7 @@ const CreateMatchDialog = () => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-background border shadow-lg z-[60]" align="start">
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-background border shadow-lg z-[100] pointer-events-auto" align="start">
                 <Command className="bg-background border-0">
                   <CommandInput 
                     placeholder="Search golf courses..." 
@@ -218,19 +218,21 @@ const CreateMatchDialog = () => {
                     {courses.map((course) => (
                       <CommandItem
                         key={`${course.name}-${course.latitude}-${course.longitude}`}
-                        onSelect={() => handleCourseSelect(course)}
-                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none hover:bg-accent hover:text-accent-foreground data-[selected]:bg-accent data-[selected]:text-accent-foreground"
-                        value={course.name}
+                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50 pointer-events-auto"
+                        onSelect={(value) => {
+                          console.log('Course selected:', course.name);
+                          handleCourseSelect(course);
+                        }}
                       >
                         <Check
                           className={cn(
-                            "mr-2 h-4 w-4",
+                            "mr-2 h-4 w-4 flex-shrink-0",
                             selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
                           )}
                         />
-                        <div className="flex flex-col flex-1 gap-1">
-                          <span className="font-medium">{course.name}</span>
-                          <span className="text-xs text-muted-foreground">
+                        <div className="flex flex-col flex-1 gap-1 overflow-hidden">
+                          <span className="font-medium truncate">{course.name}</span>
+                          <span className="text-xs text-muted-foreground truncate">
                             {course.address}
                             {course.distance && ` • ${formatDistance(course.distance)}`}
                           </span>
@@ -321,7 +323,7 @@ const CreateMatchDialog = () => {
                   )}
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-auto p-0 bg-background border shadow-lg z-50" align="start">
+              <PopoverContent className="w-auto p-0 bg-background border shadow-lg z-[100] pointer-events-auto" align="start">
                 <div className="p-4 space-y-4">
                   <div>
                     <Label className="text-sm font-medium mb-2 block">Date</Label>
@@ -338,7 +340,7 @@ const CreateMatchDialog = () => {
                       }}
                       disabled={(date) => date < new Date()}
                       initialFocus
-                      className="pointer-events-auto"
+                      className={cn("p-3 pointer-events-auto")}
                     />
                   </div>
                   <div>
