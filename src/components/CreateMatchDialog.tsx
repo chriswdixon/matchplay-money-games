@@ -1,18 +1,23 @@
-import { useState } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, MapPin, Loader2 } from 'lucide-react';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { Plus, MapPin, Loader2, Check, ChevronsUpDown } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
+import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { toast } from 'sonner';
+import { cn } from '@/lib/utils';
 
 const CreateMatchDialog = () => {
   const [open, setOpen] = useState(false);
+  const [courseOpen, setCourseOpen] = useState(false);
   const [formData, setFormData] = useState({
     course_name: '',
     location: '',
@@ -25,19 +30,49 @@ const CreateMatchDialog = () => {
     max_participants: '4'
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<any>(null);
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
   const { getCurrentLocation, geocodeAddress, loading: locationLoading } = useLocation();
+  const { courses, loading: coursesLoading, searchNearbyCourses, formatDistance } = useGolfCourses();
+
+  // Search for nearby courses when location is available
+  useEffect(() => {
+    if (locationCoords && courses.length === 0) {
+      searchNearbyCourses(locationCoords.latitude, locationCoords.longitude);
+    }
+  }, [locationCoords, courses.length, searchNearbyCourses]);
 
   const handleGetCurrentLocation = async () => {
     try {
       const location = await getCurrentLocation();
       setLocationCoords(location);
+      // Search for nearby courses when location is captured
+      searchNearbyCourses(location.latitude, location.longitude);
       toast.success('Current location captured');
     } catch (error) {
       // Error is already handled by useLocation hook
     }
+  };
+
+  const handleCourseSelect = (course: any) => {
+    setSelectedCourse(course);
+    setFormData({ 
+      ...formData, 
+      course_name: course.name,
+      address: course.address 
+    });
+    setLocationCoords({
+      latitude: course.latitude,
+      longitude: course.longitude
+    });
+    setCourseOpen(false);
+  };
+
+  const handleCustomCourse = (courseName: string) => {
+    setFormData({ ...formData, course_name: courseName });
+    setSelectedCourse(null);
   };
 
   const handleAddressChange = async (address: string) => {
@@ -93,6 +128,7 @@ const CreateMatchDialog = () => {
         max_participants: '4'
       });
       setLocationCoords(null);
+      setSelectedCourse(null);
     }
   };
 
@@ -122,13 +158,101 @@ const CreateMatchDialog = () => {
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-2">
             <Label htmlFor="course_name">Golf Course</Label>
-            <Input
-              id="course_name"
-              value={formData.course_name}
-              onChange={(e) => setFormData({ ...formData, course_name: e.target.value })}
-              placeholder="e.g., Pebble Beach Golf Links"
-              required
-            />
+            <Popover open={courseOpen} onOpenChange={setCourseOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={courseOpen}
+                  className="w-full justify-between bg-background"
+                >
+                  {selectedCourse ? (
+                    <div className="flex flex-col items-start text-left">
+                      <span className="font-medium">{selectedCourse.name}</span>
+                      {selectedCourse.distance && (
+                        <span className="text-xs text-muted-foreground">
+                          {formatDistance(selectedCourse.distance)} away
+                        </span>
+                      )}
+                    </div>
+                  ) : formData.course_name ? (
+                    formData.course_name
+                  ) : (
+                    "Select a golf course..."
+                  )}
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0 bg-background border shadow-lg z-50">
+                <Command className="bg-background">
+                  <CommandInput 
+                    placeholder="Search golf courses..." 
+                    onValueChange={handleCustomCourse}
+                  />
+                  <CommandEmpty>
+                    {coursesLoading ? (
+                      <div className="flex items-center justify-center py-4">
+                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                        Loading nearby courses...
+                      </div>
+                    ) : (
+                      <div className="py-4 text-center">
+                        <p className="text-sm text-muted-foreground mb-2">No courses found</p>
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={handleGetCurrentLocation}
+                          disabled={locationLoading}
+                        >
+                          <MapPin className="w-4 h-4 mr-2" />
+                          Find nearby courses
+                        </Button>
+                      </div>
+                    )}
+                  </CommandEmpty>
+                  <CommandGroup className="max-h-60 overflow-auto">
+                    {courses.map((course) => (
+                      <CommandItem
+                        key={`${course.name}-${course.latitude}-${course.longitude}`}
+                        onSelect={() => handleCourseSelect(course)}
+                        className="cursor-pointer"
+                      >
+                        <Check
+                          className={cn(
+                            "mr-2 h-4 w-4",
+                            selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
+                          )}
+                        />
+                        <div className="flex flex-col">
+                          <span className="font-medium">{course.name}</span>
+                          <span className="text-xs text-muted-foreground">
+                            {course.address}
+                            {course.distance && ` • ${formatDistance(course.distance)}`}
+                          </span>
+                        </div>
+                      </CommandItem>
+                    ))}
+                  </CommandGroup>
+                </Command>
+              </PopoverContent>
+            </Popover>
+            {!locationCoords && (
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={handleGetCurrentLocation}
+                disabled={locationLoading}
+                className="w-full"
+              >
+                {locationLoading ? (
+                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                ) : (
+                  <MapPin className="w-4 h-4 mr-2" />
+                )}
+                Find courses near me
+              </Button>
+            )}
           </div>
           
           <div className="space-y-2">
