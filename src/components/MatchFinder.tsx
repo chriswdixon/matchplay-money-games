@@ -140,6 +140,14 @@ const MatchFinder = () => {
     return filtered;
   }, [matches, filters]);
 
+  // Find active match for current user (started status and user is participant)
+  const activeMatch = useMemo(() => {
+    if (!user) return null;
+    return matches.find(match => 
+      match.status === 'started' && match.user_joined
+    );
+  }, [matches, user]);
+
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
     const now = new Date();
@@ -237,211 +245,241 @@ const MatchFinder = () => {
   return (
     <section className="py-20 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
-        <div className="text-center mb-16 animate-fade-in">
-          <Badge className="mb-4 bg-success/10 text-success border-success/20">
-            🎯 Live Match Finder
-          </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Find Your Perfect Match
-          </h2>
-          <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            No more playing alone. Connect with golfers in your area, book money matches, 
-            and compete with confidence knowing every stroke counts.
-          </p>
-          <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
-            <CreateMatchDialog />
-            {location && (
-              <p className="text-sm text-muted-foreground">
-                📍 Location enabled • Showing matches within {searchRadius}mi
+        {/* Show active match scorecard if user has a started match */}
+        {activeMatch ? (
+          <div className="animate-fade-in">
+            <div className="text-center mb-8">
+              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
+                🏌️ Active Match
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                {activeMatch.course_name}
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                Track your scores and compete live. Your match is in progress!
               </p>
-            )}
+            </div>
+
+            {/* Active Match Scorecard */}
+            <MatchScorecard
+              matchId={activeMatch.id}
+              matchName={activeMatch.course_name}
+              onClose={() => {
+                // Don't allow closing active match scorecard
+                // User can only exit when match is completed
+              }}
+            />
           </div>
-        </div>
+        ) : (
+          /* Regular match finder view */
+          <>
+            <div className="text-center mb-16 animate-fade-in">
+              <Badge className="mb-4 bg-success/10 text-success border-success/20">
+                🎯 Live Match Finder
+              </Badge>
+              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+                Find Your Perfect Match
+              </h2>
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                No more playing alone. Connect with golfers in your area, book money matches, 
+                and compete with confidence knowing every stroke counts.
+              </p>
+              <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
+                <CreateMatchDialog />
+                {location && (
+                  <p className="text-sm text-muted-foreground">
+                    📍 Location enabled • Showing matches within {searchRadius}mi
+                  </p>
+                )}
+              </div>
+            </div>
 
-        {/* Match Filters */}
-        <MatchFilters
-          filters={filters}
-          onFiltersChange={setFilters}
-          matchCount={filteredMatches.length}
-          showFilters={showFilters}
-          onToggleFilters={() => setShowFilters(!showFilters)}
-        />
+            {/* Match Filters */}
+            <MatchFilters
+              filters={filters}
+              onFiltersChange={setFilters}
+              matchCount={filteredMatches.length}
+              showFilters={showFilters}
+              onToggleFilters={() => setShowFilters(!showFilters)}
+            />
 
-        {/* Live Matches */}
-        <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-          {loading ? (
-            // Loading skeletons
-            Array.from({ length: 6 }, (_, index) => (
-              <Card key={index} className="bg-card">
-                <CardHeader className="pb-4">
-                  <Skeleton className="h-6 w-3/4" />
-                  <Skeleton className="h-4 w-full" />
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div className="grid grid-cols-2 gap-4">
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-4 w-full" />
-                  </div>
-                  <Skeleton className="h-6 w-20" />
-                  <Skeleton className="h-10 w-full" />
-                </CardContent>
-              </Card>
-            ))
-          ) : filteredMatches.length === 0 ? (
-            <div className="col-span-full text-center py-12">
-              {matches.length === 0 ? (
-                <div>
-                  <p className="text-muted-foreground text-lg mb-4">No matches found. Be the first to create one!</p>
-                  <CreateMatchDialog />
+            {/* Live Matches */}
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {loading ? (
+                // Loading skeletons
+                Array.from({ length: 6 }, (_, index) => (
+                  <Card key={index} className="bg-card">
+                    <CardHeader className="pb-4">
+                      <Skeleton className="h-6 w-3/4" />
+                      <Skeleton className="h-4 w-full" />
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="grid grid-cols-2 gap-4">
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                        <Skeleton className="h-4 w-full" />
+                      </div>
+                      <Skeleton className="h-6 w-20" />
+                      <Skeleton className="h-10 w-full" />
+                    </CardContent>
+                  </Card>
+                ))
+              ) : filteredMatches.length === 0 ? (
+                <div className="col-span-full text-center py-12">
+                  {matches.length === 0 ? (
+                    <div>
+                      <p className="text-muted-foreground text-lg mb-4">No matches found. Be the first to create one!</p>
+                      <CreateMatchDialog />
+                    </div>
+                  ) : (
+                    <div>
+                      <p className="text-muted-foreground text-lg mb-4">No matches match your filters.</p>
+                      <Button variant="outline" onClick={() => setFilters({
+                        search: '',
+                        format: 'all', 
+                        maxDistance: 30,
+                        buyInRange: [0, 500],
+                        dateRange: 'all',
+                        spots: 'all'
+                      })}>
+                        Clear Filters
+                      </Button>
+                    </div>
+                  )}
                 </div>
               ) : (
-                <div>
-                  <p className="text-muted-foreground text-lg mb-4">No matches match your filters.</p>
-                  <Button variant="outline" onClick={() => setFilters({
-                    search: '',
-                    format: 'all', 
-                    maxDistance: 30,
-                    buyInRange: [0, 500],
-                    dateRange: 'all',
-                    spots: 'all'
-                  })}>
-                    Clear Filters
-                  </Button>
-                </div>
-              )}
-            </div>
-          ) : (
-            filteredMatches.map((match, index) => {
-              const isFull = isMatchFull(match);
-              const isCreatedRecently = new Date(match.created_at) > new Date(Date.now() - 5 * 60 * 1000); // Within 5 minutes
-              
-              return (
-                <Card 
-                  key={match.id} 
-                  className="relative border-border hover:border-primary/30 transition-all duration-300 hover:shadow-card animate-slide-up bg-card"
-                  style={{ animationDelay: `${index * 0.1}s` }}
-                >
-                  {isCreatedRecently && (
-                    <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-pulse">
-                      <Zap className="w-3 h-3 mr-1" />
-                      NEW
-                    </Badge>
-                  )}
+                filteredMatches.map((match, index) => {
+                  const isFull = isMatchFull(match);
+                  const isCreatedRecently = new Date(match.created_at) > new Date(Date.now() - 5 * 60 * 1000); // Within 5 minutes
                   
-                  <CardHeader className="pb-4">
-                    <CardTitle className="text-lg font-semibold text-foreground line-clamp-1">
-                      {match.course_name}
-                    </CardTitle>
-                    <CardDescription className="flex items-center gap-2">
-                      <MapPin className="w-4 h-4" />
-                      {match.location}
-                      {match.distance_km && (
-                        <span className="text-primary font-medium">
-                          • {formatDistance(match.distance_km)}
-                        </span>
-                      )}
-                    </CardDescription>
-                  </CardHeader>
-                  
-                  <CardContent className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4 text-sm">
-                      <div className="flex items-center gap-2">
-                        <Clock className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-foreground">{formatMatchTime(match.scheduled_time)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-foreground">{match.participant_count || 0}/{match.max_participants} filled</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <DollarSign className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-foreground">{formatBuyIn(match.buy_in_amount)} buy-in</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <Trophy className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-foreground">{formatHandicapRange(match.handicap_min, match.handicap_max)}</span>
-                      </div>
-                    </div>
-                    
-                    <div className="pt-2 space-y-2">
-                      <Badge variant="outline" className="text-xs">
-                        {formatMatchFormat(match.format)}
-                      </Badge>
-                    </div>
-                    
-                    {/* Action Buttons */}
-                    <div className="space-y-2">
-                      {/* Edit button for match creators (only for open matches) */}
-                      {match.status === 'open' && match.created_by === user?.id && (
-                        <div className="mb-2">
-                          <EditMatchDialog 
-                            match={match} 
-                            onMatchUpdated={() => refetch()} 
-                          />
-                        </div>
+                  return (
+                    <Card 
+                      key={match.id} 
+                      className="relative border-border hover:border-primary/30 transition-all duration-300 hover:shadow-card animate-slide-up bg-card"
+                      style={{ animationDelay: `${index * 0.1}s` }}
+                    >
+                      {isCreatedRecently && (
+                        <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-pulse">
+                          <Zap className="w-3 h-3 mr-1" />
+                          NEW
+                        </Badge>
                       )}
                       
-                      {isMatchCompleted(match) && match.user_joined ? (
-                        <Button 
-                          variant="outline"
-                          className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                          onClick={() => handleRatePlayersClick(match)}
-                        >
-                          <Star className="w-4 h-4 mr-2" />
-                          Rate Players
-                        </Button>
-                      ) : match.status === 'started' && match.user_joined ? (
-                        <Button
-                          className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
-                          onClick={() => handleViewScorecard(match)}
-                        >
-                          <Target className="w-4 h-4 mr-2" />
-                          View Scorecard
-                        </Button>
-                      ) : match.status === 'completed' && match.user_joined ? (
-                        <Button
-                          className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
-                          onClick={() => handleViewScorecard(match)}
-                        >
-                          <Trophy className="w-4 h-4 mr-2" />
-                          View Results
-                        </Button>
-                      ) : match.status === 'open' && match.user_joined && isFull ? (
-                        <Button
-                          className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
-                          onClick={() => handleStartMatch(match)}
-                          disabled={!user || startingMatch === match.id}
-                        >
-                          <Trophy className="w-4 h-4 mr-2" />
-                          {startingMatch === match.id ? "Starting..." : "Start Match"}
-                        </Button>
-                      ) : (
-                        <Button 
-                          className={cn(
-                            "w-full hover:shadow-premium transition-all duration-300",
-                            match.user_joined && !isFull
-                              ? "bg-warning text-warning-foreground hover:bg-warning/90"
-                              : "bg-gradient-primary text-primary-foreground"
+                      <CardHeader className="pb-4">
+                        <CardTitle className="text-lg font-semibold text-foreground line-clamp-1">
+                          {match.course_name}
+                        </CardTitle>
+                        <CardDescription className="flex items-center gap-2">
+                          <MapPin className="w-4 h-4" />
+                          {match.location}
+                          {match.distance_km && (
+                            <span className="text-primary font-medium">
+                              • {formatDistance(match.distance_km)}
+                            </span>
                           )}
-                          disabled={isFull || !user}
-                          onClick={() => handleMatchAction(match)}
-                        >
-                          {!user ? "Sign In to Join" : 
-                           isFull ? "Match Full" : 
-                           match.user_joined ? "Leave Match" : 
-                           "Join Match"}
-                        </Button>
-                      )}
-                    </div>
-                  </CardContent>
-                </Card>
-              );
-            })
-          )}
-        </div>
-        
+                        </CardDescription>
+                      </CardHeader>
+                      
+                      <CardContent className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4 text-sm">
+                          <div className="flex items-center gap-2">
+                            <Clock className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-foreground">{formatMatchTime(match.scheduled_time)}</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Users className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-foreground">{match.participant_count || 0}/{match.max_participants} filled</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <DollarSign className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-foreground">{formatBuyIn(match.buy_in_amount)} buy-in</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Trophy className="w-4 h-4 text-muted-foreground" />
+                            <span className="text-foreground">{formatHandicapRange(match.handicap_min, match.handicap_max)}</span>
+                          </div>
+                        </div>
+                        
+                        <div className="pt-2 space-y-2">
+                          <Badge variant="outline" className="text-xs">
+                            {formatMatchFormat(match.format)}
+                          </Badge>
+                        </div>
+                        
+                        {/* Action Buttons */}
+                        <div className="space-y-2">
+                          {/* Edit button for match creators (only for open matches) */}
+                          {match.status === 'open' && match.created_by === user?.id && (
+                            <div className="mb-2">
+                              <EditMatchDialog 
+                                match={match} 
+                                onMatchUpdated={() => refetch()} 
+                              />
+                            </div>
+                          )}
+                          
+                          {isMatchCompleted(match) && match.user_joined ? (
+                            <Button 
+                              variant="outline"
+                              className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                              onClick={() => handleRatePlayersClick(match)}
+                            >
+                              <Star className="w-4 h-4 mr-2" />
+                              Rate Players
+                            </Button>
+                          ) : match.status === 'started' && match.user_joined ? (
+                            <Button
+                              className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+                              onClick={() => handleViewScorecard(match)}
+                            >
+                              <Target className="w-4 h-4 mr-2" />
+                              View Scorecard
+                            </Button>
+                          ) : match.status === 'completed' && match.user_joined ? (
+                            <Button
+                              className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+                              onClick={() => handleViewScorecard(match)}
+                            >
+                              <Trophy className="w-4 h-4 mr-2" />
+                              View Results
+                            </Button>
+                          ) : match.status === 'open' && match.user_joined && isFull ? (
+                            <Button
+                              className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+                              onClick={() => handleStartMatch(match)}
+                              disabled={!user || startingMatch === match.id}
+                            >
+                              <Trophy className="w-4 h-4 mr-2" />
+                              {startingMatch === match.id ? "Starting..." : "Start Match"}
+                            </Button>
+                          ) : (
+                            <Button 
+                              className={cn(
+                                "w-full hover:shadow-premium transition-all duration-300",
+                                match.user_joined && !isFull
+                                  ? "bg-warning text-warning-foreground hover:bg-warning/90"
+                                  : "bg-gradient-primary text-primary-foreground"
+                              )}
+                              disabled={isFull || !user}
+                              onClick={() => handleMatchAction(match)}
+                            >
+                              {!user ? "Sign In to Join" : 
+                               isFull ? "Match Full" : 
+                               match.user_joined ? "Leave Match" : 
+                               "Join Match"}
+                            </Button>
+                          )}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  );
+                })
+              )}
+            </div>
+          </>
+        )}
+
         {/* Rating Dialog */}
         <PlayerRatingDialog
           open={ratingDialogOpen}
@@ -450,8 +488,8 @@ const MatchFinder = () => {
           matchName={selectedMatchForRating?.course_name || ''}
         />
 
-        {/* Scorecard Component */}
-        {scorecardMatch && (
+        {/* Scorecard Component (for non-active matches) */}
+        {scorecardMatch && !activeMatch && (
           <MatchScorecard
             matchId={scorecardMatch.id}
             matchName={scorecardMatch.course_name}
@@ -468,42 +506,44 @@ const MatchFinder = () => {
           />
         )}
         
-        {/* How It Works */}
-        <div className="bg-gradient-card rounded-2xl p-8 md:p-12">
-          <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
-          <div className="grid md:grid-cols-4 gap-6">
-            {[
-              {
-                step: "1",
-                title: "Find Match",
-                description: "Browse nearby matches or create your own based on location and skill level"
-              },
-              {
-                step: "2", 
-                title: "Secure Buy-In",
-                description: "Deposit your match buy-in securely through our platform"
-              },
-              {
-                step: "3",
-                title: "Play & Score",
-                description: "Use our live scoring system - no cheating, every stroke tracked"
-              },
-              {
-                step: "4",
-                title: "Get Paid",
-                description: "Winners receive instant payout as soon as the round is complete"
-              }
-            ].map((step, index) => (
-              <div key={step.step} className="text-center animate-fade-in" style={{ animationDelay: `${index * 0.2}s` }}>
-                <div className="w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">
-                  {step.step}
+        {/* How It Works - Only show when not in active match */}
+        {!activeMatch && (
+          <div className="bg-gradient-card rounded-2xl p-8 md:p-12">
+            <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
+            <div className="grid md:grid-cols-4 gap-6">
+              {[
+                {
+                  step: "1",
+                  title: "Find Match",
+                  description: "Browse nearby matches or create your own based on location and skill level"
+                },
+                {
+                  step: "2", 
+                  title: "Secure Buy-In",
+                  description: "Deposit your match buy-in securely through our platform"
+                },
+                {
+                  step: "3",
+                  title: "Play & Score",
+                  description: "Use our live scoring system - no cheating, every stroke tracked"
+                },
+                {
+                  step: "4",
+                  title: "Get Paid",
+                  description: "Winners receive instant payout as soon as the round is complete"
+                }
+              ].map((step, index) => (
+                <div key={step.step} className="text-center animate-fade-in" style={{ animationDelay: `${index * 0.2}s` }}>
+                  <div className="w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">
+                    {step.step}
+                  </div>
+                  <h4 className="font-semibold mb-2 text-foreground">{step.title}</h4>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
                 </div>
-                <h4 className="font-semibold mb-2 text-foreground">{step.title}</h4>
-                <p className="text-sm text-muted-foreground">{step.description}</p>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );
