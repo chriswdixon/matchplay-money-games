@@ -60,13 +60,10 @@ export function useMatchScoring(matchId: string) {
 
       setScores(scoresData || []);
 
-      // Fetch match participants to get player names
-      const { data: participants, error: participantsError } = await supabase
+      // Fetch match participants and their profile data
+      const { data: participantData, error: participantsError } = await supabase
         .from('match_participants')
-        .select(`
-          user_id,
-          profiles!inner(display_name)
-        `)
+        .select('user_id')
         .eq('match_id', matchId);
 
       if (participantsError) {
@@ -74,13 +71,34 @@ export function useMatchScoring(matchId: string) {
         return;
       }
 
+      // Get user IDs and fetch their profiles
+      const userIds = participantData?.map(p => p.user_id) || [];
+      const { data: profiles, error: profilesError } = await supabase
+        .from('profiles')
+        .select('user_id, display_name')
+        .in('user_id', userIds);
+
+      if (profilesError) {
+        console.error('Error fetching profiles:', profilesError);
+        return;
+      }
+
+      // Create participants array with profile data
+      const participants = participantData?.map(participant => {
+        const profile = profiles?.find(p => p.user_id === participant.user_id);
+        return {
+          user_id: participant.user_id,
+          display_name: profile?.display_name || 'Unknown Player'
+        };
+      }) || [];
+
       // Process player scores
       const playerScoresMap: { [playerId: string]: PlayerScore } = {};
       
       participants.forEach((participant: any) => {
         playerScoresMap[participant.user_id] = {
           player_id: participant.user_id,
-          player_name: participant.profiles.display_name || 'Unknown Player',
+          player_name: participant.display_name || 'Unknown Player',
           scores: {},
           total: 0
         };
