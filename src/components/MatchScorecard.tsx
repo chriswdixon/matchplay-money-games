@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
 import { Target, Trophy, Clock, CheckCircle, Users } from 'lucide-react';
@@ -31,6 +32,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
   const [editingHole, setEditingHole] = useState<number | null>(null);
   const [tempScore, setTempScore] = useState<string>('');
+  const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
@@ -38,6 +40,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const handleScoreEdit = (hole: number, currentScore?: number) => {
     setEditingHole(hole);
     setTempScore(currentScore?.toString() || '');
+    setScoreDialogOpen(true);
   };
 
   const handleScoreSave = async () => {
@@ -52,12 +55,25 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
     if (success) {
       setEditingHole(null);
       setTempScore('');
+      setScoreDialogOpen(false);
     }
   };
 
   const handleScoreCancel = () => {
     setEditingHole(null);
     setTempScore('');
+    setScoreDialogOpen(false);
+  };
+
+  const handleQuickScore = async (score: number) => {
+    if (!editingHole) return;
+    
+    const success = await updateScore(editingHole, score);
+    if (success) {
+      setEditingHole(null);
+      setTempScore('');
+      setScoreDialogOpen(false);
+    }
   };
 
   const handleFinalize = async () => {
@@ -197,57 +213,20 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
                           return (
                             <td key={hole} className="text-center p-1">
-                              {isEditing ? (
-                                <div className="flex flex-col items-center gap-1">
-                                  <Input
-                                    type="number"
-                                    min="1"
-                                    max="10"
-                                    value={tempScore}
-                                    onChange={(e) => setTempScore(e.target.value)}
-                                    className="w-12 h-8 text-center p-0 border-primary"
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') handleScoreSave();
-                                      if (e.key === 'Escape') handleScoreCancel();
-                                    }}
-                                    placeholder="1-10"
-                                    autoFocus
-                                  />
-                                  <div className="flex gap-1">
-                                    <Button
-                                      size="sm"
-                                      variant="default"
-                                      className="w-4 h-4 p-0 text-xs"
-                                      onClick={handleScoreSave}
-                                    >
-                                      ✓
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="w-4 h-4 p-0 text-xs"
-                                      onClick={handleScoreCancel}
-                                    >
-                                      ✕
-                                    </Button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <Button
-                                  variant={score ? "default" : "outline"}
-                                  size="sm"
-                                  className={cn(
-                                    "w-10 h-10 p-0 text-sm font-semibold transition-all",
-                                    score 
-                                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                      : "border-dashed hover:border-primary hover:bg-primary/10"
-                                  )}
-                                  onClick={() => handleScoreEdit(hole, score)}
-                                  disabled={saving}
-                                >
-                                  {score || '+'}
-                                </Button>
-                              )}
+                              <Button
+                                variant={score ? "default" : "outline"}
+                                size="sm"
+                                className={cn(
+                                  "w-12 h-12 p-0 text-sm font-semibold transition-all touch-none",
+                                  score 
+                                    ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                    : "border-dashed hover:border-primary hover:bg-primary/10"
+                                )}
+                                onClick={() => handleScoreEdit(hole, score)}
+                                disabled={saving}
+                              >
+                                {score || '+'}
+                              </Button>
                             </td>
                           );
                         })}
@@ -345,57 +324,20 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
                           return (
                             <td key={hole} className="text-center p-1">
-                              {isEditing ? (
-                                <div className="flex flex-col items-center gap-1">
-                                  <Input
-                                    type="number"
-                                    min="1"
-                                    max="10"
-                                    value={tempScore}
-                                    onChange={(e) => setTempScore(e.target.value)}
-                                    className="w-12 h-8 text-center p-0 border-primary"
-                                    onKeyDown={(e) => {
-                                      if (e.key === 'Enter') handleScoreSave();
-                                      if (e.key === 'Escape') handleScoreCancel();
-                                    }}
-                                    placeholder="1-10"
-                                    autoFocus
-                                  />
-                                  <div className="flex gap-1">
-                                    <Button
-                                      size="sm"
-                                      variant="default"
-                                      className="w-4 h-4 p-0 text-xs"
-                                      onClick={handleScoreSave}
-                                    >
-                                      ✓
-                                    </Button>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="w-4 h-4 p-0 text-xs"
-                                      onClick={handleScoreCancel}
-                                    >
-                                      ✕
-                                    </Button>
-                                  </div>
-                                </div>
-                              ) : (
-                                <Button
-                                  variant={score ? "default" : "outline"}
-                                  size="sm"
-                                  className={cn(
-                                    "w-10 h-10 p-0 text-sm font-semibold transition-all",
-                                    score 
-                                      ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                                      : "border-dashed hover:border-primary hover:bg-primary/10"
-                                  )}
-                                  onClick={() => handleScoreEdit(hole, score)}
-                                  disabled={saving}
-                                >
-                                  {score || '+'}
-                                </Button>
-                              )}
+                              <Button
+                                variant={score ? "default" : "outline"}
+                                size="sm"
+                                className={cn(
+                                  "w-12 h-12 p-0 text-sm font-semibold transition-all touch-none",
+                                  score 
+                                    ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                    : "border-dashed hover:border-primary hover:bg-primary/10"
+                                )}
+                                onClick={() => handleScoreEdit(hole, score)}
+                                disabled={saving}
+                              >
+                                {score || '+'}
+                              </Button>
                             </td>
                           );
                         })}
@@ -473,44 +415,85 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         )}
       </div>
 
-      {/* Editing Instructions */}
-      {editingHole && (
-        <Card className="border-accent bg-accent/5">
-          <CardContent className="p-4">
-            <div className="flex flex-col gap-4">
-              <div className="flex items-center gap-2 text-accent">
-                <Target className="w-4 h-4" />
-                <span className="font-medium">
-                  Editing Hole {editingHole} - Enter your stroke count
+      {/* Score Entry Dialog */}
+      <Dialog open={scoreDialogOpen} onOpenChange={setScoreDialogOpen}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary" />
+              Hole {editingHole} Score
+            </DialogTitle>
+            <DialogDescription>
+              Enter your stroke count for hole {editingHole}
+              {matchData?.hole_pars?.[String(editingHole)] && (
+                <span className="block mt-1 font-medium">
+                  Par {matchData.hole_pars[String(editingHole)]}
                 </span>
+              )}
+            </DialogDescription>
+          </DialogHeader>
+          
+          <div className="space-y-6">
+            {/* Manual Input */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Manual Entry</label>
+              <div className="flex gap-2">
+                <Input
+                  type="number"
+                  min="1"
+                  max="10"
+                  value={tempScore}
+                  onChange={(e) => setTempScore(e.target.value)}
+                  className="text-center text-lg h-12"
+                  placeholder="1-10"
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') handleScoreSave();
+                    if (e.key === 'Escape') handleScoreCancel();
+                  }}
+                />
+                <Button 
+                  onClick={handleScoreSave} 
+                  disabled={!tempScore || saving}
+                  className="h-12 px-6"
+                >
+                  Save
+                </Button>
               </div>
-              
-              {/* Quick Score Buttons */}
-              <div className="flex flex-wrap gap-2 justify-center">
-                <div className="text-sm text-muted-foreground mb-2 w-full text-center">Quick Entry:</div>
+            </div>
+            
+            {/* Quick Entry Buttons */}
+            <div className="space-y-2">
+              <label className="text-sm font-medium">Quick Entry</label>
+              <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
                   <Button
                     key={score}
                     variant="outline"
-                    size="sm"
-                    className="w-10 h-10 p-0 hover:bg-primary hover:text-primary-foreground"
-                    onClick={() => {
-                      setTempScore(score.toString());
-                      setTimeout(() => handleScoreSave(), 100);
-                    }}
+                    size="lg"
+                    className="h-12 text-lg font-semibold hover:bg-primary hover:text-primary-foreground transition-colors"
+                    onClick={() => handleQuickScore(score)}
+                    disabled={saving}
                   >
                     {score}
                   </Button>
                 ))}
               </div>
-              
-              <div className="text-xs text-center text-muted-foreground">
-                Or type in the input field above and press Enter to save, Escape to cancel
-              </div>
             </div>
-          </CardContent>
-        </Card>
-      )}
+            
+            <div className="flex gap-2 pt-4">
+              <Button 
+                variant="outline" 
+                onClick={handleScoreCancel}
+                className="flex-1 h-12"
+              >
+                Cancel
+              </Button>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
+
+      {/* Editing Instructions - Remove this since we're using a dialog now */}
     </div>
   );
 }
