@@ -3,13 +3,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
 import CreateMatchDialog from "./CreateMatchDialog";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import PlayerRatingDialog from "./PlayerRatingDialog";
+import { MatchScorecard } from "./MatchScorecard";
+import { MatchResults } from "./MatchResults";
+import { useMatchScoring } from "@/hooks/useMatchScoring";
 import { format } from "date-fns";
 import { useState, useEffect, useMemo } from "react";
 
@@ -21,6 +24,9 @@ const MatchFinder = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
   const [selectedMatchForRating, setSelectedMatchForRating] = useState<any>(null);
+  const [scorecardMatch, setScorecardMatch] = useState<any>(null);
+  const [resultsMatch, setResultsMatch] = useState<any>(null);
+  const [startingMatch, setStartingMatch] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterType>({
     search: '',
     format: 'all',
@@ -195,6 +201,24 @@ const MatchFinder = () => {
     setRatingDialogOpen(true);
   };
 
+  const handleStartMatch = async (match: any) => {
+    setStartingMatch(match.id);
+    const { startMatch: startMatchFn } = useMatchScoring(match.id);
+    const success = await startMatchFn();
+    if (success) {
+      refetch(); // Refresh matches to update status
+    }
+    setStartingMatch(null);
+  };
+
+  const handleViewScorecard = (match: any) => {
+    if (match.status === 'completed') {
+      setResultsMatch(match);
+    } else {
+      setScorecardMatch(match);
+    }
+  };
+
   return (
     <section className="py-20 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
@@ -343,6 +367,31 @@ const MatchFinder = () => {
                           <Star className="w-4 h-4 mr-2" />
                           Rate Players
                         </Button>
+                      ) : match.status === 'started' && match.user_joined ? (
+                        <Button
+                          className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+                          onClick={() => handleViewScorecard(match)}
+                        >
+                          <Target className="w-4 h-4 mr-2" />
+                          View Scorecard
+                        </Button>
+                      ) : match.status === 'completed' && match.user_joined ? (
+                        <Button
+                          className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+                          onClick={() => handleViewScorecard(match)}
+                        >
+                          <Trophy className="w-4 h-4 mr-2" />
+                          View Results
+                        </Button>
+                      ) : match.status === 'open' && match.user_joined && isFull ? (
+                        <Button
+                          className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+                          onClick={() => handleStartMatch(match)}
+                          disabled={!user || startingMatch === match.id}
+                        >
+                          <Trophy className="w-4 h-4 mr-2" />
+                          {startingMatch === match.id ? "Starting..." : "Start Match"}
+                        </Button>
                       ) : (
                         <Button 
                           className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
@@ -370,6 +419,24 @@ const MatchFinder = () => {
           matchId={selectedMatchForRating?.id || ''}
           matchName={selectedMatchForRating?.course_name || ''}
         />
+
+        {/* Scorecard Component */}
+        {scorecardMatch && (
+          <MatchScorecard
+            matchId={scorecardMatch.id}
+            matchName={scorecardMatch.course_name}
+            onClose={() => setScorecardMatch(null)}
+          />
+        )}
+
+        {/* Results Component */}
+        {resultsMatch && (
+          <MatchResults
+            matchId={resultsMatch.id}
+            matchName={resultsMatch.course_name}
+            onClose={() => setResultsMatch(null)}
+          />
+        )}
         
         {/* How It Works */}
         <div className="bg-gradient-card rounded-2xl p-8 md:p-12">

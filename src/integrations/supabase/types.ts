@@ -14,6 +14,33 @@ export type Database = {
   }
   public: {
     Tables: {
+      match_confirmations: {
+        Row: {
+          confirmed: boolean
+          confirmed_at: string | null
+          created_at: string
+          id: string
+          match_id: string
+          player_id: string
+        }
+        Insert: {
+          confirmed?: boolean
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          match_id: string
+          player_id: string
+        }
+        Update: {
+          confirmed?: boolean
+          confirmed_at?: string | null
+          created_at?: string
+          id?: string
+          match_id?: string
+          player_id?: string
+        }
+        Relationships: []
+      }
       match_participants: {
         Row: {
           id: string
@@ -42,6 +69,66 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      match_results: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          final_scores: Json
+          id: string
+          match_id: string
+          updated_at: string
+          winner_id: string | null
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          final_scores?: Json
+          id?: string
+          match_id: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          final_scores?: Json
+          id?: string
+          match_id?: string
+          updated_at?: string
+          winner_id?: string | null
+        }
+        Relationships: []
+      }
+      match_scores: {
+        Row: {
+          created_at: string
+          hole_number: number
+          id: string
+          match_id: string
+          player_id: string
+          strokes: number | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          hole_number: number
+          id?: string
+          match_id: string
+          player_id: string
+          strokes?: number | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          hole_number?: number
+          id?: string
+          match_id?: string
+          player_id?: string
+          strokes?: number | null
+          updated_at?: string
+        }
+        Relationships: []
       }
       matches: {
         Row: {
@@ -241,6 +328,10 @@ export type Database = {
         Args: { player_user_id: string }
         Returns: number
       }
+      finalize_match_results: {
+        Args: { match_id: string }
+        Returns: boolean
+      }
       get_match_creator_info: {
         Args: { match_id: string }
         Returns: {
@@ -310,6 +401,10 @@ export type Database = {
       sanitize_text_input: {
         Args: { input_text: string }
         Returns: string
+      }
+      start_match: {
+        Args: { match_id: string }
+        Returns: boolean
       }
       user_joined_match: {
         Args: { match_id: string; user_id: string }
