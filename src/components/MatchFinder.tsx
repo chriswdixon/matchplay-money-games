@@ -14,6 +14,8 @@ import { MatchScorecard } from "./MatchScorecard";
 import { MatchResults } from "./MatchResults";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
+import EditMatchDialog from "./EditMatchDialog";
+import { cn } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 
 const MatchFinder = () => {
@@ -371,6 +373,16 @@ const MatchFinder = () => {
                     
                     {/* Action Buttons */}
                     <div className="space-y-2">
+                      {/* Edit button for match creators (only for open matches) */}
+                      {match.status === 'open' && match.created_by === user?.id && (
+                        <div className="mb-2">
+                          <EditMatchDialog 
+                            match={match} 
+                            onMatchUpdated={() => refetch()} 
+                          />
+                        </div>
+                      )}
+                      
                       {isMatchCompleted(match) && match.user_joined ? (
                         <Button 
                           variant="outline"
@@ -407,7 +419,12 @@ const MatchFinder = () => {
                         </Button>
                       ) : (
                         <Button 
-                          className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+                          className={cn(
+                            "w-full hover:shadow-premium transition-all duration-300",
+                            match.user_joined && !isFull
+                              ? "bg-warning text-warning-foreground hover:bg-warning/90"
+                              : "bg-gradient-primary text-primary-foreground"
+                          )}
                           disabled={isFull || !user}
                           onClick={() => handleMatchAction(match)}
                         >

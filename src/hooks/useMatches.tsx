@@ -381,10 +381,51 @@ export const useMatches = () => {
     return () => clearTimeout(timer);
   }, [fetchMatches]);
 
+  const updateMatch = async (matchId: string, matchData: {
+    course_name: string;
+    location: string;
+    address?: string;
+    latitude?: number;
+    longitude?: number;
+    scheduled_time: string;
+    format: string;
+    buy_in_amount: number;
+    handicap_min?: number;
+    handicap_max?: number;
+    max_participants: number;
+  }) => {
+    if (!user) {
+      toast.error('You must be logged in to update a match');
+      return { error: 'Not authenticated' };
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('matches')
+        .update(matchData)
+        .eq('id', matchId)
+        .eq('created_by', user.id) // Ensure only the creator can update
+        .select()
+        .maybeSingle();
+
+      if (error) throw error;
+      if (!data) throw new Error('Failed to update match - no data returned or unauthorized');
+
+      // Refresh the matches list
+      fetchMatches();
+      return { success: true, data };
+    } catch (error: any) {
+      console.error('Error updating match:', error);
+      toast.error(error.message || 'Failed to update match');
+      return { error: error.message };
+    }
+  };
+
   return {
     matches,
     loading,
     createMatch,
+    updateMatch,
     joinMatch,
     leaveMatch,
     isMatchCreator,
