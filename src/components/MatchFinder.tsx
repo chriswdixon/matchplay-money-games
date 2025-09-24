@@ -255,9 +255,44 @@ const MatchFinder = () => {
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
                 {activeMatch.course_name}
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              <p className="text-xl text-muted-foreground max-w-3xl mx-auto mb-6">
                 Track your scores and compete live. Your match is in progress!
               </p>
+              
+              {/* Match Details */}
+              <div className="grid grid-cols-1 md:grid-cols-4 gap-4 max-w-4xl mx-auto mb-8">
+                <Card className="bg-card/50">
+                  <CardContent className="p-4 text-center">
+                    <Clock className="w-5 h-5 mx-auto mb-2 text-primary" />
+                    <div className="text-sm text-muted-foreground">Tee Time</div>
+                    <div className="font-semibold">{formatMatchTime(activeMatch.scheduled_time)}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-card/50">
+                  <CardContent className="p-4 text-center">
+                    <Users className="w-5 h-5 mx-auto mb-2 text-primary" />
+                    <div className="text-sm text-muted-foreground">Players</div>
+                    <div className="font-semibold">{activeMatch.participant_count || 0}/{activeMatch.max_participants}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-card/50">
+                  <CardContent className="p-4 text-center">
+                    <DollarSign className="w-5 h-5 mx-auto mb-2 text-primary" />
+                    <div className="text-sm text-muted-foreground">Buy-in</div>
+                    <div className="font-semibold">{formatBuyIn(activeMatch.buy_in_amount)}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-card/50">
+                  <CardContent className="p-4 text-center">
+                    <Trophy className="w-5 h-5 mx-auto mb-2 text-primary" />
+                    <div className="text-sm text-muted-foreground">Format</div>
+                    <div className="font-semibold">{formatMatchFormat(activeMatch.format)}</div>
+                  </CardContent>
+                </Card>
+              </div>
             </div>
 
             {/* Active Match Scorecard */}
