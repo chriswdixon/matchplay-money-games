@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { Github, Mail, ArrowLeft } from 'lucide-react';
+import { ArrowLeft } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 
@@ -17,7 +17,7 @@ export function AuthForm() {
   const [resetEmail, setResetEmail] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
-  const { signIn, signUp, signInWithProvider } = useAuth();
+  const { signIn, signUp } = useAuth();
   const { toast } = useToast();
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -34,11 +34,6 @@ export function AuthForm() {
     setLoading(false);
   };
 
-  const handleSocialLogin = async (provider: 'google' | 'github' | 'twitter') => {
-    setLoading(true);
-    await signInWithProvider(provider);
-    setLoading(false);
-  };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -206,37 +201,6 @@ export function AuthForm() {
                 </TabsContent>
               </Tabs>
 
-              <div className="mt-6">
-                <div className="relative">
-                  <div className="absolute inset-0 flex items-center">
-                    <span className="w-full border-t" />
-                  </div>
-                  <div className="relative flex justify-center text-xs uppercase">
-                    <span className="bg-background px-2 text-muted-foreground">
-                      Or continue with
-                    </span>
-                  </div>
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4 mt-4">
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSocialLogin('google')}
-                    disabled={loading}
-                  >
-                    <Mail className="mr-2 h-4 w-4" />
-                    Google
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => handleSocialLogin('github')}
-                    disabled={loading}
-                  >
-                    <Github className="mr-2 h-4 w-4" />
-                    GitHub
-                  </Button>
-                </div>
-              </div>
             </>
           )}
         </CardContent>
