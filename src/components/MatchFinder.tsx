@@ -12,7 +12,7 @@ import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import PlayerRatingDialog from "./PlayerRatingDialog";
 import { MatchScorecard } from "./MatchScorecard";
 import { MatchResults } from "./MatchResults";
-import { useMatchScoring } from "@/hooks/useMatchScoring";
+import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import { useState, useEffect, useMemo } from "react";
 
@@ -202,13 +202,26 @@ const MatchFinder = () => {
   };
 
   const handleStartMatch = async (match: any) => {
+    if (!user) return;
+    
     setStartingMatch(match.id);
-    const { startMatch: startMatchFn } = useMatchScoring(match.id);
-    const success = await startMatchFn();
-    if (success) {
+    
+    try {
+      const { data, error } = await supabase.rpc('start_match', {
+        match_id: match.id
+      });
+
+      if (error) {
+        console.error('Error starting match:', error);
+        return;
+      }
+
       refetch(); // Refresh matches to update status
+    } catch (error) {
+      console.error('Error starting match:', error);
+    } finally {
+      setStartingMatch(null);
     }
-    setStartingMatch(null);
   };
 
   const handleViewScorecard = (match: any) => {
