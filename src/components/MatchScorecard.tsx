@@ -281,7 +281,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             </TabsContent>
 
             <TabsContent value="back9" className="mt-4">
-              <div className="overflow-x-auto">
+              {/* Desktop Table View */}
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     {/* Par Row */}
@@ -320,7 +321,6 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {Array.from({ length: 9 }, (_, i) => {
                           const hole = i + 10;
                           const score = currentUserScore.scores[hole];
-                          const isEditing = editingHole === hole;
 
                           return (
                             <td key={hole} className="text-center p-1">
@@ -388,6 +388,77 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     ))}
                   </tbody>
                 </table>
+              </div>
+
+              {/* Mobile Vertical View */}
+              <div className="md:hidden space-y-4">
+                {/* Back 9 Total Card */}
+                <Card className="bg-accent/10 border-accent">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between">
+                      <h3 className="font-semibold text-accent-foreground">Back 9 Total</h3>
+                      <div className="text-2xl font-bold text-accent-foreground">
+                        {currentUserScore?.back9 || 0}
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+
+                {/* Holes 10-18 */}
+                {Array.from({ length: 9 }, (_, i) => {
+                  const hole = i + 10;
+                  const par = matchData?.hole_pars?.[String(hole)] || 4;
+                  const currentScore = currentUserScore?.scores[hole];
+                  
+                  return (
+                    <Card key={hole} className="w-full">
+                      <CardContent className="p-4">
+                        <div className="flex items-center justify-between mb-3">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+                              {hole}
+                            </div>
+                            <div>
+                              <div className="font-semibold">Hole {hole}</div>
+                              <div className="text-sm text-muted-foreground">Par {par}</div>
+                            </div>
+                          </div>
+                          <Button
+                            variant={currentScore ? "default" : "outline"}
+                            size="lg"
+                            className={cn(
+                              "w-16 h-16 text-xl font-bold transition-all",
+                              currentScore 
+                                ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                : "border-dashed hover:border-primary hover:bg-primary/10"
+                            )}
+                            onClick={() => handleScoreEdit(hole, currentScore)}
+                            disabled={saving}
+                          >
+                            {currentScore || '+'}
+                          </Button>
+                        </div>
+                        
+                        {/* Other players' scores for this hole */}
+                        {otherPlayers.length > 0 && (
+                          <div className="pt-3 border-t space-y-2">
+                            <div className="text-sm font-medium text-muted-foreground">Other Players:</div>
+                            <div className="flex flex-wrap gap-2">
+                              {otherPlayers.map((player) => (
+                                <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
+                                  <span className="text-sm font-medium">{player.player_name}</span>
+                                  <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
+                                    {player.scores[hole] || '—'}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                      </CardContent>
+                    </Card>
+                  );
+                })}
               </div>
             </TabsContent>
           </Tabs>
