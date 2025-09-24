@@ -16,6 +16,7 @@ import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
+import { useNavigate } from 'react-router-dom';
 
 const CreateMatchDialog = () => {
   const [open, setOpen] = useState(false);
@@ -39,6 +40,7 @@ const CreateMatchDialog = () => {
   const { user } = useAuth();
   const { getCurrentLocation, geocodeAddress, loading: locationLoading } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
+  const navigate = useNavigate();
 
   // Search for nearby courses when location is available
   useEffect(() => {
@@ -150,7 +152,7 @@ const CreateMatchDialog = () => {
           onClick={(e) => {
             if (!user) {
               e.preventDefault();
-              toast.error('Please sign in to create matches');
+              navigate('/auth');
             }
           }}
         >
