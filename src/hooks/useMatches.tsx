@@ -35,6 +35,25 @@ export const useMatches = () => {
   const abortControllerRef = useRef<AbortController | null>(null);
   const retryTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Helper function to get match IDs where user is participating
+  const getUserParticipatingMatchIds = async (): Promise<string> => {
+    if (!user) return '';
+    
+    try {
+      const { data, error } = await supabase
+        .from('match_participants')
+        .select('match_id')
+        .eq('user_id', user.id);
+      
+      if (error || !data || data.length === 0) return '';
+      
+      return data.map(p => p.match_id).join(',');
+    } catch (error) {
+      console.error('Error getting user participating matches:', error);
+      return '';
+    }
+  };
+
   const fetchMatches = useCallback(async (userLocation?: { latitude: number; longitude: number }, retryCount = 0) => {
     // Prevent multiple simultaneous calls
     if (isLoadingRef.current) {
@@ -66,10 +85,27 @@ export const useMatches = () => {
       
       // Simple fallback-first approach - try basic query first
       try {
-        const { data, error } = await supabase
+        let matchesQuery = supabase
           .from('matches')
-          .select('*')
-          .eq('status', 'open')
+          .select('*');
+
+        // If user is logged in, get both open matches and matches they're participating in
+        if (user) {
+          const participatingMatchIds = await getUserParticipatingMatchIds();
+          
+          if (participatingMatchIds) {
+            // Get open matches OR matches where user is a participant (started/completed)
+            matchesQuery = matchesQuery.or(`status.eq.open,and(status.in.(started,completed),id.in.(${participatingMatchIds}))`);
+          } else {
+            // If no participating matches, just get open ones
+            matchesQuery = matchesQuery.eq('status', 'open');
+          }
+        } else {
+          // For non-logged in users, only show open matches
+          matchesQuery = matchesQuery.eq('status', 'open');
+        }
+
+        const { data, error } = await matchesQuery
           .order('scheduled_time', { ascending: true })
           .abortSignal(abortControllerRef.current.signal);
 
