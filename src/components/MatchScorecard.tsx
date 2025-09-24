@@ -191,7 +191,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           {i + 1}
                         </th>
                       ))}
-                      <th className="text-center p-2 font-medium bg-accent/20">Front 9</th>
+                      <th className="text-center p-2 font-medium bg-accent/20">vs Par</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -234,7 +234,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {/* Front 9 Total */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
-                            {currentUserScore.front9 || 0}
+                            {(() => {
+                              const front9Par = Array.from({ length: 9 }, (_, i) => 
+                                matchData?.hole_pars?.[String(i + 1)] || 4
+                              ).reduce((sum, par) => sum + par, 0);
+                              const scoreDiff = (currentUserScore.front9 || 0) - front9Par;
+                              
+                              if (scoreDiff === 0) return 'E';
+                              return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                            })()}
                           </div>
                         </td>
                       </tr>
@@ -270,7 +278,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {/* Front 9 Total */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
-                            {player.front9 || 0}
+                            {(() => {
+                              const front9Par = Array.from({ length: 9 }, (_, i) => 
+                                matchData?.hole_pars?.[String(i + 1)] || 4
+                              ).reduce((sum, par) => sum + par, 0);
+                              const scoreDiff = (player.front9 || 0) - front9Par;
+                              
+                              if (scoreDiff === 0) return 'E';
+                              return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                            })()}
                           </div>
                         </td>
                       </tr>
@@ -303,7 +319,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           {i + 10}
                         </th>
                       ))}
-                      <th className="text-center p-2 font-medium bg-accent/20">Back 9</th>
+                      <th className="text-center p-2 font-medium bg-accent/20">vs Par</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -345,7 +361,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {/* Back 9 Total */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
-                            {currentUserScore.back9 || 0}
+                            {(() => {
+                              const back9Par = Array.from({ length: 9 }, (_, i) => 
+                                matchData?.hole_pars?.[String(i + 10)] || 4
+                              ).reduce((sum, par) => sum + par, 0);
+                              const scoreDiff = (currentUserScore.back9 || 0) - back9Par;
+                              
+                              if (scoreDiff === 0) return 'E';
+                              return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                            })()}
                           </div>
                         </td>
                       </tr>
@@ -381,7 +405,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {/* Back 9 Total */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
-                            {player.back9 || 0}
+                            {(() => {
+                              const back9Par = Array.from({ length: 9 }, (_, i) => 
+                                matchData?.hole_pars?.[String(i + 10)] || 4
+                              ).reduce((sum, par) => sum + par, 0);
+                              const scoreDiff = (player.back9 || 0) - back9Par;
+                              
+                              if (scoreDiff === 0) return 'E';
+                              return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                            })()}
                           </div>
                         </td>
                       </tr>
@@ -396,9 +428,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 <Card className="bg-accent/10 border-accent">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-accent-foreground">Back 9 Total</h3>
+                      <h3 className="font-semibold text-accent-foreground">Back 9 vs Par</h3>
                       <div className="text-2xl font-bold text-accent-foreground">
-                        {currentUserScore?.back9 || 0}
+                        {(() => {
+                          const back9Par = Array.from({ length: 9 }, (_, i) => 
+                            matchData?.hole_pars?.[String(i + 10)] || 4
+                          ).reduce((sum, par) => sum + par, 0);
+                          const scoreDiff = (currentUserScore?.back9 || 0) - back9Par;
+                          
+                          if (scoreDiff === 0) return 'E';
+                          return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                        })()}
                       </div>
                     </div>
                   </CardContent>
