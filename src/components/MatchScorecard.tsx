@@ -243,10 +243,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
-                              const front9Par = Array.from({ length: 9 }, (_, i) => 
-                                matchData?.hole_pars?.[String(i + 1)] || 4
-                              ).reduce((sum, par) => sum + par, 0);
-                              const scoreDiff = (currentUserScore.front9 || 0) - front9Par;
+                              // Only calculate for completed holes
+                              const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
+                                .filter(hole => currentUserScore.scores[hole]);
+                              
+                              if (completedHoles.length === 0) return '—';
+                              
+                              const completedPar = completedHoles.reduce((sum, hole) => 
+                                sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                              const completedStrokes = completedHoles.reduce((sum, hole) => 
+                                sum + (currentUserScore.scores[hole] || 0), 0);
+                              const scoreDiff = completedStrokes - completedPar;
                               
                               if (scoreDiff === 0) return 'E';
                               return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
@@ -294,10 +301,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
-                              const front9Par = Array.from({ length: 9 }, (_, i) => 
-                                matchData?.hole_pars?.[String(i + 1)] || 4
-                              ).reduce((sum, par) => sum + par, 0);
-                              const scoreDiff = (player.front9 || 0) - front9Par;
+                              // Only calculate for completed holes
+                              const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
+                                .filter(hole => player.scores[hole]);
+                              
+                              if (completedHoles.length === 0) return '—';
+                              
+                              const completedPar = completedHoles.reduce((sum, hole) => 
+                                sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                              const completedStrokes = completedHoles.reduce((sum, hole) => 
+                                sum + (player.scores[hole] || 0), 0);
+                              const scoreDiff = completedStrokes - completedPar;
                               
                               if (scoreDiff === 0) return 'E';
                               return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
@@ -385,10 +399,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
-                              const back9Par = Array.from({ length: 9 }, (_, i) => 
-                                matchData?.hole_pars?.[String(i + 10)] || 4
-                              ).reduce((sum, par) => sum + par, 0);
-                              const scoreDiff = (currentUserScore.back9 || 0) - back9Par;
+                              // Only calculate for completed holes
+                              const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
+                                .filter(hole => currentUserScore.scores[hole]);
+                              
+                              if (completedHoles.length === 0) return '—';
+                              
+                              const completedPar = completedHoles.reduce((sum, hole) => 
+                                sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                              const completedStrokes = completedHoles.reduce((sum, hole) => 
+                                sum + (currentUserScore.scores[hole] || 0), 0);
+                              const scoreDiff = completedStrokes - completedPar;
                               
                               if (scoreDiff === 0) return 'E';
                               return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
@@ -436,10 +457,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
-                              const back9Par = Array.from({ length: 9 }, (_, i) => 
-                                matchData?.hole_pars?.[String(i + 10)] || 4
-                              ).reduce((sum, par) => sum + par, 0);
-                              const scoreDiff = (player.back9 || 0) - back9Par;
+                              // Only calculate for completed holes
+                              const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
+                                .filter(hole => player.scores[hole]);
+                              
+                              if (completedHoles.length === 0) return '—';
+                              
+                              const completedPar = completedHoles.reduce((sum, hole) => 
+                                sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                              const completedStrokes = completedHoles.reduce((sum, hole) => 
+                                sum + (player.scores[hole] || 0), 0);
+                              const scoreDiff = completedStrokes - completedPar;
                               
                               if (scoreDiff === 0) return 'E';
                               return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
