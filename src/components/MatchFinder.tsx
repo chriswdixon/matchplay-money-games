@@ -187,7 +187,7 @@ const MatchFinder = () => {
   };
 
   const isMatchCompleted = (match: any) => {
-    return match.status === 'completed' || new Date(match.scheduled_time) < new Date();
+    return match.status === 'completed';
   };
 
   const handleRatePlayersClick = (match: any) => {
