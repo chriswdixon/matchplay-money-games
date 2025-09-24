@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Label } from "@/components/ui/label";
 import { useToast } from "@/hooks/use-toast";
 import { Lock } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface PasswordGateProps {
   children: React.ReactNode;
@@ -18,28 +19,57 @@ const PasswordGate = ({ children }: PasswordGateProps) => {
 
   // Check if already authenticated on mount
   useEffect(() => {
-    const isAuth = localStorage.getItem("site_authenticated") === "true";
-    setIsAuthenticated(isAuth);
+    const sessionToken = localStorage.getItem("site_session_token");
+    const isAuth = sessionToken && localStorage.getItem("site_authenticated") === "true";
+    setIsAuthenticated(!!isAuth);
   }, []);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
 
-    // Simple password check - you can change this password
-    const correctPassword = "matchplay2024";
-    
-    if (password === correctPassword) {
-      localStorage.setItem("site_authenticated", "true");
-      setIsAuthenticated(true);
-      toast({
-        title: "Access granted",
-        description: "Welcome to MatchPlay!",
+    try {
+      // Get client IP for rate limiting (this is a best effort, may not always work)
+      const clientIP = await fetch('https://api.ipify.org?format=json')
+        .then(res => res.json())
+        .then(data => data.ip)
+        .catch(() => null);
+
+      const { data, error } = await supabase.functions.invoke('validate-site-password', {
+        body: { 
+          password: password.trim(),
+          clientIP 
+        }
       });
-    } else {
+
+      if (error) {
+        throw error;
+      }
+
+      if (data.success) {
+        localStorage.setItem("site_authenticated", "true");
+        localStorage.setItem("site_session_token", data.sessionToken);
+        setIsAuthenticated(true);
+        toast({
+          title: "Access granted",
+          description: "Welcome to MatchPlay!",
+        });
+      } else {
+        const errorMessage = data.rateLimited 
+          ? "Too many attempts. Please try again later."
+          : data.error || "Invalid password";
+        
+        toast({
+          title: "Access denied",
+          description: errorMessage,
+          variant: "destructive",
+        });
+      }
+    } catch (error) {
+      console.error('Authentication error:', error);
       toast({
-        title: "Access denied",
-        description: "Incorrect password. Please try again.",
+        title: "Error",
+        description: "Unable to verify password. Please try again.",
         variant: "destructive",
       });
     }
