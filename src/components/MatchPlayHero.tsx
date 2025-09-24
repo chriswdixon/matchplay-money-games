@@ -137,7 +137,7 @@ const MatchPlayHero = () => {
       {/* Scroll Down Arrow */}
       <button
         onClick={handleScrollDown}
-        className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors duration-300 animate-bounce cursor-pointer group flex flex-col items-center"
+        className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors duration-300 animate-bounce-10 cursor-pointer group flex flex-col items-center"
         aria-label="Scroll down to see more"
       >
         <span className="text-xs sm:text-sm font-medium group-hover:text-accent transition-colors text-center">
