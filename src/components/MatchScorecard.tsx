@@ -191,6 +191,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           {i + 1}
                         </th>
                       ))}
+                      <th className="text-center p-2 font-medium bg-muted">Strokes</th>
                       <th className="text-center p-2 font-medium bg-accent/20">vs Par</th>
                     </tr>
                   </thead>
@@ -231,7 +232,14 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           );
                         })}
                         
-                        {/* Front 9 Total */}
+                        {/* Front 9 Strokes */}
+                        <td className="text-center p-2">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2 font-bold text-lg">
+                            {currentUserScore.front9 || 0}
+                          </div>
+                        </td>
+                        
+                        {/* Front 9 vs Par */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
@@ -275,7 +283,14 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                             </td>
                           );
                         })}
-                        {/* Front 9 Total */}
+                        {/* Front 9 Strokes */}
+                        <td className="text-center p-2">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2 font-bold text-lg">
+                            {player.front9 || 0}
+                          </div>
+                        </td>
+                        
+                        {/* Front 9 vs Par */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
@@ -319,6 +334,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           {i + 10}
                         </th>
                       ))}
+                      <th className="text-center p-2 font-medium bg-muted">Strokes</th>
                       <th className="text-center p-2 font-medium bg-accent/20">vs Par</th>
                     </tr>
                   </thead>
@@ -358,7 +374,14 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           );
                         })}
                         
-                        {/* Back 9 Total */}
+                        {/* Back 9 Strokes */}
+                        <td className="text-center p-2">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2 font-bold text-lg">
+                            {currentUserScore.back9 || 0}
+                          </div>
+                        </td>
+                        
+                        {/* Back 9 vs Par */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
@@ -402,7 +425,14 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                             </td>
                           );
                         })}
-                        {/* Back 9 Total */}
+                        {/* Back 9 Strokes */}
+                        <td className="text-center p-2">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-3 py-2 font-bold text-lg">
+                            {player.back9 || 0}
+                          </div>
+                        </td>
+                        
+                        {/* Back 9 vs Par */}
                         <td className="text-center p-2">
                           <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
                             {(() => {
