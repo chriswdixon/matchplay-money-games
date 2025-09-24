@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useProfile } from '@/hooks/useProfile';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { useAuth } from '@/hooks/useAuth';
@@ -60,9 +61,12 @@ export function ProfileDisplay() {
       <CardContent className="space-y-6">
         {/* Profile Header */}
         <div className="flex items-start gap-4">
-          <div className="w-16 h-16 bg-gradient-primary rounded-full flex items-center justify-center">
-            <User className="w-8 h-8 text-primary-foreground" />
-          </div>
+          <Avatar className="w-16 h-16 border-2 border-border">
+            <AvatarImage src={profile?.profile_picture_url || undefined} alt="Profile picture" />
+            <AvatarFallback className="bg-gradient-primary text-primary-foreground text-lg">
+              {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'}
+            </AvatarFallback>
+          </Avatar>
           <div className="flex-1">
             <h3 className="text-xl font-semibold">
               {profile?.display_name || 'Anonymous Golfer'}

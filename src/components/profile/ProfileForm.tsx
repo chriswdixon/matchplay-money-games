@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProfile } from '@/hooks/useProfile';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
+import { AvatarUpload } from './AvatarUpload';
 import { Save, User } from 'lucide-react';
 import type { Tables } from '@/integrations/supabase/types';
 
@@ -20,6 +21,7 @@ export function ProfileForm() {
     phone: '',
     handicap: '',
     membership_tier: 'local',
+    profile_picture_url: '',
   });
 
   // Update form data when profile loads
@@ -30,6 +32,7 @@ export function ProfileForm() {
         display_name: profile.display_name || '',
         handicap: profile.handicap?.toString() || '',
         membership_tier: profile.membership_tier || 'local',
+        profile_picture_url: profile.profile_picture_url || '',
       }));
     }
   }, [profile]);
@@ -67,6 +70,7 @@ export function ProfileForm() {
         display_name: formData.display_name?.trim() || null,
         handicap: formData.handicap ? parseFloat(formData.handicap) : null,
         membership_tier: formData.membership_tier,
+        profile_picture_url: formData.profile_picture_url || null,
       };
 
       // Update private data (sensitive)
@@ -118,6 +122,15 @@ export function ProfileForm() {
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-6">
+          {/* Profile Picture Upload */}
+          <div className="flex justify-center">
+            <AvatarUpload
+              currentImageUrl={formData.profile_picture_url}
+              onImageUpdate={(imageUrl) => setFormData(prev => ({ ...prev, profile_picture_url: imageUrl || '' }))}
+              disabled={saving}
+            />
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-2">
               <Label htmlFor="display_name">Display Name</Label>
