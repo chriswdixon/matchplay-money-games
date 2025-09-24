@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { useMatchScoring, PlayerScore } from '@/hooks/useMatchScoring';
+import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
 import { Target, Trophy, Clock, CheckCircle, Users } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const { user } = useAuth();
   const {
     playerScores,
+    matchData,
     loading,
     saving,
     updateScore,
@@ -111,6 +112,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 <div className="text-right">
                   <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
                   <div className="text-xs text-muted-foreground">
+                    Front 9: {player.front9} | Back 9: {player.back9}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
                     {Object.keys(player.scores).length}/18 holes
                   </div>
                 </div>
@@ -145,11 +149,34 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
+                {/* Par Row */}
+                <tr className="border-b bg-muted/20">
+                  <th className="text-left p-2 font-medium text-muted-foreground">PAR</th>
+                  {Array.from({ length: 9 }, (_, i) => (
+                    <th key={i + 1} className="text-center p-2 font-medium w-12 text-muted-foreground">
+                      {matchData?.hole_pars?.[String(i + 1)] || 4}
+                    </th>
+                  ))}
+                  <th className="text-center p-2 font-medium bg-accent/20 text-muted-foreground">F9</th>
+                  {Array.from({ length: 9 }, (_, i) => (
+                    <th key={i + 10} className="text-center p-2 font-medium w-12 text-muted-foreground">
+                      {matchData?.hole_pars?.[String(i + 10)] || 4}
+                    </th>
+                  ))}
+                  <th className="text-center p-2 font-medium bg-primary/20">Total</th>
+                </tr>
+                {/* Hole Numbers Row */}
                 <tr className="border-b">
                   <th className="text-left p-2 font-medium">Player</th>
-                  {Array.from({ length: 18 }, (_, i) => (
+                  {Array.from({ length: 9 }, (_, i) => (
                     <th key={i + 1} className="text-center p-2 font-medium w-12">
                       {i + 1}
+                    </th>
+                  ))}
+                  <th className="text-center p-2 font-medium bg-accent/20">Front 9</th>
+                  {Array.from({ length: 9 }, (_, i) => (
+                    <th key={i + 10} className="text-center p-2 font-medium w-12">
+                      {i + 10}
                     </th>
                   ))}
                   <th className="text-center p-2 font-medium bg-primary/20">Total</th>
@@ -166,8 +193,79 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         <Badge variant="default" className="text-xs bg-primary">You</Badge>
                       </div>
                     </td>
-                    {Array.from({ length: 18 }, (_, i) => {
+                    {/* Front 9 holes */}
+                    {Array.from({ length: 9 }, (_, i) => {
                       const hole = i + 1;
+                      const score = currentUserScore.scores[hole];
+                      const isEditing = editingHole === hole;
+
+                      return (
+                        <td key={hole} className="text-center p-1">
+                          {isEditing ? (
+                            <div className="flex flex-col items-center gap-1">
+                              <Input
+                                type="number"
+                                min="1"
+                                max="10"
+                                value={tempScore}
+                                onChange={(e) => setTempScore(e.target.value)}
+                                className="w-12 h-8 text-center p-0 border-primary"
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') handleScoreSave();
+                                  if (e.key === 'Escape') handleScoreCancel();
+                                }}
+                                placeholder="1-10"
+                                autoFocus
+                              />
+                              <div className="flex gap-1">
+                                <Button
+                                  size="sm"
+                                  variant="default"
+                                  className="w-4 h-4 p-0 text-xs"
+                                  onClick={handleScoreSave}
+                                >
+                                  ✓
+                                </Button>
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  className="w-4 h-4 p-0 text-xs"
+                                  onClick={handleScoreCancel}
+                                >
+                                  ✕
+                                </Button>
+                              </div>
+                            </div>
+                          ) : (
+                            <Button
+                              variant={score ? "default" : "outline"}
+                              size="sm"
+                              className={cn(
+                                "w-10 h-10 p-0 text-sm font-semibold transition-all",
+                                score 
+                                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                  : "border-dashed hover:border-primary hover:bg-primary/10"
+                              )}
+                              onClick={() => handleScoreEdit(hole, score)}
+                              disabled={saving}
+                            >
+                              {score || '+'}
+                            </Button>
+                          )}
+                        </td>
+                      );
+                    })}
+                    
+                    {/* Front 9 Total */}
+                    <td className="text-center p-2">
+                      <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
+                        {currentUserScore.front9 || 0}
+                      </div>
+                    </td>
+                    
+                    {/* Back 9 holes */}
+                    {Array.from({ length: 9 }, (_, i) => {
+                      const hole = i + 10;
                       const score = currentUserScore.scores[hole];
                       const isEditing = editingHole === hole;
 
@@ -244,8 +342,33 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {player.player_name}
                       </div>
                     </td>
-                    {Array.from({ length: 18 }, (_, i) => {
+                    {/* Front 9 holes */}
+                    {Array.from({ length: 9 }, (_, i) => {
                       const hole = i + 1;
+                      const score = player.scores[hole];
+
+                      return (
+                        <td key={hole} className="text-center p-2">
+                          <div className={cn(
+                            "w-10 h-10 rounded-lg flex items-center justify-center font-medium transition-all",
+                            score 
+                              ? 'bg-muted text-foreground border-2 border-border' 
+                              : 'bg-muted/30 border-2 border-dashed border-border/50 text-muted-foreground'
+                          )}>
+                            {score || '—'}
+                          </div>
+                        </td>
+                      );
+                    })}
+                    {/* Front 9 Total */}
+                    <td className="text-center p-2">
+                      <div className="bg-accent text-accent-foreground rounded-lg px-3 py-2 font-bold text-lg">
+                        {player.front9 || 0}
+                      </div>
+                    </td>
+                    {/* Back 9 holes */}
+                    {Array.from({ length: 9 }, (_, i) => {
+                      const hole = i + 10;
                       const score = player.scores[hole];
 
                       return (

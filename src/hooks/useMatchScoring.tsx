@@ -17,7 +17,16 @@ export interface PlayerScore {
   player_id: string;
   player_name: string;
   scores: { [hole: number]: number };
+  front9: number;
+  back9: number;
   total: number;
+}
+
+export interface MatchData {
+  id: string;
+  course_name: string;
+  location: string;
+  hole_pars: { [hole: string]: number };
 }
 
 export interface MatchResult {
@@ -34,6 +43,7 @@ export function useMatchScoring(matchId: string) {
   const [scores, setScores] = useState<MatchScore[]>([]);
   const [playerScores, setPlayerScores] = useState<PlayerScore[]>([]);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
+  const [matchData, setMatchData] = useState<MatchData | null>(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
@@ -45,6 +55,23 @@ export function useMatchScoring(matchId: string) {
 
     try {
       setLoading(true);
+
+      // Fetch match data including hole pars
+      const { data: matchInfo, error: matchError } = await supabase
+        .from('matches')
+        .select('id, course_name, location, hole_pars')
+        .eq('id', matchId)
+        .single();
+
+      if (matchError) {
+        console.error('Error fetching match data:', matchError);
+        return;
+      }
+
+      setMatchData({
+        ...matchInfo,
+        hole_pars: matchInfo.hole_pars as { [hole: string]: number }
+      });
 
       // Fetch scores
       const { data: scoresData, error: scoresError } = await supabase
@@ -100,6 +127,8 @@ export function useMatchScoring(matchId: string) {
           player_id: participant.user_id,
           player_name: participant.display_name || 'Unknown Player',
           scores: {},
+          front9: 0,
+          back9: 0,
           total: 0
         };
       });
@@ -113,7 +142,18 @@ export function useMatchScoring(matchId: string) {
 
       // Calculate totals
       Object.values(playerScoresMap).forEach((player) => {
-        player.total = Object.values(player.scores).reduce((sum, strokes) => sum + strokes, 0);
+        // Calculate front 9 (holes 1-9)
+        player.front9 = Object.entries(player.scores)
+          .filter(([hole]) => parseInt(hole) >= 1 && parseInt(hole) <= 9)
+          .reduce((sum, [, strokes]) => sum + strokes, 0);
+        
+        // Calculate back 9 (holes 10-18)
+        player.back9 = Object.entries(player.scores)
+          .filter(([hole]) => parseInt(hole) >= 10 && parseInt(hole) <= 18)
+          .reduce((sum, [, strokes]) => sum + strokes, 0);
+        
+        // Calculate total
+        player.total = player.front9 + player.back9;
       });
 
       setPlayerScores(Object.values(playerScoresMap));
@@ -417,6 +457,7 @@ export function useMatchScoring(matchId: string) {
     scores,
     playerScores,
     matchResult,
+    matchData,
     loading,
     saving,
     startMatch,
