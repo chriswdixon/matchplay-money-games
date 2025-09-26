@@ -2,6 +2,8 @@ import { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
+import { validateSessionToken } from '@/lib/validation';
+import { isValidSessionAge } from '@/lib/utils';
 
 interface AuthContextType {
   user: User | null;
@@ -25,26 +27,64 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (event, session) => {
+        // Enhanced session validation
+        if (session) {
+          // Validate session token format
+          if (!validateSessionToken(session.access_token)) {
+            console.warn('Invalid session token format detected');
+            supabase.auth.signOut();
+            return;
+          }
+          
+          // Check session age (auto-logout after 24 hours of inactivity)
+          if (!isValidSessionAge(session.user.created_at, 24)) {
+            console.warn('Session expired due to age');
+            toast({
+              title: "Session expired",
+              description: "Please sign in again for security.",
+              variant: "destructive",
+            });
+            supabase.auth.signOut();
+            return;
+          }
+        }
+        
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
         
         if (event === 'SIGNED_IN') {
+          // Log successful authentication securely (no sensitive data)
+          console.log('User authenticated successfully');
           toast({
             title: "Welcome to MatchPlay!",
             description: "You've successfully signed in.",
           });
         } else if (event === 'SIGNED_OUT') {
+          // Clear any cached data on logout
+          setSession(null);
+          setUser(null);
           toast({
             title: "Signed out",
             description: "You've been signed out successfully.",
+          });
+        } else if (event === 'PASSWORD_RECOVERY') {
+          toast({
+            title: "Password reset",
+            description: "Follow the instructions in your email to reset your password.",
           });
         }
       }
     );
 
-    // Get initial session
+    // Get initial session with validation
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session && (!validateSessionToken(session.access_token) || 
+                     !isValidSessionAge(session.user.created_at, 24))) {
+        supabase.auth.signOut();
+        return;
+      }
+      
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);

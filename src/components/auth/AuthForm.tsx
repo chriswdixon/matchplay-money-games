@@ -5,9 +5,12 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, Shield, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
+import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter } from '@/lib/validation';
+import { checkPasswordSecurity } from '@/lib/utils';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -17,11 +20,41 @@ export function AuthForm() {
   const [resetEmail, setResetEmail] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
   const [resetLoading, setResetLoading] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
+  const [passwordWarnings, setPasswordWarnings] = useState<string[]>([]);
   const { signIn, signUp } = useAuth();
   const { toast } = useToast();
+  
+  // Initialize rate limiter for auth attempts
+  const rateLimiter = new RateLimiter(3, 15 * 60 * 1000); // 3 attempts per 15 minutes
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationErrors({});
+    
+    // Rate limiting check
+    const clientId = `signin-${email}`;
+    if (!rateLimiter.isAllowed(clientId)) {
+      const remainingTime = Math.ceil(rateLimiter.getRemainingTime(clientId) / 1000 / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${remainingTime} minutes before trying again.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate input
+    const validation = signInSchema.safeParse({ email, password });
+    if (!validation.success) {
+      const errors: Record<string, string> = {};
+      validation.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      setValidationErrors(errors);
+      return;
+    }
+    
     setLoading(true);
     await signIn(email, password);
     setLoading(false);
@@ -29,6 +62,31 @@ export function AuthForm() {
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationErrors({});
+    
+    // Rate limiting check
+    const clientId = `signup-${email}`;
+    if (!rateLimiter.isAllowed(clientId)) {
+      const remainingTime = Math.ceil(rateLimiter.getRemainingTime(clientId) / 1000 / 60);
+      toast({
+        title: "Too many attempts",
+        description: `Please wait ${remainingTime} minutes before trying again.`,
+        variant: "destructive",
+      });
+      return;
+    }
+    
+    // Validate input
+    const validation = signUpSchema.safeParse({ email, password, displayName });
+    if (!validation.success) {
+      const errors: Record<string, string> = {};
+      validation.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      setValidationErrors(errors);
+      return;
+    }
+    
     setLoading(true);
     await signUp(email, password, displayName);
     setLoading(false);
@@ -37,6 +95,19 @@ export function AuthForm() {
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
+    setValidationErrors({});
+    
+    // Validate email
+    const validation = passwordResetSchema.safeParse({ email: resetEmail });
+    if (!validation.success) {
+      const errors: Record<string, string> = {};
+      validation.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      setValidationErrors(errors);
+      return;
+    }
+    
     setResetLoading(true);
     
     try {
@@ -67,6 +138,17 @@ export function AuthForm() {
     }
     
     setResetLoading(false);
+  };
+
+  // Password security check on change
+  const handlePasswordChange = async (value: string) => {
+    setPassword(value);
+    if (value.length > 0) {
+      const { warnings } = await checkPasswordSecurity(value);
+      setPasswordWarnings(warnings);
+    } else {
+      setPasswordWarnings([]);
+    }
   };
 
   return (
@@ -105,7 +187,11 @@ export function AuthForm() {
                     value={resetEmail}
                     onChange={(e) => setResetEmail(e.target.value)}
                     required
+                    className={validationErrors.email ? "border-destructive" : ""}
                   />
+                  {validationErrors.email && (
+                    <p className="text-sm text-destructive">{validationErrors.email}</p>
+                  )}
                 </div>
                 <Button type="submit" className="w-full" disabled={resetLoading}>
                   {resetLoading ? "Sending reset link..." : "Send Reset Link"}
@@ -131,7 +217,11 @@ export function AuthForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        className={validationErrors.email ? "border-destructive" : ""}
                       />
+                      {validationErrors.email && (
+                        <p className="text-sm text-destructive">{validationErrors.email}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signin-password">Password</Label>
@@ -142,7 +232,11 @@ export function AuthForm() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         required
+                        className={validationErrors.password ? "border-destructive" : ""}
                       />
+                      {validationErrors.password && (
+                        <p className="text-sm text-destructive">{validationErrors.password}</p>
+                      )}
                     </div>
                     <div className="flex justify-end">
                       <Button
@@ -170,7 +264,11 @@ export function AuthForm() {
                         placeholder="Your golf name"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
+                        className={validationErrors.displayName ? "border-destructive" : ""}
                       />
+                      {validationErrors.displayName && (
+                        <p className="text-sm text-destructive">{validationErrors.displayName}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">Email</Label>
@@ -181,18 +279,41 @@ export function AuthForm() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
+                        className={validationErrors.email ? "border-destructive" : ""}
                       />
+                      {validationErrors.email && (
+                        <p className="text-sm text-destructive">{validationErrors.email}</p>
+                      )}
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-password">Password</Label>
+                      <Label htmlFor="signup-password" className="flex items-center gap-2">
+                        Password
+                        <Shield className="w-4 h-4 text-muted-foreground" />
+                      </Label>
                       <Input
                         id="signup-password"
                         type="password"
-                        placeholder="Create a password"
+                        placeholder="Create a strong password"
                         value={password}
-                        onChange={(e) => setPassword(e.target.value)}
+                        onChange={(e) => handlePasswordChange(e.target.value)}
                         required
+                        className={validationErrors.password ? "border-destructive" : ""}
                       />
+                      {validationErrors.password && (
+                        <p className="text-sm text-destructive">{validationErrors.password}</p>
+                      )}
+                      {passwordWarnings.length > 0 && (
+                        <Alert className="mt-2">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription>
+                            <div className="space-y-1">
+                              {passwordWarnings.map((warning, index) => (
+                                <div key={index} className="text-sm">• {warning}</div>
+                              ))}
+                            </div>
+                          </AlertDescription>
+                        </Alert>
+                      )}
                     </div>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Creating account..." : "Sign Up"}
