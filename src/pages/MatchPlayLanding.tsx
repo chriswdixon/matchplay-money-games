@@ -2,12 +2,15 @@ import MatchPlayHero from "@/components/MatchPlayHero";
 import MatchFinder from "@/components/MatchFinder";
 import AppFeatures from "@/components/AppFeatures";
 import MembershipTiers from "@/components/MembershipTiers";
+import AppHeader from "@/components/AppHeader";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 const MatchPlayLanding = () => {
+  const { user } = useAuth();
   const [showScrollTop, setShowScrollTop] = useState(false);
 
   useEffect(() => {
@@ -23,6 +26,19 @@ const MatchPlayLanding = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  // Logged-in user experience
+  if (user) {
+    return (
+      <div className="min-h-screen bg-background">
+        <AppHeader />
+        <main className="container py-8">
+          <MatchFinder />
+        </main>
+      </div>
+    );
+  }
+
+  // Landing page for non-logged-in users
   return (
     <div className="min-h-screen bg-background">
       {/* Hero Section */}
