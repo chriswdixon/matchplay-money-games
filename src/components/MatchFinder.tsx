@@ -353,8 +353,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               )}
             </div>
 
-            {/* Match Filters - Only show for current matches */}
-            {!showPastMatches && (
+            {/* Match Filters - Only show for current matches and logged-in users */}
+            {!showPastMatches && user && (
               <MatchFilters
                 filters={filters}
                 onFiltersChange={setFilters}
