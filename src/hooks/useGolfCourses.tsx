@@ -25,11 +25,16 @@ export const useGolfCourses = () => {
       const radiusInMeters = radius * 1609.34;
       
       // Using Overpass API to find golf courses near the location
+      // Include multiple tags to catch more golf courses
       const overpassQuery = `
         [out:json][timeout:25];
         (
           way["leisure"="golf_course"](around:${radiusInMeters},${latitude},${longitude});
           relation["leisure"="golf_course"](around:${radiusInMeters},${latitude},${longitude});
+          node["leisure"="golf_course"](around:${radiusInMeters},${latitude},${longitude});
+          way["sport"="golf"](around:${radiusInMeters},${latitude},${longitude});
+          relation["sport"="golf"](around:${radiusInMeters},${latitude},${longitude});
+          node["sport"="golf"](around:${radiusInMeters},${latitude},${longitude});
         );
         out center meta;
       `;
@@ -169,7 +174,13 @@ export const useGolfCourses = () => {
       { name: "Torrey Pines Golf Course", address: "11480 N Torrey Pines Rd, La Jolla, CA", lat: 32.8998, lon: -117.2573, website: "https://www.sandiego.gov/park-and-recreation/golf/torreypines" },
       { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981, website: "https://www.destinationkohler.com/golf/whistling-straits" },
       { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678, website: "https://www.pinehurst.com" },
-      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364, website: "https://www.kiawahresort.com/golf/ocean-course" }
+      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364, website: "https://www.kiawahresort.com/golf/ocean-course" },
+      { name: "Black Hawk Golf Course", address: "644 Blackhawk Rd, Beaver Falls, PA", lat: 40.7522, lon: -80.3387, website: "https://blackhawkgolfcourse.com" },
+      { name: "Star Ranch Golf Club", address: "2500 FM 685, Hutto, TX", lat: 30.5064, lon: -97.5833, website: "https://www.starranchgolf.com" },
+      { name: "Spyglass Hill Golf Course", address: "Spyglass Hill Rd, Pebble Beach, CA", lat: 36.5833, lon: -121.9500, website: "https://www.pebblebeach.com/golf/spyglass-hill-golf-course" },
+      { name: "TPC Stadium Course", address: "80080 Avenue 52, La Quinta, CA", lat: 33.6603, lon: -116.2733, website: "https://www.tpc.com/stadium-course" },
+      { name: "Oakmont Country Club", address: "1233 Hulton Rd, Oakmont, PA", lat: 40.5214, lon: -79.8431, website: "https://www.google.com/search?q=Oakmont+Country+Club+tee+time+booking" },
+      { name: "Chambers Bay", address: "6320 Grandview Dr W, University Place, WA", lat: 47.2089, lon: -122.5661, website: "https://www.chambersbay.com" }
     ];
 
     return popular.map(course => ({
@@ -203,6 +214,8 @@ export const useGolfCourses = () => {
       { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981, website: "https://www.destinationkohler.com/golf/whistling-straits" },
       { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678, website: "https://www.pinehurst.com" },
       { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364, website: "https://www.kiawahresort.com/golf/ocean-course" },
+      { name: "Black Hawk Golf Course", address: "644 Blackhawk Rd, Beaver Falls, PA", lat: 40.7522, lon: -80.3387, website: "https://blackhawkgolfcourse.com" },
+      { name: "Star Ranch Golf Club", address: "2500 FM 685, Hutto, TX", lat: 30.5064, lon: -97.5833, website: "https://www.starranchgolf.com" },
       { name: "Spyglass Hill Golf Course", address: "Spyglass Hill Rd, Pebble Beach, CA", lat: 36.5833, lon: -121.9500, website: "https://www.pebblebeach.com/golf/spyglass-hill-golf-course" },
       { name: "TPC Stadium Course", address: "80080 Avenue 52, La Quinta, CA", lat: 33.6603, lon: -116.2733, website: "https://www.tpc.com/stadium-course" },
       { name: "Oakmont Country Club", address: "1233 Hulton Rd, Oakmont, PA", lat: 40.5214, lon: -79.8431, website: "https://www.google.com/search?q=Oakmont+Country+Club+tee+time+booking" },
