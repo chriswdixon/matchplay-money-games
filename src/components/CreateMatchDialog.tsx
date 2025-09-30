@@ -38,6 +38,8 @@ const CreateMatchDialog = () => {
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [timeManuallySet, setTimeManuallySet] = useState(false);
   const [hourDisplay, setHourDisplay] = useState('');
+  const [zipcode, setZipcode] = useState('');
+  const [loadingZipcode, setLoadingZipcode] = useState(false);
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
@@ -65,9 +67,33 @@ const CreateMatchDialog = () => {
       setLocationCoords(location);
       // Search for nearby courses when location is captured
       searchNearbyCourses(location.latitude, location.longitude);
+      setZipcode(''); // Clear zipcode if location is found
       toast.success('Current location captured');
     } catch (error) {
       // Error is already handled by useLocation hook
+    }
+  };
+
+  const handleZipcodeSearch = async () => {
+    if (!zipcode || zipcode.length < 5) {
+      toast.error('Please enter a valid zipcode');
+      return;
+    }
+
+    try {
+      setLoadingZipcode(true);
+      const coords = await geocodeAddress(zipcode);
+      if (coords) {
+        setLocationCoords(coords);
+        searchNearbyCourses(coords.latitude, coords.longitude);
+        toast.success('Location found from zipcode');
+      } else {
+        toast.error('Could not find location for this zipcode');
+      }
+    } catch (error) {
+      toast.error('Failed to search by zipcode');
+    } finally {
+      setLoadingZipcode(false);
     }
   };
 
@@ -111,6 +137,7 @@ const CreateMatchDialog = () => {
     setCourseOpen(false);
     setTimeManuallySet(false);
     setHourDisplay('');
+    setZipcode('');
   };
 
   const handleDialogChange = (isOpen: boolean) => {
@@ -181,21 +208,47 @@ const CreateMatchDialog = () => {
           <div className="space-y-2">
             <Label htmlFor="course_name">Golf Course</Label>
             {!locationCoords && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                onClick={handleGetCurrentLocation}
-                disabled={locationLoading}
-                className="w-full"
-              >
-                {locationLoading ? (
-                  <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                ) : (
-                  <MapPin className="w-4 h-4 mr-2" />
-                )}
-                Find courses near me
-              </Button>
+              <div className="space-y-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGetCurrentLocation}
+                  disabled={locationLoading}
+                  className="w-full"
+                >
+                  {locationLoading ? (
+                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                  ) : (
+                    <MapPin className="w-4 h-4 mr-2" />
+                  )}
+                  Find courses near me
+                </Button>
+                
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Or enter zipcode"
+                    value={zipcode}
+                    onChange={(e) => setZipcode(e.target.value)}
+                    maxLength={5}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleZipcodeSearch}
+                    disabled={loadingZipcode || !zipcode}
+                  >
+                    {loadingZipcode ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      'Search'
+                    )}
+                  </Button>
+                </div>
+              </div>
             )}
             <Popover open={courseOpen} onOpenChange={setCourseOpen}>
               <PopoverTrigger asChild>
@@ -251,7 +304,7 @@ const CreateMatchDialog = () => {
                       </div>
                     )}
                   </CommandEmpty>
-                  <CommandGroup className="max-h-60 overflow-auto p-1">
+                  <CommandGroup className="max-h-[300px] overflow-y-auto p-1">
                     {courses.map((course) => (
                       <CommandItem
                         key={`${course.name}-${course.latitude}-${course.longitude}`}

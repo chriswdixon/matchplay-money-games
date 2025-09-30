@@ -16,7 +16,7 @@ export const useGolfCourses = () => {
   const [allCourses, setAllCourses] = useState<GolfCourse[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
 
-  const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 15) => {
+  const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 30) => {
     try {
       setLoading(true);
       console.log('🔍 Searching for golf courses near:', { latitude, longitude, radius });

@@ -41,6 +41,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [timeManuallySet, setTimeManuallySet] = useState(false);
   const [hourDisplay, setHourDisplay] = useState('');
+  const [zipcode, setZipcode] = useState('');
+  const [loadingZipcode, setLoadingZipcode] = useState(false);
 
   const { updateMatch } = useMatches();
   const { user } = useAuth();
@@ -149,6 +151,29 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
     }
   };
 
+  const handleZipcodeSearch = async () => {
+    if (!zipcode || zipcode.length < 5) {
+      toast.error('Please enter a valid zipcode');
+      return;
+    }
+
+    try {
+      setLoadingZipcode(true);
+      const coords = await geocodeAddress(zipcode);
+      if (coords) {
+        setLocationCoords(coords);
+        searchNearbyCourses(coords.latitude, coords.longitude);
+        toast.success('Location found from zipcode');
+      } else {
+        toast.error('Could not find location for this zipcode');
+      }
+    } catch (error) {
+      toast.error('Failed to search by zipcode');
+    } finally {
+      setLoadingZipcode(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -221,6 +246,35 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
           {/* Golf Course Selection */}
           <div className="space-y-2">
             <Label htmlFor="course" className="text-sm font-medium">Golf Course</Label>
+            
+            {!locationCoords && (
+              <div className="space-y-2 mb-2">
+                <div className="flex gap-2">
+                  <Input
+                    type="text"
+                    placeholder="Enter zipcode to find nearby courses"
+                    value={zipcode}
+                    onChange={(e) => setZipcode(e.target.value)}
+                    maxLength={5}
+                    className="flex-1"
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleZipcodeSearch}
+                    disabled={loadingZipcode || !zipcode}
+                  >
+                    {loadingZipcode ? (
+                      <Loader2 className="w-4 h-4 animate-spin" />
+                    ) : (
+                      'Search'
+                    )}
+                  </Button>
+                </div>
+              </div>
+            )}
+            
             <Popover open={courseOpen} onOpenChange={setCourseOpen}>
               <PopoverTrigger asChild>
                 <Button
@@ -256,7 +310,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                       "No courses found."
                     )}
                   </CommandEmpty>
-                  <CommandGroup className="max-h-64 overflow-y-auto">
+                  <CommandGroup className="max-h-[300px] overflow-y-auto">
                     {filteredCourses.map((course, index) => (
                       <CommandItem
                         key={course.name + index}
