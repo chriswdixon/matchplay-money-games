@@ -113,6 +113,32 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         </Button>
       </div>
 
+      {/* Tee Information Banner */}
+      {matchData && (
+        <Card className="bg-muted/50 border-primary/20">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-sm">
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                Playing Tees
+              </Badge>
+              {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
+                <span className="font-medium">
+                  All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                </span>
+              ) : matchData.tee_selection_mode === 'individual' ? (
+                <span className="font-medium text-muted-foreground">
+                  Each player is playing from their selected tees
+                </span>
+              ) : (
+                <span className="font-medium text-muted-foreground">
+                  Tees not specified
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
       {/* Player Summary */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {playerScores.map((player) => (

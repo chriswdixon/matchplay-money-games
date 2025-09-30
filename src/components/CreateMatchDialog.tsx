@@ -30,7 +30,9 @@ const CreateMatchDialog = () => {
     handicap_min: '',
     handicap_max: '',
     max_participants: '4',
-    booking_url: ''
+    booking_url: '',
+    tee_selection_mode: 'fixed' as 'fixed' | 'individual',
+    default_tees: ''
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
@@ -100,7 +102,9 @@ const CreateMatchDialog = () => {
       handicap_min: '',
       handicap_max: '',
       max_participants: '4',
-      booking_url: ''
+      booking_url: '',
+      tee_selection_mode: 'fixed',
+      default_tees: ''
     });
     setLocationCoords(null);
     setSelectedCourse(null);
@@ -137,7 +141,9 @@ const CreateMatchDialog = () => {
       handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
       handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
       max_participants: parseInt(formData.max_participants),
-      booking_url: formData.booking_url || undefined
+      booking_url: formData.booking_url || undefined,
+      tee_selection_mode: formData.tee_selection_mode,
+      default_tees: formData.tee_selection_mode === 'fixed' ? formData.default_tees : undefined
     };
 
     const { error } = await createMatch(matchData, locationCoords || undefined);
@@ -467,6 +473,48 @@ const CreateMatchDialog = () => {
                 <SelectItem value="scramble">Scramble</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-3">
+            <Label>Tee Selection</Label>
+            <Select 
+              value={formData.tee_selection_mode} 
+              onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
+            >
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fixed">Creator selects tees for everyone</SelectItem>
+                <SelectItem value="individual">Each participant picks their own tees</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            {formData.tee_selection_mode === 'fixed' && (
+              <div className="space-y-2">
+                <Label htmlFor="default_tees">Which Tees?</Label>
+                <Select 
+                  value={formData.default_tees} 
+                  onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select tees" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Black">Black (Championship)</SelectItem>
+                    <SelectItem value="Blue">Blue (Tournament)</SelectItem>
+                    <SelectItem value="White">White (Men's)</SelectItem>
+                    <SelectItem value="Gold">Gold</SelectItem>
+                    <SelectItem value="Red">Red (Forward/Ladies)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {formData.tee_selection_mode === 'individual' && (
+              <p className="text-xs text-muted-foreground">
+                Participants will select their preferred tees when they join the match
+              </p>
+            )}
           </div>
           
           <div className="space-y-2">

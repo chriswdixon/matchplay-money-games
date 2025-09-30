@@ -46,18 +46,21 @@ export type Database = {
           id: string
           joined_at: string
           match_id: string
+          selected_tees: string | null
           user_id: string
         }
         Insert: {
           id?: string
           joined_at?: string
           match_id: string
+          selected_tees?: string | null
           user_id: string
         }
         Update: {
           id?: string
           joined_at?: string
           match_id?: string
+          selected_tees?: string | null
           user_id?: string
         }
         Relationships: [
@@ -138,6 +141,7 @@ export type Database = {
           course_name: string
           created_at: string
           created_by: string
+          default_tees: string | null
           format: string
           handicap_max: number | null
           handicap_min: number | null
@@ -149,6 +153,7 @@ export type Database = {
           max_participants: number
           scheduled_time: string
           status: string
+          tee_selection_mode: string
           updated_at: string
         }
         Insert: {
@@ -158,6 +163,7 @@ export type Database = {
           course_name: string
           created_at?: string
           created_by: string
+          default_tees?: string | null
           format: string
           handicap_max?: number | null
           handicap_min?: number | null
@@ -169,6 +175,7 @@ export type Database = {
           max_participants?: number
           scheduled_time: string
           status?: string
+          tee_selection_mode?: string
           updated_at?: string
         }
         Update: {
@@ -178,6 +185,7 @@ export type Database = {
           course_name?: string
           created_at?: string
           created_by?: string
+          default_tees?: string | null
           format?: string
           handicap_max?: number | null
           handicap_min?: number | null
@@ -189,6 +197,7 @@ export type Database = {
           max_participants?: number
           scheduled_time?: string
           status?: string
+          tee_selection_mode?: string
           updated_at?: string
         }
         Relationships: []

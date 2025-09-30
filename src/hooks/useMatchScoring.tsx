@@ -27,6 +27,8 @@ export interface MatchData {
   course_name: string;
   location: string;
   hole_pars: { [hole: string]: number };
+  tee_selection_mode?: 'fixed' | 'individual';
+  default_tees?: string;
 }
 
 export interface MatchResult {

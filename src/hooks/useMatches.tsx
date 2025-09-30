@@ -24,6 +24,8 @@ export interface Match {
   user_joined?: boolean;
   distance_km?: number;
   booking_url?: string;
+  tee_selection_mode: 'fixed' | 'individual';
+  default_tees?: string;
 }
 
 export const useMatches = () => {
@@ -258,6 +260,8 @@ export const useMatches = () => {
     handicap_max?: number;
     max_participants: number;
     booking_url?: string;
+    tee_selection_mode: 'fixed' | 'individual';
+    default_tees?: string;
   }, userLocation?: { latitude: number; longitude: number }) => {
     if (!user) {
       toast.error('You must be logged in to create a match');
@@ -432,6 +436,8 @@ export const useMatches = () => {
     handicap_max?: number;
     max_participants: number;
     booking_url?: string | null;
+    tee_selection_mode: 'fixed' | 'individual';
+    default_tees?: string | null;
   }) => {
     if (!user) {
       toast.error('You must be logged in to update a match');

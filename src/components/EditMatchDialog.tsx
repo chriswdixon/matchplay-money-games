@@ -33,7 +33,9 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
     handicap_min: '',
     handicap_max: '',
     max_participants: '',
-    booking_url: ''
+    booking_url: '',
+    tee_selection_mode: 'fixed' as 'fixed' | 'individual',
+    default_tees: ''
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
@@ -56,7 +58,9 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
         handicap_min: match.handicap_min ? String(match.handicap_min) : '',
         handicap_max: match.handicap_max ? String(match.handicap_max) : '',
         max_participants: String(match.max_participants) || '4',
-        booking_url: match.booking_url || ''
+        booking_url: match.booking_url || '',
+        tee_selection_mode: match.tee_selection_mode || 'fixed',
+        default_tees: match.default_tees || ''
       });
       
       if (match.latitude && match.longitude) {
@@ -171,7 +175,9 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
         max_participants: parseInt(formData.max_participants),
         latitude: locationCoords?.latitude || match.latitude,
         longitude: locationCoords?.longitude || match.longitude,
-        booking_url: formData.booking_url || null
+        booking_url: formData.booking_url || null,
+        tee_selection_mode: formData.tee_selection_mode,
+        default_tees: formData.tee_selection_mode === 'fixed' ? formData.default_tees : null
       };
 
       await updateMatch(match.id, matchData);
@@ -315,7 +321,49 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
             </Select>
           </div>
 
-          {/* Buy-in and Players */}
+          {/* Tee Selection */}
+          <div className="space-y-3">
+            <Label className="text-sm font-medium">Tee Selection</Label>
+            <Select 
+              value={formData.tee_selection_mode} 
+              onValueChange={(value: 'fixed' | 'individual') => handleInputChange('tee_selection_mode', value)}
+            >
+              <SelectTrigger className="hover:border-primary">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="fixed">Creator selects tees for everyone</SelectItem>
+                <SelectItem value="individual">Each participant picks their own tees</SelectItem>
+              </SelectContent>
+            </Select>
+            
+            {formData.tee_selection_mode === 'fixed' && (
+              <div className="space-y-2">
+                <Label htmlFor="default_tees" className="text-sm font-medium">Which Tees?</Label>
+                <Select 
+                  value={formData.default_tees} 
+                  onValueChange={(value) => handleInputChange('default_tees', value)}
+                >
+                  <SelectTrigger className="hover:border-primary">
+                    <SelectValue placeholder="Select tees" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="Black">Black (Championship)</SelectItem>
+                    <SelectItem value="Blue">Blue (Tournament)</SelectItem>
+                    <SelectItem value="White">White (Men's)</SelectItem>
+                    <SelectItem value="Gold">Gold</SelectItem>
+                    <SelectItem value="Red">Red (Forward/Ladies)</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            )}
+            {formData.tee_selection_mode === 'individual' && (
+              <p className="text-xs text-muted-foreground">
+                Participants will select their preferred tees when they join the match
+              </p>
+            )}
+          </div>
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="buy_in" className="text-sm font-medium">Buy-in Amount ($)</Label>
