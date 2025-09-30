@@ -19,6 +19,7 @@ export const useGolfCourses = () => {
   const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 15) => {
     try {
       setLoading(true);
+      console.log('🔍 Searching for golf courses near:', { latitude, longitude, radius });
       
       // Convert miles to meters for the API
       const radiusInMeters = radius * 1609.34;
@@ -33,25 +34,31 @@ export const useGolfCourses = () => {
         out center meta;
       `;
       
-      console.log('Searching for golf courses with query:', overpassQuery);
+      console.log('📡 Overpass API query:', overpassQuery);
+      
+      // Set a timeout for the fetch request
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
       
       const response = await fetch('https://overpass-api.de/api/interpreter', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/x-www-form-urlencoded',
         },
-        body: `data=${encodeURIComponent(overpassQuery)}`
+        body: `data=${encodeURIComponent(overpassQuery)}`,
+        signal: controller.signal
       });
 
-      console.log('Overpass API response status:', response.status);
+      clearTimeout(timeoutId);
+      console.log('✅ Overpass API response status:', response.status);
 
       if (!response.ok) {
-        console.error('Overpass API error:', response.status, response.statusText);
+        console.error('❌ Overpass API error:', response.status, response.statusText);
         throw new Error(`API returned ${response.status}: ${response.statusText}`);
       }
 
       const data = await response.json();
-      console.log('Overpass API data:', data);
+      console.log('📊 Overpass API data elements:', data.elements?.length || 0);
       
       const foundCourses: GolfCourse[] = data.elements
         ?.map((element: any) => {
@@ -92,28 +99,44 @@ export const useGolfCourses = () => {
         .sort((a: GolfCourse, b: GolfCourse) => (a.distance || 0) - (b.distance || 0))
         .slice(0, 20) || []; // Limit to 20 courses
 
-      console.log('Found courses:', foundCourses);
+      console.log('🏌️ Found local courses:', foundCourses.length);
 
-      // Add some popular courses if we don't find many
-      if (foundCourses.length < 3) {
-        const popularCourses = getPopularCourses(latitude, longitude);
-        foundCourses.push(...popularCourses);
+      // Always include popular courses as fallback
+      const popularCourses = getPopularCourses(latitude, longitude);
+      
+      // Combine local and popular courses, removing duplicates
+      const allCourses = [...foundCourses];
+      popularCourses.forEach(popular => {
+        if (!allCourses.some(course => course.name === popular.name)) {
+          allCourses.push(popular);
+        }
+      });
+
+      console.log('📋 Total courses (local + popular):', allCourses.length);
+
+      if (allCourses.length === 0) {
+        console.warn('⚠️ No courses found at all');
+        toast.warning('No golf courses found nearby. Try entering a course name manually.');
+      } else if (foundCourses.length === 0) {
+        console.log('ℹ️ Only showing popular courses');
+        toast.info('Showing popular golf courses. Try searching by name for more options.');
+      } else {
+        toast.success(`Found ${foundCourses.length} local golf courses`);
       }
 
-      setCourses(foundCourses);
-      setAllCourses(foundCourses);
-      return foundCourses;
-    } catch (error) {
-      console.error('Error fetching golf courses:', error);
+      setCourses(allCourses);
+      setAllCourses(allCourses);
+      return allCourses;
+    } catch (error: any) {
+      console.error('❌ Error fetching golf courses:', error);
       
       // Always provide fallback popular courses
       const popularCourses = getPopularCourses(latitude, longitude);
       setCourses(popularCourses);
       setAllCourses(popularCourses);
       
-      // Only show error toast if we have no fallback courses
-      if (popularCourses.length === 0) {
-        toast.error('Failed to load nearby golf courses. Please try again or enter a course name manually.');
+      if (error.name === 'AbortError') {
+        toast.error('Search timed out. Showing popular courses instead.');
       } else {
         toast.info('Showing popular golf courses near you');
       }
