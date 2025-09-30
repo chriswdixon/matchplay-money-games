@@ -133,10 +133,10 @@ export const useGolfCourses = () => {
 
       console.log('🏌️ Found local courses:', foundCourses.length);
 
-      // Always include popular courses as fallback
+      // Always include popular courses after local results
       const popularCourses = getPopularCourses(latitude, longitude);
       
-      // Combine local and popular courses, removing duplicates
+      // Combine local and popular courses: local results first, then popular courses
       const allCourses = [...foundCourses];
       popularCourses.forEach(popular => {
         if (!allCourses.some(course => course.name === popular.name)) {
@@ -255,7 +255,7 @@ export const useGolfCourses = () => {
       longitude: course.lon,
       distance: calculateDistance(latitude, longitude, course.lat, course.lon),
       website: course.website
-    })).sort((a, b) => a.distance - b.distance).slice(0, 10);
+    })).sort((a, b) => a.distance - b.distance);
   };
 
   const searchCoursesByName = (searchTermInput: string): GolfCourse[] => {

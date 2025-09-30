@@ -312,7 +312,7 @@ const CreateMatchDialog = () => {
                     onValueChange={handleCustomCourse}
                     className="border-0"
                   />
-                  <CommandList>
+                  <CommandList className="max-h-[300px] overflow-y-auto">
                     <CommandEmpty className="py-6 text-center">
                       {coursesLoading ? (
                         <div className="flex items-center justify-center py-4">
