@@ -92,24 +92,41 @@ export const useLocation = () => {
       // For zipcodes, append USA to improve geocoding accuracy
       const searchQuery = isZipcode ? `${address}, USA` : address;
       
-      console.log('Geocoding address:', searchQuery);
+      console.log('🌍 Geocoding address:', searchQuery);
+      console.log('📡 API URL:', `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`);
       
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`,
+        {
+          headers: {
+            'User-Agent': 'MatchPlayGolf/1.0'
+          }
+        }
       );
-      const data = await response.json();
       
-      console.log('Geocoding response:', data);
+      console.log('📊 Response status:', response.status, response.statusText);
+      
+      if (!response.ok) {
+        console.error('❌ API request failed:', response.status, response.statusText);
+        return null;
+      }
+      
+      const data = await response.json();
+      console.log('📦 Geocoding response data:', data);
+      console.log('📦 Response length:', data?.length);
       
       if (data && data.length > 0) {
+        console.log('✅ Found coordinates:', { lat: data[0].lat, lon: data[0].lon });
         return {
           latitude: parseFloat(data[0].lat),
           longitude: parseFloat(data[0].lon)
         };
       }
+      
+      console.warn('⚠️ No results found in response');
       return null;
     } catch (error) {
-      console.error('Geocoding failed:', error);
+      console.error('❌ Geocoding failed with error:', error);
       return null;
     }
   };
