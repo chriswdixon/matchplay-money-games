@@ -89,16 +89,21 @@ const CreateMatchDialog = () => {
 
     try {
       setLoadingZipcode(true);
+      console.log('🔍 Searching for zipcode:', zipcode);
       const coords = await geocodeAddress(zipcode);
+      console.log('📍 Geocode result:', coords);
+      
       if (coords) {
         setLocationCoords(coords);
-        searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
+        await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
         toast.success(`Location found - searching within ${searchRadius} miles`);
       } else {
-        toast.error('Could not find location for this zipcode');
+        console.error('❌ No coordinates returned for zipcode:', zipcode);
+        toast.error('Could not find location for this zipcode. Try a different zipcode.');
       }
     } catch (error) {
-      toast.error('Failed to search by zipcode');
+      console.error('❌ Zipcode search error:', error);
+      toast.error('Failed to search by zipcode. Please try again.');
     } finally {
       setLoadingZipcode(false);
     }
@@ -299,12 +304,12 @@ const CreateMatchDialog = () => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-popover border shadow-lg z-[100]" align="start">
-                <Command className="bg-popover border-0 max-h-[400px]">
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 border shadow-lg z-[9999]" align="start" sideOffset={5}>
+                <Command className="border-0">
                   <CommandInput 
                     placeholder="Search golf courses..." 
                     onValueChange={handleCustomCourse}
-                    className="border-0 bg-transparent"
+                    className="border-0"
                   />
                   <CommandEmpty className="py-6 text-center">
                     {coursesLoading ? (
@@ -328,7 +333,7 @@ const CreateMatchDialog = () => {
                       </div>
                     )}
                   </CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-y-auto p-1">
+                  <CommandGroup className="max-h-[320px] overflow-y-auto p-1">
                     {courses.map((course) => (
                       <CommandItem
                         key={`${course.name}-${course.latitude}-${course.longitude}`}

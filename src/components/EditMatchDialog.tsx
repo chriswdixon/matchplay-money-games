@@ -166,16 +166,21 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
 
     try {
       setLoadingZipcode(true);
+      console.log('🔍 Searching for zipcode:', zipcode);
       const coords = await geocodeAddress(zipcode);
+      console.log('📍 Geocode result:', coords);
+      
       if (coords) {
         setLocationCoords(coords);
-        searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
+        await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
         toast.success(`Location found - searching within ${searchRadius} miles`);
       } else {
-        toast.error('Could not find location for this zipcode');
+        console.error('❌ No coordinates returned for zipcode:', zipcode);
+        toast.error('Could not find location for this zipcode. Try a different zipcode.');
       }
     } catch (error) {
-      toast.error('Failed to search by zipcode');
+      console.error('❌ Zipcode search error:', error);
+      toast.error('Failed to search by zipcode. Please try again.');
     } finally {
       setLoadingZipcode(false);
     }
@@ -311,8 +316,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-popover border shadow-lg z-[100]" align="start">
-                <Command className="bg-popover border-0 max-h-[400px]">
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 border shadow-lg z-[9999]" align="start" sideOffset={5}>
+                <Command className="border-0">
                   <CommandInput
                     placeholder="Search courses..."
                     value={formData.course_name}
@@ -320,7 +325,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                       handleInputChange('course_name', value);
                       searchCourses(value);
                     }}
-                    className="border-0 bg-transparent"
+                    className="border-0"
                   />
                   <CommandEmpty>
                     {coursesLoading ? (
@@ -332,7 +337,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                       "No courses found."
                     )}
                   </CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-y-auto p-1">
+                  <CommandGroup className="max-h-[320px] overflow-y-auto p-1">
                     {filteredCourses.map((course, index) => (
                       <CommandItem
                         key={course.name + index}
