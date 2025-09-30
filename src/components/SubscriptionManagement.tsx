@@ -48,7 +48,11 @@ const SubscriptionManagement = () => {
     ]
   };
 
-  const currentTier = profile?.membership_tier || 'local';
+  // Ensure currentTier is always a valid tier value
+  const validTiers = ['local', 'regional', 'national'] as const;
+  const rawTier = profile?.membership_tier || 'local';
+  const currentTier = validTiers.includes(rawTier as any) ? rawTier : 'local';
+  
   const tierColors = {
     local: "bg-muted",
     regional: "bg-primary/10",
@@ -77,7 +81,7 @@ const SubscriptionManagement = () => {
           <div className="space-y-2">
             <h4 className="font-medium">Your Features</h4>
             <ul className="space-y-2">
-              {tierFeatures[currentTier as keyof typeof tierFeatures].map((feature, idx) => (
+              {(tierFeatures[currentTier as keyof typeof tierFeatures] || tierFeatures.local).map((feature, idx) => (
                 <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
                   <CheckCircle className="w-4 h-4 text-accent" />
                   {feature}
