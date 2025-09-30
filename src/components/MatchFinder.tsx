@@ -18,7 +18,7 @@ import EditMatchDialog from "./EditMatchDialog";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 
-const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) => {
+const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
@@ -58,9 +58,29 @@ const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) =
     return () => clearTimeout(timer);
   }, [location, searchRadius]); // Removed refetch from dependencies to prevent loops
 
-  // Filter matches based on current filters
+  // Filter matches based on current filters and view type
   const filteredMatches = useMemo(() => {
     let filtered = [...matches];
+    const now = new Date();
+
+    // Filter by view type (current vs past matches)
+    if (showPastMatches) {
+      // Show only completed matches
+      filtered = filtered.filter(match => match.status === 'completed');
+    } else {
+      // Show only current/upcoming matches
+      filtered = filtered.filter(match => {
+        // Exclude completed matches
+        if (match.status === 'completed') return false;
+        
+        // Exclude open matches that are scheduled in the past
+        if (match.status === 'open' && new Date(match.scheduled_time) < now) {
+          return false;
+        }
+        
+        return true;
+      });
+    }
 
     // Search filter
     if (filters.search) {
@@ -91,8 +111,8 @@ const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) =
       return buyInDollars >= minBuyIn && buyInDollars <= maxBuyIn;
     });
 
-    // Date filter
-    if (filters.dateRange !== 'all') {
+    // Date filter (only for current matches, not past)
+    if (!showPastMatches && filters.dateRange !== 'all') {
       const now = new Date();
       const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
       const tomorrow = new Date(today);
@@ -120,8 +140,8 @@ const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) =
       });
     }
 
-    // Spots filter
-    if (filters.spots !== 'all') {
+    // Spots filter (only for current matches, not past)
+    if (!showPastMatches && filters.spots !== 'all') {
       filtered = filtered.filter(match => {
         const availableSpots = match.max_participants - (match.participant_count || 0);
         switch (filters.spots) {
@@ -138,7 +158,7 @@ const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) =
     }
 
     return filtered;
-  }, [matches, filters]);
+  }, [matches, filters, showPastMatches]);
 
   // Find active match for current user (started status and user is participant)
   const activeMatch = useMemo(() => {
@@ -310,33 +330,39 @@ const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) =
           <>
             <div className="text-center mb-16 animate-fade-in">
               <Badge className="mb-4 bg-success/10 text-success border-success/20">
-                🎯 Live Match Finder
+                {showPastMatches ? '📜 Match History' : '🎯 Live Match Finder'}
               </Badge>
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-                Find Your Perfect Match
+                {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
               </h2>
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                No more playing alone. Connect with golfers in your area, book money matches, 
-                and compete with confidence knowing every stroke counts.
+                {showPastMatches 
+                  ? 'Review your completed matches, see final results, and track your competitive history.'
+                  : 'No more playing alone. Connect with golfers in your area, book money matches, and compete with confidence knowing every stroke counts.'
+                }
               </p>
-              <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
-                <CreateMatchDialog />
-                {location && (
-                  <p className="text-sm text-muted-foreground">
-                    📍 Location enabled • Showing matches within {searchRadius}mi
-                  </p>
-                )}
-              </div>
+              {!showPastMatches && (
+                <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
+                  <CreateMatchDialog />
+                  {location && (
+                    <p className="text-sm text-muted-foreground">
+                      📍 Location enabled • Showing matches within {searchRadius}mi
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
-            {/* Match Filters */}
-            <MatchFilters
-              filters={filters}
-              onFiltersChange={setFilters}
-              matchCount={filteredMatches.length}
-              showFilters={showFilters}
-              onToggleFilters={() => setShowFilters(!showFilters)}
-            />
+            {/* Match Filters - Only show for current matches */}
+            {!showPastMatches && (
+              <MatchFilters
+                filters={filters}
+                onFiltersChange={setFilters}
+                matchCount={filteredMatches.length}
+                showFilters={showFilters}
+                onToggleFilters={() => setShowFilters(!showFilters)}
+              />
+            )}
 
             {/* Live Matches */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -364,22 +390,28 @@ const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) =
                 <div className="col-span-full text-center py-12">
                   {matches.length === 0 ? (
                     <div>
-                      <p className="text-muted-foreground text-lg mb-4">No matches found. Be the first to create one!</p>
-                      <CreateMatchDialog />
+                      <p className="text-muted-foreground text-lg mb-4">
+                        {showPastMatches ? 'No past matches yet.' : 'No matches found. Be the first to create one!'}
+                      </p>
+                      {!showPastMatches && <CreateMatchDialog />}
                     </div>
                   ) : (
                     <div>
-                      <p className="text-muted-foreground text-lg mb-4">No matches match your filters.</p>
-                      <Button variant="outline" onClick={() => setFilters({
+                      <p className="text-muted-foreground text-lg mb-4">
+                        {showPastMatches ? 'No past matches found.' : 'No matches match your filters.'}
+                      </p>
+                      {!showPastMatches && (
+                        <Button variant="outline" onClick={() => setFilters({
                         search: '',
                         format: 'all', 
                         maxDistance: 30,
                         buyInRange: [0, 500],
                         dateRange: 'all',
                         spots: 'all'
-                      })}>
-                        Clear Filters
-                      </Button>
+                        })}>
+                          Clear Filters
+                        </Button>
+                      )}
                     </div>
                   )}
                 </div>

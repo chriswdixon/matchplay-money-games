@@ -8,7 +8,7 @@ import SubscriptionManagement from "@/components/SubscriptionManagement";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp } from "lucide-react";
+import { Search, Crown, ArrowUp, History } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -36,10 +36,14 @@ const MatchPlayLanding = () => {
         <AppHeader />
         <main className="container py-8 flex-1">
           <Tabs defaultValue="matches" className="w-full">
-            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
+            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto mb-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Find Matches
+              </TabsTrigger>
+              <TabsTrigger value="past" className="flex items-center gap-2">
+                <History className="w-4 h-4" />
+                Past Matches
               </TabsTrigger>
               <TabsTrigger value="subscription" className="flex items-center gap-2">
                 <Crown className="w-4 h-4" />
@@ -49,6 +53,10 @@ const MatchPlayLanding = () => {
             
             <TabsContent value="matches">
               <MatchFinder hideHowItWorks />
+            </TabsContent>
+            
+            <TabsContent value="past">
+              <MatchFinder hideHowItWorks showPastMatches />
             </TabsContent>
             
             <TabsContent value="subscription">
