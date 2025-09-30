@@ -67,13 +67,13 @@ export default function Profile() {
               <User className="w-4 h-4" />
               Profile
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
-              <Settings className="w-4 h-4" />
-              Settings
-            </TabsTrigger>
             <TabsTrigger value="handicap" className="gap-2">
               <Trophy className="w-4 h-4" />
               Handicap
+            </TabsTrigger>
+            <TabsTrigger value="settings" className="gap-2">
+              <Settings className="w-4 h-4" />
+              Settings
             </TabsTrigger>
             <TabsTrigger value="subscription" className="gap-2">
               <CreditCard className="w-4 h-4" />
@@ -85,12 +85,12 @@ export default function Profile() {
             <ProfileDisplay />
           </TabsContent>
 
-          <TabsContent value="settings">
-            <ProfileForm />
-          </TabsContent>
-
           <TabsContent value="handicap">
             <HandicapSettings />
+          </TabsContent>
+
+          <TabsContent value="settings">
+            <ProfileForm />
           </TabsContent>
 
           <TabsContent value="subscription">
