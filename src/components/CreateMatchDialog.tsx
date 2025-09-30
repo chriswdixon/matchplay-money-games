@@ -40,6 +40,7 @@ const CreateMatchDialog = () => {
   const [hourDisplay, setHourDisplay] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [loadingZipcode, setLoadingZipcode] = useState(false);
+  const [searchRadius, setSearchRadius] = useState<number>(30);
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
@@ -50,9 +51,9 @@ const CreateMatchDialog = () => {
   // Search for nearby courses when location is available
   useEffect(() => {
     if (locationCoords && courses.length === 0) {
-      searchNearbyCourses(locationCoords.latitude, locationCoords.longitude);
+      searchNearbyCourses(locationCoords.latitude, locationCoords.longitude, searchRadius);
     }
-  }, [locationCoords, courses.length, searchNearbyCourses]);
+  }, [locationCoords, courses.length, searchNearbyCourses, searchRadius]);
 
   // Initialize search with all courses when dialog opens
   useEffect(() => {
@@ -66,7 +67,7 @@ const CreateMatchDialog = () => {
       const location = await getCurrentLocation();
       setLocationCoords(location);
       // Search for nearby courses when location is captured
-      searchNearbyCourses(location.latitude, location.longitude);
+      searchNearbyCourses(location.latitude, location.longitude, searchRadius);
       setZipcode(''); // Clear zipcode if location is found
       toast.success('Current location captured');
     } catch (error) {
@@ -76,7 +77,13 @@ const CreateMatchDialog = () => {
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
-      toast.error('Please enter a valid zipcode');
+      toast.error('Please enter a valid 5-digit zipcode');
+      return;
+    }
+
+    // Validate zipcode format (US zipcodes only)
+    if (!/^\d{5}$/.test(zipcode)) {
+      toast.error('Please enter a valid 5-digit zipcode');
       return;
     }
 
@@ -85,8 +92,8 @@ const CreateMatchDialog = () => {
       const coords = await geocodeAddress(zipcode);
       if (coords) {
         setLocationCoords(coords);
-        searchNearbyCourses(coords.latitude, coords.longitude);
-        toast.success('Location found from zipcode');
+        searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
+        toast.success(`Location found - searching within ${searchRadius} miles`);
       } else {
         toast.error('Could not find location for this zipcode');
       }
@@ -209,28 +216,45 @@ const CreateMatchDialog = () => {
             <Label htmlFor="course_name">Golf Course</Label>
             {!locationCoords && (
               <div className="space-y-2">
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  onClick={handleGetCurrentLocation}
-                  disabled={locationLoading}
-                  className="w-full"
-                >
-                  {locationLoading ? (
-                    <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                  ) : (
-                    <MapPin className="w-4 h-4 mr-2" />
-                  )}
-                  Find courses near me
-                </Button>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGetCurrentLocation}
+                    disabled={locationLoading}
+                    className="flex-1"
+                  >
+                    {locationLoading ? (
+                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                    ) : (
+                      <MapPin className="w-4 h-4 mr-2" />
+                    )}
+                    Find courses near me
+                  </Button>
+                  
+                  <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 miles</SelectItem>
+                      <SelectItem value="30">30 miles</SelectItem>
+                      <SelectItem value="50">50 miles</SelectItem>
+                      <SelectItem value="100">100 miles</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
                 
                 <div className="flex gap-2">
                   <Input
                     type="text"
                     placeholder="Or enter zipcode"
                     value={zipcode}
-                    onChange={(e) => setZipcode(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setZipcode(value);
+                    }}
                     maxLength={5}
                     className="flex-1"
                   />
@@ -239,7 +263,7 @@ const CreateMatchDialog = () => {
                     variant="outline"
                     size="sm"
                     onClick={handleZipcodeSearch}
-                    disabled={loadingZipcode || !zipcode}
+                    disabled={loadingZipcode || !zipcode || zipcode.length < 5}
                   >
                     {loadingZipcode ? (
                       <Loader2 className="w-4 h-4 animate-spin" />

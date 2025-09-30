@@ -43,6 +43,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
   const [hourDisplay, setHourDisplay] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [loadingZipcode, setLoadingZipcode] = useState(false);
+  const [searchRadius, setSearchRadius] = useState<number>(30);
 
   const { updateMatch } = useMatches();
   const { user } = useAuth();
@@ -77,9 +78,9 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
   // Search for nearby courses when location is available
   useEffect(() => {
     if (locationCoords && courses.length === 0) {
-      searchNearbyCourses(locationCoords.latitude, locationCoords.longitude);
+      searchNearbyCourses(locationCoords.latitude, locationCoords.longitude, searchRadius);
     }
-  }, [locationCoords, courses.length, searchNearbyCourses]);
+  }, [locationCoords, courses.length, searchNearbyCourses, searchRadius]);
 
   // Set hour display when scheduled time changes
   useEffect(() => {
@@ -153,7 +154,13 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
-      toast.error('Please enter a valid zipcode');
+      toast.error('Please enter a valid 5-digit zipcode');
+      return;
+    }
+
+    // Validate zipcode format (US zipcodes only)
+    if (!/^\d{5}$/.test(zipcode)) {
+      toast.error('Please enter a valid 5-digit zipcode');
       return;
     }
 
@@ -162,8 +169,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
       const coords = await geocodeAddress(zipcode);
       if (coords) {
         setLocationCoords(coords);
-        searchNearbyCourses(coords.latitude, coords.longitude);
-        toast.success('Location found from zipcode');
+        searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
+        toast.success(`Location found - searching within ${searchRadius} miles`);
       } else {
         toast.error('Could not find location for this zipcode');
       }
@@ -254,16 +261,30 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                     type="text"
                     placeholder="Enter zipcode to find nearby courses"
                     value={zipcode}
-                    onChange={(e) => setZipcode(e.target.value)}
+                    onChange={(e) => {
+                      const value = e.target.value.replace(/\D/g, '');
+                      setZipcode(value);
+                    }}
                     maxLength={5}
                     className="flex-1"
                   />
+                  <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
+                    <SelectTrigger className="w-[110px]">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="15">15 miles</SelectItem>
+                      <SelectItem value="30">30 miles</SelectItem>
+                      <SelectItem value="50">50 miles</SelectItem>
+                      <SelectItem value="100">100 miles</SelectItem>
+                    </SelectContent>
+                  </Select>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={handleZipcodeSearch}
-                    disabled={loadingZipcode || !zipcode}
+                    disabled={loadingZipcode || !zipcode || zipcode.length < 5}
                   >
                     {loadingZipcode ? (
                       <Loader2 className="w-4 h-4 animate-spin" />
