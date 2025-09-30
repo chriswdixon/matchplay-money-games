@@ -86,11 +86,20 @@ export const useLocation = () => {
   // Convert address to coordinates using a geocoding service
   const geocodeAddress = async (address: string): Promise<Location | null> => {
     try {
-      // Using a simple geocoding approach - in production you'd use Google Maps API or similar
+      // Detect if it's a zipcode (5 digits, optionally with -4 digits)
+      const isZipcode = /^\d{5}(-\d{4})?$/.test(address.trim());
+      
+      // For zipcodes, append USA to improve geocoding accuracy
+      const searchQuery = isZipcode ? `${address}, USA` : address;
+      
+      console.log('Geocoding address:', searchQuery);
+      
       const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(address)}&limit=1`
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`
       );
       const data = await response.json();
+      
+      console.log('Geocoding response:', data);
       
       if (data && data.length > 0) {
         return {
