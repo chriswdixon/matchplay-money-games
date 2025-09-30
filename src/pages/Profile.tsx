@@ -3,10 +3,9 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
-import { HandicapSettings } from '@/components/profile/HandicapSettings';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, User, Settings, Trophy, CreditCard } from 'lucide-react';
+import { ArrowLeft, User, Settings, CreditCard } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 
 export default function Profile() {
@@ -57,14 +56,10 @@ export default function Profile() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-3">
             <TabsTrigger value="profile" className="gap-2">
               <User className="w-4 h-4" />
               Profile
-            </TabsTrigger>
-            <TabsTrigger value="handicap" className="gap-2">
-              <Trophy className="w-4 h-4" />
-              Handicap
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
@@ -78,10 +73,6 @@ export default function Profile() {
 
           <TabsContent value="profile">
             <ProfileDisplay />
-          </TabsContent>
-
-          <TabsContent value="handicap">
-            <HandicapSettings />
           </TabsContent>
 
           <TabsContent value="settings">
