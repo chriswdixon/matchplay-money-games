@@ -126,7 +126,11 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
     }
 
     setSelectedCourse(course);
-    setFormData(prev => ({ ...prev, course_name: course.name }));
+    setFormData(prev => ({ 
+      ...prev, 
+      course_name: course.name,
+      booking_url: course.website || `https://www.google.com/search?q=${encodeURIComponent(course.name + ' tee time booking')}`
+    }));
     setCourseOpen(false);
   };
 

@@ -7,6 +7,7 @@ export interface GolfCourse {
   latitude: number;
   longitude: number;
   distance?: number;
+  website?: string;
 }
 
 export const useGolfCourses = () => {
@@ -70,6 +71,11 @@ export const useGolfCourses = () => {
             element.tags?.['addr:state']
           ].filter(Boolean).join(', ') || 'Address not available';
 
+          // Try to get website from tags, or generate a search URL
+          const website = element.tags?.website || 
+                         element.tags?.['contact:website'] ||
+                         `https://www.google.com/search?q=${encodeURIComponent(name + ' tee time booking')}`;
+
           // Calculate distance
           const distance = calculateDistance(latitude, longitude, lat, lon);
 
@@ -78,7 +84,8 @@ export const useGolfCourses = () => {
             address,
             latitude: lat,
             longitude: lon,
-            distance
+            distance,
+            website
           };
         })
         .filter((course: GolfCourse | null) => course !== null)
@@ -130,16 +137,16 @@ export const useGolfCourses = () => {
   };
 
   const getPopularCourses = (latitude: number, longitude: number): GolfCourse[] => {
-    // Some popular golf courses with approximate locations
+    // Some popular golf courses with approximate locations and websites
     const popular = [
-      { name: "Pebble Beach Golf Links", address: "1700 17-Mile Drive, Pebble Beach, CA", lat: 36.5694, lon: -121.9469 },
-      { name: "Augusta National Golf Club", address: "2604 Washington Road, Augusta, GA", lat: 33.5028, lon: -82.0201 },
-      { name: "TPC Sawgrass", address: "110 Championship Way, Ponte Vedra Beach, FL", lat: 30.1958, lon: -81.3959 },
-      { name: "Bethpage Black Course", address: "99 Quaker Meeting House Rd, Farmingdale, NY", lat: 40.7456, lon: -73.4593 },
-      { name: "Torrey Pines Golf Course", address: "11480 N Torrey Pines Rd, La Jolla, CA", lat: 32.8998, lon: -117.2573 },
-      { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981 },
-      { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678 },
-      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364 }
+      { name: "Pebble Beach Golf Links", address: "1700 17-Mile Drive, Pebble Beach, CA", lat: 36.5694, lon: -121.9469, website: "https://www.pebblebeach.com" },
+      { name: "Augusta National Golf Club", address: "2604 Washington Road, Augusta, GA", lat: 33.5028, lon: -82.0201, website: "https://www.google.com/search?q=Augusta+National+Golf+Club+tee+time+booking" },
+      { name: "TPC Sawgrass", address: "110 Championship Way, Ponte Vedra Beach, FL", lat: 30.1958, lon: -81.3959, website: "https://www.tpc.com/sawgrass" },
+      { name: "Bethpage Black Course", address: "99 Quaker Meeting House Rd, Farmingdale, NY", lat: 40.7456, lon: -73.4593, website: "https://www.nysparks.com/golf-courses/12/details.aspx" },
+      { name: "Torrey Pines Golf Course", address: "11480 N Torrey Pines Rd, La Jolla, CA", lat: 32.8998, lon: -117.2573, website: "https://www.sandiego.gov/park-and-recreation/golf/torreypines" },
+      { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981, website: "https://www.destinationkohler.com/golf/whistling-straits" },
+      { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678, website: "https://www.pinehurst.com" },
+      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364, website: "https://www.kiawahresort.com/golf/ocean-course" }
     ];
 
     return popular.map(course => ({
@@ -147,7 +154,8 @@ export const useGolfCourses = () => {
       address: course.address,
       latitude: course.lat,
       longitude: course.lon,
-      distance: calculateDistance(latitude, longitude, course.lat, course.lon)
+      distance: calculateDistance(latitude, longitude, course.lat, course.lon),
+      website: course.website
     })).sort((a, b) => a.distance - b.distance).slice(0, 5);
   };
 
@@ -164,26 +172,27 @@ export const useGolfCourses = () => {
     
     // Get all popular courses for broader search
     const allPopularCourses = [
-      { name: "Pebble Beach Golf Links", address: "1700 17-Mile Drive, Pebble Beach, CA", lat: 36.5694, lon: -121.9469 },
-      { name: "Augusta National Golf Club", address: "2604 Washington Road, Augusta, GA", lat: 33.5028, lon: -82.0201 },
-      { name: "TPC Sawgrass", address: "110 Championship Way, Ponte Vedra Beach, FL", lat: 30.1958, lon: -81.3959 },
-      { name: "Bethpage Black Course", address: "99 Quaker Meeting House Rd, Farmingdale, NY", lat: 40.7456, lon: -73.4593 },
-      { name: "Torrey Pines Golf Course", address: "11480 N Torrey Pines Rd, La Jolla, CA", lat: 32.8998, lon: -117.2573 },
-      { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981 },
-      { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678 },
-      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364 },
-      { name: "Spyglass Hill Golf Course", address: "Spyglass Hill Rd, Pebble Beach, CA", lat: 36.5833, lon: -121.9500 },
-      { name: "TPC Stadium Course", address: "80080 Avenue 52, La Quinta, CA", lat: 33.6603, lon: -116.2733 },
-      { name: "Oakmont Country Club", address: "1233 Hulton Rd, Oakmont, PA", lat: 40.5214, lon: -79.8431 },
-      { name: "Winged Foot Golf Club", address: "851 Fenimore Rd, Mamaroneck, NY", lat: 40.9506, lon: -73.7632 },
-      { name: "Shinnecock Hills Golf Club", address: "200 Tuckahoe Rd, Southampton, NY", lat: 40.8922, lon: -72.4575 },
-      { name: "Chambers Bay", address: "6320 Grandview Dr W, University Place, WA", lat: 47.2089, lon: -122.5661 },
-      { name: "Congressional Country Club", address: "8500 River Rd, Bethesda, MD", lat: 38.9833, lon: -77.1167 }
+      { name: "Pebble Beach Golf Links", address: "1700 17-Mile Drive, Pebble Beach, CA", lat: 36.5694, lon: -121.9469, website: "https://www.pebblebeach.com" },
+      { name: "Augusta National Golf Club", address: "2604 Washington Road, Augusta, GA", lat: 33.5028, lon: -82.0201, website: "https://www.google.com/search?q=Augusta+National+Golf+Club+tee+time+booking" },
+      { name: "TPC Sawgrass", address: "110 Championship Way, Ponte Vedra Beach, FL", lat: 30.1958, lon: -81.3959, website: "https://www.tpc.com/sawgrass" },
+      { name: "Bethpage Black Course", address: "99 Quaker Meeting House Rd, Farmingdale, NY", lat: 40.7456, lon: -73.4593, website: "https://www.nysparks.com/golf-courses/12/details.aspx" },
+      { name: "Torrey Pines Golf Course", address: "11480 N Torrey Pines Rd, La Jolla, CA", lat: 32.8998, lon: -117.2573, website: "https://www.sandiego.gov/park-and-recreation/golf/torreypines" },
+      { name: "Whistling Straits", address: "W12782 Whistling Straits Dr, Sheboygan, WI", lat: 43.6636, lon: -87.7981, website: "https://www.destinationkohler.com/golf/whistling-straits" },
+      { name: "Pinehurst No. 2", address: "1 Carolina Vista Dr, Pinehurst, NC", lat: 35.1959, lon: -79.4678, website: "https://www.pinehurst.com" },
+      { name: "Kiawah Island Ocean Course", address: "1000 Ocean Course Dr, Kiawah Island, SC", lat: 32.5732, lon: -80.0364, website: "https://www.kiawahresort.com/golf/ocean-course" },
+      { name: "Spyglass Hill Golf Course", address: "Spyglass Hill Rd, Pebble Beach, CA", lat: 36.5833, lon: -121.9500, website: "https://www.pebblebeach.com/golf/spyglass-hill-golf-course" },
+      { name: "TPC Stadium Course", address: "80080 Avenue 52, La Quinta, CA", lat: 33.6603, lon: -116.2733, website: "https://www.tpc.com/stadium-course" },
+      { name: "Oakmont Country Club", address: "1233 Hulton Rd, Oakmont, PA", lat: 40.5214, lon: -79.8431, website: "https://www.google.com/search?q=Oakmont+Country+Club+tee+time+booking" },
+      { name: "Winged Foot Golf Club", address: "851 Fenimore Rd, Mamaroneck, NY", lat: 40.9506, lon: -73.7632, website: "https://www.google.com/search?q=Winged+Foot+Golf+Club+tee+time+booking" },
+      { name: "Shinnecock Hills Golf Club", address: "200 Tuckahoe Rd, Southampton, NY", lat: 40.8922, lon: -72.4575, website: "https://www.google.com/search?q=Shinnecock+Hills+Golf+Club+tee+time+booking" },
+      { name: "Chambers Bay", address: "6320 Grandview Dr W, University Place, WA", lat: 47.2089, lon: -122.5661, website: "https://www.chambersbay.com" },
+      { name: "Congressional Country Club", address: "8500 River Rd, Bethesda, MD", lat: 38.9833, lon: -77.1167, website: "https://www.google.com/search?q=Congressional+Country+Club+tee+time+booking" }
     ].map(course => ({
       name: course.name,
       address: course.address,
       latitude: course.lat,
-      longitude: course.lon
+      longitude: course.lon,
+      website: course.website
     }));
 
     // Combine local courses and popular courses for search

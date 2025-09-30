@@ -73,7 +73,8 @@ const CreateMatchDialog = () => {
     setSelectedCourse(course);
     setFormData({ 
       ...formData, 
-      course_name: course.name
+      course_name: course.name,
+      booking_url: course.website || `https://www.google.com/search?q=${encodeURIComponent(course.name + ' tee time booking')}`
     });
     setLocationCoords({
       latitude: course.latitude,
