@@ -3,9 +3,11 @@ import MatchFinder from "@/components/MatchFinder";
 import AppFeatures from "@/components/AppFeatures";
 import MembershipTiers from "@/components/MembershipTiers";
 import AppHeader from "@/components/AppHeader";
+import SubscriptionManagement from "@/components/SubscriptionManagement";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUp } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Search, Crown, ArrowUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -32,7 +34,26 @@ const MatchPlayLanding = () => {
       <div className="min-h-screen bg-background">
         <AppHeader />
         <main className="container py-8">
-          <MatchFinder />
+          <Tabs defaultValue="matches" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
+              <TabsTrigger value="matches" className="flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                Find Matches
+              </TabsTrigger>
+              <TabsTrigger value="subscription" className="flex items-center gap-2">
+                <Crown className="w-4 h-4" />
+                Subscription
+              </TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="matches">
+              <MatchFinder />
+            </TabsContent>
+            
+            <TabsContent value="subscription">
+              <SubscriptionManagement />
+            </TabsContent>
+          </Tabs>
         </main>
       </div>
     );
