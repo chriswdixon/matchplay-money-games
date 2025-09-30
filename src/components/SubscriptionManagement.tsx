@@ -6,7 +6,18 @@ import { useProfile } from "@/hooks/useProfile";
 import { toast } from "sonner";
 
 const SubscriptionManagement = () => {
-  const { profile } = useProfile();
+  const { profile, loading } = useProfile();
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-[400px]">
+        <div className="text-center space-y-4">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto"></div>
+          <p className="text-muted-foreground">Loading subscription details...</p>
+        </div>
+      </div>
+    );
+  }
 
   const handleUpgrade = () => {
     toast.info("Upgrade feature coming soon!");
