@@ -5,10 +5,11 @@ import MembershipTiers from "@/components/MembershipTiers";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import SubscriptionManagement from "@/components/SubscriptionManagement";
+import { HandicapSettings } from "@/components/profile/HandicapSettings";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp, History } from "lucide-react";
+import { Search, Crown, ArrowUp, History, Trophy } from "lucide-react";
 import { useEffect, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 
@@ -36,7 +37,7 @@ const MatchPlayLanding = () => {
         <AppHeader />
         <main className="container py-8 flex-1">
           <Tabs defaultValue="matches" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 max-w-2xl mx-auto mb-8">
+            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Find Matches
@@ -44,6 +45,10 @@ const MatchPlayLanding = () => {
               <TabsTrigger value="past" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
                 Past Matches
+              </TabsTrigger>
+              <TabsTrigger value="handicap" className="flex items-center gap-2">
+                <Trophy className="w-4 h-4" />
+                Handicap
               </TabsTrigger>
               <TabsTrigger value="subscription" className="flex items-center gap-2">
                 <Crown className="w-4 h-4" />
@@ -57,6 +62,10 @@ const MatchPlayLanding = () => {
             
             <TabsContent value="past">
               <MatchFinder hideHowItWorks showPastMatches />
+            </TabsContent>
+            
+            <TabsContent value="handicap">
+              <HandicapSettings />
             </TabsContent>
             
             <TabsContent value="subscription">
