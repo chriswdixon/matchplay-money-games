@@ -4,7 +4,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Edit, MapPin, Loader2, Check, ChevronsUpDown, Clock, X } from 'lucide-react';
@@ -327,35 +327,37 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                     }}
                     className="border-0"
                   />
-                  <CommandEmpty>
-                    {coursesLoading ? (
-                      <div className="flex items-center justify-center p-4">
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        Searching courses...
-                      </div>
-                    ) : (
-                      "No courses found."
-                    )}
-                  </CommandEmpty>
-                  <CommandGroup className="max-h-[320px] overflow-y-auto p-1">
-                    {filteredCourses.map((course, index) => (
-                      <CommandItem
-                        key={course.name + index}
-                        value={course.name}
-                        onSelect={() => handleCourseSelect(course)}
-                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
-                      >
-                        <Check className={cn("mr-2 h-4 w-4 flex-shrink-0", selectedCourse?.name === course.name ? "opacity-100" : "opacity-0")} />
-                        <div className="flex flex-col flex-1 gap-1 overflow-hidden">
-                          <span className="font-medium truncate">{course.name}</span>
-                          <span className="text-xs text-muted-foreground truncate">
-                            {course.address}
-                            {course.distance && ` • ${formatDistance(course.distance)}`}
-                          </span>
+                  <CommandList>
+                    <CommandEmpty>
+                      {coursesLoading ? (
+                        <div className="flex items-center justify-center p-4">
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          Searching courses...
                         </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                      ) : (
+                        "No courses found."
+                      )}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {filteredCourses.map((course, index) => (
+                        <CommandItem
+                          key={course.name + index}
+                          value={course.name}
+                          onSelect={() => handleCourseSelect(course)}
+                          className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
+                        >
+                          <Check className={cn("mr-2 h-4 w-4 flex-shrink-0", selectedCourse?.name === course.name ? "opacity-100" : "opacity-0")} />
+                          <div className="flex flex-col flex-1 gap-1 overflow-hidden">
+                            <span className="font-medium truncate">{course.name}</span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              {course.address}
+                              {course.distance && ` • ${formatDistance(course.distance)}`}
+                            </span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>

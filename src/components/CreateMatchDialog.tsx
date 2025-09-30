@@ -5,7 +5,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from '@/components/ui/command';
+import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Plus, MapPin, Loader2, Check, ChevronsUpDown, Clock, X } from 'lucide-react';
@@ -311,54 +311,56 @@ const CreateMatchDialog = () => {
                     onValueChange={handleCustomCourse}
                     className="border-0"
                   />
-                  <CommandEmpty className="py-6 text-center">
-                    {coursesLoading ? (
-                      <div className="flex items-center justify-center py-4">
-                        <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                        <span className="text-muted-foreground">Loading nearby courses...</span>
-                      </div>
-                    ) : (
-                      <div className="py-4 text-center space-y-2">
-                        <p className="text-sm text-muted-foreground mb-2">No courses found</p>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={handleGetCurrentLocation}
-                          disabled={locationLoading}
-                          className="mx-auto"
-                        >
-                          <MapPin className="w-4 h-4 mr-2" />
-                          Find nearby courses
-                        </Button>
-                      </div>
-                    )}
-                  </CommandEmpty>
-                  <CommandGroup className="max-h-[320px] overflow-y-auto p-1">
-                    {courses.map((course) => (
-                      <CommandItem
-                        key={`${course.name}-${course.latitude}-${course.longitude}`}
-                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
-                        onSelect={(value) => {
-                          console.log('Course selected:', course.name);
-                          handleCourseSelect(course);
-                        }}
-                      >
-                        <Check
-                          className={cn(
-                            "mr-2 h-4 w-4 flex-shrink-0",
-                            selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
-                          )}
-                        />
-                        <div className="flex flex-col flex-1 gap-1 overflow-hidden">
-                          <span className="font-medium truncate">{course.name}</span>
-                          <span className="text-xs text-muted-foreground truncate">
-                            {course.address}
-                            {course.distance && ` • ${formatDistance(course.distance)}`}
-                          </span>
+                  <CommandList>
+                    <CommandEmpty className="py-6 text-center">
+                      {coursesLoading ? (
+                        <div className="flex items-center justify-center py-4">
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          <span className="text-muted-foreground">Loading nearby courses...</span>
                         </div>
-                      </CommandItem>
-                    ))}
-                  </CommandGroup>
+                      ) : (
+                        <div className="py-4 text-center space-y-2">
+                          <p className="text-sm text-muted-foreground mb-2">No courses found</p>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={handleGetCurrentLocation}
+                            disabled={locationLoading}
+                            className="mx-auto"
+                          >
+                            <MapPin className="w-4 h-4 mr-2" />
+                            Find nearby courses
+                          </Button>
+                        </div>
+                      )}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {courses.map((course) => (
+                        <CommandItem
+                          key={`${course.name}-${course.latitude}-${course.longitude}`}
+                          className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
+                          onSelect={(value) => {
+                            console.log('Course selected:', course.name);
+                            handleCourseSelect(course);
+                          }}
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4 flex-shrink-0",
+                              selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex flex-col flex-1 gap-1 overflow-hidden">
+                            <span className="font-medium truncate">{course.name}</span>
+                            <span className="text-xs text-muted-foreground truncate">
+                              {course.address}
+                              {course.distance && ` • ${formatDistance(course.distance)}`}
+                            </span>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
                 </Command>
               </PopoverContent>
             </Popover>
