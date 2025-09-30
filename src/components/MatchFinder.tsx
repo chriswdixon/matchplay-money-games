@@ -389,12 +389,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               ) : filteredMatches.length === 0 ? (
                 <div className="col-span-full text-center py-12">
                   {matches.length === 0 ? (
-                    <div>
-                      <p className="text-muted-foreground text-lg mb-4">
-                        {showPastMatches ? 'No past matches yet.' : 'No matches found. Be the first to create one!'}
-                      </p>
-                      {!showPastMatches && <CreateMatchDialog />}
-                    </div>
+                    user ? (
+                      <div>
+                        <p className="text-muted-foreground text-lg mb-4">
+                          {showPastMatches ? 'No past matches yet.' : 'No matches found. Be the first to create one!'}
+                        </p>
+                        {!showPastMatches && <CreateMatchDialog />}
+                      </div>
+                    ) : null
                   ) : (
                     <div>
                       <p className="text-muted-foreground text-lg mb-4">
