@@ -18,7 +18,7 @@ import EditMatchDialog from "./EditMatchDialog";
 import { cn } from "@/lib/utils";
 import { useState, useEffect, useMemo } from "react";
 
-const MatchFinder = () => {
+const MatchFinder = ({ hideHowItWorks = false }: { hideHowItWorks?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
@@ -541,8 +541,8 @@ const MatchFinder = () => {
           />
         )}
         
-        {/* How It Works - Only show when not in active match */}
-        {!activeMatch && (
+        {/* How It Works - Only show when not in active match and not hidden */}
+        {!activeMatch && !hideHowItWorks && (
           <div className="bg-gradient-card rounded-2xl p-8 md:p-12">
             <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
             <div className="grid md:grid-cols-4 gap-6">

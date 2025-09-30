@@ -3,6 +3,7 @@ import MatchFinder from "@/components/MatchFinder";
 import AppFeatures from "@/components/AppFeatures";
 import MembershipTiers from "@/components/MembershipTiers";
 import AppHeader from "@/components/AppHeader";
+import AppFooter from "@/components/AppFooter";
 import SubscriptionManagement from "@/components/SubscriptionManagement";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -31,9 +32,9 @@ const MatchPlayLanding = () => {
   // Logged-in user experience
   if (user) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-background flex flex-col">
         <AppHeader />
-        <main className="container py-8">
+        <main className="container py-8 flex-1">
           <Tabs defaultValue="matches" className="w-full">
             <TabsList className="grid w-full grid-cols-2 max-w-md mx-auto mb-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
@@ -47,7 +48,7 @@ const MatchPlayLanding = () => {
             </TabsList>
             
             <TabsContent value="matches">
-              <MatchFinder />
+              <MatchFinder hideHowItWorks />
             </TabsContent>
             
             <TabsContent value="subscription">
@@ -55,6 +56,7 @@ const MatchPlayLanding = () => {
             </TabsContent>
           </Tabs>
         </main>
+        <AppFooter />
       </div>
     );
   }
