@@ -93,40 +93,41 @@ export const useLocation = () => {
       const searchQuery = isZipcode ? `${address}, USA` : address;
       
       console.log('🌍 Geocoding address:', searchQuery);
-      console.log('📡 API URL:', `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`);
       
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`,
-        {
-          headers: {
-            'User-Agent': 'MatchPlayGolf/1.0'
-          }
+      // Try multiple geocoding services for better reliability
+      const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`;
+      console.log('📡 Nominatim URL:', nominatimUrl);
+      
+      const response = await fetch(nominatimUrl, {
+        headers: {
+          'User-Agent': 'MatchPlayGolfApp/1.0 (contact@example.com)'
         }
-      );
+      });
       
       console.log('📊 Response status:', response.status, response.statusText);
+      console.log('📊 Response headers:', Object.fromEntries(response.headers.entries()));
       
       if (!response.ok) {
-        console.error('❌ API request failed:', response.status, response.statusText);
-        return null;
+        console.error('❌ Nominatim API failed:', response.status, response.statusText);
+        throw new Error(`Nominatim API failed: ${response.status}`);
       }
       
       const data = await response.json();
       console.log('📦 Geocoding response data:', data);
-      console.log('📦 Response length:', data?.length);
       
       if (data && data.length > 0) {
-        console.log('✅ Found coordinates:', { lat: data[0].lat, lon: data[0].lon });
-        return {
+        const result = {
           latitude: parseFloat(data[0].lat),
           longitude: parseFloat(data[0].lon)
         };
+        console.log('✅ Found coordinates:', result);
+        return result;
       }
       
-      console.warn('⚠️ No results found in response');
+      console.warn('⚠️ No results found for:', searchQuery);
       return null;
     } catch (error) {
-      console.error('❌ Geocoding failed with error:', error);
+      console.error('❌ Geocoding error:', error);
       return null;
     }
   };
