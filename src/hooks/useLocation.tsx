@@ -91,34 +91,33 @@ export const useLocation = () => {
       
       console.log('🌍 Geocoding address:', address);
       
-      // For US zipcodes, use Census Bureau geocoding API (more reliable)
+      // Use geocode.xyz for zipcode lookups (CORS-friendly, free tier)
       if (isZipcode) {
-        const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(address)}&benchmark=2020&format=json`;
-        console.log('📡 Using Census Bureau API:', censusUrl);
+        const geocodeUrl = `https://geocode.xyz/${encodeURIComponent(address)}?json=1&region=US`;
+        console.log('📡 Using geocode.xyz API:', geocodeUrl);
         
-        const response = await fetch(censusUrl);
+        const response = await fetch(geocodeUrl);
         console.log('📊 Response status:', response.status);
         
         if (!response.ok) {
-          console.error('❌ Census API failed:', response.status);
-          throw new Error(`Census API failed: ${response.status}`);
+          console.error('❌ Geocode.xyz API failed:', response.status);
+          throw new Error(`Geocode.xyz API failed: ${response.status}`);
         }
         
         const data = await response.json();
-        console.log('📦 Census response:', data);
+        console.log('📦 Geocode.xyz response:', data);
         
-        if (data?.result?.addressMatches && data.result.addressMatches.length > 0) {
-          const coords = data.result.addressMatches[0].coordinates;
+        if (data?.latt && data?.longt && data.latt !== "0" && data.longt !== "0") {
           const result = {
-            latitude: coords.y,
-            longitude: coords.x
+            latitude: parseFloat(data.latt),
+            longitude: parseFloat(data.longt)
           };
           console.log('✅ Found coordinates:', result);
           return result;
         }
       }
       
-      // For non-zipcode addresses, fallback to Nominatim
+      // For non-zipcode addresses, use Nominatim
       const searchQuery = isZipcode ? `${address}, USA` : address;
       const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`;
       console.log('📡 Using Nominatim API:', nominatimUrl);
