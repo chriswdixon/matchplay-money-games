@@ -89,14 +89,39 @@ export const useLocation = () => {
       // Detect if it's a zipcode (5 digits, optionally with -4 digits)
       const isZipcode = /^\d{5}(-\d{4})?$/.test(address.trim());
       
-      // For zipcodes, append USA to improve geocoding accuracy
+      console.log('🌍 Geocoding address:', address);
+      
+      // For US zipcodes, use Census Bureau geocoding API (more reliable)
+      if (isZipcode) {
+        const censusUrl = `https://geocoding.geo.census.gov/geocoder/locations/onelineaddress?address=${encodeURIComponent(address)}&benchmark=2020&format=json`;
+        console.log('📡 Using Census Bureau API:', censusUrl);
+        
+        const response = await fetch(censusUrl);
+        console.log('📊 Response status:', response.status);
+        
+        if (!response.ok) {
+          console.error('❌ Census API failed:', response.status);
+          throw new Error(`Census API failed: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        console.log('📦 Census response:', data);
+        
+        if (data?.result?.addressMatches && data.result.addressMatches.length > 0) {
+          const coords = data.result.addressMatches[0].coordinates;
+          const result = {
+            latitude: coords.y,
+            longitude: coords.x
+          };
+          console.log('✅ Found coordinates:', result);
+          return result;
+        }
+      }
+      
+      // For non-zipcode addresses, fallback to Nominatim
       const searchQuery = isZipcode ? `${address}, USA` : address;
-      
-      console.log('🌍 Geocoding address:', searchQuery);
-      
-      // Try multiple geocoding services for better reliability
       const nominatimUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&limit=1&countrycodes=us`;
-      console.log('📡 Nominatim URL:', nominatimUrl);
+      console.log('📡 Using Nominatim API:', nominatimUrl);
       
       const response = await fetch(nominatimUrl, {
         headers: {
@@ -104,16 +129,15 @@ export const useLocation = () => {
         }
       });
       
-      console.log('📊 Response status:', response.status, response.statusText);
-      console.log('📊 Response headers:', Object.fromEntries(response.headers.entries()));
+      console.log('📊 Response status:', response.status);
       
       if (!response.ok) {
-        console.error('❌ Nominatim API failed:', response.status, response.statusText);
+        console.error('❌ Nominatim API failed:', response.status);
         throw new Error(`Nominatim API failed: ${response.status}`);
       }
       
       const data = await response.json();
-      console.log('📦 Geocoding response data:', data);
+      console.log('📦 Nominatim response:', data);
       
       if (data && data.length > 0) {
         const result = {
@@ -124,7 +148,7 @@ export const useLocation = () => {
         return result;
       }
       
-      console.warn('⚠️ No results found for:', searchQuery);
+      console.warn('⚠️ No results found for:', address);
       return null;
     } catch (error) {
       console.error('❌ Geocoding error:', error);
