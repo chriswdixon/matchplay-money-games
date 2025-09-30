@@ -339,8 +339,9 @@ const CreateMatchDialog = () => {
                       {courses.map((course) => (
                         <CommandItem
                           key={`${course.name}-${course.latitude}-${course.longitude}`}
+                          value={course.name}
                           className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
-                          onSelect={(value) => {
+                          onSelect={() => {
                             console.log('Course selected:', course.name);
                             handleCourseSelect(course);
                           }}
