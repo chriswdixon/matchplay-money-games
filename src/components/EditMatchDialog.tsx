@@ -290,8 +290,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-full p-0">
-                <Command>
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-popover border shadow-lg z-[100]" align="start">
+                <Command className="bg-popover border-0 max-h-[400px]">
                   <CommandInput
                     placeholder="Search courses..."
                     value={formData.course_name}
@@ -299,6 +299,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                       handleInputChange('course_name', value);
                       searchCourses(value);
                     }}
+                    className="border-0 bg-transparent"
                   />
                   <CommandEmpty>
                     {coursesLoading ? (
@@ -310,21 +311,21 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                       "No courses found."
                     )}
                   </CommandEmpty>
-                  <CommandGroup className="max-h-[300px] overflow-y-auto">
+                  <CommandGroup className="max-h-[300px] overflow-y-auto p-1">
                     {filteredCourses.map((course, index) => (
                       <CommandItem
                         key={course.name + index}
                         value={course.name}
                         onSelect={() => handleCourseSelect(course)}
-                        className="cursor-pointer"
+                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
                       >
-                        <Check className={cn("mr-2 h-4 w-4", selectedCourse?.name === course.name ? "opacity-100" : "opacity-0")} />
-                        <div className="flex-1">
-                          <div className="font-medium">{course.name}</div>
-                          <div className="text-sm text-muted-foreground">
+                        <Check className={cn("mr-2 h-4 w-4 flex-shrink-0", selectedCourse?.name === course.name ? "opacity-100" : "opacity-0")} />
+                        <div className="flex flex-col flex-1 gap-1 overflow-hidden">
+                          <span className="font-medium truncate">{course.name}</span>
+                          <span className="text-xs text-muted-foreground truncate">
                             {course.address}
                             {course.distance && ` • ${formatDistance(course.distance)}`}
-                          </div>
+                          </span>
                         </div>
                       </CommandItem>
                     ))}

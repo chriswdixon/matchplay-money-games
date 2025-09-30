@@ -275,12 +275,12 @@ const CreateMatchDialog = () => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-background border shadow-lg z-[100] pointer-events-auto" align="start">
-                <Command className="bg-background border-0">
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 bg-popover border shadow-lg z-[100]" align="start">
+                <Command className="bg-popover border-0 max-h-[400px]">
                   <CommandInput 
                     placeholder="Search golf courses..." 
                     onValueChange={handleCustomCourse}
-                    className="border-0 bg-background"
+                    className="border-0 bg-transparent"
                   />
                   <CommandEmpty className="py-6 text-center">
                     {coursesLoading ? (
@@ -308,7 +308,7 @@ const CreateMatchDialog = () => {
                     {courses.map((course) => (
                       <CommandItem
                         key={`${course.name}-${course.latitude}-${course.longitude}`}
-                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50 pointer-events-auto"
+                        className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
                         onSelect={(value) => {
                           console.log('Course selected:', course.name);
                           handleCourseSelect(course);
