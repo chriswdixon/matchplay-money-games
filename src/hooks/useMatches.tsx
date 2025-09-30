@@ -23,6 +23,7 @@ export interface Match {
   participant_count?: number;
   user_joined?: boolean;
   distance_km?: number;
+  booking_url?: string;
 }
 
 export const useMatches = () => {
@@ -256,6 +257,7 @@ export const useMatches = () => {
     handicap_min?: number;
     handicap_max?: number;
     max_participants: number;
+    booking_url?: string;
   }, userLocation?: { latitude: number; longitude: number }) => {
     if (!user) {
       toast.error('You must be logged in to create a match');
@@ -429,6 +431,7 @@ export const useMatches = () => {
     handicap_min?: number;
     handicap_max?: number;
     max_participants: number;
+    booking_url?: string | null;
   }) => {
     if (!user) {
       toast.error('You must be logged in to update a match');

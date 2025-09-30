@@ -29,7 +29,8 @@ const CreateMatchDialog = () => {
     buy_in_amount: '50',
     handicap_min: '',
     handicap_max: '',
-    max_participants: '4'
+    max_participants: '4',
+    booking_url: ''
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
@@ -97,7 +98,8 @@ const CreateMatchDialog = () => {
       buy_in_amount: '50',
       handicap_min: '',
       handicap_max: '',
-      max_participants: '4'
+      max_participants: '4',
+      booking_url: ''
     });
     setLocationCoords(null);
     setSelectedCourse(null);
@@ -133,7 +135,8 @@ const CreateMatchDialog = () => {
       buy_in_amount: parseInt(formData.buy_in_amount) * 100, // Convert to cents
       handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
       handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
-      max_participants: parseInt(formData.max_participants)
+      max_participants: parseInt(formData.max_participants),
+      booking_url: formData.booking_url || undefined
     };
 
     const { error } = await createMatch(matchData, locationCoords || undefined);
@@ -518,6 +521,20 @@ const CreateMatchDialog = () => {
                 <SelectItem value="4">4 Players</SelectItem>
               </SelectContent>
             </Select>
+          </div>
+          
+          <div className="space-y-2">
+            <Label htmlFor="booking_url">Tee Time Booking URL (Optional)</Label>
+            <Input
+              id="booking_url"
+              type="url"
+              value={formData.booking_url}
+              onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
+              placeholder="https://example.com/book-tee-time"
+            />
+            <p className="text-xs text-muted-foreground">
+              Add a link to the course's booking page so participants can reserve their tee time
+            </p>
           </div>
           
           <div className="flex justify-end space-x-2 pt-4">

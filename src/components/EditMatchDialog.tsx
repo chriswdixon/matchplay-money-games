@@ -32,7 +32,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
     buy_in_amount: '',
     handicap_min: '',
     handicap_max: '',
-    max_participants: ''
+    max_participants: '',
+    booking_url: ''
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
@@ -54,7 +55,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
         buy_in_amount: String(match.buy_in_amount / 100) || '50',
         handicap_min: match.handicap_min ? String(match.handicap_min) : '',
         handicap_max: match.handicap_max ? String(match.handicap_max) : '',
-        max_participants: String(match.max_participants) || '4'
+        max_participants: String(match.max_participants) || '4',
+        booking_url: match.booking_url || ''
       });
       
       if (match.latitude && match.longitude) {
@@ -165,6 +167,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
         max_participants: parseInt(formData.max_participants),
         latitude: locationCoords?.latitude || match.latitude,
         longitude: locationCoords?.longitude || match.longitude,
+        booking_url: formData.booking_url || null
       };
 
       await updateMatch(match.id, matchData);
@@ -372,6 +375,22 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                 placeholder="e.g., 25"
               />
             </div>
+          </div>
+
+          {/* Booking URL */}
+          <div className="space-y-2">
+            <Label htmlFor="booking_url" className="text-sm font-medium">Tee Time Booking URL (Optional)</Label>
+            <Input
+              id="booking_url"
+              type="url"
+              value={formData.booking_url}
+              onChange={(e) => handleInputChange('booking_url', e.target.value)}
+              className="hover:border-primary focus:border-primary"
+              placeholder="https://example.com/book-tee-time"
+            />
+            <p className="text-xs text-muted-foreground">
+              Add a link to the course's booking page so participants can reserve their tee time
+            </p>
           </div>
 
           {/* Submit Button */}

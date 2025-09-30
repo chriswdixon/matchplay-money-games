@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
@@ -484,6 +484,18 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 onMatchUpdated={() => refetch()} 
                               />
                             </div>
+                          )}
+                          
+                          {/* Book Tee Time button - show if booking URL exists and match is open/user joined */}
+                          {match.booking_url && (match.status === 'open' || match.user_joined) && (
+                            <Button
+                              variant="outline"
+                              className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                              onClick={() => window.open(match.booking_url, '_blank')}
+                            >
+                              <Calendar className="w-4 h-4 mr-2" />
+                              Book Tee Time
+                            </Button>
                           )}
                           
                           {isMatchCompleted(match) && match.user_joined ? (
