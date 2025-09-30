@@ -81,7 +81,6 @@ const CreateMatchDialog = () => {
       return;
     }
 
-    // Validate zipcode format (US zipcodes only)
     if (!/^\d{5}$/.test(zipcode)) {
       toast.error('Please enter a valid 5-digit zipcode');
       return;
@@ -89,12 +88,14 @@ const CreateMatchDialog = () => {
 
     try {
       setLoadingZipcode(true);
-      console.log('🔍 Searching for zipcode:', zipcode);
+      console.log('🔍 Searching for zipcode:', zipcode, 'with radius:', searchRadius, 'miles');
       const coords = await geocodeAddress(zipcode);
-      console.log('📍 Geocode result:', coords);
+      console.log('📍 Geocode result for', zipcode, ':', coords);
       
       if (coords) {
+        console.log('✅ Coordinates found:', coords.latitude, coords.longitude);
         setLocationCoords(coords);
+        console.log('🔎 Searching nearby courses with radius:', searchRadius);
         await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
         toast.success(`Location found - searching within ${searchRadius} miles`);
       } else {
