@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 
 export interface GolfCourse {
@@ -15,6 +15,25 @@ export const useGolfCourses = () => {
   const [loading, setLoading] = useState(false);
   const [allCourses, setAllCourses] = useState<GolfCourse[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const lastToastMessage = useRef<string>('');
+  const toastTimestamp = useRef<number>(0);
+
+  const showToastOnce = (message: string, type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
+    const now = Date.now();
+    // Prevent duplicate toasts within 3 seconds
+    if (lastToastMessage.current === message && now - toastTimestamp.current < 3000) {
+      return;
+    }
+    lastToastMessage.current = message;
+    toastTimestamp.current = now;
+    
+    switch(type) {
+      case 'success': toast.success(message); break;
+      case 'warning': toast.warning(message); break;
+      case 'error': toast.error(message); break;
+      default: toast.info(message);
+    }
+  };
 
   const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 30) => {
     try {
@@ -121,12 +140,12 @@ export const useGolfCourses = () => {
 
       if (allCourses.length === 0) {
         console.warn('⚠️ No courses found at all');
-        toast.warning('No golf courses found nearby. Try entering a course name manually.');
+        showToastOnce('No golf courses found nearby. Try entering a course name manually.', 'warning');
       } else if (foundCourses.length === 0) {
         console.log('ℹ️ Only showing popular courses');
-        toast.info('Showing popular golf courses. Try searching by name for more options.');
+        showToastOnce('Showing popular golf courses. Try searching by name for more options.', 'info');
       } else {
-        toast.success(`Found ${foundCourses.length} local golf courses`);
+        showToastOnce(`Found ${foundCourses.length} local golf courses`, 'success');
       }
 
       setCourses(allCourses);
@@ -141,9 +160,9 @@ export const useGolfCourses = () => {
       setAllCourses(popularCourses);
       
       if (error.name === 'AbortError') {
-        toast.error('Search timed out. Showing popular courses instead.');
+        showToastOnce('Search timed out. Showing popular courses instead.', 'error');
       } else {
-        toast.info('Showing popular golf courses near you');
+        showToastOnce('Showing popular golf courses near you', 'info');
       }
       
       return popularCourses;
