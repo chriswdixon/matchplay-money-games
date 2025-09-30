@@ -3,7 +3,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useProfile } from '@/hooks/useProfile';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { AvatarUpload } from './AvatarUpload';
@@ -19,8 +18,6 @@ export function ProfileForm() {
   const [formData, setFormData] = useState({
     display_name: '',
     phone: '',
-    handicap: '',
-    membership_tier: 'local',
     profile_picture_url: '',
   });
 
@@ -30,8 +27,6 @@ export function ProfileForm() {
       setFormData(prev => ({
         ...prev,
         display_name: profile.display_name || '',
-        handicap: profile.handicap?.toString() || '',
-        membership_tier: profile.membership_tier || 'local',
         profile_picture_url: profile.profile_picture_url || '',
       }));
     }
@@ -68,8 +63,6 @@ export function ProfileForm() {
       // Update profile data (non-sensitive)
       const profileUpdates: Partial<Profile> = {
         display_name: formData.display_name?.trim() || null,
-        handicap: formData.handicap ? parseFloat(formData.handicap) : null,
-        membership_tier: formData.membership_tier,
         profile_picture_url: formData.profile_picture_url || null,
       };
 
@@ -152,38 +145,6 @@ export function ProfileForm() {
                 value={formData.phone}
                 onChange={(e) => handleInputChange('phone', e.target.value)}
               />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="handicap">Golf Handicap</Label>
-              <Input
-                id="handicap"
-                type="number"
-                step="0.1"
-                min="-10"
-                max="54"
-                placeholder="e.g., 12.5"
-                value={formData.handicap}
-                onChange={(e) => handleInputChange('handicap', e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="membership_tier">Membership Tier</Label>
-              <Select
-                value={formData.membership_tier}
-                onValueChange={(value) => handleInputChange('membership_tier', value)}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Select membership tier" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="local">Local Player</SelectItem>
-                  <SelectItem value="premium">Premium Member</SelectItem>
-                  <SelectItem value="pro">Pro Member</SelectItem>
-                  <SelectItem value="tournament">Tournament Player</SelectItem>
-                </SelectContent>
-              </Select>
             </div>
           </div>
 
