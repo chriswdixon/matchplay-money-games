@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/button";
-import { Mail, Facebook, Twitter, Instagram, Linkedin } from "lucide-react";
+import { Mail, Facebook, X, Instagram, Linkedin } from "lucide-react";
 
 const AppFooter = () => {
   const currentYear = new Date().getFullYear();
@@ -31,8 +31,8 @@ const AppFooter = () => {
               </a>
             </Button>
             <Button variant="ghost" size="icon" asChild>
-              <a href="https://twitter.com" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
-                <Twitter className="w-4 h-4" />
+              <a href="https://x.com" target="_blank" rel="noopener noreferrer" aria-label="X">
+                <X className="w-4 h-4" />
               </a>
             </Button>
             <Button variant="ghost" size="icon" asChild>
