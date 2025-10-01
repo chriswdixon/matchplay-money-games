@@ -38,12 +38,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     spots: 'all'
   });
 
-  // Request location on component mount
+  // Request location on component mount (only for current matches, not past)
   useEffect(() => {
-    if (user && !location) {
+    if (user && !location && !showPastMatches) {
       requestLocation();
     }
-  }, [user, location, requestLocation]);
+  }, [user, location, requestLocation, showPastMatches]);
 
   // Refetch matches when location changes (with debouncing)
   useEffect(() => {
