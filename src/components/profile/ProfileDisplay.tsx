@@ -76,8 +76,8 @@ export function ProfileDisplay() {
               <span className="text-muted-foreground">{user?.email}</span>
             </div>
             <div className="mt-2">
-              <Badge className={getMembershipColor(profile?.membership_tier)}>
-                {getMembershipLabel(profile?.membership_tier)}
+              <Badge className={getMembershipColor(privateData?.membership_tier)}>
+                {getMembershipLabel(privateData?.membership_tier)}
               </Badge>
             </div>
           </div>

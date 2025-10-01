@@ -3,12 +3,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Crown, CheckCircle, ExternalLink } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
+import { usePrivateProfile } from "@/hooks/usePrivateProfile";
 import { toast } from "sonner";
 
 const SubscriptionManagement = () => {
   const { profile, loading } = useProfile();
+  const { privateData, loading: privateLoading } = usePrivateProfile();
 
-  if (loading) {
+  if (loading || privateLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
         <div className="text-center space-y-4">
@@ -50,7 +52,7 @@ const SubscriptionManagement = () => {
 
   // Ensure currentTier is always a valid tier value
   const validTiers = ['local', 'regional', 'national'] as const;
-  const rawTier = profile?.membership_tier || 'local';
+  const rawTier = privateData?.membership_tier || 'local';
   const currentTier = validTiers.includes(rawTier as any) ? rawTier : 'local';
   
   const tierColors = {
