@@ -171,6 +171,10 @@ export function HandicapSettings() {
                 {saving ? "Saving..." : "Save Handicap"}
               </Button>
             </div>
+            
+            <p className="text-sm text-muted-foreground text-center pt-4">
+              Played matches will automatically set your handicap.
+            </p>
           </form>
         </CardContent>
       </Card>
