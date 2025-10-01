@@ -3,7 +3,6 @@ import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { validateSessionToken } from '@/lib/validation';
-import { isValidSessionAge } from '@/lib/utils';
 
 interface AuthContextType {
   user: User | null;
@@ -32,18 +31,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Validate session token format
           if (!validateSessionToken(session.access_token)) {
             console.warn('Invalid session token format detected');
-            supabase.auth.signOut();
-            return;
-          }
-          
-          // Check session age (auto-logout after 24 hours of inactivity)
-          if (!isValidSessionAge(session.user.created_at, 24)) {
-            console.warn('Session expired due to age');
-            toast({
-              title: "Session expired",
-              description: "Please sign in again for security.",
-              variant: "destructive",
-            });
             supabase.auth.signOut();
             return;
           }
@@ -79,8 +66,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
     // Get initial session with validation
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session && (!validateSessionToken(session.access_token) || 
-                     !isValidSessionAge(session.user.created_at, 24))) {
+      if (session && !validateSessionToken(session.access_token)) {
         supabase.auth.signOut();
         return;
       }
