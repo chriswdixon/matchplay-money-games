@@ -292,6 +292,13 @@ export type Database = {
             referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "profile_audit_log_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: false
+            referencedRelation: "public_profiles"
+            referencedColumns: ["id"]
+          },
         ]
       }
       profiles: {
@@ -332,7 +339,36 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      public_profiles: {
+        Row: {
+          average_rating: number | null
+          created_at: string | null
+          display_name: string | null
+          handicap: number | null
+          id: string | null
+          profile_picture_url: string | null
+          user_id: string | null
+        }
+        Insert: {
+          average_rating?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          handicap?: number | null
+          id?: string | null
+          profile_picture_url?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          average_rating?: number | null
+          created_at?: string | null
+          display_name?: string | null
+          handicap?: number | null
+          id?: string | null
+          profile_picture_url?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
     }
     Functions: {
       calculate_distance: {
