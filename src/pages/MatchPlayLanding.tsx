@@ -2,6 +2,7 @@ import MatchPlayHero from "@/components/MatchPlayHero";
 import MatchFinder from "@/components/MatchFinder";
 import AppFeatures from "@/components/AppFeatures";
 import MembershipTiers from "@/components/MembershipTiers";
+import { HandicapCalculators } from "@/components/HandicapCalculators";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import SubscriptionManagement from "@/components/SubscriptionManagement";
@@ -89,6 +90,9 @@ const MatchPlayLanding = () => {
       
       {/* App Features Section */}
       <AppFeatures />
+      
+      {/* Handicap Calculators Section */}
+      <HandicapCalculators />
       
       {/* Membership Tiers Section */}
       <MembershipTiers />
