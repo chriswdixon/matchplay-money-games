@@ -306,7 +306,7 @@ const CreateMatchDialog = () => {
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
-              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 border shadow-lg z-[9999]" align="start" sideOffset={5}>
+              <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 border shadow-lg z-[9999] pointer-events-auto bg-background" align="start" sideOffset={5}>
                 <Command className="border-0">
                   <CommandInput 
                     placeholder="Search golf courses..." 
