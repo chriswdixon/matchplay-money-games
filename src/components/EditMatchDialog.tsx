@@ -101,9 +101,9 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
     { value: 'scramble', label: 'Scramble' }
   ];
 
-  const participantOptions = Array.from({ length: 3 }, (_, i) => ({
-    value: String(i + 2),
-    label: `${i + 2} players`
+  const participantOptions = Array.from({ length: 4 }, (_, i) => ({
+    value: String(i + 1),
+    label: `${i + 1} player${i === 0 ? ' (Testing)' : 's'}`
   }));
 
   const isTimeInPast = (datetime: string) => {

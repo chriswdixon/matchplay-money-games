@@ -654,6 +654,7 @@ const CreateMatchDialog = () => {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                <SelectItem value="1">1 Player (Testing)</SelectItem>
                 <SelectItem value="2">2 Players</SelectItem>
                 <SelectItem value="3">3 Players</SelectItem>
                 <SelectItem value="4">4 Players</SelectItem>
