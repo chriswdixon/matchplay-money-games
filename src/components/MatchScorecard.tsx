@@ -888,17 +888,6 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         )}
       </div>
 
-      {/* Back to Matches Button - Fixed at bottom */}
-      <div className="sticky bottom-0 left-0 right-0 p-4 bg-background border-t z-20">
-        <Button 
-          variant="default" 
-          onClick={onClose} 
-          className="w-full bg-[hsl(var(--accent))] text-accent-foreground hover:bg-[hsl(var(--accent))]/90"
-        >
-          Back to Matches
-        </Button>
-      </div>
-
       {/* Score Entry Dialog */}
       <Dialog open={scoreDialogOpen} onOpenChange={setScoreDialogOpen}>
         <DialogContent className="sm:max-w-md">
