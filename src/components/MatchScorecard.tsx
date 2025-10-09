@@ -323,9 +323,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               </div>
 
               {/* Mobile Vertical View */}
-              <div className="md:hidden space-y-4">
+              <div className="md:hidden">
                 {/* Front 9 Total Card - Sticky */}
-                <Card className="bg-accent/10 border-accent sticky top-0 z-10">
+                <div className="sticky top-0 z-10 bg-background pb-4">
+                  <Card className="bg-accent/10 border-accent">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -358,8 +359,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     </div>
                   </CardContent>
                 </Card>
+                </div>
 
                 {/* Holes 1-9 */}
+                <div className="space-y-4">
                 {Array.from({ length: 9 }, (_, i) => {
                   const hole = i + 1;
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
@@ -429,6 +432,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     </Card>
                   );
                 })}
+                </div>
               </div>
             </TabsContent>
 
@@ -602,9 +606,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               </div>
 
               {/* Mobile Vertical View */}
-              <div className="md:hidden space-y-4">
+              <div className="md:hidden">
                 {/* Back 9 Total Card - Sticky */}
-                <Card className="bg-accent/10 border-accent sticky top-0 z-10">
+                <div className="sticky top-0 z-10 bg-background pb-4">
+                  <Card className="bg-accent/10 border-accent">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -637,8 +642,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     </div>
                   </CardContent>
                 </Card>
+                </div>
 
                 {/* Holes 10-18 */}
+                <div className="space-y-4">
                 {Array.from({ length: 9 }, (_, i) => {
                   const hole = i + 10;
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
@@ -708,6 +715,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     </Card>
                   );
                 })}
+                </div>
               </div>
             </TabsContent>
           </Tabs>
