@@ -868,14 +868,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex justify-center gap-4 px-6 pb-4">
+      <div className="flex justify-center gap-4 px-6 pb-8 pt-6">
         {isMatchComplete && canFinalize && (
           <Button
             onClick={handleFinalize}
             disabled={saving}
-            className="bg-gradient-primary text-primary-foreground hover:shadow-premium"
+            size="lg"
+            className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
-            <Trophy className="w-4 h-4 mr-2" />
+            <Trophy className="w-5 h-5 mr-2" />
             {saving ? "Finalizing..." : "Finalize Results"}
           </Button>
         )}
