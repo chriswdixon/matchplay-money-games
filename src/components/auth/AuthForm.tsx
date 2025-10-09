@@ -22,7 +22,8 @@ export function AuthForm() {
   const [resetLoading, setResetLoading] = useState(false);
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [passwordWarnings, setPasswordWarnings] = useState<string[]>([]);
-  const { signIn, signUp } = useAuth();
+  const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   
   // Initialize rate limiter for auth attempts
@@ -151,6 +152,25 @@ export function AuthForm() {
     }
   };
 
+  const handleMagicLink = async () => {
+    setValidationErrors({});
+    
+    // Validate email
+    const validation = passwordResetSchema.safeParse({ email });
+    if (!validation.success) {
+      const errors: Record<string, string> = {};
+      validation.error.errors.forEach((error) => {
+        errors[error.path[0] as string] = error.message;
+      });
+      setValidationErrors(errors);
+      return;
+    }
+    
+    setMagicLinkLoading(true);
+    await signInWithMagicLink(email);
+    setMagicLinkLoading(false);
+  };
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">
       <Card className="w-full max-w-md">
@@ -250,6 +270,27 @@ export function AuthForm() {
                     </div>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Signing in..." : "Sign In"}
+                    </Button>
+                    
+                    <div className="relative my-4">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-background px-2 text-muted-foreground">
+                          Or
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={handleMagicLink}
+                      disabled={magicLinkLoading || !email}
+                      className="w-full"
+                    >
+                      {magicLinkLoading ? "Sending magic link..." : "Send me a magic link"}
                     </Button>
                   </form>
                 </TabsContent>
