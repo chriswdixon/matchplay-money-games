@@ -5,9 +5,10 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
-import { Target, Trophy, Clock, CheckCircle, Users } from 'lucide-react';
+import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MatchScorecardProps {
@@ -33,6 +34,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [editingHole, setEditingHole] = useState<number | null>(null);
   const [tempScore, setTempScore] = useState<string>('');
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
@@ -534,71 +536,163 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         </Button>
       </div>
 
-      {/* Tee Information Banner */}
-      {matchData && (
-        <Card className="bg-muted/50 border-primary/20 mx-0 sm:mx-6">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-sm">
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                Playing Tees
-              </Badge>
-              {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
-                <span className="font-medium">
-                  All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+      {/* Match Settings - Collapsible on mobile, always visible on desktop */}
+      <div className="px-0 sm:px-6">
+        {/* Mobile: Collapsible */}
+        <div className="md:hidden">
+          <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
+            <CollapsibleTrigger asChild>
+              <Button 
+                variant="outline" 
+                className="w-full flex items-center justify-between"
+              >
+                <span className="flex items-center gap-2">
+                  <Users className="w-4 h-4" />
+                  Match Settings
                 </span>
-              ) : matchData.tee_selection_mode === 'individual' ? (
-                <span className="font-medium text-muted-foreground">
-                  Each player is playing from their selected tees
-                </span>
-              ) : (
-                <span className="font-medium text-muted-foreground">
-                  Tees not specified
-                </span>
+                <ChevronDown className={cn("w-4 h-4 transition-transform", settingsOpen && "rotate-180")} />
+              </Button>
+            </CollapsibleTrigger>
+            <CollapsibleContent className="mt-4 space-y-4">
+              {/* Tee Information Banner */}
+              {matchData && (
+                <Card className="bg-muted/50 border-primary/20">
+                  <CardContent className="p-4">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                        Playing Tees
+                      </Badge>
+                      {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
+                        <span className="font-medium">
+                          All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                        </span>
+                      ) : matchData.tee_selection_mode === 'individual' ? (
+                        <span className="font-medium text-muted-foreground">
+                          Each player is playing from their selected tees
+                        </span>
+                      ) : (
+                        <span className="font-medium text-muted-foreground">
+                          Tees not specified
+                        </span>
+                      )}
+                    </div>
+                  </CardContent>
+                </Card>
               )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
-      {/* Player Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-0 sm:px-6">
-        {playerScores.map((player) => (
-          <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">{player.player_name}</span>
-                  {player.player_id === user?.id && (
-                    <Badge variant="default" className="text-xs bg-primary">You</Badge>
+              {/* Player Summary */}
+              <div className="space-y-3">
+                {playerScores.map((player) => (
+                  <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-medium">{player.player_name}</span>
+                          {player.player_id === user?.id && (
+                            <Badge variant="default" className="text-xs bg-primary">You</Badge>
+                          )}
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Front 9: {player.front9} | Back 9: {player.back9}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {Object.keys(player.scores).length}/18 holes
+                          </div>
+                        </div>
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-3">
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div 
+                            className="bg-primary h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1 text-center">
+                          {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                ))}
+              </div>
+            </CollapsibleContent>
+          </Collapsible>
+        </div>
+
+        {/* Desktop: Always visible */}
+        <div className="hidden md:block space-y-4">
+          {/* Tee Information Banner */}
+          {matchData && (
+            <Card className="bg-muted/50 border-primary/20">
+              <CardContent className="p-4">
+                <div className="flex items-center gap-2 text-sm">
+                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                    Playing Tees
+                  </Badge>
+                  {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
+                    <span className="font-medium">
+                      All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                    </span>
+                  ) : matchData.tee_selection_mode === 'individual' ? (
+                    <span className="font-medium text-muted-foreground">
+                      Each player is playing from their selected tees
+                    </span>
+                  ) : (
+                    <span className="font-medium text-muted-foreground">
+                      Tees not specified
+                    </span>
                   )}
                 </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Front 9: {player.front9} | Back 9: {player.back9}
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Player Summary */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+            {playerScores.map((player) => (
+              <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+                <CardContent className="p-4">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Users className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">{player.player_name}</span>
+                      {player.player_id === user?.id && (
+                        <Badge variant="default" className="text-xs bg-primary">You</Badge>
+                      )}
+                    </div>
+                    <div className="text-right">
+                      <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
+                      <div className="text-xs text-muted-foreground">
+                        Front 9: {player.front9} | Back 9: {player.back9}
+                      </div>
+                      <div className="text-xs text-muted-foreground">
+                        {Object.keys(player.scores).length}/18 holes
+                      </div>
+                    </div>
                   </div>
-                  <div className="text-xs text-muted-foreground">
-                    {Object.keys(player.scores).length}/18 holes
+                  
+                  {/* Progress Bar */}
+                  <div className="mt-3">
+                    <div className="w-full bg-muted rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-300" 
+                        style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
+                      ></div>
+                    </div>
+                    <div className="text-xs text-muted-foreground mt-1 text-center">
+                      {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
+                    </div>
                   </div>
-                </div>
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="mt-3">
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1 text-center">
-                  {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* Action Buttons */}
