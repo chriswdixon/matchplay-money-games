@@ -475,7 +475,16 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                               else if (!isAM && inputHour !== 12) hour24 = inputHour + 12;
                               
                               currentDate.setHours(hour24);
-                              setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                              
+                              // Format as local datetime string to avoid timezone conversion
+                              const year = currentDate.getFullYear();
+                              const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                              const day = String(currentDate.getDate()).padStart(2, '0');
+                              const hours = String(currentDate.getHours()).padStart(2, '0');
+                              const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+                              const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+                              
+                              setFormData({ ...formData, scheduled_time: localDateTime });
                               setTimeManuallySet(true);
                             }
                           }
@@ -497,7 +506,16 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                           const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
                           const minutes = parseInt(e.target.value) || 0;
                           currentDate.setMinutes(minutes);
-                          setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                          
+                          // Format as local datetime string to avoid timezone conversion
+                          const year = currentDate.getFullYear();
+                          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                          const day = String(currentDate.getDate()).padStart(2, '0');
+                          const hours = String(currentDate.getHours()).padStart(2, '0');
+                          const mins = String(currentDate.getMinutes()).padStart(2, '0');
+                          const localDateTime = `${year}-${month}-${day}T${hours}:${mins}`;
+                          
+                          setFormData({ ...formData, scheduled_time: localDateTime });
                           setTimeManuallySet(true);
                         }}
                         className="w-16 text-center"
@@ -520,7 +538,15 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                             }
                           }
                           
-                          setFormData({ ...formData, scheduled_time: currentDate.toISOString().slice(0, 16) });
+                          // Format as local datetime string to avoid timezone conversion
+                          const year = currentDate.getFullYear();
+                          const month = String(currentDate.getMonth() + 1).padStart(2, '0');
+                          const day = String(currentDate.getDate()).padStart(2, '0');
+                          const hours = String(currentDate.getHours()).padStart(2, '0');
+                          const minutes = String(currentDate.getMinutes()).padStart(2, '0');
+                          const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
+                          
+                          setFormData({ ...formData, scheduled_time: localDateTime });
                           setTimeManuallySet(true);
                         }}
                       >
