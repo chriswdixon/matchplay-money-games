@@ -211,7 +211,13 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     </tr>
                     {/* Hole Numbers Row */}
                     <tr className="border-b">
-                      <th className="text-left p-2 font-medium">Player</th>
+                      <th className="text-left p-2 font-medium">
+                        <div className="flex items-center gap-2">
+                          <span>Player</span>
+                          <span className="text-muted-foreground">|</span>
+                          <span className="text-muted-foreground">Hole</span>
+                        </div>
+                      </th>
                       {Array.from({ length: 9 }, (_, i) => (
                         <th key={i + 1} className="text-center p-2 font-medium w-12">
                           {i + 1}
@@ -368,7 +374,13 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     </tr>
                     {/* Hole Numbers Row */}
                     <tr className="border-b">
-                      <th className="text-left p-2 font-medium">Player</th>
+                      <th className="text-left p-2 font-medium">
+                        <div className="flex items-center gap-2">
+                          <span>Player</span>
+                          <span className="text-muted-foreground">|</span>
+                          <span className="text-muted-foreground">Hole</span>
+                        </div>
+                      </th>
                       {Array.from({ length: 9 }, (_, i) => (
                         <th key={i + 10} className="text-center p-2 font-medium w-12">
                           {i + 10}
