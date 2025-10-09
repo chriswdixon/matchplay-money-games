@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -35,9 +35,22 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [tempScore, setTempScore] = useState<string>('');
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const activeHoleRef = useRef<HTMLDivElement>(null);
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
+
+  // Scroll to active hole on mobile
+  useEffect(() => {
+    if (activeHoleRef.current && window.innerWidth < 768) {
+      setTimeout(() => {
+        activeHoleRef.current?.scrollIntoView({ 
+          behavior: 'smooth', 
+          block: 'center'
+        });
+      }, 300);
+    }
+  }, [currentUserScore?.scores]);
 
   const handleScoreEdit = (hole: number, currentScore?: number) => {
     setEditingHole(hole);
@@ -311,8 +324,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
               {/* Mobile Vertical View */}
               <div className="md:hidden space-y-4">
-                {/* Front 9 Total Card */}
-                <Card className="bg-accent/10 border-accent">
+                {/* Front 9 Total Card - Sticky */}
+                <Card className="bg-accent/10 border-accent sticky top-0 z-10">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -359,7 +372,11 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   const isActiveHole = hole === lastCompletedHole + 1 && !currentScore;
                   
                   return (
-                    <Card key={hole} className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}>
+                    <Card 
+                      key={hole} 
+                      ref={isActiveHole ? activeHoleRef : null}
+                      className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
@@ -586,8 +603,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
               {/* Mobile Vertical View */}
               <div className="md:hidden space-y-4">
-                {/* Back 9 Total Card */}
-                <Card className="bg-accent/10 border-accent">
+                {/* Back 9 Total Card - Sticky */}
+                <Card className="bg-accent/10 border-accent sticky top-0 z-10">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
@@ -634,7 +651,11 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   const isActiveHole = hole === lastCompletedHole + 1 && !currentScore;
                   
                   return (
-                    <Card key={hole} className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}>
+                    <Card 
+                      key={hole} 
+                      ref={isActiveHole ? activeHoleRef : null}
+                      className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}
+                    >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
