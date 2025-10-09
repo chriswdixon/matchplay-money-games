@@ -722,7 +722,6 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           </div>
           <div>
             <h1 className="text-2xl font-bold">{matchName}</h1>
-            <p className="text-muted-foreground">Click on your scores to edit them</p>
           </div>
         </div>
 
