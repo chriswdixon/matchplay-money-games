@@ -31,7 +31,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems }: AppHeader
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
-              <SheetContent side="left" className="w-[250px]">
+              <SheetContent side="right" className="w-[250px]">
                 <div className="flex flex-col gap-2 mt-8">
                   {navItems.map((item) => (
                     <Button
