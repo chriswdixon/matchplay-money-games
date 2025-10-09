@@ -343,7 +343,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               </p>
               {!showPastMatches && (
                 <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
-                  <CreateMatchDialog />
+          <CreateMatchDialog onMatchCreated={refetch} />
                   {location && (
                     <p className="text-sm text-muted-foreground">
                       📍 Location enabled • Showing matches within {searchRadius}mi

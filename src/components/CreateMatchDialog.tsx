@@ -19,7 +19,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
-const CreateMatchDialog = () => {
+const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) => {
   const [open, setOpen] = useState(false);
   const [courseOpen, setCourseOpen] = useState(false);
   const [dateTimeOpen, setDateTimeOpen] = useState(false);
@@ -192,6 +192,7 @@ const CreateMatchDialog = () => {
     if (!error) {
       setOpen(false);
       resetForm();
+      onMatchCreated?.(); // Trigger refresh
     }
   };
 
