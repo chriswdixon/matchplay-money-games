@@ -96,92 +96,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   }
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-6">
-      {/* Header */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <Target className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <h1 className="text-2xl font-bold">Match Scorecard</h1>
-            <p className="text-muted-foreground">{matchName}</p>
-          </div>
-        </div>
-        <Button variant="outline" onClick={onClose} className="w-full sm:w-auto order-first sm:order-none">
-          Back to Matches
-        </Button>
-      </div>
-
-      {/* Tee Information Banner */}
-      {matchData && (
-        <Card className="bg-muted/50 border-primary/20">
-          <CardContent className="p-4">
-            <div className="flex items-center gap-2 text-sm">
-              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                Playing Tees
-              </Badge>
-              {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
-                <span className="font-medium">
-                  All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
-                </span>
-              ) : matchData.tee_selection_mode === 'individual' ? (
-                <span className="font-medium text-muted-foreground">
-                  Each player is playing from their selected tees
-                </span>
-              ) : (
-                <span className="font-medium text-muted-foreground">
-                  Tees not specified
-                </span>
-              )}
-            </div>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Player Summary */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {playerScores.map((player) => (
-          <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
-            <CardContent className="p-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Users className="w-4 h-4 text-muted-foreground" />
-                  <span className="font-medium">{player.player_name}</span>
-                  {player.player_id === user?.id && (
-                    <Badge variant="default" className="text-xs bg-primary">You</Badge>
-                  )}
-                </div>
-                <div className="text-right">
-                  <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
-                  <div className="text-xs text-muted-foreground">
-                    Front 9: {player.front9} | Back 9: {player.back9}
-                  </div>
-                  <div className="text-xs text-muted-foreground">
-                    {Object.keys(player.scores).length}/18 holes
-                  </div>
-                </div>
-              </div>
-              
-              {/* Progress Bar */}
-              <div className="mt-3">
-                <div className="w-full bg-muted rounded-full h-2">
-                  <div 
-                    className="bg-primary h-2 rounded-full transition-all duration-300" 
-                    style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
-                  ></div>
-                </div>
-                <div className="text-xs text-muted-foreground mt-1 text-center">
-                  {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
-
-      {/* Scorecard Tabs */}
-      <Card>
+    <div className="w-full px-0 sm:px-6 space-y-6">
+      {/* Scorecard - Full width on mobile, comes first */}
+      <Card className="w-full">
         <CardHeader>
           <CardTitle>18-Hole Scorecard</CardTitle>
           <CardDescription>
@@ -601,8 +518,91 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         </CardContent>
       </Card>
 
+      {/* Header - Moved below scorecard */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-6">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-primary rounded-lg">
+            <Target className="w-5 h-5 text-primary-foreground" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-bold">Match Scorecard</h1>
+            <p className="text-muted-foreground">{matchName}</p>
+          </div>
+        </div>
+        <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+          Back to Matches
+        </Button>
+      </div>
+
+      {/* Tee Information Banner */}
+      {matchData && (
+        <Card className="bg-muted/50 border-primary/20 mx-0 sm:mx-6">
+          <CardContent className="p-4">
+            <div className="flex items-center gap-2 text-sm">
+              <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                Playing Tees
+              </Badge>
+              {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
+                <span className="font-medium">
+                  All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                </span>
+              ) : matchData.tee_selection_mode === 'individual' ? (
+                <span className="font-medium text-muted-foreground">
+                  Each player is playing from their selected tees
+                </span>
+              ) : (
+                <span className="font-medium text-muted-foreground">
+                  Tees not specified
+                </span>
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Player Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 px-0 sm:px-6">
+        {playerScores.map((player) => (
+          <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+            <CardContent className="p-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Users className="w-4 h-4 text-muted-foreground" />
+                  <span className="font-medium">{player.player_name}</span>
+                  {player.player_id === user?.id && (
+                    <Badge variant="default" className="text-xs bg-primary">You</Badge>
+                  )}
+                </div>
+                <div className="text-right">
+                  <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
+                  <div className="text-xs text-muted-foreground">
+                    Front 9: {player.front9} | Back 9: {player.back9}
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    {Object.keys(player.scores).length}/18 holes
+                  </div>
+                </div>
+              </div>
+              
+              {/* Progress Bar */}
+              <div className="mt-3">
+                <div className="w-full bg-muted rounded-full h-2">
+                  <div 
+                    className="bg-primary h-2 rounded-full transition-all duration-300" 
+                    style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
+                  ></div>
+                </div>
+                <div className="text-xs text-muted-foreground mt-1 text-center">
+                  {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+
       {/* Action Buttons */}
-      <div className="flex justify-center gap-4">
+      <div className="flex justify-center gap-4 px-6">
         {isMatchComplete && canFinalize && (
           <Button
             onClick={handleFinalize}
