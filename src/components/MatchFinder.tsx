@@ -289,12 +289,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
                 {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
               </h2>
-              <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                {showPastMatches 
-                  ? 'Review your completed matches, see final results, and track your competitive history.'
-                  : 'Connect with golfers in your area, book money matches, and compete with confidence knowing every stroke counts.'
-                }
-              </p>
+              {showPastMatches && (
+                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+                  Review your completed matches, see final results, and track your competitive history.
+                </p>
+              )}
               {!showPastMatches && (
                 <div className="mt-8 flex flex-col items-center justify-center gap-2">
                   <CreateMatchDialog onMatchCreated={refetch} />
