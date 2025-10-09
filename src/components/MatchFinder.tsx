@@ -268,15 +268,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         {/* Show active match scorecard if user has a started match */}
         {activeMatch ? (
           <div className="animate-fade-in">
-            <div className="text-center mb-8">
-              <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-                🏌️ Active Match
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-                {activeMatch.course_name}
-              </h2>
-            </div>
-
             {/* Active Match Scorecard */}
             <MatchScorecard
               matchId={activeMatch.id}
