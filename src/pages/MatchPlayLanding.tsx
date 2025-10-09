@@ -11,12 +11,22 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Crown, ArrowUp, History, Trophy } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { useMatches } from "@/hooks/useMatches";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
+  const { matches } = useMatches();
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Check if user has an active match
+  const activeMatch = useMemo(() => {
+    if (!user) return null;
+    return matches.find(match => 
+      match.status === 'started' && match.user_joined
+    );
+  }, [matches, user]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -33,6 +43,20 @@ const MatchPlayLanding = () => {
 
   // Logged-in user experience
   if (user) {
+    // If user has an active match, show only the scorecard (no tabs)
+    if (activeMatch) {
+      return (
+        <div className="min-h-screen bg-background flex flex-col">
+          <AppHeader />
+          <main className="container py-8 flex-1">
+            <MatchFinder hideHowItWorks />
+          </main>
+          <AppFooter />
+        </div>
+      );
+    }
+
+    // Otherwise show the tabs navigation
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <AppHeader />
