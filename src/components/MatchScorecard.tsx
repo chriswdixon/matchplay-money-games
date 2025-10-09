@@ -130,10 +130,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       {/* Scorecard - Full width on mobile, comes first */}
       <Card className="w-full">
         <CardHeader>
-          <CardTitle>18-Hole Scorecard</CardTitle>
-          <CardDescription>
-            Track your strokes for each hole. Click on your scores to edit them.
-          </CardDescription>
+          <CardTitle>Match Scorecard</CardTitle>
         </CardHeader>
         <CardContent className="px-1 sm:px-4 py-4">
           <Tabs defaultValue="front9" className="w-full">
@@ -550,19 +547,14 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
       {/* Header - Moved below scorecard */}
       <div className="px-6">
-        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-primary rounded-lg">
-              <Target className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold">Match Scorecard</h1>
-              <p className="text-muted-foreground">{matchName}</p>
-            </div>
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-gradient-primary rounded-lg">
+            <Target className="w-5 h-5 text-primary-foreground" />
           </div>
-          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
-            Back to Matches
-          </Button>
+          <div>
+            <h1 className="text-2xl font-bold">{matchName}</h1>
+            <p className="text-muted-foreground">Click on your scores to edit them</p>
+          </div>
         </div>
 
         {/* Match Settings Button - Directly below course name */}
@@ -692,6 +684,13 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               </div>
             </CollapsibleContent>
           </Collapsible>
+        </div>
+
+        {/* Back to Matches Button - Below Match Settings */}
+        <div className="mt-4">
+          <Button variant="outline" onClick={onClose} className="w-full">
+            Back to Matches
+          </Button>
         </div>
       </div>
 
