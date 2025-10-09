@@ -126,13 +126,13 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-0 sm:px-6 space-y-6">
+    <div className="w-full max-w-[1400px] mx-auto px-0 space-y-6">
       {/* Scorecard - Full width on mobile, comes first */}
-      <Card className="w-full">
-        <CardHeader>
+      <Card className="w-full border-0 md:border">
+        <CardHeader className="px-2 md:px-6">
           <CardTitle>Match Scorecard</CardTitle>
         </CardHeader>
-        <CardContent className="px-1 sm:px-4 py-4">
+        <CardContent className="px-0 md:px-2 py-4">
           <Tabs defaultValue="front9" className="w-full">
             <TabsList className="grid w-full grid-cols-2">
               <TabsTrigger value="front9">Front 9</TabsTrigger>
@@ -141,46 +141,46 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             
             <TabsContent value="front9" className="mt-4">
               {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-sm md:text-base">
+              <div className="hidden md:block">
+                <table className="w-full text-xs lg:text-sm">
                   <thead>
                     {/* Par Row */}
                     <tr className="border-b bg-muted/20">
-                      <th className="text-left p-1 md:p-2 text-xs md:text-sm font-medium text-muted-foreground">PAR</th>
+                      <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium text-muted-foreground">PAR</th>
                       {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 1} className="text-center p-1 md:p-2 text-xs md:text-sm font-medium w-8 md:w-12 text-muted-foreground">
+                        <th key={i + 1} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10 text-muted-foreground">
                           {matchData?.hole_pars?.[String(i + 1)] || 4}
                         </th>
                       ))}
-                      <th className="text-center p-1 md:p-2 text-xs md:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
+                      <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
                     </tr>
                     {/* Hole Numbers Row */}
                     <tr className="border-b">
-                      <th className="text-left p-1 md:p-2 text-xs md:text-sm font-medium">
-                        <div className="flex items-center gap-1 md:gap-2">
+                      <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium">
+                        <div className="flex items-center gap-1 lg:gap-2">
                           <span>Player</span>
                           <span className="text-muted-foreground">|</span>
                           <span className="text-muted-foreground">Hole</span>
                         </div>
                       </th>
                       {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 1} className="text-center p-1 md:p-2 text-xs md:text-sm font-medium w-8 md:w-12">
+                        <th key={i + 1} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10">
                           {i + 1}
                         </th>
                       ))}
-                      <th className="text-center p-1 md:p-2 text-xs md:text-sm font-medium bg-muted">Strokes</th>
-                      <th className="text-center p-1 md:p-2 text-xs md:text-sm font-medium bg-accent/20">vs Par</th>
+                      <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-muted">Strokes</th>
+                      <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20">vs Par</th>
                     </tr>
                   </thead>
                   <tbody>
                     {/* Current User Row */}
                     {currentUserScore && (
                       <tr className="border-b bg-primary/5">
-                        <td className="p-1 md:p-2 text-xs md:text-sm font-medium">
-                          <div className="flex items-center gap-1 md:gap-2">
-                            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary"></div>
-                            <span className="truncate max-w-[80px] md:max-w-none">{currentUserScore.player_name}</span>
-                            <Badge variant="default" className="text-[10px] md:text-xs bg-primary px-1 md:px-2">You</Badge>
+                        <td className="p-1 lg:p-2 text-xs lg:text-sm font-medium">
+                          <div className="flex items-center gap-1 lg:gap-2">
+                            <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-primary"></div>
+                            <span className="truncate max-w-[60px] lg:max-w-none">{currentUserScore.player_name}</span>
+                            <Badge variant="default" className="text-[10px] lg:text-xs bg-primary px-1 lg:px-2">You</Badge>
                           </div>
                         </td>
                         {/* Front 9 holes */}
@@ -190,12 +190,12 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           const isEditing = editingHole === hole;
 
                           return (
-                            <td key={hole} className="text-center p-0.5 md:p-1">
+                            <td key={hole} className="text-center p-0.5">
                               <Button
                                 variant={score ? "default" : "outline"}
                                 size="sm"
                                 className={cn(
-                                  "w-8 h-8 md:w-10 md:h-10 p-0 text-xs md:text-sm font-semibold transition-all touch-none",
+                                  "w-7 h-7 lg:w-9 lg:h-9 p-0 text-xs lg:text-sm font-semibold transition-all touch-none",
                                   score 
                                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                                     : "border-dashed hover:border-primary hover:bg-primary/10"
@@ -210,15 +210,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         })}
                         
                         {/* Front 9 Strokes */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-muted text-muted-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {currentUserScore.front9 || 0}
                           </div>
                         </td>
                         
                         {/* Front 9 vs Par */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-accent text-accent-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-accent text-accent-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {(() => {
                               // Only calculate for completed holes
                               const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
@@ -243,10 +243,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     {/* Other Players Rows */}
                     {otherPlayers.map((player) => (
                       <tr key={player.player_id} className="border-b hover:bg-muted/10">
-                        <td className="p-1 md:p-2 text-xs md:text-sm font-medium">
-                          <div className="flex items-center gap-1 md:gap-2">
-                            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-muted-foreground"></div>
-                            <span className="truncate max-w-[80px] md:max-w-none">{player.player_name}</span>
+                        <td className="p-1 lg:p-2 text-xs lg:text-sm font-medium">
+                          <div className="flex items-center gap-1 lg:gap-2">
+                            <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-muted-foreground"></div>
+                            <span className="truncate max-w-[60px] lg:max-w-none">{player.player_name}</span>
                           </div>
                         </td>
                         {/* Front 9 holes */}
@@ -255,9 +255,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           const score = player.scores[hole];
 
                           return (
-                            <td key={hole} className="text-center p-0.5 md:p-1">
+                            <td key={hole} className="text-center p-0.5">
                               <div className={cn(
-                                "w-8 h-8 md:w-10 md:h-10 rounded-lg flex items-center justify-center text-xs md:text-sm font-medium transition-all",
+                                "w-7 h-7 lg:w-9 lg:h-9 rounded-lg flex items-center justify-center text-xs lg:text-sm font-medium transition-all",
                                 score 
                                   ? 'bg-muted text-foreground border-2 border-border' 
                                   : 'bg-muted/30 border-2 border-dashed border-border/50 text-muted-foreground'
@@ -268,15 +268,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           );
                         })}
                         {/* Front 9 Strokes */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-muted text-muted-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {player.front9 || 0}
                           </div>
                         </td>
                         
                         {/* Front 9 vs Par */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-accent text-accent-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-accent text-accent-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {(() => {
                               // Only calculate for completed holes
                               const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
@@ -383,46 +383,46 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
             <TabsContent value="back9" className="mt-4">
               {/* Desktop Table View */}
-              <div className="hidden md:block overflow-x-auto">
-                <table className="w-full text-sm md:text-base">
+              <div className="hidden md:block">
+                <table className="w-full text-xs lg:text-sm">
                   <thead>
                     {/* Par Row */}
                     <tr className="border-b bg-muted/20">
-                      <th className="text-left p-1 md:p-2 text-xs md:text-sm font-medium text-muted-foreground">PAR</th>
+                      <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium text-muted-foreground">PAR</th>
                       {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 10} className="text-center p-1 md:p-2 text-xs md:text-sm font-medium w-8 md:w-12 text-muted-foreground">
+                        <th key={i + 10} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10 text-muted-foreground">
                           {matchData?.hole_pars?.[String(i + 10)] || 4}
                         </th>
                       ))}
-                      <th className="text-center p-1 md:p-2 text-xs md:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
+                      <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
                     </tr>
                     {/* Hole Numbers Row */}
                     <tr className="border-b">
-                      <th className="text-left p-1 md:p-2 text-xs md:text-sm font-medium">
-                        <div className="flex items-center gap-1 md:gap-2">
+                      <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium">
+                        <div className="flex items-center gap-1 lg:gap-2">
                           <span>Player</span>
                           <span className="text-muted-foreground">|</span>
                           <span className="text-muted-foreground">Hole</span>
                         </div>
                       </th>
                       {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 10} className="text-center p-1 md:p-2 text-xs md:text-sm font-medium w-8 md:w-12">
+                        <th key={i + 10} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10">
                           {i + 10}
                         </th>
                       ))}
-                      <th className="text-center p-1 md:p-2 text-xs md:text-sm font-medium bg-muted">Strokes</th>
-                      <th className="text-center p-1 md:p-2 text-xs md:text-sm font-medium bg-accent/20">vs Par</th>
+                      <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-muted">Strokes</th>
+                      <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20">vs Par</th>
                     </tr>
                   </thead>
                   <tbody>
                     {/* Current User Row */}
                     {currentUserScore && (
                       <tr className="border-b bg-primary/5">
-                        <td className="p-1 md:p-2 text-xs md:text-sm font-medium">
-                          <div className="flex items-center gap-1 md:gap-2">
-                            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-primary"></div>
-                            <span className="truncate max-w-[80px] md:max-w-none">{currentUserScore.player_name}</span>
-                            <Badge variant="default" className="text-[10px] md:text-xs bg-primary px-1 md:px-2">You</Badge>
+                        <td className="p-1 lg:p-2 text-xs lg:text-sm font-medium">
+                          <div className="flex items-center gap-1 lg:gap-2">
+                            <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-primary"></div>
+                            <span className="truncate max-w-[60px] lg:max-w-none">{currentUserScore.player_name}</span>
+                            <Badge variant="default" className="text-[10px] lg:text-xs bg-primary px-1 lg:px-2">You</Badge>
                           </div>
                         </td>
                         {/* Back 9 holes */}
@@ -431,12 +431,12 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           const score = currentUserScore.scores[hole];
 
                           return (
-                            <td key={hole} className="text-center p-0.5 md:p-1">
+                            <td key={hole} className="text-center p-0.5">
                               <Button
                                 variant={score ? "default" : "outline"}
                                 size="sm"
                                 className={cn(
-                                  "w-8 h-8 md:w-10 md:h-10 p-0 text-xs md:text-sm font-semibold transition-all touch-none",
+                                  "w-7 h-7 lg:w-9 lg:h-9 p-0 text-xs lg:text-sm font-semibold transition-all touch-none",
                                   score 
                                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                                     : "border-dashed hover:border-primary hover:bg-primary/10"
@@ -451,15 +451,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         })}
                         
                         {/* Back 9 Strokes */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-muted text-muted-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {currentUserScore.back9 || 0}
                           </div>
                         </td>
                         
                         {/* Back 9 vs Par */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-accent text-accent-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-accent text-accent-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {(() => {
                               // Only calculate for completed holes
                               const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
@@ -484,10 +484,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     {/* Other Players Rows */}
                     {otherPlayers.map((player) => (
                       <tr key={player.player_id} className="border-b hover:bg-muted/10">
-                        <td className="p-1 md:p-2 text-xs md:text-sm font-medium">
-                          <div className="flex items-center gap-1 md:gap-2">
-                            <div className="w-1.5 h-1.5 md:w-2 md:h-2 rounded-full bg-muted-foreground"></div>
-                            <span className="truncate max-w-[80px] md:max-w-none">{player.player_name}</span>
+                        <td className="p-1 lg:p-2 text-xs lg:text-sm font-medium">
+                          <div className="flex items-center gap-1 lg:gap-2">
+                            <div className="w-1.5 h-1.5 lg:w-2 lg:h-2 rounded-full bg-muted-foreground"></div>
+                            <span className="truncate max-w-[60px] lg:max-w-none">{player.player_name}</span>
                           </div>
                         </td>
                         {/* Back 9 holes */}
@@ -496,9 +496,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           const score = player.scores[hole];
 
                           return (
-                            <td key={hole} className="text-center p-0.5 md:p-1">
+                            <td key={hole} className="text-center p-0.5">
                               <div className={cn(
-                                "w-8 h-8 md:w-10 md:h-10 rounded-lg flex items-center justify-center text-xs md:text-sm font-medium transition-all",
+                                "w-7 h-7 lg:w-9 lg:h-9 rounded-lg flex items-center justify-center text-xs lg:text-sm font-medium transition-all",
                                 score 
                                   ? 'bg-muted text-foreground border-2 border-border' 
                                   : 'bg-muted/30 border-2 border-dashed border-border/50 text-muted-foreground'
@@ -509,15 +509,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           );
                         })}
                         {/* Back 9 Strokes */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-muted text-muted-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-muted text-muted-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {player.back9 || 0}
                           </div>
                         </td>
                         
                         {/* Back 9 vs Par */}
-                        <td className="text-center p-1 md:p-2">
-                          <div className="bg-accent text-accent-foreground rounded-lg px-2 py-1 md:px-3 md:py-2 font-bold text-sm md:text-lg">
+                        <td className="text-center p-1">
+                          <div className="bg-accent text-accent-foreground rounded-lg px-1.5 py-1 lg:px-2 lg:py-1.5 font-bold text-xs lg:text-sm">
                             {(() => {
                               // Only calculate for completed holes
                               const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
