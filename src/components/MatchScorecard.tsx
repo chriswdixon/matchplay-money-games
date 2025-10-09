@@ -582,7 +582,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-4 space-y-4">
               {/* Match Info Grid */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
                 <Card className="bg-card/50">
                   <CardContent className="p-3">
                     <div className="flex items-center gap-2 mb-1">
@@ -651,7 +651,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               )}
 
               {/* Player Summary */}
-              <div className="space-y-3">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
                 {playerScores.map((player) => (
                   <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
                     <CardContent className="p-4">
@@ -692,119 +692,6 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               </div>
             </CollapsibleContent>
           </Collapsible>
-        </div>
-      </div>
-
-      {/* Desktop: Always visible match info */}
-      <div className="hidden md:block px-6 space-y-4">
-        {/* Match Info Grid */}
-        <div className="grid grid-cols-4 gap-3">
-          <Card className="bg-card/50">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Clock className="w-4 h-4 text-primary" />
-                <div className="text-xs text-muted-foreground">Tee Time</div>
-              </div>
-              <div className="text-sm font-semibold">{formatMatchTime(matchData?.scheduled_time)}</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card/50">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Users className="w-4 h-4 text-primary" />
-                <div className="text-xs text-muted-foreground">Players</div>
-              </div>
-              <div className="text-sm font-semibold">{matchData?.participant_count || 0}/{matchData?.max_participants || 4}</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card/50">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <DollarSign className="w-4 h-4 text-primary" />
-                <div className="text-xs text-muted-foreground">Buy-in</div>
-              </div>
-              <div className="text-sm font-semibold">{formatBuyIn(matchData?.buy_in_amount)}</div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-card/50">
-            <CardContent className="p-3">
-              <div className="flex items-center gap-2 mb-1">
-                <Trophy className="w-4 h-4 text-primary" />
-                <div className="text-xs text-muted-foreground">Format</div>
-              </div>
-              <div className="text-sm font-semibold">{formatMatchFormat(matchData?.format)}</div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Tee Information Banner */}
-        {matchData && (
-          <Card className="bg-muted/50 border-primary/20">
-            <CardContent className="p-4">
-              <div className="flex items-center gap-2 text-sm">
-                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                  Playing Tees
-                </Badge>
-                {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
-                  <span className="font-medium">
-                    All players: <span className="text-primary font-bold">{matchData.default_tees}</span> tees
-                  </span>
-                ) : matchData.tee_selection_mode === 'individual' ? (
-                  <span className="font-medium text-muted-foreground">
-                    Individual tee selection
-                  </span>
-                ) : (
-                  <span className="font-medium text-muted-foreground">
-                    Tees not specified
-                  </span>
-                )}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Player Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-          {playerScores.map((player) => (
-            <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
-              <CardContent className="p-4">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <Users className="w-4 h-4 text-muted-foreground" />
-                    <span className="font-medium">{player.player_name}</span>
-                    {player.player_id === user?.id && (
-                      <Badge variant="default" className="text-xs bg-primary">You</Badge>
-                    )}
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
-                    <div className="text-xs text-muted-foreground">
-                      Front 9: {player.front9} | Back 9: {player.back9}
-                    </div>
-                    <div className="text-xs text-muted-foreground">
-                      {Object.keys(player.scores).length}/18 holes
-                    </div>
-                  </div>
-                </div>
-                
-                {/* Progress Bar */}
-                <div className="mt-3">
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="bg-primary h-2 rounded-full transition-all duration-300" 
-                      style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
-                    ></div>
-                  </div>
-                  <div className="text-xs text-muted-foreground mt-1 text-center">
-                    {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
         </div>
       </div>
 
