@@ -74,10 +74,10 @@ const MatchPlayLanding = () => {
           currentTab={currentTab}
           navItems={navItems}
         />
-        <main className="container py-0 md:py-8 flex-1">
+        <main className="container flex-1">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            {/* Desktop Tabs - Hidden on mobile */}
-            <TabsList className="hidden md:grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
+            {/* Desktop/Tablet Tabs - Visible on md screens and above */}
+            <TabsList className="hidden md:grid w-full grid-cols-4 max-w-3xl mx-auto my-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Find Matches
