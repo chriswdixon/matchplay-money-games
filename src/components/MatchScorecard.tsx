@@ -283,11 +283,11 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         {/* Back to Matches Button - Below Match Settings */}
         <div className="mt-4">
           <Button 
-            variant="default" 
+            variant="outline" 
             onClick={onClose} 
-            className="w-full bg-[hsl(var(--accent))] text-accent-foreground hover:bg-[hsl(var(--accent))]/90"
+            className="w-full"
           >
-            Back to Matches
+            Close Match Settings
           </Button>
         </div>
       </div>
@@ -872,7 +872,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       </Card>
 
       {/* Action Buttons */}
-      <div className="flex justify-center gap-4 px-6">
+      <div className="flex justify-center gap-4 px-6 pb-4">
         {isMatchComplete && canFinalize && (
           <Button
             onClick={handleFinalize}
@@ -890,6 +890,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             <p>Complete all 18 holes to finalize results</p>
           </div>
         )}
+      </div>
+
+      {/* Back to Matches Button - Fixed at bottom */}
+      <div className="sticky bottom-0 left-0 right-0 p-4 bg-background border-t z-20">
+        <Button 
+          variant="default" 
+          onClick={onClose} 
+          className="w-full bg-[hsl(var(--accent))] text-accent-foreground hover:bg-[hsl(var(--accent))]/90"
+        >
+          Back to Matches
+        </Button>
       </div>
 
       {/* Score Entry Dialog */}

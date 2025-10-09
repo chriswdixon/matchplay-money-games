@@ -281,9 +281,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             <MatchScorecard
               matchId={activeMatch.id}
               matchName={activeMatch.course_name}
-              onClose={() => {
-                // Don't allow closing active match scorecard
-                // User can only exit when match is completed
+              onClose={async () => {
+                // Let user leave the active match to see tabs
+                if (window.confirm('Leave this match? You can rejoin from the Matches tab.')) {
+                  await leaveMatch(activeMatch.id);
+                  refetch();
+                }
               }}
             />
           </div>
