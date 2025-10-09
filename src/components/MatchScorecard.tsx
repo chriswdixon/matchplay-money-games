@@ -98,7 +98,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-3">
           <div className="p-2 bg-gradient-primary rounded-lg">
             <Target className="w-5 h-5 text-primary-foreground" />
@@ -108,7 +108,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             <p className="text-muted-foreground">{matchName}</p>
           </div>
         </div>
-        <Button variant="outline" onClick={onClose}>
+        <Button variant="outline" onClick={onClose} className="w-full sm:w-auto order-first sm:order-none">
           Back to Matches
         </Button>
       </div>
