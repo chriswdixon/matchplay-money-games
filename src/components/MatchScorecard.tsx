@@ -188,6 +188,12 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           const hole = i + 1;
                           const score = currentUserScore.scores[hole];
                           const isEditing = editingHole === hole;
+                          
+                          // Find the active hole (first hole after last scored hole)
+                          const completedHoles = Array.from({ length: 9 }, (_, j) => j + 1)
+                            .filter(h => currentUserScore.scores[h]);
+                          const lastCompletedHole = completedHoles.length > 0 ? Math.max(...completedHoles) : 0;
+                          const isActiveHole = hole === lastCompletedHole + 1 && !score;
 
                           return (
                             <td key={hole} className="text-center p-0.5">
@@ -198,6 +204,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                   "w-7 h-7 lg:w-9 lg:h-9 p-0 text-xs lg:text-sm font-semibold transition-all touch-none",
                                   score 
                                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                    : isActiveHole
+                                    ? "border-2 border-primary bg-primary/20 hover:bg-primary/30 animate-pulse"
                                     : "border-dashed hover:border-primary hover:bg-primary/10"
                                 )}
                                 onClick={() => handleScoreEdit(hole, score)}
@@ -308,7 +316,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-accent-foreground">Front 9</h3>
+                        <h3 className="font-semibold text-accent-foreground">Total</h3>
                         <div className="text-sm text-muted-foreground">
                           {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) <= 9).length}/9 holes
                         </div>
@@ -344,12 +352,21 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
                   const currentScore = currentUserScore?.scores[hole];
                   
+                  // Find the active hole (first hole after last scored hole)
+                  const completedHoles = Array.from({ length: 9 }, (_, j) => j + 1)
+                    .filter(h => currentUserScore?.scores[h]);
+                  const lastCompletedHole = completedHoles.length > 0 ? Math.max(...completedHoles) : 0;
+                  const isActiveHole = hole === lastCompletedHole + 1 && !currentScore;
+                  
                   return (
-                    <Card key={hole} className="w-full">
+                    <Card key={hole} className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}>
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+                            <div className={cn(
+                              "w-8 h-8 rounded-full flex items-center justify-center font-bold",
+                              isActiveHole ? "bg-primary text-primary-foreground animate-pulse" : "bg-primary/20 text-primary"
+                            )}>
                               {hole}
                             </div>
                             <div>
@@ -364,6 +381,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                               "w-16 h-16 text-xl font-bold transition-all",
                               currentScore 
                                 ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                : isActiveHole
+                                ? "border-2 border-primary bg-primary/20 hover:bg-primary/30 animate-pulse"
                                 : "border-dashed hover:border-primary hover:bg-primary/10"
                             )}
                             onClick={() => handleScoreEdit(hole, currentScore)}
@@ -444,6 +463,12 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {Array.from({ length: 9 }, (_, i) => {
                           const hole = i + 10;
                           const score = currentUserScore.scores[hole];
+                          
+                          // Find the active hole (first hole after last scored hole)
+                          const completedHoles = Array.from({ length: 9 }, (_, j) => j + 10)
+                            .filter(h => currentUserScore.scores[h]);
+                          const lastCompletedHole = completedHoles.length > 0 ? Math.max(...completedHoles) : 9;
+                          const isActiveHole = hole === lastCompletedHole + 1 && !score;
 
                           return (
                             <td key={hole} className="text-center p-0.5">
@@ -454,6 +479,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                   "w-7 h-7 lg:w-9 lg:h-9 p-0 text-xs lg:text-sm font-semibold transition-all touch-none",
                                   score 
                                     ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                    : isActiveHole
+                                    ? "border-2 border-primary bg-primary/20 hover:bg-primary/30 animate-pulse"
                                     : "border-dashed hover:border-primary hover:bg-primary/10"
                                 )}
                                 onClick={() => handleScoreEdit(hole, score)}
@@ -564,7 +591,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
                       <div>
-                        <h3 className="font-semibold text-accent-foreground">Back 9</h3>
+                        <h3 className="font-semibold text-accent-foreground">Total</h3>
                         <div className="text-sm text-muted-foreground">
                           {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) >= 10).length}/9 holes
                         </div>
@@ -600,12 +627,21 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
                   const currentScore = currentUserScore?.scores[hole];
                   
+                  // Find the active hole (first hole after last scored hole)
+                  const completedHoles = Array.from({ length: 9 }, (_, j) => j + 10)
+                    .filter(h => currentUserScore?.scores[h]);
+                  const lastCompletedHole = completedHoles.length > 0 ? Math.max(...completedHoles) : 9;
+                  const isActiveHole = hole === lastCompletedHole + 1 && !currentScore;
+                  
                   return (
-                    <Card key={hole} className="w-full">
+                    <Card key={hole} className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}>
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center font-bold text-primary">
+                            <div className={cn(
+                              "w-8 h-8 rounded-full flex items-center justify-center font-bold",
+                              isActiveHole ? "bg-primary text-primary-foreground animate-pulse" : "bg-primary/20 text-primary"
+                            )}>
                               {hole}
                             </div>
                             <div>
@@ -620,6 +656,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                               "w-16 h-16 text-xl font-bold transition-all",
                               currentScore 
                                 ? "bg-primary text-primary-foreground hover:bg-primary/90" 
+                                : isActiveHole
+                                ? "border-2 border-primary bg-primary/20 hover:bg-primary/30 animate-pulse"
                                 : "border-dashed hover:border-primary hover:bg-primary/10"
                             )}
                             onClick={() => handleScoreEdit(hole, currentScore)}
