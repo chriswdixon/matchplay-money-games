@@ -48,7 +48,7 @@ const MatchPlayLanding = () => {
       return (
         <div className="min-h-screen bg-background flex flex-col">
           <AppHeader />
-          <main className="w-full py-8 flex-1">
+          <main className="w-full flex-1">
             <MatchFinder hideHowItWorks />
           </main>
           <AppFooter />

@@ -688,7 +688,11 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
         {/* Back to Matches Button - Below Match Settings */}
         <div className="mt-4">
-          <Button variant="outline" onClick={onClose} className="w-full">
+          <Button 
+            variant="default" 
+            onClick={onClose} 
+            className="w-full bg-[hsl(var(--accent))] text-accent-foreground hover:bg-[hsl(var(--accent))]/90"
+          >
             Back to Matches
           </Button>
         </div>
