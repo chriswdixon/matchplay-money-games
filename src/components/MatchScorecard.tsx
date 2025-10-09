@@ -307,17 +307,32 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 <Card className="bg-accent/10 border-accent">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-accent-foreground">Front 9 vs Par</h3>
-                      <div className="text-2xl font-bold text-accent-foreground">
-                        {(() => {
-                          const front9Par = Array.from({ length: 9 }, (_, i) => 
-                            matchData?.hole_pars?.[String(i + 1)] || 4
-                          ).reduce((sum, par) => sum + par, 0);
-                          const scoreDiff = (currentUserScore?.front9 || 0) - front9Par;
-                          
-                          if (scoreDiff === 0) return 'E';
-                          return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
-                        })()}
+                      <div>
+                        <h3 className="font-semibold text-accent-foreground">Front 9</h3>
+                        <div className="text-sm text-muted-foreground">
+                          {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) <= 9).length}/9 holes
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.front9 || 0}</div>
+                        <div className="text-sm font-semibold text-accent-foreground">
+                          {(() => {
+                            // Only calculate for completed holes
+                            const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
+                              .filter(hole => currentUserScore?.scores[hole]);
+                            
+                            if (completedHoles.length === 0) return '—';
+                            
+                            const completedPar = completedHoles.reduce((sum, hole) => 
+                              sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                            const completedStrokes = completedHoles.reduce((sum, hole) => 
+                              sum + (currentUserScore?.scores[hole] || 0), 0);
+                            const scoreDiff = completedStrokes - completedPar;
+                            
+                            if (scoreDiff === 0) return 'E';
+                            return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
@@ -548,17 +563,32 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 <Card className="bg-accent/10 border-accent">
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="font-semibold text-accent-foreground">Back 9 vs Par</h3>
-                      <div className="text-2xl font-bold text-accent-foreground">
-                        {(() => {
-                          const back9Par = Array.from({ length: 9 }, (_, i) => 
-                            matchData?.hole_pars?.[String(i + 10)] || 4
-                          ).reduce((sum, par) => sum + par, 0);
-                          const scoreDiff = (currentUserScore?.back9 || 0) - back9Par;
-                          
-                          if (scoreDiff === 0) return 'E';
-                          return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
-                        })()}
+                      <div>
+                        <h3 className="font-semibold text-accent-foreground">Back 9</h3>
+                        <div className="text-sm text-muted-foreground">
+                          {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) >= 10).length}/9 holes
+                        </div>
+                      </div>
+                      <div className="text-right">
+                        <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.back9 || 0}</div>
+                        <div className="text-sm font-semibold text-accent-foreground">
+                          {(() => {
+                            // Only calculate for completed holes
+                            const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
+                              .filter(hole => currentUserScore?.scores[hole]);
+                            
+                            if (completedHoles.length === 0) return '—';
+                            
+                            const completedPar = completedHoles.reduce((sum, hole) => 
+                              sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                            const completedStrokes = completedHoles.reduce((sum, hole) => 
+                              sum + (currentUserScore?.scores[hole] || 0), 0);
+                            const scoreDiff = completedStrokes - completedPar;
+                            
+                            if (scoreDiff === 0) return 'E';
+                            return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                          })()}
+                        </div>
                       </div>
                     </div>
                   </CardContent>
