@@ -29,6 +29,11 @@ export interface MatchData {
   hole_pars: { [hole: string]: number };
   tee_selection_mode?: 'fixed' | 'individual';
   default_tees?: string;
+  scheduled_time?: string;
+  format?: string;
+  buy_in_amount?: number;
+  participant_count?: number;
+  max_participants?: number;
 }
 
 export interface MatchResult {
@@ -61,7 +66,7 @@ export function useMatchScoring(matchId: string) {
       // Fetch match data including hole pars and tee settings
       const { data: matchInfo, error: matchError } = await supabase
         .from('matches')
-        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees')
+        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants')
         .eq('id', matchId)
         .single();
 
@@ -70,13 +75,24 @@ export function useMatchScoring(matchId: string) {
         return;
       }
 
+      // Fetch participant count
+      const { count: participantCount } = await supabase
+        .from('match_participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('match_id', matchId);
+
       setMatchData({
         id: matchInfo.id,
         course_name: matchInfo.course_name,
         location: matchInfo.location,
         hole_pars: matchInfo.hole_pars as { [hole: string]: number },
         tee_selection_mode: matchInfo.tee_selection_mode as 'fixed' | 'individual' | undefined,
-        default_tees: matchInfo.default_tees || undefined
+        default_tees: matchInfo.default_tees || undefined,
+        scheduled_time: matchInfo.scheduled_time,
+        format: matchInfo.format,
+        buy_in_amount: matchInfo.buy_in_amount,
+        participant_count: participantCount || 0,
+        max_participants: matchInfo.max_participants
       });
 
       // Fetch scores

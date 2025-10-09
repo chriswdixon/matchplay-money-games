@@ -8,7 +8,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
-import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown } from 'lucide-react';
+import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 interface MatchScorecardProps {
@@ -84,6 +84,34 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
   const handleConfirm = async () => {
     await confirmResults();
+  };
+
+  const formatMatchTime = (scheduledTime?: string) => {
+    if (!scheduledTime) return 'Not scheduled';
+    const date = new Date(scheduledTime);
+    return new Intl.DateTimeFormat('en-US', {
+      month: 'short',
+      day: 'numeric',
+      hour: 'numeric',
+      minute: '2-digit'
+    }).format(date);
+  };
+
+  const formatBuyIn = (buyInCents?: number) => {
+    if (!buyInCents) return '$0';
+    return `$${(buyInCents / 100).toFixed(0)}`;
+  };
+
+  const formatMatchFormat = (format?: string) => {
+    if (!format) return 'Standard';
+    const formatMap: { [key: string]: string } = {
+      'stroke-play': 'Stroke Play',
+      'match-play': 'Match Play',
+      'best-ball': '2v2 Best Ball',
+      'skins': 'Skins Game',
+      'scramble': 'Scramble'
+    };
+    return formatMap[format] || format;
   };
 
   if (loading) {
@@ -521,25 +549,24 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       </Card>
 
       {/* Header - Moved below scorecard */}
-      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between px-6">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <Target className="w-5 h-5 text-primary-foreground" />
+      <div className="px-6">
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <Target className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Match Scorecard</h1>
+              <p className="text-muted-foreground">{matchName}</p>
+            </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold">Match Scorecard</h1>
-            <p className="text-muted-foreground">{matchName}</p>
-          </div>
+          <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
+            Back to Matches
+          </Button>
         </div>
-        <Button variant="outline" onClick={onClose} className="w-full sm:w-auto">
-          Back to Matches
-        </Button>
-      </div>
 
-      {/* Match Settings - Collapsible on mobile, always visible on desktop */}
-      <div className="px-0 sm:px-6">
-        {/* Mobile: Collapsible */}
-        <div className="md:hidden">
+        {/* Match Settings Button - Directly below course name */}
+        <div className="mt-4">
           <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
             <CollapsibleTrigger asChild>
               <Button 
@@ -554,6 +581,49 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               </Button>
             </CollapsibleTrigger>
             <CollapsibleContent className="mt-4 space-y-4">
+              {/* Match Info Grid */}
+              <div className="grid grid-cols-2 gap-3">
+                <Card className="bg-card/50">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Clock className="w-4 h-4 text-primary" />
+                      <div className="text-xs text-muted-foreground">Tee Time</div>
+                    </div>
+                    <div className="text-sm font-semibold">{formatMatchTime(matchData?.scheduled_time)}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-card/50">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Users className="w-4 h-4 text-primary" />
+                      <div className="text-xs text-muted-foreground">Players</div>
+                    </div>
+                    <div className="text-sm font-semibold">{matchData?.participant_count || 0}/{matchData?.max_participants || 4}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-card/50">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <DollarSign className="w-4 h-4 text-primary" />
+                      <div className="text-xs text-muted-foreground">Buy-in</div>
+                    </div>
+                    <div className="text-sm font-semibold">{formatBuyIn(matchData?.buy_in_amount)}</div>
+                  </CardContent>
+                </Card>
+                
+                <Card className="bg-card/50">
+                  <CardContent className="p-3">
+                    <div className="flex items-center gap-2 mb-1">
+                      <Trophy className="w-4 h-4 text-primary" />
+                      <div className="text-xs text-muted-foreground">Format</div>
+                    </div>
+                    <div className="text-sm font-semibold">{formatMatchFormat(matchData?.format)}</div>
+                  </CardContent>
+                </Card>
+              </div>
+
               {/* Tee Information Banner */}
               {matchData && (
                 <Card className="bg-muted/50 border-primary/20">
@@ -564,11 +634,11 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                       </Badge>
                       {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
                         <span className="font-medium">
-                          All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                          All players: <span className="text-primary font-bold">{matchData.default_tees}</span> tees
                         </span>
                       ) : matchData.tee_selection_mode === 'individual' ? (
                         <span className="font-medium text-muted-foreground">
-                          Each player is playing from their selected tees
+                          Individual tee selection
                         </span>
                       ) : (
                         <span className="font-medium text-muted-foreground">
@@ -623,75 +693,118 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             </CollapsibleContent>
           </Collapsible>
         </div>
+      </div>
 
-        {/* Desktop: Always visible */}
-        <div className="hidden md:block space-y-4">
-          {/* Tee Information Banner */}
-          {matchData && (
-            <Card className="bg-muted/50 border-primary/20">
+      {/* Desktop: Always visible match info */}
+      <div className="hidden md:block px-6 space-y-4">
+        {/* Match Info Grid */}
+        <div className="grid grid-cols-4 gap-3">
+          <Card className="bg-card/50">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Clock className="w-4 h-4 text-primary" />
+                <div className="text-xs text-muted-foreground">Tee Time</div>
+              </div>
+              <div className="text-sm font-semibold">{formatMatchTime(matchData?.scheduled_time)}</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/50">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Users className="w-4 h-4 text-primary" />
+                <div className="text-xs text-muted-foreground">Players</div>
+              </div>
+              <div className="text-sm font-semibold">{matchData?.participant_count || 0}/{matchData?.max_participants || 4}</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/50">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <DollarSign className="w-4 h-4 text-primary" />
+                <div className="text-xs text-muted-foreground">Buy-in</div>
+              </div>
+              <div className="text-sm font-semibold">{formatBuyIn(matchData?.buy_in_amount)}</div>
+            </CardContent>
+          </Card>
+          
+          <Card className="bg-card/50">
+            <CardContent className="p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <Trophy className="w-4 h-4 text-primary" />
+                <div className="text-xs text-muted-foreground">Format</div>
+              </div>
+              <div className="text-sm font-semibold">{formatMatchFormat(matchData?.format)}</div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Tee Information Banner */}
+        {matchData && (
+          <Card className="bg-muted/50 border-primary/20">
+            <CardContent className="p-4">
+              <div className="flex items-center gap-2 text-sm">
+                <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                  Playing Tees
+                </Badge>
+                {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
+                  <span className="font-medium">
+                    All players: <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                  </span>
+                ) : matchData.tee_selection_mode === 'individual' ? (
+                  <span className="font-medium text-muted-foreground">
+                    Individual tee selection
+                  </span>
+                ) : (
+                  <span className="font-medium text-muted-foreground">
+                    Tees not specified
+                  </span>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Player Summary */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          {playerScores.map((player) => (
+            <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
               <CardContent className="p-4">
-                <div className="flex items-center gap-2 text-sm">
-                  <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                    Playing Tees
-                  </Badge>
-                  {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
-                    <span className="font-medium">
-                      All players are playing from <span className="text-primary font-bold">{matchData.default_tees}</span> tees
-                    </span>
-                  ) : matchData.tee_selection_mode === 'individual' ? (
-                    <span className="font-medium text-muted-foreground">
-                      Each player is playing from their selected tees
-                    </span>
-                  ) : (
-                    <span className="font-medium text-muted-foreground">
-                      Tees not specified
-                    </span>
-                  )}
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <Users className="w-4 h-4 text-muted-foreground" />
+                    <span className="font-medium">{player.player_name}</span>
+                    {player.player_id === user?.id && (
+                      <Badge variant="default" className="text-xs bg-primary">You</Badge>
+                    )}
+                  </div>
+                  <div className="text-right">
+                    <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
+                    <div className="text-xs text-muted-foreground">
+                      Front 9: {player.front9} | Back 9: {player.back9}
+                    </div>
+                    <div className="text-xs text-muted-foreground">
+                      {Object.keys(player.scores).length}/18 holes
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Progress Bar */}
+                <div className="mt-3">
+                  <div className="w-full bg-muted rounded-full h-2">
+                    <div 
+                      className="bg-primary h-2 rounded-full transition-all duration-300" 
+                      style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
+                    ></div>
+                  </div>
+                  <div className="text-xs text-muted-foreground mt-1 text-center">
+                    {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
+                  </div>
                 </div>
               </CardContent>
             </Card>
-          )}
-
-          {/* Player Summary */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            {playerScores.map((player) => (
-              <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
-                <CardContent className="p-4">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <Users className="w-4 h-4 text-muted-foreground" />
-                      <span className="font-medium">{player.player_name}</span>
-                      {player.player_id === user?.id && (
-                        <Badge variant="default" className="text-xs bg-primary">You</Badge>
-                      )}
-                    </div>
-                    <div className="text-right">
-                      <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
-                      <div className="text-xs text-muted-foreground">
-                        Front 9: {player.front9} | Back 9: {player.back9}
-                      </div>
-                      <div className="text-xs text-muted-foreground">
-                        {Object.keys(player.scores).length}/18 holes
-                      </div>
-                    </div>
-                  </div>
-                  
-                  {/* Progress Bar */}
-                  <div className="mt-3">
-                    <div className="w-full bg-muted rounded-full h-2">
-                      <div 
-                        className="bg-primary h-2 rounded-full transition-all duration-300" 
-                        style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
-                      ></div>
-                    </div>
-                    <div className="text-xs text-muted-foreground mt-1 text-center">
-                      {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          ))}
         </div>
       </div>
 
