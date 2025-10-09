@@ -918,8 +918,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           </DialogHeader>
           
           <div className="space-y-6">
-            {/* Manual Input */}
-            <div className="space-y-2">
+            {/* Manual Input - Hidden on mobile */}
+            <div className="hidden md:block space-y-2">
               <label className="text-sm font-medium">Manual Entry</label>
               <div className="flex gap-2">
                 <Input
@@ -947,7 +947,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             
             {/* Quick Entry Buttons */}
             <div className="space-y-2">
-              <label className="text-sm font-medium">Quick Entry</label>
+              <label className="hidden md:block text-sm font-medium">Quick Entry</label>
               <div className="grid grid-cols-5 gap-2">
                 {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((score) => (
                   <Button
