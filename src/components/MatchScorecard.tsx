@@ -35,6 +35,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [tempScore, setTempScore] = useState<string>('');
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(true);
+  const [userClosedSettings, setUserClosedSettings] = useState(false);
   const activeHoleRef = useRef<HTMLDivElement>(null);
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
@@ -51,6 +52,14 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       }, 300);
     }
   }, [currentUserScore?.scores]);
+
+  // Auto-expand settings when match is 100% complete
+  useEffect(() => {
+    if (currentUserScore && Object.keys(currentUserScore.scores).length === 18) {
+      setSettingsOpen(true);
+      setUserClosedSettings(false);
+    }
+  }, [currentUserScore]);
 
   const handleScoreEdit = (hole: number, currentScore?: number) => {
     setEditingHole(hole);
@@ -154,7 +163,12 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           <Button
             variant="ghost"
             size="icon"
-            onClick={() => setSettingsOpen(!settingsOpen)}
+            onClick={() => {
+              setSettingsOpen(!settingsOpen);
+              if (settingsOpen) {
+                setUserClosedSettings(true);
+              }
+            }}
             className="h-10 w-10"
           >
             {settingsOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
@@ -162,7 +176,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         </div>
 
         {/* Match Settings Collapsible Content */}
-        <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
+        <Collapsible 
+          open={settingsOpen} 
+          onOpenChange={(open) => {
+            setSettingsOpen(open);
+            if (!open) {
+              setUserClosedSettings(true);
+            }
+          }}
+        >
           <CollapsibleContent className="mt-4 space-y-4">
             {/* Match Info Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
@@ -276,6 +298,21 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           </CollapsibleContent>
         </Collapsible>
       </div>
+
+      {/* Top Finalize Button - Shows when match is complete */}
+      {isMatchComplete && canFinalize && (
+        <div className="flex justify-center gap-4 px-6 py-4">
+          <Button
+            onClick={handleFinalize}
+            disabled={saving}
+            size="lg"
+            className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
+          >
+            <Trophy className="w-5 h-5 mr-2" />
+            {saving ? "Finalizing..." : "Finalize Results"}
+          </Button>
+        </div>
+      )}
 
       {/* Scorecard */}
       <Card className="w-full border-0 md:border">
