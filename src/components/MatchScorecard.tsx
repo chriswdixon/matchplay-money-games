@@ -296,10 +296,13 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       <Card className="w-full border-0 md:border">
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs defaultValue="front9" className="w-full">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="front9">Front 9</TabsTrigger>
-              <TabsTrigger value="back9">Back 9</TabsTrigger>
-            </TabsList>
+            {/* Sticky Tabs Header */}
+            <div className="sticky top-0 z-20 bg-background">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="front9">Front 9</TabsTrigger>
+                <TabsTrigger value="back9">Back 9</TabsTrigger>
+              </TabsList>
+            </div>
             
             <TabsContent value="front9" className="mt-4">
               {/* Desktop Table View */}
@@ -473,41 +476,41 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
               {/* Mobile Vertical View */}
               <div className="md:hidden">
-                {/* Front 9 Total Card - Sticky */}
-                <div className="sticky top-0 z-10 bg-background pb-4">
+                {/* Front 9 Total Card - Sticky below tabs */}
+                <div className="sticky top-[52px] z-10 bg-background pb-4">
                   <Card className="bg-accent/10 border-accent">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-accent-foreground">Total</h3>
-                        <div className="text-sm text-muted-foreground">
-                          {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) <= 9).length}/9 holes
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-accent-foreground">Total</h3>
+                          <div className="text-sm text-muted-foreground">
+                            {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) <= 9).length}/9 holes
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.front9 || 0}</div>
+                          <div className="text-sm font-semibold text-accent-foreground">
+                            {(() => {
+                              // Only calculate for completed holes
+                              const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
+                                .filter(hole => currentUserScore?.scores[hole]);
+                              
+                              if (completedHoles.length === 0) return '—';
+                              
+                              const completedPar = completedHoles.reduce((sum, hole) => 
+                                sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                              const completedStrokes = completedHoles.reduce((sum, hole) => 
+                                sum + (currentUserScore?.scores[hole] || 0), 0);
+                              const scoreDiff = completedStrokes - completedPar;
+                              
+                              if (scoreDiff === 0) return 'E';
+                              return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                            })()}
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.front9 || 0}</div>
-                        <div className="text-sm font-semibold text-accent-foreground">
-                          {(() => {
-                            // Only calculate for completed holes
-                            const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
-                              .filter(hole => currentUserScore?.scores[hole]);
-                            
-                            if (completedHoles.length === 0) return '—';
-                            
-                            const completedPar = completedHoles.reduce((sum, hole) => 
-                              sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
-                            const completedStrokes = completedHoles.reduce((sum, hole) => 
-                              sum + (currentUserScore?.scores[hole] || 0), 0);
-                            const scoreDiff = completedStrokes - completedPar;
-                            
-                            if (scoreDiff === 0) return 'E';
-                            return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 {/* Holes 1-9 */}
@@ -522,12 +525,16 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     .filter(h => currentUserScore?.scores[h]);
                   const lastCompletedHole = completedHoles.length > 0 ? Math.max(...completedHoles) : 0;
                   const isActiveHole = hole === lastCompletedHole + 1 && !currentScore;
+                  const isPlayedHole = currentScore !== undefined;
                   
                   return (
                     <Card 
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
-                      className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}
+                      className={cn(
+                        "w-full",
+                        isActiveHole && "border-2 border-primary bg-primary/5"
+                      )}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
@@ -756,41 +763,41 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
               {/* Mobile Vertical View */}
               <div className="md:hidden">
-                {/* Back 9 Total Card - Sticky */}
-                <div className="sticky top-0 z-10 bg-background pb-4">
+                {/* Back 9 Total Card - Sticky below tabs */}
+                <div className="sticky top-[52px] z-10 bg-background pb-4">
                   <Card className="bg-accent/10 border-accent">
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div>
-                        <h3 className="font-semibold text-accent-foreground">Total</h3>
-                        <div className="text-sm text-muted-foreground">
-                          {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) >= 10).length}/9 holes
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div>
+                          <h3 className="font-semibold text-accent-foreground">Total</h3>
+                          <div className="text-sm text-muted-foreground">
+                            {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) >= 10).length}/9 holes
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.back9 || 0}</div>
+                          <div className="text-sm font-semibold text-accent-foreground">
+                            {(() => {
+                              // Only calculate for completed holes
+                              const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
+                                .filter(hole => currentUserScore?.scores[hole]);
+                              
+                              if (completedHoles.length === 0) return '—';
+                              
+                              const completedPar = completedHoles.reduce((sum, hole) => 
+                                sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
+                              const completedStrokes = completedHoles.reduce((sum, hole) => 
+                                sum + (currentUserScore?.scores[hole] || 0), 0);
+                              const scoreDiff = completedStrokes - completedPar;
+                              
+                              if (scoreDiff === 0) return 'E';
+                              return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
+                            })()}
+                          </div>
                         </div>
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.back9 || 0}</div>
-                        <div className="text-sm font-semibold text-accent-foreground">
-                          {(() => {
-                            // Only calculate for completed holes
-                            const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
-                              .filter(hole => currentUserScore?.scores[hole]);
-                            
-                            if (completedHoles.length === 0) return '—';
-                            
-                            const completedPar = completedHoles.reduce((sum, hole) => 
-                              sum + (matchData?.hole_pars?.[String(hole)] || 4), 0);
-                            const completedStrokes = completedHoles.reduce((sum, hole) => 
-                              sum + (currentUserScore?.scores[hole] || 0), 0);
-                            const scoreDiff = completedStrokes - completedPar;
-                            
-                            if (scoreDiff === 0) return 'E';
-                            return scoreDiff > 0 ? `+${scoreDiff}` : `${scoreDiff}`;
-                          })()}
-                        </div>
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
+                    </CardContent>
+                  </Card>
                 </div>
 
                 {/* Holes 10-18 */}
@@ -805,12 +812,16 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                     .filter(h => currentUserScore?.scores[h]);
                   const lastCompletedHole = completedHoles.length > 0 ? Math.max(...completedHoles) : 9;
                   const isActiveHole = hole === lastCompletedHole + 1 && !currentScore;
+                  const isPlayedHole = currentScore !== undefined;
                   
                   return (
                     <Card 
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
-                      className={cn("w-full", isActiveHole && "border-2 border-primary bg-primary/5")}
+                      className={cn(
+                        "w-full",
+                        isActiveHole && "border-2 border-primary bg-primary/5"
+                      )}
                     >
                       <CardContent className="p-4">
                         <div className="flex items-center justify-between mb-3">
