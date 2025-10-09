@@ -734,7 +734,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         </div>
 
         {/* Match Settings Button - Directly below course name */}
-        <div className="mt-4">
+        <div>
           <Collapsible open={settingsOpen} onOpenChange={setSettingsOpen}>
             <CollapsibleTrigger asChild>
               <Button 
