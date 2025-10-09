@@ -7,7 +7,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Edit, MapPin, Loader2, Check, ChevronsUpDown, Clock, X } from 'lucide-react';
+import { Edit, MapPin, Loader2, Check, ChevronsUpDown, X } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -39,8 +39,6 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
   });
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
-  const [timeManuallySet, setTimeManuallySet] = useState(false);
-  const [hourDisplay, setHourDisplay] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [loadingZipcode, setLoadingZipcode] = useState(false);
   const [searchRadius, setSearchRadius] = useState<number>(30);
@@ -81,17 +79,6 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
       searchNearbyCourses(locationCoords.latitude, locationCoords.longitude, searchRadius);
     }
   }, [locationCoords, courses.length, searchNearbyCourses, searchRadius]);
-
-  // Set hour display when scheduled time changes
-  useEffect(() => {
-    if (formData.scheduled_time && !timeManuallySet) {
-      const time = new Date(formData.scheduled_time);
-      const hours = time.getHours();
-      const displayHour = hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-      const period = hours >= 12 ? 'PM' : 'AM';
-      setHourDisplay(`${displayHour}:${time.getMinutes().toString().padStart(2, '0')} ${period}`);
-    }
-  }, [formData.scheduled_time, timeManuallySet]);
 
   const formatOptions = [
     { value: 'stroke-play', label: 'Stroke Play' },
@@ -142,7 +129,6 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
   };
 
   const handleTimeChange = (field: string, value: string) => {
-    setTimeManuallySet(true);
     handleInputChange(field, value);
   };
 
@@ -364,27 +350,17 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
           </div>
 
           {/* Date and Time */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="date" className="text-sm font-medium">Date & Time</Label>
-              <Input
-                id="datetime"
-                type="datetime-local"
-                value={formData.scheduled_time}
-                onChange={(e) => handleTimeChange('scheduled_time', e.target.value)}
-                min={new Date().toISOString().slice(0, 16)}
-                className="hover:border-primary focus:border-primary"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label className="text-sm font-medium">Selected Time</Label>
-              <div className="flex items-center h-10 px-3 border border-border rounded-md bg-muted">
-                <Clock className="w-4 h-4 mr-2 text-muted-foreground" />
-                <span className="text-sm">{hourDisplay || 'No time selected'}</span>
-              </div>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="date" className="text-sm font-medium">Date & Time</Label>
+            <Input
+              id="datetime"
+              type="datetime-local"
+              value={formData.scheduled_time}
+              onChange={(e) => handleTimeChange('scheduled_time', e.target.value)}
+              min={new Date().toISOString().slice(0, 16)}
+              className="hover:border-primary focus:border-primary"
+              required
+            />
           </div>
 
           {/* Match Format */}

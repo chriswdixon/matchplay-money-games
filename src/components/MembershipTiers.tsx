@@ -110,11 +110,7 @@ const MembershipTiers = () => {
               
               <CardFooter>
                 <Button 
-                  className={`w-full transition-all duration-300 ${
-                    tier.popular 
-                      ? 'bg-gradient-accent text-accent-foreground shadow-accent hover:shadow-accent/80' 
-                      : 'bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-premium/80'
-                  } transform hover:scale-105`}
+                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white transform hover:scale-105 transition-all duration-300"
                   size="lg"
                 >
                   {tier.buttonText}
