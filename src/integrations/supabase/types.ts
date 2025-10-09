@@ -344,7 +344,7 @@ export type Database = {
         Returns: number
       }
       finalize_match_results: {
-        Args: { match_id: string }
+        Args: { p_match_id: string }
         Returns: boolean
       }
       get_match_creator_info: {

@@ -358,7 +358,7 @@ export function useMatchScoring(matchId: string) {
       setSaving(true);
 
       const { error } = await supabase.rpc('finalize_match_results', {
-        match_id: matchId
+        p_match_id: matchId
       });
 
       if (error) {
