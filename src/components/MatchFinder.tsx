@@ -292,12 +292,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
                 {showPastMatches 
                   ? 'Review your completed matches, see final results, and track your competitive history.'
-                  : 'No more playing alone. Connect with golfers in your area, book money matches, and compete with confidence knowing every stroke counts.'
+                  : 'Connect with golfers in your area, book money matches, and compete with confidence knowing every stroke counts.'
                 }
               </p>
               {!showPastMatches && (
-                <div className="mt-8 flex flex-col sm:flex-row gap-4 items-center justify-center">
-          <CreateMatchDialog onMatchCreated={refetch} />
+                <div className="mt-8 flex flex-col items-center justify-center gap-2">
+                  <CreateMatchDialog onMatchCreated={refetch} />
                   {location && (
                     <p className="text-sm text-muted-foreground">
                       📍 Location enabled • Showing matches within {searchRadius}mi
@@ -442,8 +442,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             </div>
                           )}
                           
-                          {/* Book Tee Time button - show if booking URL exists and match is open/user joined */}
-                          {match.booking_url && (match.status === 'open' || match.user_joined) && (
+                          {/* Book Tee Time button - show if booking URL exists and match is open/user joined (but not in past matches view) */}
+                          {!showPastMatches && match.booking_url && (match.status === 'open' || match.user_joined) && (
                             <Button
                               variant="outline"
                               className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"

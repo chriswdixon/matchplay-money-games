@@ -4,7 +4,8 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useMatchScoring } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
-import { Trophy, Crown, Medal, CheckCircle, Clock, Users } from 'lucide-react';
+import { Trophy, Crown, Medal, CheckCircle, Clock, Users, DollarSign } from 'lucide-react';
+import { MatchResultsDisplay } from './MatchResultsDisplay';
 
 interface MatchResultsProps {
   matchId: string;
@@ -17,6 +18,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
   const {
     playerScores,
     matchResult,
+    matchData,
     loading,
     saving,
     confirmResults
@@ -78,6 +80,36 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
     }
   };
 
+  // If match is finalized, show the full results display
+  if (matchResult) {
+    return (
+      <div className="max-w-6xl mx-auto">
+        {/* Header */}
+        <div className="flex items-center justify-between px-4 md:px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-gradient-primary rounded-lg">
+              <Trophy className="w-5 h-5 text-primary-foreground" />
+            </div>
+            <div>
+              <h1 className="text-2xl font-bold">Match Results</h1>
+              <p className="text-muted-foreground">{matchName}</p>
+            </div>
+          </div>
+          <Button variant="outline" onClick={onClose}>
+            Back to Matches
+          </Button>
+        </div>
+
+        <MatchResultsDisplay 
+          matchResult={matchResult}
+          playerScores={playerScores}
+          buyInAmount={matchData?.buy_in_amount}
+        />
+      </div>
+    );
+  }
+
+  // Otherwise show the confirmation view
   return (
     <div className="max-w-4xl mx-auto p-6 space-y-6">
       {/* Header */}
