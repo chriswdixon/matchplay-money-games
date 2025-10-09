@@ -139,7 +139,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-0 space-y-2">
+    <div className="w-full max-w-[1400px] mx-auto px-0 space-y-0 md:space-y-2">
       {/* Header with Course Name and Hamburger Menu */}
       <div className="px-4 md:px-6">
         <div className="flex items-center justify-between">

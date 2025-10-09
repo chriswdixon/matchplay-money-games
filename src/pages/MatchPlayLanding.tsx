@@ -19,6 +19,15 @@ const MatchPlayLanding = () => {
   const { user } = useAuth();
   const { matches } = useMatches();
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [currentTab, setCurrentTab] = useState("matches");
+
+  // Navigation items for hamburger menu
+  const navItems = [
+    { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
+    { value: "past", label: "Past Matches", icon: <History className="w-4 h-4" /> },
+    { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
+    { value: "subscription", label: "Subscription", icon: <Crown className="w-4 h-4" /> },
+  ];
 
   // Check if user has an active match
   const activeMatch = useMemo(() => {
@@ -59,10 +68,16 @@ const MatchPlayLanding = () => {
     // Otherwise show the tabs navigation
     return (
       <div className="min-h-screen bg-background flex flex-col">
-        <AppHeader />
-        <main className="container py-8 flex-1">
-          <Tabs defaultValue="matches" className="w-full">
-            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
+        <AppHeader 
+          showNavMenu 
+          onNavSelect={setCurrentTab}
+          currentTab={currentTab}
+          navItems={navItems}
+        />
+        <main className="container py-0 md:py-8 flex-1">
+          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+            {/* Desktop Tabs - Hidden on mobile */}
+            <TabsList className="hidden md:grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 Find Matches

@@ -263,7 +263,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   return (
-    <section className="py-20 px-6 bg-background">
+    <section className="py-4 md:py-20 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
         {/* Show active match scorecard if user has a started match */}
         {activeMatch ? (
