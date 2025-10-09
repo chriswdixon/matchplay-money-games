@@ -21,7 +21,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems }: AppHeader
           {showNavMenu && navItems && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild className="md:hidden">
-                <Button variant="ghost" size="icon">
+                <Button variant="ghost" size="icon" className="text-accent hover:text-accent hover:bg-accent/10">
                   <Menu className="h-5 w-5" />
                 </Button>
               </SheetTrigger>
