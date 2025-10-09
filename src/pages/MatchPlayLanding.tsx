@@ -52,7 +52,7 @@ const MatchPlayLanding = () => {
 
   // Logged-in user experience
   if (user) {
-    // If user has an active match, show only the scorecard (no tabs on desktop/tablet, but hamburger on mobile)
+    // If user has an active match, show only the scorecard (tabs only in hamburger menu)
     if (activeMatch) {
       return (
         <div className="min-h-screen bg-background flex flex-col">
@@ -63,14 +63,30 @@ const MatchPlayLanding = () => {
             navItems={navItems}
           />
           <main className="w-full flex-1">
-            <MatchFinder hideHowItWorks />
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+              <TabsContent value="matches">
+                <MatchFinder hideHowItWorks />
+              </TabsContent>
+              
+              <TabsContent value="past">
+                <MatchFinder hideHowItWorks showPastMatches />
+              </TabsContent>
+              
+              <TabsContent value="handicap">
+                <HandicapSettings />
+              </TabsContent>
+              
+              <TabsContent value="subscription">
+                <SubscriptionManagement />
+              </TabsContent>
+            </Tabs>
           </main>
           <AppFooter />
         </div>
       );
     }
 
-    // Otherwise show the tabs navigation
+    // Otherwise show the tabs navigation with visible tabs
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <AppHeader 
@@ -81,7 +97,28 @@ const MatchPlayLanding = () => {
         />
         <main className="container flex-1 py-8">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            {/* Tabs are now only accessible via hamburger menu on all screen sizes */}
+            {/* Desktop/Tablet Tabs - Visible when not in active match */}
+            <TabsList className="hidden md:grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
+              <TabsTrigger value="matches" className="flex items-center gap-2">
+                <Search className="w-4 h-4" />
+                <span className="hidden lg:inline">Find Matches</span>
+                <span className="lg:hidden">Matches</span>
+              </TabsTrigger>
+              <TabsTrigger value="past" className="flex items-center gap-2">
+                <History className="w-4 h-4" />
+                <span className="hidden lg:inline">Past Matches</span>
+                <span className="lg:hidden">Past</span>
+              </TabsTrigger>
+              <TabsTrigger value="handicap" className="flex items-center gap-2">
+                <Trophy className="w-4 h-4" />
+                Handicap
+              </TabsTrigger>
+              <TabsTrigger value="subscription" className="flex items-center gap-2">
+                <Crown className="w-4 h-4" />
+                <span className="hidden lg:inline">Subscription</span>
+                <span className="lg:hidden">Sub</span>
+              </TabsTrigger>
+            </TabsList>
             
             <TabsContent value="matches">
               <MatchFinder hideHowItWorks />
