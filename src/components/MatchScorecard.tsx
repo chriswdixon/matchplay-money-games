@@ -8,8 +8,9 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } f
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
-import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X } from 'lucide-react';
+import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { MatchResultsDisplay } from './MatchResultsDisplay';
 
 interface MatchScorecardProps {
   matchId: string;
@@ -22,6 +23,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const {
     playerScores,
     matchData,
+    matchResult,
+    confirmations,
     loading,
     saving,
     updateScore,
@@ -101,7 +104,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   };
 
   const handleFinalize = async () => {
-    await finalizeResults();
+    await confirmResults();
   };
 
   const handleConfirm = async () => {
@@ -257,65 +260,96 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
             {/* Player Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
-              {playerScores.map((player) => (
-                <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
-                  <CardContent className="p-4">
-                    <div className="flex items-center justify-between">
-                      <div className="flex items-center gap-2">
-                        <Users className="w-4 h-4 text-muted-foreground" />
-                        <span className="font-medium truncate">{player.player_name}</span>
-                        {player.player_id === user?.id && (
-                          <Badge variant="default" className="text-xs bg-primary">You</Badge>
+              {playerScores.map((player) => {
+                const confirmation = confirmations.find(c => c.player_id === player.player_id);
+                const hasConfirmed = confirmation?.confirmed || false;
+                
+                return (
+                  <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+                    <CardContent className="p-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                          <Users className="w-4 h-4 text-muted-foreground" />
+                          <span className="font-medium truncate">{player.player_name}</span>
+                          {player.player_id === user?.id && (
+                            <Badge variant="default" className="text-xs bg-primary">You</Badge>
+                          )}
+                        </div>
+                        {hasConfirmed && (
+                          <Check className="w-5 h-5 text-green-600" />
                         )}
                       </div>
-                      <div className="text-right">
-                        <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
-                        <div className="text-xs text-muted-foreground">
-                          Front 9: {player.front9} | Back 9: {player.back9}
+                      <div className="flex items-start justify-between mt-2">
+                        <div className="text-right">
+                          <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
+                          <div className="text-xs text-muted-foreground">
+                            Front 9: {player.front9} | Back 9: {player.back9}
+                          </div>
+                          <div className="text-xs text-muted-foreground">
+                            {Object.keys(player.scores).length}/18 holes
+                          </div>
                         </div>
-                        <div className="text-xs text-muted-foreground">
-                          {Object.keys(player.scores).length}/18 holes
+                      </div>
+                      
+                      {/* Progress Bar */}
+                      <div className="mt-3">
+                        <div className="w-full bg-muted rounded-full h-2">
+                          <div 
+                            className="bg-primary h-2 rounded-full transition-all duration-300" 
+                            style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
+                          ></div>
+                        </div>
+                        <div className="text-xs text-muted-foreground mt-1 text-center">
+                          {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
+                          {hasConfirmed && isMatchComplete && (
+                            <span className="ml-2 text-green-600 font-medium">✓ Confirmed</span>
+                          )}
                         </div>
                       </div>
-                    </div>
-                    
-                    {/* Progress Bar */}
-                    <div className="mt-3">
-                      <div className="w-full bg-muted rounded-full h-2">
-                        <div 
-                          className="bg-primary h-2 rounded-full transition-all duration-300" 
-                          style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
-                        ></div>
-                      </div>
-                      <div className="text-xs text-muted-foreground mt-1 text-center">
-                        {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              ))}
+                    </CardContent>
+                  </Card>
+                );
+              })}
             </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
 
       {/* Top Finalize Button - Shows when match is complete */}
-      {isMatchComplete && canFinalize && (
-        <div className="flex justify-center gap-4 px-6 py-4">
+      {isMatchComplete && canFinalize && !matchResult && (
+        <div className="flex flex-col items-center gap-4 px-6 py-4">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-2">Round Complete!</h3>
+            <p className="text-sm text-muted-foreground">
+              {confirmations.filter(c => c.confirmed).length} of {confirmations.length} players confirmed
+            </p>
+          </div>
           <Button
             onClick={handleFinalize}
-            disabled={saving}
+            disabled={saving || confirmations.find(c => c.player_id === user?.id)?.confirmed}
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            {saving ? "Finalizing..." : "Finalize Results"}
+            {confirmations.find(c => c.player_id === user?.id)?.confirmed 
+              ? "Waiting for others..." 
+              : saving ? "Confirming..." : "Confirm Results"}
           </Button>
         </div>
       )}
 
+      {/* Display Results when all confirmed */}
+      {matchResult && (
+        <MatchResultsDisplay 
+          matchResult={matchResult}
+          playerScores={playerScores}
+          buyInAmount={matchData?.buy_in_amount}
+        />
+      )}
+
       {/* Scorecard */}
-      <Card className="w-full border-0 md:border">
+      {!matchResult && (
+        <Card className="w-full border-0 md:border">
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs defaultValue="front9" className="w-full">
             {/* Sticky Tabs Header */}
@@ -903,28 +937,36 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           </Tabs>
         </CardContent>
       </Card>
+      )}
 
-      {/* Action Buttons */}
-      <div className="flex justify-center gap-4 px-6 pb-8 pt-6">
-        {isMatchComplete && canFinalize && (
+      {/* Action Buttons - Bottom */}
+      {!matchResult && isMatchComplete && canFinalize && (
+        <div className="flex flex-col items-center gap-4 px-6 pb-8 pt-6">
+          <div className="text-center">
+            <p className="text-sm text-muted-foreground">
+              {confirmations.filter(c => c.confirmed).length} of {confirmations.length} players confirmed
+            </p>
+          </div>
           <Button
             onClick={handleFinalize}
-            disabled={saving}
+            disabled={saving || confirmations.find(c => c.player_id === user?.id)?.confirmed}
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            {saving ? "Finalizing..." : "Finalize Results"}
+            {confirmations.find(c => c.player_id === user?.id)?.confirmed 
+              ? "Waiting for others..." 
+              : saving ? "Confirming..." : "Confirm Results"}
           </Button>
-        )}
+        </div>
+      )}
 
-        {!isMatchComplete && (
-          <div className="text-center text-muted-foreground">
-            <Clock className="w-5 h-5 mx-auto mb-2" />
-            <p>Complete all 18 holes to finalize results</p>
-          </div>
-        )}
-      </div>
+      {!matchResult && !isMatchComplete && (
+        <div className="text-center text-muted-foreground px-6 pb-8">
+          <Clock className="w-5 h-5 mx-auto mb-2" />
+          <p>Complete all 18 holes to finalize results</p>
+        </div>
+      )}
 
       {/* Score Entry Dialog */}
       <Dialog open={scoreDialogOpen} onOpenChange={setScoreDialogOpen}>

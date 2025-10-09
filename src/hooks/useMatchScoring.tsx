@@ -46,11 +46,19 @@ export interface MatchResult {
   updated_at: string;
 }
 
+export interface PlayerConfirmation {
+  player_id: string;
+  player_name: string;
+  confirmed: boolean;
+  confirmed_at: string | null;
+}
+
 export function useMatchScoring(matchId: string) {
   const [scores, setScores] = useState<MatchScore[]>([]);
   const [playerScores, setPlayerScores] = useState<PlayerScore[]>([]);
   const [matchResult, setMatchResult] = useState<MatchResult | null>(null);
   const [matchData, setMatchData] = useState<MatchData | null>(null);
+  const [confirmations, setConfirmations] = useState<PlayerConfirmation[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
@@ -193,6 +201,29 @@ export function useMatchScoring(matchId: string) {
       }
 
       setMatchResult(resultData);
+
+      // Fetch confirmations
+      const { data: confirmationsData, error: confirmationsError } = await supabase
+        .from('match_confirmations')
+        .select('player_id, confirmed, confirmed_at')
+        .eq('match_id', matchId);
+
+      if (confirmationsError) {
+        console.error('Error fetching confirmations:', confirmationsError);
+      }
+
+      // Map confirmations with player names
+      const confirmationsWithNames: PlayerConfirmation[] = participants.map(participant => {
+        const confirmation = confirmationsData?.find(c => c.player_id === participant.user_id);
+        return {
+          player_id: participant.user_id,
+          player_name: participant.display_name,
+          confirmed: confirmation?.confirmed || false,
+          confirmed_at: confirmation?.confirmed_at || null
+        };
+      });
+
+      setConfirmations(confirmationsWithNames);
 
     } catch (error) {
       console.error('Error in fetchMatchData:', error);
@@ -429,8 +460,33 @@ export function useMatchScoring(matchId: string) {
 
       toast({
         title: "Results confirmed!",
-        description: "You have confirmed the match results",
+        description: "Waiting for other players to confirm...",
       });
+
+      // Refresh data to get updated confirmations
+      await fetchMatchData();
+
+      // Check if all players have confirmed
+      const { data: allConfirmations } = await supabase
+        .from('match_confirmations')
+        .select('confirmed')
+        .eq('match_id', matchId)
+        .eq('confirmed', true);
+
+      const { count: participantCount } = await supabase
+        .from('match_participants')
+        .select('*', { count: 'exact', head: true })
+        .eq('match_id', matchId);
+
+      // If all players have confirmed, finalize the match
+      if (allConfirmations && participantCount && allConfirmations.length === participantCount) {
+        toast({
+          title: "All players confirmed!",
+          description: "Finalizing match results...",
+        });
+        
+        await finalizeResults();
+      }
 
       return true;
     } catch (error) {
@@ -489,9 +545,58 @@ export function useMatchScoring(matchId: string) {
       )
       .subscribe();
 
+    // Subscribe to confirmation changes
+    const confirmationChannel = supabase
+      .channel(`match-confirmations-${matchId}`)
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'match_confirmations',
+          filter: `match_id=eq.${matchId}`
+        },
+        async (payload) => {
+          // Refetch to update confirmation status
+          await fetchMatchData();
+          
+          // Check if all players have confirmed and auto-finalize
+          const { data: allConfirmations } = await supabase
+            .from('match_confirmations')
+            .select('confirmed')
+            .eq('match_id', matchId)
+            .eq('confirmed', true);
+
+          const { count: participantCount } = await supabase
+            .from('match_participants')
+            .select('*', { count: 'exact', head: true })
+            .eq('match_id', matchId);
+
+          // If all players have confirmed, finalize the match
+          if (allConfirmations && participantCount && allConfirmations.length === participantCount) {
+            const { data: existingResult } = await supabase
+              .from('match_results')
+              .select('id')
+              .eq('match_id', matchId)
+              .maybeSingle();
+            
+            // Only finalize if not already finalized
+            if (!existingResult) {
+              toast({
+                title: "All players confirmed!",
+                description: "Finalizing match results...",
+              });
+              await finalizeResults();
+            }
+          }
+        }
+      )
+      .subscribe();
+
     return () => {
       supabase.removeChannel(scoreChannel);
       supabase.removeChannel(resultChannel);
+      supabase.removeChannel(confirmationChannel);
     };
   }, [matchId, user]);
 
@@ -513,6 +618,7 @@ export function useMatchScoring(matchId: string) {
     playerScores,
     matchResult,
     matchData,
+    confirmations,
     loading,
     saving,
     startMatch,
