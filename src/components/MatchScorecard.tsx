@@ -96,7 +96,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   }
 
   return (
-    <div className="w-full px-0 sm:px-6 space-y-6">
+    <div className="w-full max-w-[1400px] mx-auto px-0 sm:px-6 space-y-6">
       {/* Scorecard - Full width on mobile, comes first */}
       <Card className="w-full">
         <CardHeader>
