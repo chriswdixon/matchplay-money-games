@@ -74,17 +74,19 @@ const MatchPlayLanding = () => {
           currentTab={currentTab}
           navItems={navItems}
         />
-        <main className="container flex-1">
+        <main className="container flex-1 py-8">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            {/* Desktop/Tablet Tabs - Visible on md screens and above */}
-            <TabsList className="hidden md:grid w-full grid-cols-4 max-w-3xl mx-auto my-8">
+            {/* Desktop/Tablet Tabs - Hidden only on mobile */}
+            <TabsList className="hidden sm:grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
-                Find Matches
+                <span className="hidden md:inline">Find Matches</span>
+                <span className="md:hidden">Matches</span>
               </TabsTrigger>
               <TabsTrigger value="past" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
-                Past Matches
+                <span className="hidden md:inline">Past Matches</span>
+                <span className="md:hidden">Past</span>
               </TabsTrigger>
               <TabsTrigger value="handicap" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
@@ -92,7 +94,8 @@ const MatchPlayLanding = () => {
               </TabsTrigger>
               <TabsTrigger value="subscription" className="flex items-center gap-2">
                 <Crown className="w-4 h-4" />
-                Subscription
+                <span className="hidden md:inline">Subscription</span>
+                <span className="md:hidden">Sub</span>
               </TabsTrigger>
             </TabsList>
             

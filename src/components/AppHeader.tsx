@@ -20,7 +20,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems }: AppHeader
         <div className="flex items-center gap-2">
           {showNavMenu && navItems && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
-              <SheetTrigger asChild className="md:hidden">
+              <SheetTrigger asChild className="sm:hidden">
                 <Button variant="ghost" size="icon" className="text-accent hover:text-accent hover:bg-accent/10">
                   <Menu className="h-5 w-5" />
                 </Button>
