@@ -283,10 +283,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               matchName={activeMatch.course_name}
               onClose={async () => {
                 // Let user leave the active match to see tabs
-                if (window.confirm('Leave this match? You can rejoin from the Matches tab.')) {
-                  await leaveMatch(activeMatch.id);
-                  refetch();
-                }
+                await leaveMatch(activeMatch.id);
+                refetch();
               }}
             />
           </div>
