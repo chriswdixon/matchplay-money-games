@@ -52,11 +52,16 @@ const MatchPlayLanding = () => {
 
   // Logged-in user experience
   if (user) {
-    // If user has an active match, show only the scorecard (no tabs)
+    // If user has an active match, show only the scorecard (no tabs on desktop/tablet, but hamburger on mobile)
     if (activeMatch) {
       return (
         <div className="min-h-screen bg-background flex flex-col">
-          <AppHeader />
+          <AppHeader 
+            showNavMenu 
+            onNavSelect={setCurrentTab}
+            currentTab={currentTab}
+            navItems={navItems}
+          />
           <main className="w-full flex-1">
             <MatchFinder hideHowItWorks />
           </main>
@@ -77,16 +82,16 @@ const MatchPlayLanding = () => {
         <main className="container flex-1 py-8">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             {/* Desktop/Tablet Tabs - Hidden only on mobile */}
-            <TabsList className="hidden sm:grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
+            <TabsList className="grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
-                <span className="hidden md:inline">Find Matches</span>
-                <span className="md:hidden">Matches</span>
+                <span className="hidden lg:inline">Find Matches</span>
+                <span className="lg:hidden">Matches</span>
               </TabsTrigger>
               <TabsTrigger value="past" className="flex items-center gap-2">
                 <History className="w-4 h-4" />
-                <span className="hidden md:inline">Past Matches</span>
-                <span className="md:hidden">Past</span>
+                <span className="hidden lg:inline">Past Matches</span>
+                <span className="lg:hidden">Past</span>
               </TabsTrigger>
               <TabsTrigger value="handicap" className="flex items-center gap-2">
                 <Trophy className="w-4 h-4" />
@@ -94,8 +99,8 @@ const MatchPlayLanding = () => {
               </TabsTrigger>
               <TabsTrigger value="subscription" className="flex items-center gap-2">
                 <Crown className="w-4 h-4" />
-                <span className="hidden md:inline">Subscription</span>
-                <span className="md:hidden">Sub</span>
+                <span className="hidden lg:inline">Subscription</span>
+                <span className="lg:hidden">Sub</span>
               </TabsTrigger>
             </TabsList>
             
