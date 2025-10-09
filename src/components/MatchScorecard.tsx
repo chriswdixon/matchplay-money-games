@@ -297,10 +297,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs defaultValue="front9" className="w-full">
             {/* Sticky Tabs Header */}
-            <div className="sticky top-0 z-20 bg-background">
-              <TabsList className="grid w-full grid-cols-2">
-                <TabsTrigger value="front9">Front 9</TabsTrigger>
-                <TabsTrigger value="back9">Back 9</TabsTrigger>
+            <div className="sticky top-0 z-20 bg-background pb-2 px-2">
+              <TabsList className="grid w-full grid-cols-2 h-10">
+                <TabsTrigger value="front9" className="text-sm">Front 9</TabsTrigger>
+                <TabsTrigger value="back9" className="text-sm">Back 9</TabsTrigger>
               </TabsList>
             </div>
             
@@ -477,7 +477,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               {/* Mobile Vertical View */}
               <div className="md:hidden">
                 {/* Front 9 Total Card - Sticky below tabs */}
-                <div className="sticky top-[52px] z-10 bg-background pb-4">
+                <div className="sticky top-[56px] z-10 bg-background pb-4 px-2">
                   <Card className="bg-accent/10 border-accent">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
@@ -514,7 +514,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 </div>
 
                 {/* Holes 1-9 */}
-                <div className="space-y-4">
+                <div className="space-y-4 px-2">
                 {Array.from({ length: 9 }, (_, i) => {
                   const hole = i + 1;
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
@@ -764,7 +764,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               {/* Mobile Vertical View */}
               <div className="md:hidden">
                 {/* Back 9 Total Card - Sticky below tabs */}
-                <div className="sticky top-[52px] z-10 bg-background pb-4">
+                <div className="sticky top-[56px] z-10 bg-background pb-4 px-2">
                   <Card className="bg-accent/10 border-accent">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
@@ -801,7 +801,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 </div>
 
                 {/* Holes 10-18 */}
-                <div className="space-y-4">
+                <div className="space-y-4 px-2">
                 {Array.from({ length: 9 }, (_, i) => {
                   const hole = i + 10;
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
