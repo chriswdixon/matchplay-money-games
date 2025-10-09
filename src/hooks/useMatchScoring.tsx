@@ -276,6 +276,34 @@ export function useMatchScoring(matchId: string) {
     try {
       setSaving(true);
 
+      // Optimistically update local state first
+      setPlayerScores(prevScores => {
+        return prevScores.map(player => {
+          if (player.player_id === user.id) {
+            const updatedScores = { ...player.scores, [holeNumber]: strokes };
+            
+            // Recalculate totals
+            const front9 = Object.entries(updatedScores)
+              .filter(([hole]) => parseInt(hole) <= 9)
+              .reduce((sum, [, score]) => sum + score, 0);
+            
+            const back9 = Object.entries(updatedScores)
+              .filter(([hole]) => parseInt(hole) >= 10)
+              .reduce((sum, [, score]) => sum + score, 0);
+            
+            return {
+              ...player,
+              scores: updatedScores,
+              front9,
+              back9,
+              total: front9 + back9
+            };
+          }
+          return player;
+        });
+      });
+
+      // Then save to database
       const { error } = await supabase
         .from('match_scores')
         .upsert({
@@ -289,6 +317,8 @@ export function useMatchScoring(matchId: string) {
 
       if (error) {
         console.error('Error updating score:', error);
+        // Revert optimistic update on error
+        await fetchMatchData();
         toast({
           title: "Failed to update score",
           description: error.message,
@@ -297,11 +327,11 @@ export function useMatchScoring(matchId: string) {
         return false;
       }
 
-      // Refresh data
-      await fetchMatchData();
       return true;
     } catch (error) {
       console.error('Error updating score:', error);
+      // Revert optimistic update on error
+      await fetchMatchData();
       toast({
         title: "Failed to update score",
         description: "An unexpected error occurred",
@@ -422,7 +452,7 @@ export function useMatchScoring(matchId: string) {
 
     fetchMatchData();
 
-    // Subscribe to score changes
+    // Subscribe to score changes (only from other players)
     const scoreChannel = supabase
       .channel(`match-scores-${matchId}`)
       .on(
@@ -433,8 +463,11 @@ export function useMatchScoring(matchId: string) {
           table: 'match_scores',
           filter: `match_id=eq.${matchId}`
         },
-        () => {
-          fetchMatchData();
+        (payload) => {
+          // Only refetch if the change is from another player
+          if (payload.new && 'player_id' in payload.new && payload.new.player_id !== user?.id) {
+            fetchMatchData();
+          }
         }
       )
       .subscribe();
