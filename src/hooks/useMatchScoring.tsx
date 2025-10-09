@@ -58,10 +58,10 @@ export function useMatchScoring(matchId: string) {
     try {
       setLoading(true);
 
-      // Fetch match data including hole pars
+      // Fetch match data including hole pars and tee settings
       const { data: matchInfo, error: matchError } = await supabase
         .from('matches')
-        .select('id, course_name, location, hole_pars')
+        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees')
         .eq('id', matchId)
         .single();
 
@@ -71,8 +71,12 @@ export function useMatchScoring(matchId: string) {
       }
 
       setMatchData({
-        ...matchInfo,
-        hole_pars: matchInfo.hole_pars as { [hole: string]: number }
+        id: matchInfo.id,
+        course_name: matchInfo.course_name,
+        location: matchInfo.location,
+        hole_pars: matchInfo.hole_pars as { [hole: string]: number },
+        tee_selection_mode: matchInfo.tee_selection_mode as 'fixed' | 'individual' | undefined,
+        default_tees: matchInfo.default_tees || undefined
       });
 
       // Fetch scores
