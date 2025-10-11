@@ -309,6 +309,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             {matchData?.status === 'cancelled' && (
               <Badge variant="destructive">Cancelled</Badge>
             )}
+            {matchResult?.winner_id === user?.id && (
+              <Badge variant="success">Winner</Badge>
+            )}
           </div>
           
           {/* Back Button for Cancelled Matches or Hamburger Menu */}
