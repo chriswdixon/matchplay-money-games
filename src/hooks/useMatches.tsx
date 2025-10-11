@@ -97,8 +97,8 @@ export const useMatches = () => {
           const participatingMatchIds = await getUserParticipatingMatchIds();
           
           if (participatingMatchIds) {
-            // Get open matches OR matches where user is a participant (started/completed)
-            matchesQuery = matchesQuery.or(`status.eq.open,and(status.in.(started,completed),id.in.(${participatingMatchIds}))`);
+            // Get open matches OR matches where user is a participant (started/completed/cancelled)
+            matchesQuery = matchesQuery.or(`status.eq.open,and(status.in.(started,completed,cancelled),id.in.(${participatingMatchIds}))`);
           } else {
             // If no participating matches, just get open ones
             matchesQuery = matchesQuery.eq('status', 'open');
