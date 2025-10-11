@@ -25,6 +25,7 @@ export interface PlayerScore {
   net_front9: number;
   net_back9: number;
   net_total: number;
+  status?: string;
 }
 
 export interface MatchData {
@@ -125,7 +126,7 @@ export function useMatchScoring(matchId: string) {
       // Fetch match participants and their profile data
       const { data: participantData, error: participantsError } = await supabase
         .from('match_participants')
-        .select('user_id')
+        .select('user_id, status')
         .eq('match_id', matchId);
 
       if (participantsError) {
@@ -151,7 +152,8 @@ export function useMatchScoring(matchId: string) {
         return {
           user_id: participant.user_id,
           display_name: profile?.display_name || 'Unknown Player',
-          handicap: profile?.handicap || 0
+          handicap: profile?.handicap || 0,
+          status: participant.status || 'active'
         };
       }) || [];
 
@@ -174,7 +176,8 @@ export function useMatchScoring(matchId: string) {
           course_handicap: courseHandicap,
           net_front9: 0,
           net_back9: 0,
-          net_total: 0
+          net_total: 0,
+          status: participant.status || 'active'
         };
       });
 

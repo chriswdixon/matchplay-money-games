@@ -336,12 +336,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 return (
                    <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
                     <CardContent className="p-4">
-                      <div className="flex items-center justify-between">
+                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
                           <Users className="w-4 h-4 text-muted-foreground" />
                           <span className="font-medium truncate">{player.player_name}</span>
                           {player.player_id === user?.id && (
                             <Badge variant="default" className="text-xs bg-primary">You</Badge>
+                          )}
+                          {player.status === 'dnf' && (
+                            <Badge variant="destructive" className="text-xs">DNF</Badge>
                           )}
                         </div>
                         {hasConfirmed && (
