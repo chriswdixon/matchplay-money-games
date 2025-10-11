@@ -689,7 +689,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
                       className={cn(
-                        "w-full",
+                        "w-full touch-auto",
                         isActiveHole && "border-2 border-primary bg-primary/5"
                       )}
                     >
@@ -711,7 +711,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                             variant={currentScore ? "default" : "outline"}
                             size="lg"
                             className={cn(
-                              "w-16 h-16 text-xl font-bold transition-all",
+                              "w-16 h-16 text-xl font-bold transition-all touch-auto",
                               currentScore 
                                 ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                                 : isActiveHole
@@ -994,7 +994,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
                       className={cn(
-                        "w-full",
+                        "w-full touch-auto",
                         isActiveHole && "border-2 border-primary bg-primary/5"
                       )}
                     >
@@ -1016,7 +1016,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                             variant={currentScore ? "default" : "outline"}
                             size="lg"
                             className={cn(
-                              "w-16 h-16 text-xl font-bold transition-all",
+                              "w-16 h-16 text-xl font-bold transition-all touch-auto",
                               currentScore 
                                 ? "bg-primary text-primary-foreground hover:bg-primary/90" 
                                 : isActiveHole
