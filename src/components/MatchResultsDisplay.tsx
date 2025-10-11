@@ -94,7 +94,6 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
               {payouts[player.player_id] && (
                 <div className="flex items-center justify-center gap-2 pt-2 border-t bg-green-50 dark:bg-green-950 rounded-lg p-2">
-                  <DollarSign className="w-5 h-5 text-green-600" />
                   <span className="text-2xl font-bold text-green-600">
                     ${payouts[player.player_id].toFixed(0)}
                   </span>
