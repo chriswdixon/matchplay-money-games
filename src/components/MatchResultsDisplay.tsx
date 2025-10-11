@@ -150,6 +150,64 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           </CardContent>
         </Card>
       )}
+
+      {/* Detailed Scorecard */}
+      <Card className="max-w-4xl mx-auto">
+        <CardHeader>
+          <CardTitle>Detailed Scorecard</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b">
+                  <th className="text-left p-2 font-medium">Player</th>
+                  {Array.from({ length: 18 }, (_, i) => (
+                    <th key={i + 1} className="text-center p-2 font-medium w-10">
+                      {i + 1}
+                    </th>
+                  ))}
+                  <th className="text-center p-2 font-medium">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                {sortedPlayers.map((player, index) => (
+                  <tr 
+                    key={player.player_id} 
+                    className={`border-b ${
+                      index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''
+                    }`}
+                  >
+                    <td className="p-2 font-medium">
+                      <div className="flex items-center gap-2">
+                        {getPositionIcon(index)}
+                        <span className="text-xs lg:text-sm">{player.player_name}</span>
+                      </div>
+                    </td>
+                    {Array.from({ length: 18 }, (_, i) => {
+                      const hole = i + 1;
+                      const score = player.scores[hole];
+
+                      return (
+                        <td key={hole} className="text-center p-1">
+                          <div className={`w-7 h-7 rounded flex items-center justify-center text-xs ${
+                            score ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground'
+                          }`}>
+                            {score || '-'}
+                          </div>
+                        </td>
+                      );
+                    })}
+                    <td className="text-center p-2 font-bold">
+                      {player.total > 0 ? player.total : 'DNF'}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

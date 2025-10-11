@@ -306,22 +306,34 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             <h1 className="text-xl md:text-2xl font-bold">
               {matchData?.course_name || matchName || 'Golf Match'}
             </h1>
+            {matchData?.status === 'cancelled' && (
+              <Badge variant="destructive">Cancelled</Badge>
+            )}
           </div>
           
-          {/* Hamburger Menu Button */}
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => {
-              setSettingsOpen(!settingsOpen);
-              if (settingsOpen) {
-                setUserClosedSettings(true);
-              }
-            }}
-            className="h-10 w-10"
-          >
-            {settingsOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-          </Button>
+          {/* Back Button for Cancelled Matches or Hamburger Menu */}
+          {matchData?.status === 'cancelled' ? (
+            <Button
+              variant="outline"
+              onClick={onClose}
+            >
+              Back to Matches
+            </Button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={() => {
+                setSettingsOpen(!settingsOpen);
+                if (settingsOpen) {
+                  setUserClosedSettings(true);
+                }
+              }}
+              className="h-10 w-10"
+            >
+              {settingsOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+            </Button>
+          )}
         </div>
 
         {/* Match Settings Collapsible Content */}
