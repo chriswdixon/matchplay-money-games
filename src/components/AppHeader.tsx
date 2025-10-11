@@ -12,9 +12,10 @@ interface AppHeaderProps {
   currentTab?: string;
   navItems?: Array<{ value: string; label: string; icon: React.ReactNode }>;
   onReturnToMatch?: () => void;
+  hideReturnButton?: boolean;
 }
 
-const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToMatch }: AppHeaderProps) => {
+const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToMatch, hideReturnButton }: AppHeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { hasActiveMatch, activeMatchName } = useActiveMatch();
   const navigate = useNavigate();
@@ -40,7 +41,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
         </div>
         
         <div className="flex items-center gap-2">
-          {hasActiveMatch && (
+          {hasActiveMatch && !hideReturnButton && (
             <Button
               variant="default"
               size="sm"

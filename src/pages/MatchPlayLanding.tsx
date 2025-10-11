@@ -77,6 +77,7 @@ const MatchPlayLanding = () => {
           currentTab={currentTab}
           navItems={navItems}
           onReturnToMatch={handleReturnToMatch}
+          hideReturnButton={currentTab === "active-match"}
         />
         <main className="container flex-1 py-8">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
