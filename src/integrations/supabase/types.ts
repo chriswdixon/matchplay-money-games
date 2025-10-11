@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      match_cancellation_confirmations: {
+        Row: {
+          alternate_reason: string | null
+          cancelling_player_id: string
+          confirmed: boolean
+          confirmed_at: string | null
+          confirming_player_id: string
+          created_at: string
+          id: string
+          match_id: string
+          stated_reason: string
+        }
+        Insert: {
+          alternate_reason?: string | null
+          cancelling_player_id: string
+          confirmed?: boolean
+          confirmed_at?: string | null
+          confirming_player_id: string
+          created_at?: string
+          id?: string
+          match_id: string
+          stated_reason: string
+        }
+        Update: {
+          alternate_reason?: string | null
+          cancelling_player_id?: string
+          confirmed?: boolean
+          confirmed_at?: string | null
+          confirming_player_id?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          stated_reason?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_cancellation_confirmations_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_confirmations: {
         Row: {
           confirmed: boolean

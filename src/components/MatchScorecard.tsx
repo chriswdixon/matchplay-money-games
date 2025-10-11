@@ -13,10 +13,12 @@ import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring
 import { useAuth } from '@/hooks/useAuth';
 import { useMatches } from '@/hooks/useMatches';
 import { useActiveMatch } from '@/hooks/useActiveMatch';
+import { useCancellationConfirmations } from '@/hooks/useCancellationConfirmations';
 import { supabase } from '@/integrations/supabase/client';
 import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
+import { CancellationConfirmationDialog } from './CancellationConfirmationDialog';
 import { toast } from '@/hooks/use-toast';
 
 interface MatchScorecardProps {
@@ -52,7 +54,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [cancelReason, setCancelReason] = useState<string>('');
   const [isLeaving, setIsLeaving] = useState(false);
   const [expandedOtherPlayers, setExpandedOtherPlayers] = useState<Record<number, boolean>>({});
+  const [currentConfirmationIndex, setCurrentConfirmationIndex] = useState(0);
   const activeHoleRef = useRef<HTMLDivElement>(null);
+
+  const { pendingConfirmations, confirmCancellation } = useCancellationConfirmations(matchId);
 
   const toggleOtherPlayers = (hole: number) => {
     setExpandedOtherPlayers(prev => ({
@@ -151,6 +156,27 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       });
 
       if (error) throw error;
+
+      // Create confirmation requests for all other active players
+      const otherActivePlayers = playerScores
+        .filter(p => p.player_id !== user.id && p.status !== 'dnf');
+      
+      if (otherActivePlayers.length > 0) {
+        const confirmationRequests = otherActivePlayers.map(player => ({
+          match_id: matchId,
+          cancelling_player_id: user.id,
+          stated_reason: cancelReason,
+          confirming_player_id: player.player_id
+        }));
+
+        const { error: confirmError } = await supabase
+          .from('match_cancellation_confirmations')
+          .insert(confirmationRequests);
+
+        if (confirmError) {
+          console.error('Error creating confirmation requests:', confirmError);
+        }
+      }
 
       clearActiveMatch();
       
@@ -1361,6 +1387,32 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             Leave Match
           </Button>
         </div>
+      )}
+
+      {/* Cancellation Confirmation Dialogs */}
+      {pendingConfirmations.length > 0 && (
+        <CancellationConfirmationDialog
+          confirmation={pendingConfirmations[currentConfirmationIndex]}
+          open={true}
+          onOpenChange={(open) => {
+            if (!open && currentConfirmationIndex < pendingConfirmations.length - 1) {
+              setCurrentConfirmationIndex(prev => prev + 1);
+            }
+          }}
+          onConfirm={async (confirmed, alternateReason) => {
+            await confirmCancellation(
+              pendingConfirmations[currentConfirmationIndex].id,
+              confirmed,
+              alternateReason
+            );
+            
+            if (currentConfirmationIndex < pendingConfirmations.length - 1) {
+              setCurrentConfirmationIndex(prev => prev + 1);
+            } else {
+              setCurrentConfirmationIndex(0);
+            }
+          }}
+        />
       )}
 
       {/* Editing Instructions - Remove this since we're using a dialog now */}
