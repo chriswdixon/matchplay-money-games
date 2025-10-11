@@ -51,8 +51,15 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState<string>('');
   const [isLeaving, setIsLeaving] = useState(false);
-  const [showOtherPlayersMobile, setShowOtherPlayersMobile] = useState(false);
+  const [expandedOtherPlayers, setExpandedOtherPlayers] = useState<Record<number, boolean>>({});
   const activeHoleRef = useRef<HTMLDivElement>(null);
+
+  const toggleOtherPlayers = (hole: number) => {
+    setExpandedOtherPlayers(prev => ({
+      ...prev,
+      [hole]: !prev[hole]
+    }));
+  };
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
@@ -721,8 +728,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {/* Other players' scores for this hole */}
                         {otherPlayers.length > 0 && (
                           <Collapsible 
-                            open={showOtherPlayersMobile} 
-                            onOpenChange={setShowOtherPlayersMobile}
+                            open={expandedOtherPlayers[hole] || false}
+                            onOpenChange={() => toggleOtherPlayers(hole)}
                             className="pt-3 border-t"
                           >
                             <CollapsibleTrigger asChild>
@@ -734,7 +741,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                 <span className="text-sm font-medium">Other Players</span>
                                 <ChevronDown className={cn(
                                   "h-4 w-4 transition-transform",
-                                  showOtherPlayersMobile && "rotate-180"
+                                  expandedOtherPlayers[hole] && "rotate-180"
                                 )} />
                               </Button>
                             </CollapsibleTrigger>
@@ -1026,8 +1033,8 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         {/* Other players' scores for this hole */}
                         {otherPlayers.length > 0 && (
                           <Collapsible 
-                            open={showOtherPlayersMobile} 
-                            onOpenChange={setShowOtherPlayersMobile}
+                            open={expandedOtherPlayers[hole] || false}
+                            onOpenChange={() => toggleOtherPlayers(hole)}
                             className="pt-3 border-t"
                           >
                             <CollapsibleTrigger asChild>
@@ -1039,7 +1046,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                 <span className="text-sm font-medium">Other Players</span>
                                 <ChevronDown className={cn(
                                   "h-4 w-4 transition-transform",
-                                  showOtherPlayersMobile && "rotate-180"
+                                  expandedOtherPlayers[hole] && "rotate-180"
                                 )} />
                               </Button>
                             </CollapsibleTrigger>
