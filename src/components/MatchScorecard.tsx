@@ -314,7 +314,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           {/* Back Button for Cancelled Matches or Hamburger Menu */}
           {matchData?.status === 'cancelled' ? (
             <Button
-              variant="outline"
+              variant="success"
               onClick={onClose}
             >
               Back to Matches
