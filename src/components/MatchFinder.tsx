@@ -163,9 +163,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   // Find active match for current user (started status and user is participant)
   const activeMatch = useMemo(() => {
     if (!user) return null;
-    return matches.find(match => 
+    const match = matches.find(match => 
       match.status === 'started' && match.user_joined
     );
+    console.log('Active match found:', match);
+    return match;
   }, [matches, user]);
 
   const formatMatchTime = (scheduledTime: string) => {
