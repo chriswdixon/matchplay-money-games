@@ -522,6 +522,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             matchId={scorecardMatch.id}
             matchName={scorecardMatch.course_name}
             onClose={() => setScorecardMatch(null)}
+            readOnly={scorecardMatch.status === 'completed' || scorecardMatch.status === 'cancelled'}
           />
         )}
 

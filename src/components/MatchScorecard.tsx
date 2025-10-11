@@ -25,9 +25,10 @@ interface MatchScorecardProps {
   matchId: string;
   matchName: string;
   onClose?: () => void;
+  readOnly?: boolean;
 }
 
-export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardProps) {
+export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }: MatchScorecardProps) {
   const { user } = useAuth();
   const { leaveMatch, refetch } = useMatches();
   const { clearActiveMatch } = useActiveMatch();
@@ -599,7 +600,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                     : "border-dashed hover:border-primary hover:bg-primary/10"
                                 )}
                                 onClick={() => handleScoreEdit(hole, score)}
-                                disabled={saving}
+                                disabled={saving || readOnly || matchData?.status === 'cancelled' || matchData?.status === 'completed'}
                               >
                                 {score || '+'}
                               </Button>
@@ -787,7 +788,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                 : "border-dashed hover:border-primary hover:bg-primary/10"
                             )}
                             onClick={() => handleScoreEdit(hole, currentScore)}
-                            disabled={saving}
+                            disabled={saving || readOnly || matchData?.status === 'cancelled' || matchData?.status === 'completed'}
                           >
                             {currentScore || '+'}
                           </Button>
@@ -904,7 +905,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                     : "border-dashed hover:border-primary hover:bg-primary/10"
                                 )}
                                 onClick={() => handleScoreEdit(hole, score)}
-                                disabled={saving}
+                                disabled={saving || readOnly || matchData?.status === 'cancelled' || matchData?.status === 'completed'}
                               >
                                 {score || '+'}
                               </Button>
@@ -1092,7 +1093,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                                 : "border-dashed hover:border-primary hover:bg-primary/10"
                             )}
                             onClick={() => handleScoreEdit(hole, currentScore)}
-                            disabled={saving}
+                            disabled={saving || readOnly || matchData?.status === 'cancelled' || matchData?.status === 'completed'}
                           >
                             {currentScore || '+'}
                           </Button>
