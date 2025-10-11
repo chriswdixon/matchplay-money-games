@@ -242,6 +242,55 @@ export function useHandicapCalculation() {
     return Math.round(handicapIndex * 10) / 10;
   };
 
+  const getMatchSummaries = () => {
+    if (completedMatches.length === 0) return [];
+
+    // Calculate Score Differential for each round with adjusted scores
+    const matchSummaries = completedMatches.map((match, index) => {
+      const adjustedGrossScore = applyNetDoubleBogeyAdjustment(match);
+      const grossScore = match.hole_scores.reduce((sum, hole) => sum + hole.strokes, 0);
+      
+      const differential =
+        ((adjustedGrossScore - match.course_rating) * 113) / match.slope_rating;
+      
+      return {
+        matchId: match.match_id,
+        grossScore,
+        adjustedScore: adjustedGrossScore,
+        differential: Math.round(differential * 10) / 10,
+        completedAt: match.completed_at,
+      };
+    });
+
+    // Determine which scores are used for handicap calculation
+    if (matchSummaries.length < 3) {
+      return matchSummaries.map(m => ({ ...m, usedForHandicap: false }));
+    }
+
+    // Sort by differential to find best scores
+    const sortedByDiff = [...matchSummaries].sort((a, b) => a.differential - b.differential);
+    
+    // Determine how many scores to use
+    let numScoresToUse = 1;
+    const numRounds = matchSummaries.length;
+
+    if (numRounds >= 20) numScoresToUse = 8;
+    else if (numRounds >= 19) numScoresToUse = 7;
+    else if (numRounds >= 18) numScoresToUse = 6;
+    else if (numRounds >= 15) numScoresToUse = 5;
+    else if (numRounds >= 12) numScoresToUse = 4;
+    else if (numRounds >= 9) numScoresToUse = 3;
+    else if (numRounds >= 6) numScoresToUse = 2;
+    else if (numRounds >= 3) numScoresToUse = 1;
+
+    const usedMatchIds = new Set(sortedByDiff.slice(0, numScoresToUse).map(m => m.matchId));
+
+    return matchSummaries.map(m => ({
+      ...m,
+      usedForHandicap: usedMatchIds.has(m.matchId),
+    }));
+  };
+
   const canEditHandicap = matchCount < 3;
 
   return {
@@ -250,6 +299,7 @@ export function useHandicapCalculation() {
     loading,
     calculateHandicapIndex,
     canEditHandicap,
+    getMatchSummaries,
     refetch: fetchCompletedMatches,
   };
 }

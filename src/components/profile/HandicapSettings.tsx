@@ -8,8 +8,10 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useProfile } from '@/hooks/useProfile';
 import { useHandicapCalculation } from '@/hooks/useHandicapCalculation';
-import { Trophy, Calculator, Lock, Info } from 'lucide-react';
+import { Trophy, Calculator, Lock, Info, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { format } from 'date-fns';
 
 export function HandicapSettings() {
   const { profile, loading, updateProfile } = useProfile();
@@ -18,12 +20,14 @@ export function HandicapSettings() {
     loading: matchLoading, 
     calculateHandicapIndex, 
     canEditHandicap,
-    completedMatches
+    completedMatches,
+    getMatchSummaries
   } = useHandicapCalculation();
   
   const [handicap, setHandicap] = useState('');
   const [saving, setSaving] = useState(false);
   const [autoCalculatedHandicap, setAutoCalculatedHandicap] = useState<number | null>(null);
+  const [matchHistoryOpen, setMatchHistoryOpen] = useState(false);
 
   // Course Handicap Calculator state
   const [handicapIndex, setHandicapIndex] = useState('');
@@ -235,6 +239,62 @@ export function HandicapSettings() {
                 )}
               </p>
             </div>
+
+            {/* Match History Summary - Show for users with matches */}
+            {matchCount > 0 && (
+              <Collapsible open={matchHistoryOpen} onOpenChange={setMatchHistoryOpen} className="space-y-2">
+                <CollapsibleTrigger asChild>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full flex items-center justify-between"
+                  >
+                    <span className="flex items-center gap-2">
+                      <Trophy className="w-4 h-4" />
+                      Match History Summary ({matchCount} {matchCount === 1 ? 'match' : 'matches'})
+                    </span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${matchHistoryOpen ? 'rotate-180' : ''}`} />
+                  </Button>
+                </CollapsibleTrigger>
+                <CollapsibleContent className="space-y-2">
+                  <div className="border rounded-lg overflow-hidden">
+                    <div className="bg-muted/50 p-3 grid grid-cols-4 gap-2 text-xs font-semibold text-muted-foreground border-b">
+                      <div>Date</div>
+                      <div className="text-right">Gross</div>
+                      <div className="text-right">Adjusted</div>
+                      <div className="text-right">Differential</div>
+                    </div>
+                    <div className="divide-y max-h-96 overflow-y-auto">
+                      {getMatchSummaries().map((match, index) => (
+                        <div
+                          key={match.matchId}
+                          className={`p-3 grid grid-cols-4 gap-2 text-sm ${
+                            match.usedForHandicap
+                              ? 'bg-accent/20 font-semibold border-l-4 border-l-accent'
+                              : ''
+                          }`}
+                        >
+                          <div className="text-muted-foreground">
+                            {format(new Date(match.completedAt), 'MMM d, yyyy')}
+                          </div>
+                          <div className="text-right">{match.grossScore}</div>
+                          <div className="text-right">{match.adjustedScore}</div>
+                          <div className="text-right">
+                            {match.differential}
+                            {match.usedForHandicap && (
+                              <span className="ml-1 text-accent">★</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <p className="text-xs text-muted-foreground text-center pt-2">
+                    ★ Highlighted scores are used for your handicap calculation
+                  </p>
+                </CollapsibleContent>
+              </Collapsible>
+            )}
 
             {canEditHandicap && (
               <div className="flex justify-end pt-4">
