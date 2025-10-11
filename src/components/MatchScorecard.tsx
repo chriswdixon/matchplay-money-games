@@ -1241,7 +1241,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 
                 return (
                   <div className={cn(
-                    "rounded-lg p-4 space-y-2 border",
+                    "rounded-lg p-4 space-y-2 border text-left",
                     isWeatherOrCourse 
                       ? "bg-blue-500/10 border-blue-500/30" 
                       : "bg-destructive/10 border-destructive/30"
@@ -1253,7 +1253,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                       <AlertTriangle className="w-4 h-4" />
                       {isWeatherOrCourse ? "Weather/Course Cancellation" : "Important: By leaving this match"}
                     </p>
-                    <ul className="text-sm space-y-1 pl-6 list-disc text-foreground">
+                    <ul className="text-sm space-y-1 pl-6 list-disc text-foreground text-left">
                       {isWeatherOrCourse ? (
                         <>
                           <li>Your <strong>buy-in will be fully refunded</strong> ({formatBuyIn(matchData?.buy_in_amount)})</li>
