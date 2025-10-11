@@ -31,24 +31,24 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center gap-2 md:justify-between">
+      <div className="flex h-16 items-center gap-2 px-4 md:container md:justify-between">
         {/* Left: Logo */}
         <div className="flex items-center shrink-0">
           <Link to="/">
-            <h1 className="text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
+            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
               MatchPlay
             </h1>
           </Link>
         </div>
         
         {/* Right Section: Active Match + Hamburger + User Menu */}
-        <div className="flex items-center gap-2 flex-1 md:flex-none justify-end">
+        <div className="flex items-center gap-1 md:gap-2 ml-auto shrink-0">
           {hasActiveMatch && !hideReturnButton && (
             <Button
               variant="default"
               size="sm"
               onClick={handleReturnToMatch}
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90 gap-2"
+              className="bg-gradient-primary text-primary-foreground hover:opacity-90 gap-1 md:gap-2"
             >
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Return to Active Match</span>
