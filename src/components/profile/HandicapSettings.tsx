@@ -5,14 +5,25 @@ import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Separator } from '@/components/ui/separator';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useProfile } from '@/hooks/useProfile';
-import { Trophy, Calculator } from 'lucide-react';
+import { useHandicapCalculation } from '@/hooks/useHandicapCalculation';
+import { Trophy, Calculator, Lock, Info } from 'lucide-react';
 import { toast } from 'sonner';
 
 export function HandicapSettings() {
   const { profile, loading, updateProfile } = useProfile();
+  const { 
+    matchCount, 
+    loading: matchLoading, 
+    calculateHandicapIndex, 
+    canEditHandicap,
+    completedMatches
+  } = useHandicapCalculation();
+  
   const [handicap, setHandicap] = useState('');
   const [saving, setSaving] = useState(false);
+  const [autoCalculatedHandicap, setAutoCalculatedHandicap] = useState<number | null>(null);
 
   // Course Handicap Calculator state
   const [handicapIndex, setHandicapIndex] = useState('');
@@ -33,8 +44,30 @@ export function HandicapSettings() {
     }
   }, [profile]);
 
+  // Auto-calculate handicap when user has 3+ matches
+  useEffect(() => {
+    if (!canEditHandicap && matchCount >= 3) {
+      const calculated = calculateHandicapIndex();
+      if (calculated !== null) {
+        setAutoCalculatedHandicap(calculated);
+        setHandicap(calculated.toString());
+        
+        // Auto-update profile with calculated handicap
+        if (profile && profile.handicap !== calculated) {
+          updateProfile({ handicap: calculated });
+        }
+      }
+    }
+  }, [matchCount, canEditHandicap, calculateHandicapIndex, completedMatches]);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    if (!canEditHandicap) {
+      toast.error('Handicap is auto-calculated after 3 matches');
+      return;
+    }
+    
     setSaving(true);
 
     try {
@@ -113,7 +146,7 @@ export function HandicapSettings() {
     setPlayingHandicap(null);
   };
 
-  if (loading) {
+  if (loading || matchLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -144,9 +177,35 @@ export function HandicapSettings() {
           </div>
         </CardHeader>
         <CardContent>
+          {/* Match count and auto-calculation status */}
+          <Alert className="mb-6">
+            <Info className="h-4 w-4" />
+            <AlertDescription>
+              {matchCount < 3 ? (
+                <>
+                  You have completed <strong>{matchCount}</strong> of 3 matches required for automatic handicap calculation.
+                  {matchCount === 0 && ' You can manually set your handicap until then.'}
+                  {matchCount > 0 && ` ${3 - matchCount} more match${3 - matchCount > 1 ? 'es' : ''} to go!`}
+                </>
+              ) : (
+                <>
+                  Your handicap is automatically calculated based on your last {matchCount} completed matches.
+                  {autoCalculatedHandicap !== null && (
+                    <> Current calculated handicap: <strong>{autoCalculatedHandicap}</strong></>
+                  )}
+                </>
+              )}
+            </AlertDescription>
+          </Alert>
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <Label htmlFor="handicap">Handicap Index</Label>
+              <Label htmlFor="handicap" className="flex items-center gap-2">
+                Handicap Index
+                {!canEditHandicap && (
+                  <Lock className="w-4 h-4 text-muted-foreground" />
+                )}
+              </Label>
               <Input
                 id="handicap"
                 type="number"
@@ -156,25 +215,35 @@ export function HandicapSettings() {
                 placeholder="e.g., 12.5"
                 value={handicap}
                 onChange={(e) => setHandicap(e.target.value)}
+                disabled={!canEditHandicap}
+                className={!canEditHandicap ? 'bg-muted cursor-not-allowed' : ''}
               />
               <p className="text-sm text-muted-foreground">
-                Enter your official USGA Handicap Index (range: -10 to 54)
+                {canEditHandicap ? (
+                  'Enter your official USGA Handicap Index (range: -10 to 54)'
+                ) : (
+                  'Handicap is auto-calculated from your match scores using USGA formulas'
+                )}
               </p>
             </div>
 
-            <div className="flex justify-end pt-4">
-              <Button 
-                type="submit" 
-                disabled={saving}
-                className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-smooth"
-              >
-                {saving ? "Saving..." : "Save Handicap"}
-              </Button>
-            </div>
+            {canEditHandicap && (
+              <div className="flex justify-end pt-4">
+                <Button 
+                  type="submit" 
+                  disabled={saving}
+                  className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-smooth"
+                >
+                  {saving ? "Saving..." : "Save Handicap"}
+                </Button>
+              </div>
+            )}
             
-            <p className="text-sm text-muted-foreground text-center pt-4">
-              Played matches will automatically set your handicap.
-            </p>
+            {!canEditHandicap && (
+              <p className="text-sm text-muted-foreground text-center pt-4 bg-accent/10 p-3 rounded-lg border border-accent/20">
+                🏆 Handicap updates automatically after each completed match
+              </p>
+            )}
           </form>
         </CardContent>
       </Card>
