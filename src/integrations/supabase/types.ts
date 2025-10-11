@@ -47,6 +47,7 @@ export type Database = {
           joined_at: string
           match_id: string
           selected_tees: string | null
+          status: string
           user_id: string
         }
         Insert: {
@@ -54,6 +55,7 @@ export type Database = {
           joined_at?: string
           match_id: string
           selected_tees?: string | null
+          status?: string
           user_id: string
         }
         Update: {
@@ -61,6 +63,7 @@ export type Database = {
           joined_at?: string
           match_id?: string
           selected_tees?: string | null
+          status?: string
           user_id?: string
         }
         Relationships: [
@@ -78,6 +81,7 @@ export type Database = {
           completed_at: string | null
           created_at: string
           final_scores: Json
+          forfeited_players: Json | null
           id: string
           match_id: string
           updated_at: string
@@ -87,6 +91,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           final_scores?: Json
+          forfeited_players?: Json | null
           id?: string
           match_id: string
           updated_at?: string
@@ -96,6 +101,7 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           final_scores?: Json
+          forfeited_players?: Json | null
           id?: string
           match_id?: string
           updated_at?: string
@@ -468,6 +474,10 @@ export type Database = {
       is_profile_owner: {
         Args: { profile_user_id: string }
         Returns: boolean
+      }
+      leave_match_with_dnf: {
+        Args: { p_match_id: string; p_reason: string; p_user_id: string }
+        Returns: Json
       }
       recalculate_player_handicap: {
         Args: { player_user_id: string }

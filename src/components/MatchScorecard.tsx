@@ -13,6 +13,7 @@ import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring
 import { useAuth } from '@/hooks/useAuth';
 import { useMatches } from '@/hooks/useMatches';
 import { useActiveMatch } from '@/hooks/useActiveMatch';
+import { supabase } from '@/integrations/supabase/client';
 import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
@@ -134,24 +135,36 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
     setIsLeaving(true);
     try {
-      const success = await leaveMatch(matchId);
-      if (success) {
-        clearActiveMatch();
+      // Call the new RPC function to handle DNF logic
+      const { data, error } = await supabase.rpc('leave_match_with_dnf', {
+        p_match_id: matchId,
+        p_user_id: user.id,
+        p_reason: cancelReason
+      });
+
+      if (error) throw error;
+
+      clearActiveMatch();
+      
+      // Show different messages based on outcome
+      const result = data as { status: string; remaining_players: number; match_status: string };
+      
+      if (result.status === 'dnf') {
         toast({
-          title: "Left Match",
-          description: "You have successfully left the match.",
+          title: "Marked as DNF",
+          description: `You have been marked as Did Not Finish. The match will continue with ${result.remaining_players} remaining player${result.remaining_players !== 1 ? 's' : ''}.`,
         });
-        setCancelDialogOpen(false);
-        // Navigate back or close if onClose is provided
-        if (onClose) {
-          onClose();
-        }
       } else {
         toast({
-          title: "Error",
-          description: "Failed to leave the match. Please try again.",
-          variant: "destructive"
+          title: "Match Cancelled",
+          description: "All players have left. The match has been cancelled. Refunds will be processed minus a $2 cancellation fee.",
         });
+      }
+      
+      setCancelDialogOpen(false);
+      // Navigate back or close if onClose is provided
+      if (onClose) {
+        onClose();
       }
     } catch (error) {
       console.error('Error leaving match:', error);
@@ -1116,8 +1129,23 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
               <AlertTriangle className="w-5 h-5" />
               Leave Match
             </AlertDialogTitle>
-            <AlertDialogDescription>
-              Please select a reason for leaving this match. This action cannot be undone.
+            <AlertDialogDescription className="space-y-3">
+              <p>Please select a reason for leaving this match. This action cannot be undone.</p>
+              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 space-y-2">
+                <p className="font-semibold text-destructive text-sm flex items-center gap-2">
+                  <AlertTriangle className="w-4 h-4" />
+                  Important: By leaving this match
+                </p>
+                <ul className="text-sm space-y-1 pl-6 list-disc text-foreground">
+                  <li>You will <strong>forfeit your buy-in amount</strong> ({formatBuyIn(matchData?.buy_in_amount)})</li>
+                  <li>You will <strong>not be eligible for any payouts</strong></li>
+                  {playerScores.filter(p => p.player_id !== user?.id).length >= 2 ? (
+                    <li>You will be marked as <strong>DNF (Did Not Finish)</strong> and the match will continue</li>
+                  ) : (
+                    <li>The match will be <strong>cancelled</strong> and all players will receive refunds minus a <strong>$2 cancellation fee</strong></li>
+                  )}
+                </ul>
+              </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
 
