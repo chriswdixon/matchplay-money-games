@@ -31,7 +31,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between gap-2">
+      <div className="container flex h-16 items-center gap-2 md:justify-between">
         {/* Left: Logo */}
         <div className="flex items-center shrink-0">
           <Link to="/">
@@ -42,7 +42,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
         </div>
         
         {/* Right Section: Active Match + Hamburger + User Menu */}
-        <div className="flex items-center gap-2 flex-1 md:flex-none justify-center md:justify-end">
+        <div className="flex items-center gap-2 flex-1 md:flex-none justify-end">
           {hasActiveMatch && !hideReturnButton && (
             <Button
               variant="default"
