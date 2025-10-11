@@ -65,13 +65,18 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
 
     // Filter by view type (current vs past matches)
     if (showPastMatches) {
-      // Show only completed matches
-      filtered = filtered.filter(match => match.status === 'completed');
+      // Show completed and cancelled matches
+      filtered = filtered.filter(match => 
+        match.status === 'completed' || match.status === 'cancelled'
+      );
     } else {
       // Show only current/upcoming matches
       filtered = filtered.filter(match => {
         // Exclude completed matches
         if (match.status === 'completed') return false;
+        
+        // Exclude cancelled matches
+        if (match.status === 'cancelled') return false;
         
         // Exclude started matches (active matches)
         if (match.status === 'started') return false;
@@ -359,7 +364,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       className="relative border-border hover:border-primary/30 transition-all duration-300 hover:shadow-card animate-slide-up bg-card"
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      {isCreatedRecently && (
+                      {match.status === 'cancelled' && (
+                        <Badge className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground">
+                          CANCELLED
+                        </Badge>
+                      )}
+                      {isCreatedRecently && match.status !== 'cancelled' && (
                         <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-pulse">
                           <Zap className="w-3 h-3 mr-1" />
                           NEW
