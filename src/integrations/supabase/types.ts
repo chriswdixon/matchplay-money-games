@@ -125,6 +125,8 @@ export type Database = {
           completed_at: string | null
           created_at: string
           final_scores: Json
+          finalized_at: string | null
+          finalized_by: string | null
           forfeited_players: Json | null
           id: string
           match_id: string
@@ -135,6 +137,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           final_scores?: Json
+          finalized_at?: string | null
+          finalized_by?: string | null
           forfeited_players?: Json | null
           id?: string
           match_id: string
@@ -145,6 +149,8 @@ export type Database = {
           completed_at?: string | null
           created_at?: string
           final_scores?: Json
+          finalized_at?: string | null
+          finalized_by?: string | null
           forfeited_players?: Json | null
           id?: string
           match_id?: string
