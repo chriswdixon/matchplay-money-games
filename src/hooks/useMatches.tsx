@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { validateHolePars, DEFAULT_HOLE_PARS } from '@/lib/matchValidation';
 
 export interface Match {
   id: string;
@@ -282,6 +283,7 @@ export const useMatches = () => {
     booking_url?: string;
     tee_selection_mode: 'fixed' | 'individual';
     default_tees?: string;
+    hole_pars?: Record<string, number>;
   }, userLocation?: { latitude: number; longitude: number }) => {
     if (!user) {
       toast.error('You must be logged in to create a match');
@@ -289,10 +291,20 @@ export const useMatches = () => {
     }
 
     try {
+      // Validate hole_pars if provided, otherwise use default
+      const holeParsToUse = matchData.hole_pars || DEFAULT_HOLE_PARS;
+      const holeParsValidation = validateHolePars(holeParsToUse);
+      
+      if (!holeParsValidation.success) {
+        toast.error(`Invalid hole pars: ${holeParsValidation.error}`);
+        return { error: holeParsValidation.error };
+      }
+
       const { data, error } = await supabase
         .from('matches')
         .insert({
           ...matchData,
+          hole_pars: holeParsValidation.data,
           created_by: user.id
         })
         .select()
@@ -458,6 +470,7 @@ export const useMatches = () => {
     booking_url?: string | null;
     tee_selection_mode: 'fixed' | 'individual';
     default_tees?: string | null;
+    hole_pars?: Record<string, number>;
   }) => {
     if (!user) {
       toast.error('You must be logged in to update a match');
@@ -465,6 +478,18 @@ export const useMatches = () => {
     }
 
     try {
+      // Validate hole_pars if provided
+      if (matchData.hole_pars) {
+        const holeParsValidation = validateHolePars(matchData.hole_pars);
+        
+        if (!holeParsValidation.success) {
+          toast.error(`Invalid hole pars: ${holeParsValidation.error}`);
+          return { error: holeParsValidation.error };
+        }
+        
+        matchData.hole_pars = holeParsValidation.data;
+      }
+
       const { data, error } = await supabase
         .from('matches')
         .update(matchData)
