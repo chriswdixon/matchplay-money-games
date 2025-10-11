@@ -180,19 +180,28 @@ export function HandicapSettings() {
           {/* Match count and auto-calculation status */}
           <Alert className="mb-6">
             <Info className="h-4 w-4" />
-            <AlertDescription>
+            <AlertDescription className="space-y-2">
               {matchCount < 3 ? (
                 <>
-                  You have completed <strong>{matchCount}</strong> of 3 matches required for automatic handicap calculation.
-                  {matchCount === 0 && ' You can manually set your handicap until then.'}
-                  {matchCount > 0 && ` ${3 - matchCount} more match${3 - matchCount > 1 ? 'es' : ''} to go!`}
+                  <p>You have completed <strong>{matchCount}</strong> of 3 matches needed for automatic handicap calculation.</p>
+                  <p>You can manually set your handicap until you complete 3 matches.</p>
                 </>
               ) : (
                 <>
-                  Your handicap is automatically calculated based on your last {matchCount} completed matches.
+                  <p className="font-semibold">Your handicap is automatically calculated using USGA rules:</p>
+                  <ul className="list-disc list-inside text-sm space-y-1 mt-2">
+                    <li>Uses your last {Math.min(matchCount, 20)} completed rounds (max 20)</li>
+                    <li>Applies Net Double Bogey adjustment to each round</li>
+                    <li>Calculates score differentials for each round</li>
+                    <li>Uses the best {matchCount >= 20 ? '8' : matchCount >= 12 ? '4-7' : '1-3'} differentials</li>
+                    <li>Multiplies average by 0.96 (96% factor)</li>
+                  </ul>
                   {autoCalculatedHandicap !== null && (
-                    <> Current calculated handicap: <strong>{autoCalculatedHandicap}</strong></>
+                    <p className="mt-3 text-sm font-medium">
+                      Current handicap: <strong className="text-lg">{autoCalculatedHandicap}</strong>
+                    </p>
                   )}
+                  <p className="mt-2 text-sm text-muted-foreground">Updates automatically after each completed match.</p>
                 </>
               )}
             </AlertDescription>

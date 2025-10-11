@@ -469,6 +469,10 @@ export type Database = {
         Args: { profile_user_id: string }
         Returns: boolean
       }
+      recalculate_player_handicap: {
+        Args: { player_user_id: string }
+        Returns: undefined
+      }
       sanitize_text_input: {
         Args: { input_text: string }
         Returns: string
