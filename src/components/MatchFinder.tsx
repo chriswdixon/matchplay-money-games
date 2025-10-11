@@ -7,6 +7,7 @@ import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
+import { useActiveMatch } from "@/hooks/useActiveMatch";
 import CreateMatchDialog from "./CreateMatchDialog";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import PlayerRatingDialog from "./PlayerRatingDialog";
@@ -22,6 +23,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
+  const { hasActiveMatch } = useActiveMatch();
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
@@ -416,8 +418,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             </div>
                           )}
                           
-                          {/* Book Tee Time button - show if booking URL exists and match is open/user joined (but not in past matches view) */}
-                          {!showPastMatches && match.booking_url && (match.status === 'open' || match.user_joined) && (
+                          {/* Book Tee Time button - show if booking URL exists and match is open/user joined (but not in past matches view or when user has active match) */}
+                          {!showPastMatches && match.booking_url && (match.status === 'open' || match.user_joined) && !hasActiveMatch && (
                             <Button
                               variant="outline"
                               className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
