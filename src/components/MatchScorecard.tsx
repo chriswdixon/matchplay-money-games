@@ -146,6 +146,17 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       return;
     }
 
+    // Prevent leaving a cancelled match
+    if (matchData?.status === 'cancelled') {
+      toast({
+        title: "Match Already Cancelled",
+        description: "This match has already been cancelled.",
+        variant: "destructive"
+      });
+      setCancelDialogOpen(false);
+      return;
+    }
+
     setIsLeaving(true);
     try {
       // Call the new RPC function to handle DNF logic
