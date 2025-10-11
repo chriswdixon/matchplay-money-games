@@ -32,7 +32,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between gap-2">
-        <div className="flex items-center flex-1">
+        {/* Left: Logo */}
+        <div className="flex items-center shrink-0">
           <Link to="/">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
               MatchPlay
@@ -40,7 +41,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
           </Link>
         </div>
         
-        <div className="flex items-center gap-2 flex-1 justify-end">
+        {/* Center: Active Match Button (when present) */}
+        <div className="flex-1 flex justify-center">
           {hasActiveMatch && !hideReturnButton && (
             <Button
               variant="default"
@@ -53,7 +55,10 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
               <span className="sm:hidden">Active Match</span>
             </Button>
           )}
-          
+        </div>
+        
+        {/* Right: Hamburger Menu + User Menu */}
+        <div className="flex items-center gap-2 shrink-0">
           {showNavMenu && navItems && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
