@@ -444,10 +444,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                             onClick={() => setCancelDialogOpen(true)}
                             variant="ghost"
                             size="sm"
-                            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                            className="w-full"
                           >
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            Leave Match
+                            <AlertTriangle className="w-3 h-3 mr-1 text-destructive" />
+                            <span className="text-destructive">Leave Match</span>
                           </Button>
                         </div>
                       )}
@@ -1384,10 +1384,10 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             onClick={() => setCancelDialogOpen(true)}
             variant="ghost"
             size="sm"
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+            className="hover:bg-destructive/10"
           >
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            Leave Match
+            <AlertTriangle className="w-3 h-3 mr-1 text-destructive" />
+            <span className="text-destructive">Leave Match</span>
           </Button>
         </div>
       )}

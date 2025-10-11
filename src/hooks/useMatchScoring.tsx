@@ -110,6 +110,8 @@ export function useMatchScoring(matchId: string) {
         max_participants: matchInfo.max_participants,
         status: matchInfo.status
       });
+      
+      console.log('Match data loaded:', { id: matchInfo.id, status: matchInfo.status });
 
       // Fetch scores
       const { data: scoresData, error: scoresError } = await supabase
