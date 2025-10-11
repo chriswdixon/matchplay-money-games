@@ -73,6 +73,9 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         // Exclude completed matches
         if (match.status === 'completed') return false;
         
+        // Exclude started matches (active matches)
+        if (match.status === 'started') return false;
+        
         // Exclude open matches that are scheduled in the past
         if (match.status === 'open' && new Date(match.scheduled_time) < now) {
           return false;

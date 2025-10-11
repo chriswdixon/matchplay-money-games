@@ -373,22 +373,6 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 );
               })}
             </div>
-
-            {/* Cancel Match Button */}
-            <div className="pt-4 border-t border-border/50">
-              <Button
-                onClick={() => setCancelDialogOpen(true)}
-                variant="destructive"
-                className="w-full"
-                size="lg"
-              >
-                <AlertTriangle className="w-4 h-4 mr-2" />
-                Leave Match
-              </Button>
-              <p className="text-xs text-muted-foreground text-center mt-2">
-                You can leave this match at any time
-              </p>
-            </div>
           </CollapsibleContent>
         </Collapsible>
       </div>
@@ -1229,6 +1213,21 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {/* Leave Match Button - Bottom Right */}
+      {!matchResult && (
+        <div className="flex justify-end px-4 md:px-6 pb-4">
+          <Button
+            onClick={() => setCancelDialogOpen(true)}
+            variant="ghost"
+            size="sm"
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <AlertTriangle className="w-3 h-3 mr-1" />
+            Leave Match
+          </Button>
+        </div>
+      )}
 
       {/* Editing Instructions - Remove this since we're using a dialog now */}
     </div>
