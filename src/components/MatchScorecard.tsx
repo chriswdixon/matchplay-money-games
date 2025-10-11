@@ -147,18 +147,33 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       clearActiveMatch();
       
       // Show different messages based on outcome
-      const result = data as { status: string; remaining_players: number; match_status: string };
+      const result = data as { status: string; remaining_players: number; match_status: string; refund_eligible: boolean };
       
       if (result.status === 'dnf') {
-        toast({
-          title: "Marked as DNF",
-          description: `You have been marked as Did Not Finish. The match will continue with ${result.remaining_players} remaining player${result.remaining_players !== 1 ? 's' : ''}.`,
-        });
+        if (result.refund_eligible) {
+          toast({
+            title: "Marked as DNF",
+            description: `You have been marked as Did Not Finish. Your buy-in will be refunded. The match will continue with ${result.remaining_players} remaining player${result.remaining_players !== 1 ? 's' : ''}.`,
+          });
+        } else {
+          toast({
+            title: "Marked as DNF",
+            description: `You have been marked as Did Not Finish and forfeit your buy-in. The match will continue with ${result.remaining_players} remaining player${result.remaining_players !== 1 ? 's' : ''}.`,
+            variant: "destructive"
+          });
+        }
       } else {
-        toast({
-          title: "Match Cancelled",
-          description: "All players have left. The match has been cancelled. Refunds will be processed minus a $2 cancellation fee.",
-        });
+        if (result.refund_eligible) {
+          toast({
+            title: "Match Cancelled",
+            description: "All players have left. The match has been cancelled. Full refunds will be processed.",
+          });
+        } else {
+          toast({
+            title: "Match Cancelled",
+            description: "All players have left. The match has been cancelled. Refunds will be processed minus a $2 cancellation fee.",
+          });
+        }
       }
       
       setCancelDialogOpen(false);
@@ -1134,21 +1149,50 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             </AlertDialogTitle>
             <AlertDialogDescription className="space-y-3">
               <p>Please select a reason for leaving this match. This action cannot be undone.</p>
-              <div className="bg-destructive/10 border border-destructive/30 rounded-lg p-4 space-y-2">
-                <p className="font-semibold text-destructive text-sm flex items-center gap-2">
-                  <AlertTriangle className="w-4 h-4" />
-                  Important: By leaving this match
-                </p>
-                <ul className="text-sm space-y-1 pl-6 list-disc text-foreground">
-                  <li>You will <strong>forfeit your buy-in amount</strong> ({formatBuyIn(matchData?.buy_in_amount)})</li>
-                  <li>You will <strong>not be eligible for any payouts</strong></li>
-                  {playerScores.filter(p => p.player_id !== user?.id).length >= 2 ? (
-                    <li>You will be marked as <strong>DNF (Did Not Finish)</strong> and the match will continue</li>
-                  ) : (
-                    <li>The match will be <strong>cancelled</strong> and all players will receive refunds minus a <strong>$2 cancellation fee</strong></li>
-                  )}
-                </ul>
-              </div>
+              {(() => {
+                const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife'];
+                const isWeatherOrCourse = cancelReason && weatherOrCourseReasons.includes(cancelReason);
+                const otherPlayersCount = playerScores.filter(p => p.player_id !== user?.id).length;
+                
+                return (
+                  <div className={cn(
+                    "rounded-lg p-4 space-y-2 border",
+                    isWeatherOrCourse 
+                      ? "bg-blue-500/10 border-blue-500/30" 
+                      : "bg-destructive/10 border-destructive/30"
+                  )}>
+                    <p className={cn(
+                      "font-semibold text-sm flex items-center gap-2",
+                      isWeatherOrCourse ? "text-blue-600 dark:text-blue-400" : "text-destructive"
+                    )}>
+                      <AlertTriangle className="w-4 h-4" />
+                      {isWeatherOrCourse ? "Weather/Course Cancellation" : "Important: By leaving this match"}
+                    </p>
+                    <ul className="text-sm space-y-1 pl-6 list-disc text-foreground">
+                      {isWeatherOrCourse ? (
+                        <>
+                          <li>Your <strong>buy-in will be fully refunded</strong> ({formatBuyIn(matchData?.buy_in_amount)})</li>
+                          {otherPlayersCount >= 2 ? (
+                            <li>You will be marked as <strong>DNF</strong> and the match will continue</li>
+                          ) : (
+                            <li>The match will be <strong>cancelled</strong> with full refunds to all players</li>
+                          )}
+                        </>
+                      ) : (
+                        <>
+                          <li>You will <strong>forfeit your buy-in amount</strong> ({formatBuyIn(matchData?.buy_in_amount)})</li>
+                          <li>You will <strong>not be eligible for any payouts</strong></li>
+                          {otherPlayersCount >= 2 ? (
+                            <li>You will be marked as <strong>DNF (Did Not Finish)</strong> and the match will continue</li>
+                          ) : (
+                            <li>The match will be <strong>cancelled</strong> and all players will receive refunds minus a <strong>$2 cancellation fee</strong></li>
+                          )}
+                        </>
+                      )}
+                    </ul>
+                  </div>
+                );
+              })()}
             </AlertDialogDescription>
           </AlertDialogHeader>
 
