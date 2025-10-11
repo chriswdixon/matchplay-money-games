@@ -407,6 +407,21 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                           )}
                         </div>
                       </div>
+
+                      {/* Leave Match Button - Mobile Only - Only shown for current user */}
+                      {player.player_id === user?.id && !matchResult && (
+                        <div className="mt-3 md:hidden">
+                          <Button
+                            onClick={() => setCancelDialogOpen(true)}
+                            variant="ghost"
+                            size="sm"
+                            className="w-full text-destructive hover:text-destructive hover:bg-destructive/10"
+                          >
+                            <AlertTriangle className="w-3 h-3 mr-1" />
+                            Leave Match
+                          </Button>
+                        </div>
+                      )}
                     </CardContent>
                   </Card>
                 );
@@ -1333,9 +1348,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Leave Match Button - Bottom Right */}
+      {/* Leave Match Button - Desktop Only - Bottom Right */}
       {!matchResult && (
-        <div className="flex justify-end px-4 md:px-6 pb-4">
+        <div className="hidden md:flex justify-end px-4 md:px-6 pb-4">
           <Button
             onClick={() => setCancelDialogOpen(true)}
             variant="ghost"
