@@ -51,6 +51,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState<string>('');
   const [isLeaving, setIsLeaving] = useState(false);
+  const [showOtherPlayersMobile, setShowOtherPlayersMobile] = useState(false);
   const activeHoleRef = useRef<HTMLDivElement>(null);
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
@@ -719,19 +720,37 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         
                         {/* Other players' scores for this hole */}
                         {otherPlayers.length > 0 && (
-                          <div className="pt-3 border-t space-y-2">
-                            <div className="text-sm font-medium text-muted-foreground">Other Players:</div>
-                            <div className="flex flex-wrap gap-2">
-                              {otherPlayers.map((player) => (
-                                <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
-                                  <span className="text-sm font-medium">{player.player_name}</span>
-                                  <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
-                                    {player.scores[hole] || '—'}
+                          <Collapsible 
+                            open={showOtherPlayersMobile} 
+                            onOpenChange={setShowOtherPlayersMobile}
+                            className="pt-3 border-t"
+                          >
+                            <CollapsibleTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
+                              >
+                                <span className="text-sm font-medium">Other Players</span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 transition-transform",
+                                  showOtherPlayersMobile && "rotate-180"
+                                )} />
+                              </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pt-2">
+                              <div className="flex flex-wrap gap-2">
+                                {otherPlayers.map((player) => (
+                                  <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
+                                    <span className="text-sm font-medium">{player.player_name}</span>
+                                    <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
+                                      {player.scores[hole] || '—'}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                                ))}
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
                         )}
                       </CardContent>
                     </Card>
@@ -1006,19 +1025,37 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         
                         {/* Other players' scores for this hole */}
                         {otherPlayers.length > 0 && (
-                          <div className="pt-3 border-t space-y-2">
-                            <div className="text-sm font-medium text-muted-foreground">Other Players:</div>
-                            <div className="flex flex-wrap gap-2">
-                              {otherPlayers.map((player) => (
-                                <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
-                                  <span className="text-sm font-medium">{player.player_name}</span>
-                                  <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
-                                    {player.scores[hole] || '—'}
+                          <Collapsible 
+                            open={showOtherPlayersMobile} 
+                            onOpenChange={setShowOtherPlayersMobile}
+                            className="pt-3 border-t"
+                          >
+                            <CollapsibleTrigger asChild>
+                              <Button 
+                                variant="ghost" 
+                                size="sm" 
+                                className="w-full flex items-center justify-between text-muted-foreground hover:text-foreground"
+                              >
+                                <span className="text-sm font-medium">Other Players</span>
+                                <ChevronDown className={cn(
+                                  "h-4 w-4 transition-transform",
+                                  showOtherPlayersMobile && "rotate-180"
+                                )} />
+                              </Button>
+                            </CollapsibleTrigger>
+                            <CollapsibleContent className="pt-2">
+                              <div className="flex flex-wrap gap-2">
+                                {otherPlayers.map((player) => (
+                                  <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
+                                    <span className="text-sm font-medium">{player.player_name}</span>
+                                    <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
+                                      {player.scores[hole] || '—'}
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
+                                ))}
+                              </div>
+                            </CollapsibleContent>
+                          </Collapsible>
                         )}
                       </CardContent>
                     </Card>
