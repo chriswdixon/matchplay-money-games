@@ -159,7 +159,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             <div className="p-2 bg-gradient-primary rounded-lg">
               <Target className="w-5 h-5 text-primary-foreground" />
             </div>
-            <h1 className="text-xl md:text-2xl font-bold">{matchName}</h1>
+            <h1 className="text-xl md:text-2xl font-bold">{matchData?.course_name || matchName}</h1>
           </div>
           
           {/* Hamburger Menu Button */}
