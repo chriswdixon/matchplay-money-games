@@ -1209,7 +1209,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
             <AlertDialogDescription className="space-y-3">
               <p>Please select a reason for leaving this match. This action cannot be undone.</p>
               {(() => {
-                const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife'];
+                const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife', 'equipment'];
                 const isWeatherOrCourse = cancelReason && weatherOrCourseReasons.includes(cancelReason);
                 const otherPlayersCount = playerScores.filter(p => p.player_id !== user?.id).length;
                 
