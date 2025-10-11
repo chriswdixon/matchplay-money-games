@@ -10,8 +10,8 @@ interface MatchResultsDisplayProps {
 }
 
 export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0 }: MatchResultsDisplayProps) {
-  // Sort players by score (lowest to highest)
-  const sortedPlayers = [...playerScores].sort((a, b) => a.total - b.total);
+  // Sort players by net score (lowest to highest)
+  const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
   
   // Calculate payouts
   const totalPot = (buyInAmount / 100) * playerScores.length;
@@ -67,19 +67,28 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
               {getPositionBadge(index)}
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="text-center">
-                <div className="text-4xl font-bold text-primary">{player.total}</div>
-                <div className="text-sm text-muted-foreground">Total Strokes</div>
+              <div className="text-center space-y-1">
+                <div className="text-5xl font-bold text-primary">{player.net_total}</div>
+                <div className="text-sm text-muted-foreground font-semibold">Net Score</div>
+                <div className="text-2xl text-muted-foreground">({player.total})</div>
+                <div className="text-xs text-muted-foreground">Gross Score</div>
+              </div>
+              
+              <div className="text-center py-2 bg-muted/50 rounded-lg">
+                <div className="text-sm text-muted-foreground">Handicap: {player.handicap_index.toFixed(1)}</div>
+                <div className="text-xs text-muted-foreground">Course Handicap: {player.course_handicap}</div>
               </div>
               
               <div className="grid grid-cols-2 gap-2 text-center pt-2 border-t">
                 <div>
-                  <div className="text-xl font-semibold">{player.front9}</div>
-                  <div className="text-xs text-muted-foreground">Front 9</div>
+                  <div className="text-xl font-semibold">{player.net_front9}</div>
+                  <div className="text-xs text-muted-foreground">Net F9</div>
+                  <div className="text-sm text-muted-foreground">({player.front9})</div>
                 </div>
                 <div>
-                  <div className="text-xl font-semibold">{player.back9}</div>
-                  <div className="text-xs text-muted-foreground">Back 9</div>
+                  <div className="text-xl font-semibold">{player.net_back9}</div>
+                  <div className="text-xs text-muted-foreground">Net B9</div>
+                  <div className="text-sm text-muted-foreground">({player.back9})</div>
                 </div>
               </div>
 
@@ -108,10 +117,11 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                   <span className="font-medium">{player.player_name}</span>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-primary">{player.total}</div>
+                  <div className="text-right space-y-1">
+                    <div className="text-2xl font-bold text-primary">{player.net_total}</div>
+                    <div className="text-xs text-muted-foreground">Net ({player.total} gross)</div>
                     <div className="text-xs text-muted-foreground">
-                      F9: {player.front9} | B9: {player.back9}
+                      HCP: {player.handicap_index.toFixed(1)} / CH: {player.course_handicap}
                     </div>
                   </div>
                 </div>

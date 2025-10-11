@@ -20,6 +20,11 @@ export interface PlayerScore {
   front9: number;
   back9: number;
   total: number;
+  handicap_index: number;
+  course_handicap: number;
+  net_front9: number;
+  net_back9: number;
+  net_total: number;
 }
 
 export interface MatchData {
@@ -128,11 +133,11 @@ export function useMatchScoring(matchId: string) {
         return;
       }
 
-      // Get user IDs and fetch their profiles
+      // Get user IDs and fetch their profiles with handicaps
       const userIds = participantData?.map(p => p.user_id) || [];
       const { data: profiles, error: profilesError } = await supabase
         .from('profiles')
-        .select('user_id, display_name')
+        .select('user_id, display_name, handicap')
         .in('user_id', userIds);
 
       if (profilesError) {
@@ -145,21 +150,31 @@ export function useMatchScoring(matchId: string) {
         const profile = profiles?.find(p => p.user_id === participant.user_id);
         return {
           user_id: participant.user_id,
-          display_name: profile?.display_name || 'Unknown Player'
+          display_name: profile?.display_name || 'Unknown Player',
+          handicap: profile?.handicap || 0
         };
       }) || [];
 
-      // Process player scores
+      // Process player scores with handicap calculations
       const playerScoresMap: { [playerId: string]: PlayerScore } = {};
+      const slopeRating = 113; // Standard slope rating
       
       participants.forEach((participant: any) => {
+        const handicapIndex = participant.handicap || 0;
+        const courseHandicap = Math.round((handicapIndex * slopeRating) / 113);
+        
         playerScoresMap[participant.user_id] = {
           player_id: participant.user_id,
           player_name: participant.display_name || 'Unknown Player',
           scores: {},
           front9: 0,
           back9: 0,
-          total: 0
+          total: 0,
+          handicap_index: handicapIndex,
+          course_handicap: courseHandicap,
+          net_front9: 0,
+          net_back9: 0,
+          net_total: 0
         };
       });
 
@@ -170,7 +185,7 @@ export function useMatchScoring(matchId: string) {
         }
       });
 
-      // Calculate totals
+      // Calculate totals and net scores
       Object.values(playerScoresMap).forEach((player) => {
         // Calculate front 9 (holes 1-9)
         player.front9 = Object.entries(player.scores)
@@ -182,8 +197,14 @@ export function useMatchScoring(matchId: string) {
           .filter(([hole]) => parseInt(hole) >= 10 && parseInt(hole) <= 18)
           .reduce((sum, [, strokes]) => sum + strokes, 0);
         
-        // Calculate total
+        // Calculate gross total
         player.total = player.front9 + player.back9;
+        
+        // Calculate net scores (gross - course handicap)
+        const halfHandicap = Math.floor(player.course_handicap / 2);
+        player.net_front9 = player.front9 - halfHandicap;
+        player.net_back9 = player.back9 - (player.course_handicap - halfHandicap);
+        player.net_total = player.total - player.course_handicap;
       });
 
       setPlayerScores(Object.values(playerScoresMap));
@@ -313,7 +334,7 @@ export function useMatchScoring(matchId: string) {
           if (player.player_id === user.id) {
             const updatedScores = { ...player.scores, [holeNumber]: strokes };
             
-            // Recalculate totals
+            // Recalculate gross totals
             const front9 = Object.entries(updatedScores)
               .filter(([hole]) => parseInt(hole) <= 9)
               .reduce((sum, [, score]) => sum + score, 0);
@@ -322,12 +343,23 @@ export function useMatchScoring(matchId: string) {
               .filter(([hole]) => parseInt(hole) >= 10)
               .reduce((sum, [, score]) => sum + score, 0);
             
+            const total = front9 + back9;
+            
+            // Recalculate net scores
+            const halfHandicap = Math.floor(player.course_handicap / 2);
+            const net_front9 = front9 - halfHandicap;
+            const net_back9 = back9 - (player.course_handicap - halfHandicap);
+            const net_total = total - player.course_handicap;
+            
             return {
               ...player,
               scores: updatedScores,
               front9,
               back9,
-              total: front9 + back9
+              total,
+              net_front9,
+              net_back9,
+              net_total
             };
           }
           return player;

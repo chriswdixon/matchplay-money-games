@@ -44,12 +44,12 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
     );
   }
 
-  // Sort players by score (lowest first)
+  // Sort players by net score (lowest first)
   const sortedPlayers = [...playerScores].sort((a, b) => {
-    if (a.total === 0 && b.total === 0) return 0;
-    if (a.total === 0) return 1;
-    if (b.total === 0) return -1;
-    return a.total - b.total;
+    if (a.net_total === 0 && b.net_total === 0) return 0;
+    if (a.net_total === 0) return 1;
+    if (b.net_total === 0) return -1;
+    return a.net_total - b.net_total;
   });
 
   const winner = sortedPlayers[0];
@@ -129,7 +129,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
       </div>
 
       {/* Winner Announcement */}
-      {winner && winner.total > 0 && (
+      {winner && winner.net_total > 0 && (
         <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50">
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-4">
@@ -138,7 +138,10 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                 <h2 className="text-2xl font-bold text-yellow-700">🏆 Winner!</h2>
                 <p className="text-xl font-semibold">{winner.player_name}</p>
                 <p className="text-lg text-muted-foreground">
-                  Total Strokes: {winner.total}
+                  Net Score: {winner.net_total} (Gross: {winner.total})
+                </p>
+                <p className="text-sm text-muted-foreground">
+                  Handicap: {winner.handicap_index.toFixed(1)} (Course: {winner.course_handicap})
                 </p>
               </div>
               <Crown className="w-8 h-8 text-yellow-500" />
@@ -180,11 +183,17 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                     </span>
                   </div>
                 </div>
-                <div className="text-right">
+                <div className="text-right space-y-1">
                   <div className="text-2xl font-bold">
-                    {player.total > 0 ? player.total : 'DNF'}
+                    {player.net_total > 0 ? player.net_total : 'DNF'}
                   </div>
                   <div className="text-sm text-muted-foreground">
+                    Net Score (Gross: {player.total > 0 ? player.total : 'DNF'})
+                  </div>
+                  <div className="text-xs text-muted-foreground">
+                    HCP: {player.handicap_index.toFixed(1)} (CH: {player.course_handicap})
+                  </div>
+                  <div className="text-xs text-muted-foreground">
                     {Object.keys(player.scores).length}/18 holes completed
                   </div>
                 </div>

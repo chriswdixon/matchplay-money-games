@@ -265,7 +265,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                 const hasConfirmed = confirmation?.confirmed || false;
                 
                 return (
-                  <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+                   <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -280,10 +280,16 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                         )}
                       </div>
                       <div className="flex items-start justify-between mt-2">
+                        <div>
+                          <div className="text-xs text-muted-foreground">Handicap</div>
+                          <div className="text-sm font-semibold">{player.handicap_index.toFixed(1)}</div>
+                          <div className="text-xs text-muted-foreground">CH: {player.course_handicap}</div>
+                        </div>
                         <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">{player.total || 0}</div>
+                          <div className="text-2xl font-bold text-primary">{player.net_total || 0}</div>
+                          <div className="text-xs text-muted-foreground">Net ({player.total || 0})</div>
                           <div className="text-xs text-muted-foreground">
-                            Front 9: {player.front9} | Back 9: {player.back9}
+                            F9: {player.net_front9} ({player.front9}) | B9: {player.net_back9} ({player.back9})
                           </div>
                           <div className="text-xs text-muted-foreground">
                             {Object.keys(player.scores).length}/18 holes
