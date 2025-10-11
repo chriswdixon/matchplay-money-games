@@ -29,7 +29,7 @@ interface MatchScorecardProps {
 
 export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardProps) {
   const { user } = useAuth();
-  const { leaveMatch } = useMatches();
+  const { leaveMatch, refetch } = useMatches();
   const { clearActiveMatch } = useActiveMatch();
   const {
     playerScores,
@@ -179,6 +179,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       }
 
       clearActiveMatch();
+      
+      // Refresh matches to update the UI
+      await refetch();
       
       // Show different messages based on outcome
       const result = data as { status: string; remaining_players: number; match_status: string; refund_eligible: boolean };
