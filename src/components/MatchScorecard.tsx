@@ -67,6 +67,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       });
     }
   }, [matchData?.status, loading, matchResult]);
+
+  // Debug: Log winner badge data
+  useEffect(() => {
+    console.log('🏆 Winner Badge Debug:', {
+      matchResult_winner_id: matchResult?.winner_id,
+      user_id: user?.id,
+      matches: matchResult?.winner_id === user?.id,
+      showBadge: !!(matchResult?.winner_id && user?.id && matchResult.winner_id === user.id)
+    });
+  }, [matchResult, user]);
+
   const [expandedOtherPlayers, setExpandedOtherPlayers] = useState<Record<number, boolean>>({});
   const [currentConfirmationIndex, setCurrentConfirmationIndex] = useState(0);
   const activeHoleRef = useRef<HTMLDivElement>(null);
@@ -309,7 +320,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             {matchData?.status === 'cancelled' && (
               <Badge variant="destructive">Cancelled</Badge>
             )}
-            {matchResult?.winner_id === user?.id && (
+            {matchResult?.winner_id && user?.id && matchResult.winner_id === user.id && (
               <Badge variant="success">Winner</Badge>
             )}
           </div>
