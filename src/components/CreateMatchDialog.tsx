@@ -14,7 +14,6 @@ import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
-import { useActiveMatch } from '@/hooks/useActiveMatch';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -49,7 +48,6 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
   const { getCurrentLocation, geocodeAddress, loading: locationLoading } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
   const navigate = useNavigate();
-  const { hasActiveMatch } = useActiveMatch();
 
   // Search for nearby courses when location is available
   useEffect(() => {
@@ -203,19 +201,15 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
       <DialogTrigger asChild>
         <Button 
           className="bg-gradient-primary text-primary-foreground hover:shadow-premium"
-          disabled={hasActiveMatch}
           onClick={(e) => {
             if (!user) {
               e.preventDefault();
               navigate('/auth');
-            } else if (hasActiveMatch) {
-              e.preventDefault();
-              toast.error('You already have an active match. Complete it before creating a new one.');
             }
           }}
         >
           <Plus className="w-4 h-4 mr-2" />
-          {hasActiveMatch ? 'Match In Progress' : user ? 'Create Match' : 'Sign In to Create Match'}
+          {user ? 'Create Match' : 'Sign In to Create Match'}
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-[425px]">
