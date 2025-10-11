@@ -369,7 +369,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           CANCELLED
                         </Badge>
                       )}
-                      {isCreatedRecently && match.status !== 'cancelled' && (
+                      {match.status === 'completed' && match.winner_id === user?.id && (
+                        <Badge className="absolute -top-2 -left-2 bg-success text-success-foreground">
+                          <Trophy className="w-3 h-3 mr-1" />
+                          WINNER
+                        </Badge>
+                      )}
+                      {isCreatedRecently && match.status !== 'cancelled' && match.status !== 'completed' && (
                         <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-pulse">
                           <Zap className="w-3 h-3 mr-1" />
                           NEW

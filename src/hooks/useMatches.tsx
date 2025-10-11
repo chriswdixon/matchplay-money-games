@@ -26,6 +26,7 @@ export interface Match {
   booking_url?: string;
   tee_selection_mode: 'fixed' | 'individual';
   default_tees?: string;
+  winner_id?: string;
 }
 
 export const useMatches = () => {
@@ -199,12 +200,31 @@ export const useMatches = () => {
             }
           }
 
+          // Fetch winner_id for completed matches
+          let winnerId: string | undefined = undefined;
+          if (match.status === 'completed') {
+            try {
+              if (abortControllerRef.current?.signal.aborted) return null;
+              
+              const { data: resultData } = await supabase
+                .from('match_results')
+                .select('winner_id')
+                .eq('match_id', match.id)
+                .single();
+              
+              if (resultData) winnerId = resultData.winner_id || undefined;
+            } catch (error) {
+              console.log(`Winner fetch failed for match ${match.id}`);
+            }
+          }
+
           return {
             ...match,
             status: match.status as 'open' | 'full' | 'started' | 'completed' | 'cancelled',
             participant_count: participantCount,
             user_joined: userJoined,
-            distance_km: match.distance_km || undefined
+            distance_km: match.distance_km || undefined,
+            winner_id: winnerId
           } as Match;
         })
       );
