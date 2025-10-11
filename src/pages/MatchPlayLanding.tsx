@@ -11,11 +11,12 @@ import { MatchScorecard } from "@/components/MatchScorecard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp, History, Trophy } from "lucide-react";
+import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
+import { cn } from "@/lib/utils";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
@@ -23,15 +24,22 @@ const MatchPlayLanding = () => {
   const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentTab, setCurrentTab] = useState("matches");
-  const [showingActiveMatch, setShowingActiveMatch] = useState(false);
 
-  // Navigation items for hamburger menu
-  const navItems = [
-    { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
-    { value: "past", label: "Past Matches", icon: <History className="w-4 h-4" /> },
-    { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
-    { value: "subscription", label: "Subscription", icon: <Crown className="w-4 h-4" /> },
-  ];
+  // Navigation items for hamburger menu (dynamically includes active match)
+  const navItems = useMemo(() => {
+    const items = [
+      { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
+      { value: "past", label: "Past Matches", icon: <History className="w-4 h-4" /> },
+      { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
+      { value: "subscription", label: "Subscription", icon: <Crown className="w-4 h-4" /> },
+    ];
+    
+    if (hasActiveMatch) {
+      items.unshift({ value: "active-match", label: "Active Match", icon: <Target className="w-4 h-4" /> });
+    }
+    
+    return items;
+  }, [hasActiveMatch]);
 
   // Check if user has an active match
   const activeMatch = useMemo(() => {
@@ -55,37 +63,12 @@ const MatchPlayLanding = () => {
   };
 
   const handleReturnToMatch = () => {
-    setShowingActiveMatch(true);
-    setCurrentTab("matches");
+    setCurrentTab("active-match");
     scrollToTop();
   };
 
   // Logged-in user experience
   if (user) {
-    // Show active match scorecard if user clicked "Return to Active Match"
-    if (showingActiveMatch && hasActiveMatch && activeMatchId) {
-      return (
-        <div className="min-h-screen bg-background flex flex-col">
-          <AppHeader 
-            showNavMenu 
-            onNavSelect={setCurrentTab}
-            currentTab={currentTab}
-            navItems={navItems}
-            onReturnToMatch={handleReturnToMatch}
-          />
-          <main className="w-full flex-1">
-            <MatchScorecard
-              matchId={activeMatchId}
-              matchName={activeMatchName || 'Active Match'}
-              onClose={() => setShowingActiveMatch(false)}
-            />
-          </main>
-          <AppFooter />
-        </div>
-      );
-    }
-
-    // Otherwise show the tabs navigation with visible tabs
     return (
       <div className="min-h-screen bg-background flex flex-col">
         <AppHeader 
@@ -97,8 +80,18 @@ const MatchPlayLanding = () => {
         />
         <main className="container flex-1 py-8">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            {/* Desktop/Tablet Tabs - Visible when not in active match */}
-            <TabsList className="hidden md:grid w-full grid-cols-4 max-w-3xl mx-auto mb-8">
+            {/* Desktop/Tablet Tabs - Dynamically adjusts based on active match */}
+            <TabsList className={cn(
+              "hidden md:grid w-full max-w-3xl mx-auto mb-8",
+              hasActiveMatch ? "grid-cols-5" : "grid-cols-4"
+            )}>
+              {hasActiveMatch && (
+                <TabsTrigger value="active-match" className="flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  <span className="hidden lg:inline">Active Match</span>
+                  <span className="lg:hidden">Active</span>
+                </TabsTrigger>
+              )}
               <TabsTrigger value="matches" className="flex items-center gap-2">
                 <Search className="w-4 h-4" />
                 <span className="hidden lg:inline">Find Matches</span>
@@ -119,6 +112,15 @@ const MatchPlayLanding = () => {
                 <span className="lg:hidden">Sub</span>
               </TabsTrigger>
             </TabsList>
+            
+            {hasActiveMatch && (
+              <TabsContent value="active-match">
+                <MatchScorecard
+                  matchId={activeMatchId!}
+                  matchName={activeMatchName || 'Active Match'}
+                />
+              </TabsContent>
+            )}
             
             <TabsContent value="matches">
               <MatchFinder hideHowItWorks />

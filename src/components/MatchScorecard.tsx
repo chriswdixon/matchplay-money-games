@@ -15,7 +15,7 @@ import { MatchResultsDisplay } from './MatchResultsDisplay';
 interface MatchScorecardProps {
   matchId: string;
   matchName: string;
-  onClose: () => void;
+  onClose?: () => void;
 }
 
 export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardProps) {
