@@ -450,6 +450,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               <Star className="w-4 h-4 mr-2" />
                               Rate Players
                             </Button>
+                          ) : match.status === 'cancelled' && match.user_joined ? (
+                            <Button
+                              className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
+                              onClick={() => handleViewScorecard(match)}
+                            >
+                              <Target className="w-4 h-4 mr-2" />
+                              View Scorecard
+                            </Button>
                           ) : match.status === 'started' && match.user_joined ? (
                             <Button
                               className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
