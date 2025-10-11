@@ -5,12 +5,18 @@ import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Label } from '@/components/ui/label';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import { useMatchScoring, PlayerScore, MatchData } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
-import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check } from 'lucide-react';
+import { useMatches } from '@/hooks/useMatches';
+import { useActiveMatch } from '@/hooks/useActiveMatch';
+import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
+import { toast } from '@/hooks/use-toast';
 
 interface MatchScorecardProps {
   matchId: string;
@@ -20,6 +26,8 @@ interface MatchScorecardProps {
 
 export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardProps) {
   const { user } = useAuth();
+  const { leaveMatch } = useMatches();
+  const { clearActiveMatch } = useActiveMatch();
   const {
     playerScores,
     matchData,
@@ -39,6 +47,9 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(true);
   const [userClosedSettings, setUserClosedSettings] = useState(false);
+  const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
+  const [cancelReason, setCancelReason] = useState<string>('');
+  const [isLeaving, setIsLeaving] = useState(false);
   const activeHoleRef = useRef<HTMLDivElement>(null);
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
@@ -109,6 +120,49 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
 
   const handleConfirm = async () => {
     await confirmResults();
+  };
+
+  const handleCancelMatch = async () => {
+    if (!cancelReason || !user) {
+      toast({
+        title: "Reason Required",
+        description: "Please select a reason for leaving the match.",
+        variant: "destructive"
+      });
+      return;
+    }
+
+    setIsLeaving(true);
+    try {
+      const success = await leaveMatch(matchId);
+      if (success) {
+        clearActiveMatch();
+        toast({
+          title: "Left Match",
+          description: "You have successfully left the match.",
+        });
+        setCancelDialogOpen(false);
+        // Navigate back or close if onClose is provided
+        if (onClose) {
+          onClose();
+        }
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to leave the match. Please try again.",
+          variant: "destructive"
+        });
+      }
+    } catch (error) {
+      console.error('Error leaving match:', error);
+      toast({
+        title: "Error",
+        description: "An unexpected error occurred.",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLeaving(false);
+    }
   };
 
   const formatMatchTime = (scheduledTime?: string) => {
@@ -318,6 +372,22 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                   </Card>
                 );
               })}
+            </div>
+
+            {/* Cancel Match Button */}
+            <div className="pt-4 border-t border-border/50">
+              <Button
+                onClick={() => setCancelDialogOpen(true)}
+                variant="destructive"
+                className="w-full"
+                size="lg"
+              >
+                <AlertTriangle className="w-4 h-4 mr-2" />
+                Leave Match
+              </Button>
+              <p className="text-xs text-muted-foreground text-center mt-2">
+                You can leave this match at any time
+              </p>
             </div>
           </CollapsibleContent>
         </Collapsible>
@@ -1053,6 +1123,112 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
           </div>
         </DialogContent>
       </Dialog>
+
+      {/* Cancel Match Dialog */}
+      <AlertDialog open={cancelDialogOpen} onOpenChange={setCancelDialogOpen}>
+        <AlertDialogContent className="max-w-lg">
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2 text-destructive">
+              <AlertTriangle className="w-5 h-5" />
+              Leave Match
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              Please select a reason for leaving this match. This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+
+          <div className="space-y-4 py-4">
+            <RadioGroup value={cancelReason} onValueChange={setCancelReason}>
+              {/* Player-Related */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground">🩺 Player-Related</h4>
+                <div className="space-y-2 pl-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="injury" id="injury" />
+                    <Label htmlFor="injury" className="cursor-pointer">Injury or sudden pain</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="medical" id="medical" />
+                    <Label htmlFor="medical" className="cursor-pointer">Medical emergency or illness</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="mental" id="mental" />
+                    <Label htmlFor="mental" className="cursor-pointer">Mental or emotional distress</Label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Weather-Related */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground">🌦️ Weather-Related</h4>
+                <div className="space-y-2 pl-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="lightning" id="lightning" />
+                    <Label htmlFor="lightning" className="cursor-pointer">Lightning or dangerous storms</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="rain" id="rain" />
+                    <Label htmlFor="rain" className="cursor-pointer">Heavy rain or flooding</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="temperature" id="temperature" />
+                    <Label htmlFor="temperature" className="cursor-pointer">Extreme heat or cold</Label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Course or Equipment-Related */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground">⛳ Course or Equipment-Related</h4>
+                <div className="space-y-2 pl-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="course-closure" id="course-closure" />
+                    <Label htmlFor="course-closure" className="cursor-pointer">Course closure or suspension of play</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="equipment" id="equipment" />
+                    <Label htmlFor="equipment" className="cursor-pointer">Equipment failure</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="wildlife" id="wildlife" />
+                    <Label htmlFor="wildlife" className="cursor-pointer">Dangerous wildlife or terrain</Label>
+                  </div>
+                </div>
+              </div>
+
+              {/* Group or Match-Play Related */}
+              <div className="space-y-3">
+                <h4 className="text-sm font-semibold text-foreground">👥 Group or Match-Play Related</h4>
+                <div className="space-y-2 pl-6">
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="withdrawal" id="withdrawal" />
+                    <Label htmlFor="withdrawal" className="cursor-pointer">Opponent or partner withdrawal</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="unsafe-play" id="unsafe-play" />
+                    <Label htmlFor="unsafe-play" className="cursor-pointer">Unsafe or disruptive play by others</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="emergency-call" id="emergency-call" />
+                    <Label htmlFor="emergency-call" className="cursor-pointer">Personal or family emergency call</Label>
+                  </div>
+                </div>
+              </div>
+            </RadioGroup>
+          </div>
+
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isLeaving}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleCancelMatch}
+              disabled={!cancelReason || isLeaving}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {isLeaving ? 'Leaving...' : 'Leave Match'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Editing Instructions - Remove this since we're using a dialog now */}
     </div>
