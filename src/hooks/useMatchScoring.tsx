@@ -40,6 +40,7 @@ export interface MatchData {
   buy_in_amount?: number;
   participant_count?: number;
   max_participants?: number;
+  status?: string;
 }
 
 export interface MatchResult {
@@ -80,7 +81,7 @@ export function useMatchScoring(matchId: string) {
       // Fetch match data including hole pars and tee settings
       const { data: matchInfo, error: matchError } = await supabase
         .from('matches')
-        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants')
+        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants, status')
         .eq('id', matchId)
         .single();
 
@@ -106,7 +107,8 @@ export function useMatchScoring(matchId: string) {
         format: matchInfo.format,
         buy_in_amount: matchInfo.buy_in_amount,
         participant_count: participantCount || 0,
-        max_participants: matchInfo.max_participants
+        max_participants: matchInfo.max_participants,
+        status: matchInfo.status
       });
 
       // Fetch scores

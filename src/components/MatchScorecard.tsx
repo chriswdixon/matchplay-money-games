@@ -438,7 +438,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                       </div>
 
                       {/* Leave Match Button - Mobile Only - Only shown for current user */}
-                      {player.player_id === user?.id && !matchResult && (
+                      {player.player_id === user?.id && !matchResult && matchData?.status !== 'cancelled' && (
                         <div className="mt-3 md:hidden">
                           <Button
                             onClick={() => setCancelDialogOpen(true)}
@@ -1378,7 +1378,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       </AlertDialog>
 
       {/* Leave Match Button - Desktop Only - Bottom Right */}
-      {!matchResult && (
+      {!matchResult && matchData?.status !== 'cancelled' && (
         <div className="hidden md:flex justify-end px-4 md:px-6 pb-4">
           <Button
             onClick={() => setCancelDialogOpen(true)}
