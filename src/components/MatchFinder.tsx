@@ -370,7 +370,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         </Badge>
                       )}
                       {match.status === 'completed' && match.winner_id === user?.id && (
-                        <Badge className="absolute -top-2 -left-2 bg-success text-success-foreground">
+                        <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground">
                           <Trophy className="w-3 h-3 mr-1" />
                           WINNER
                         </Badge>
