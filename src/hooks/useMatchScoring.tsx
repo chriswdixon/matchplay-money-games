@@ -111,7 +111,12 @@ export function useMatchScoring(matchId: string) {
         status: matchInfo.status
       });
       
-      console.log('Match data loaded:', { id: matchInfo.id, status: matchInfo.status });
+      console.log('✅ Match data loaded:', { 
+        id: matchInfo.id, 
+        status: matchInfo.status,
+        isCancelled: matchInfo.status === 'cancelled',
+        raw: matchInfo 
+      });
 
       // Fetch scores
       const { data: scoresData, error: scoresError } = await supabase

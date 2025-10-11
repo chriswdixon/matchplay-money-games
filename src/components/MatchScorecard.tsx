@@ -53,6 +53,19 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState<string>('');
   const [isLeaving, setIsLeaving] = useState(false);
+
+  // Debug: Log match status changes
+  useEffect(() => {
+    if (matchData) {
+      console.log('🔍 MatchScorecard - matchData status:', {
+        status: matchData.status,
+        isCancelled: matchData.status === 'cancelled',
+        shouldShowButton: matchData.status !== 'cancelled',
+        loading,
+        matchResult: !!matchResult
+      });
+    }
+  }, [matchData?.status, loading, matchResult]);
   const [expandedOtherPlayers, setExpandedOtherPlayers] = useState<Record<number, boolean>>({});
   const [currentConfirmationIndex, setCurrentConfirmationIndex] = useState(0);
   const activeHoleRef = useRef<HTMLDivElement>(null);
@@ -449,7 +462,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
                       </div>
 
                       {/* Leave Match Button - Mobile Only - Only shown for current user */}
-                      {player.player_id === user?.id && !matchResult && matchData?.status !== 'cancelled' && (
+                      {player.player_id === user?.id && !matchResult && !loading && matchData?.status !== 'cancelled' && (
                         <div className="mt-3 md:hidden">
                           <Button
                             onClick={() => setCancelDialogOpen(true)}
@@ -1389,7 +1402,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
       </AlertDialog>
 
       {/* Leave Match Button - Desktop Only - Bottom Right */}
-      {!matchResult && matchData?.status !== 'cancelled' && (
+      {!matchResult && !loading && matchData?.status !== 'cancelled' && (
         <div className="hidden md:flex justify-end px-4 md:px-6 pb-4">
           <Button
             onClick={() => setCancelDialogOpen(true)}
