@@ -164,7 +164,7 @@ export function HandicapSettings() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="max-w-[1400px] mx-auto space-y-6">
       {/* Handicap Index Card */}
       <Card className="shadow-card">
         <CardHeader className="pb-4">

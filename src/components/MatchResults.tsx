@@ -35,7 +35,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
 
   if (loading) {
     return (
-      <div className="max-w-4xl mx-auto p-6">
+      <div className="max-w-[1400px] mx-auto p-6">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-muted rounded w-1/3"></div>
           <div className="h-64 bg-muted rounded"></div>
@@ -83,7 +83,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
   // If match is finalized, show the full results display
   if (matchResult) {
     return (
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-[1400px] mx-auto">
         {/* Header */}
         <div className="flex items-center justify-between px-4 md:px-6 py-4">
           <div className="flex items-center gap-3">
@@ -111,7 +111,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
 
   // Otherwise show the confirmation view
   return (
-    <div className="max-w-4xl mx-auto p-6 space-y-6">
+    <div className="max-w-[1400px] mx-auto p-6 space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">

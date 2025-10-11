@@ -83,7 +83,7 @@ const MatchPlayLanding = () => {
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             {/* Desktop/Tablet Tabs - Dynamically adjusts based on active match */}
             <TabsList className={cn(
-              "hidden md:grid w-full max-w-3xl mx-auto mb-8",
+              "hidden md:grid w-full max-w-[1400px] mx-auto mb-8",
               hasActiveMatch ? "grid-cols-5" : "grid-cols-4"
             )}>
               {hasActiveMatch && (
