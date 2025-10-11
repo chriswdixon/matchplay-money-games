@@ -33,12 +33,13 @@ export function ActiveMatchProvider({ children }: { children: ReactNode }) {
     if (startedMatch && !activeMatchId) {
       setActiveMatchId(startedMatch.id);
       setActiveMatchName(startedMatch.course_name);
-    } else if (!startedMatch && activeMatchId) {
-      // Match no longer started, clear it
+    } else if (!startedMatch) {
+      // No started match found, clear active match
+      // This handles cases where match is completed, cancelled, or user left
       setActiveMatchId(null);
       setActiveMatchName(null);
     }
-  }, [matches, user, activeMatchId]);
+  }, [matches, user]);
 
   const setActiveMatch = (matchId: string | null, matchName: string | null) => {
     setActiveMatchId(matchId);
