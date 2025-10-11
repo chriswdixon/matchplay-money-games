@@ -19,7 +19,6 @@ interface MatchScorecardProps {
 }
 
 export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardProps) {
-  console.log('MatchScorecard props:', { matchId, matchName });
   const { user } = useAuth();
   const {
     playerScores,

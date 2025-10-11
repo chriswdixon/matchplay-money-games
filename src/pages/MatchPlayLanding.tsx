@@ -7,6 +7,7 @@ import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import SubscriptionManagement from "@/components/SubscriptionManagement";
 import { HandicapSettings } from "@/components/profile/HandicapSettings";
+import { MatchScorecard } from "@/components/MatchScorecard";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -14,12 +15,15 @@ import { Search, Crown, ArrowUp, History, Trophy } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
+import { useActiveMatch } from "@/hooks/useActiveMatch";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
   const { matches } = useMatches();
+  const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentTab, setCurrentTab] = useState("matches");
+  const [showingActiveMatch, setShowingActiveMatch] = useState(false);
 
   // Navigation items for hamburger menu
   const navItems = [
@@ -50,10 +54,16 @@ const MatchPlayLanding = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
+  const handleReturnToMatch = () => {
+    setShowingActiveMatch(true);
+    setCurrentTab("matches");
+    scrollToTop();
+  };
+
   // Logged-in user experience
   if (user) {
-    // If user has an active match, show only the scorecard (tabs only in hamburger menu)
-    if (activeMatch) {
+    // Show active match scorecard if user clicked "Return to Active Match"
+    if (showingActiveMatch && hasActiveMatch && activeMatchId) {
       return (
         <div className="min-h-screen bg-background flex flex-col">
           <AppHeader 
@@ -61,25 +71,14 @@ const MatchPlayLanding = () => {
             onNavSelect={setCurrentTab}
             currentTab={currentTab}
             navItems={navItems}
+            onReturnToMatch={handleReturnToMatch}
           />
           <main className="w-full flex-1">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <TabsContent value="matches">
-                <MatchFinder hideHowItWorks />
-              </TabsContent>
-              
-              <TabsContent value="past">
-                <MatchFinder hideHowItWorks showPastMatches />
-              </TabsContent>
-              
-              <TabsContent value="handicap">
-                <HandicapSettings />
-              </TabsContent>
-              
-              <TabsContent value="subscription">
-                <SubscriptionManagement />
-              </TabsContent>
-            </Tabs>
+            <MatchScorecard
+              matchId={activeMatchId}
+              matchName={activeMatchName || 'Active Match'}
+              onClose={() => setShowingActiveMatch(false)}
+            />
           </main>
           <AppFooter />
         </div>
@@ -94,6 +93,7 @@ const MatchPlayLanding = () => {
           onNavSelect={setCurrentTab}
           currentTab={currentTab}
           navItems={navItems}
+          onReturnToMatch={handleReturnToMatch}
         />
         <main className="container flex-1 py-8">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
@@ -145,6 +145,8 @@ const MatchPlayLanding = () => {
   // Landing page for non-logged-in users
   return (
     <div className="min-h-screen bg-background">
+      <AppHeader onReturnToMatch={handleReturnToMatch} />
+      
       {/* Hero Section */}
       <MatchPlayHero />
       

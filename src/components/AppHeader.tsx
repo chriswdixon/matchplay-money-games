@@ -1,29 +1,58 @@
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
+import { Menu, Target } from "lucide-react";
 import { useState } from "react";
+import { useActiveMatch } from "@/hooks/useActiveMatch";
+import { Link, useNavigate } from "react-router-dom";
 
 interface AppHeaderProps {
   showNavMenu?: boolean;
   onNavSelect?: (value: string) => void;
   currentTab?: string;
   navItems?: Array<{ value: string; label: string; icon: React.ReactNode }>;
+  onReturnToMatch?: () => void;
 }
 
-const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems }: AppHeaderProps) => {
+const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToMatch }: AppHeaderProps) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { hasActiveMatch, activeMatchName } = useActiveMatch();
+  const navigate = useNavigate();
+
+  const handleReturnToMatch = () => {
+    if (onReturnToMatch) {
+      onReturnToMatch();
+    } else {
+      // Default behavior: navigate to home with active match
+      navigate('/');
+    }
+  };
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container flex h-16 items-center justify-between">
         <div className="flex items-center gap-2">
-          <h1 className="text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent">
-            MatchPlay
-          </h1>
+          <Link to="/">
+            <h1 className="text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
+              MatchPlay
+            </h1>
+          </Link>
         </div>
         
         <div className="flex items-center gap-2">
+          {hasActiveMatch && (
+            <Button
+              variant="default"
+              size="sm"
+              onClick={handleReturnToMatch}
+              className="bg-gradient-primary text-primary-foreground hover:opacity-90 gap-2"
+            >
+              <Target className="h-4 w-4" />
+              <span className="hidden sm:inline">Return to Active Match</span>
+              <span className="sm:hidden">Active Match</span>
+            </Button>
+          )}
+          
           {showNavMenu && navItems && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>

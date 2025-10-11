@@ -160,16 +160,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     return filtered;
   }, [matches, filters, showPastMatches]);
 
-  // Find active match for current user (started status and user is participant)
-  const activeMatch = useMemo(() => {
-    if (!user) return null;
-    const match = matches.find(match => 
-      match.status === 'started' && match.user_joined
-    );
-    console.log('Active match found:', match);
-    return match;
-  }, [matches, user]);
-
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
     const now = new Date();
@@ -267,57 +257,40 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   return (
     <section className="py-4 md:py-20 px-6 bg-background">
       <div className="max-w-6xl mx-auto">
-        {/* Show active match scorecard if user has a started match */}
-        {activeMatch ? (
-          <div className="animate-fade-in">
-            {/* Active Match Scorecard */}
-            <MatchScorecard
-              matchId={activeMatch.id}
-              matchName={activeMatch.course_name}
-              onClose={async () => {
-                // Let user leave the active match to see tabs
-                await leaveMatch(activeMatch.id);
-                refetch();
-              }}
-            />
-          </div>
-        ) : (
-          /* Regular match finder view */
-          <>
-            <div className="text-center mb-16 animate-fade-in">
-              <Badge className="mb-4 bg-success/10 text-success border-success/20">
-                {showPastMatches ? '📜 Match History' : '🎯 Live Match Finder'}
-              </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-                {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
-              </h2>
-              {showPastMatches && (
-                <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-                  Review your completed matches, see final results, and track your competitive history.
+        <div className="text-center mb-16 animate-fade-in">
+          <Badge className="mb-4 bg-success/10 text-success border-success/20">
+            {showPastMatches ? '📜 Match History' : '🎯 Live Match Finder'}
+          </Badge>
+          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+            {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
+          </h2>
+          {showPastMatches && (
+            <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
+              Review your completed matches, see final results, and track your competitive history.
+            </p>
+          )}
+          {!showPastMatches && (
+            <div className="mt-8 flex flex-col items-center justify-center gap-2">
+              <CreateMatchDialog onMatchCreated={refetch} />
+              {location && (
+                <p className="text-sm text-muted-foreground">
+                  📍 Location enabled • Showing matches within {searchRadius}mi
                 </p>
               )}
-              {!showPastMatches && (
-                <div className="mt-8 flex flex-col items-center justify-center gap-2">
-                  <CreateMatchDialog onMatchCreated={refetch} />
-                  {location && (
-                    <p className="text-sm text-muted-foreground">
-                      📍 Location enabled • Showing matches within {searchRadius}mi
-                    </p>
-                  )}
-                </div>
-              )}
             </div>
+          )}
+        </div>
 
-            {/* Match Filters - Only show for current matches and logged-in users */}
-            {!showPastMatches && user && (
-              <MatchFilters
-                filters={filters}
-                onFiltersChange={setFilters}
-                matchCount={filteredMatches.length}
-                showFilters={showFilters}
-                onToggleFilters={() => setShowFilters(!showFilters)}
-              />
-            )}
+        {/* Match Filters - Only show for current matches and logged-in users */}
+        {!showPastMatches && user && (
+          <MatchFilters
+            filters={filters}
+            onFiltersChange={setFilters}
+            matchCount={filteredMatches.length}
+            showFilters={showFilters}
+            onToggleFilters={() => setShowFilters(!showFilters)}
+          />
+        )}
 
             {/* Live Matches */}
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -513,8 +486,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 })
               )}
             </div>
-          </>
-        )}
 
         {/* Rating Dialog */}
         <PlayerRatingDialog
@@ -524,8 +495,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           matchName={selectedMatchForRating?.course_name || ''}
         />
 
-        {/* Scorecard Component (for non-active matches) */}
-        {scorecardMatch && !activeMatch && (
+        {/* Scorecard Component */}
+        {scorecardMatch && (
           <MatchScorecard
             matchId={scorecardMatch.id}
             matchName={scorecardMatch.course_name}
@@ -542,8 +513,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           />
         )}
         
-        {/* How It Works - Only show when not in active match and not hidden */}
-        {!activeMatch && !hideHowItWorks && (
+        {/* How It Works - Only show when not hidden */}
+        {!hideHowItWorks && (
           <div className="bg-gradient-card rounded-2xl p-8 md:p-12">
             <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
             <div className="grid md:grid-cols-4 gap-6">

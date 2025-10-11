@@ -1,15 +1,17 @@
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { useActiveMatch } from '@/hooks/useActiveMatch';
 import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, User, Settings, CreditCard } from 'lucide-react';
+import { ArrowLeft, User, Settings, CreditCard, Target } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 
 export default function Profile() {
   const { user, loading } = useAuth();
+  const { hasActiveMatch } = useActiveMatch();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,6 +47,20 @@ export default function Profile() {
               <ArrowLeft className="w-4 h-4 mr-2" />
               Back to Home
             </Button>
+            
+            {hasActiveMatch && (
+              <Button
+                variant="default"
+                size="sm"
+                onClick={() => navigate('/')}
+                className="bg-gradient-primary text-primary-foreground hover:opacity-90 gap-2"
+              >
+                <Target className="h-4 w-4" />
+                <span className="hidden sm:inline">Return to Active Match</span>
+                <span className="sm:hidden">Active Match</span>
+              </Button>
+            )}
+            
             <div className="flex-1">
               <h1 className="text-2xl font-bold">Profile Settings</h1>
               <p className="text-muted-foreground">Manage your MatchPlay profile and preferences</p>
