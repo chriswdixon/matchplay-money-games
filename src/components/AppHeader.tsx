@@ -31,8 +31,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
-      <div className="container flex h-16 items-center justify-between">
-        <div className="flex items-center gap-2">
+      <div className="container flex h-16 items-center justify-between gap-2">
+        <div className="flex items-center flex-1">
           <Link to="/">
             <h1 className="text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
               MatchPlay
@@ -40,7 +40,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
           </Link>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-1 justify-end">
           {hasActiveMatch && !hideReturnButton && (
             <Button
               variant="default"
