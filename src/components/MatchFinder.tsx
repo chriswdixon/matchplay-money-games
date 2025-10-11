@@ -442,14 +442,23 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           )}
                           
                           {isMatchCompleted(match) && match.user_joined ? (
-                            <Button 
-                              variant="outline"
-                              className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
-                              onClick={() => handleRatePlayersClick(match)}
-                            >
-                              <Star className="w-4 h-4 mr-2" />
-                              Rate Players
-                            </Button>
+                            <>
+                              <Button
+                                className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+                                onClick={() => handleViewScorecard(match)}
+                              >
+                                <Trophy className="w-4 h-4 mr-2" />
+                                View Results
+                              </Button>
+                              <Button 
+                                variant="outline"
+                                className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
+                                onClick={() => handleRatePlayersClick(match)}
+                              >
+                                <Star className="w-4 h-4 mr-2" />
+                                Rate Players
+                              </Button>
+                            </>
                           ) : match.status === 'cancelled' && match.user_joined ? (
                             <Button
                               className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
@@ -465,14 +474,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             >
                               <Target className="w-4 h-4 mr-2" />
                               View Scorecard
-                            </Button>
-                          ) : match.status === 'completed' && match.user_joined ? (
-                            <Button
-                              className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
-                              onClick={() => handleViewScorecard(match)}
-                            >
-                              <Trophy className="w-4 h-4 mr-2" />
-                              View Results
                             </Button>
                           ) : match.status === 'open' && match.user_joined && isFull ? (
                             <Button
