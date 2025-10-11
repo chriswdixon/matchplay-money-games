@@ -46,7 +46,7 @@ export function MatchScorecard({ matchId, matchName, onClose }: MatchScorecardPr
   const [editingHole, setEditingHole] = useState<number | null>(null);
   const [tempScore, setTempScore] = useState<string>('');
   const [scoreDialogOpen, setScoreDialogOpen] = useState(false);
-  const [settingsOpen, setSettingsOpen] = useState(true);
+  const [settingsOpen, setSettingsOpen] = useState(typeof window !== 'undefined' && window.innerWidth >= 768);
   const [userClosedSettings, setUserClosedSettings] = useState(false);
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState<string>('');
