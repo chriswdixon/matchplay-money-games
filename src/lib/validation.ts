@@ -84,6 +84,9 @@ export const createMatchSchema = z.object({
   format: z.enum(['Stroke Play', 'Match Play', 'Best Ball', 'Skins Game', 'Scramble'], {
     errorMap: () => ({ message: "Invalid match format" })
   }),
+  holes: z.number().int().refine((val) => val === 9 || val === 18, {
+    message: "Number of holes must be either 9 or 18"
+  }),
   max_participants: z.number().int().min(1, "Must have at least 1 participant").max(8, "Cannot exceed 8 participants"),
   location: z.string().trim().min(1, "Location is required").max(200, "Location must be less than 200 characters"),
   latitude: z.number().optional().nullable(),

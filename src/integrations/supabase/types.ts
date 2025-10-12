@@ -256,6 +256,7 @@ export type Database = {
           handicap_max: number | null
           handicap_min: number | null
           hole_pars: Json | null
+          holes: number
           id: string
           latitude: number | null
           location: string
@@ -278,6 +279,7 @@ export type Database = {
           handicap_max?: number | null
           handicap_min?: number | null
           hole_pars?: Json | null
+          holes?: number
           id?: string
           latitude?: number | null
           location: string
@@ -300,6 +302,7 @@ export type Database = {
           handicap_max?: number | null
           handicap_min?: number | null
           hole_pars?: Json | null
+          holes?: number
           id?: string
           latitude?: number | null
           location?: string

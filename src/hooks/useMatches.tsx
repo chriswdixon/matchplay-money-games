@@ -16,6 +16,7 @@ export interface Match {
   longitude?: number;
   scheduled_time: string;
   format: string;
+  holes: number;
   buy_in_amount: number;
   handicap_min?: number;
   handicap_max?: number;
@@ -278,6 +279,7 @@ export const useMatches = () => {
     longitude?: number;
     scheduled_time: string;
     format: string;
+    holes: number;
     buy_in_amount: number;
     handicap_min?: number;
     handicap_max?: number;
@@ -329,6 +331,7 @@ export const useMatches = () => {
           longitude: validationResult.data.longitude,
           scheduled_time: matchData.scheduled_time,
           format: validationResult.data.format,
+          holes: matchData.holes,
           buy_in_amount: validationResult.data.buy_in_amount,
           handicap_min: validationResult.data.handicap_min,
           handicap_max: validationResult.data.handicap_max,
