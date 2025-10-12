@@ -357,26 +357,34 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 filteredMatches.map((match, index) => {
                   const isFull = isMatchFull(match);
                   const isCreatedRecently = new Date(match.created_at) > new Date(Date.now() - 5 * 60 * 1000); // Within 5 minutes
+                  const buyInDollars = match.buy_in_amount / 100;
+                  const isHighStakes = buyInDollars >= 100;
+                  const isMediumStakes = buyInDollars >= 50 && buyInDollars < 100;
                   
                   return (
                     <Card 
                       key={match.id} 
-                      className="relative border-border hover:border-primary/30 transition-all duration-300 hover:shadow-card animate-slide-up bg-card"
+                      className={cn(
+                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up",
+                        isHighStakes ? "bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/30 hover:border-amber-500/50" :
+                        isMediumStakes ? "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50" :
+                        "bg-card border-border hover:border-accent"
+                      )}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
                       {match.status === 'cancelled' && (
-                        <Badge className="absolute -top-2 -right-2 bg-destructive text-destructive-foreground">
+                        <Badge className="absolute -top-2 -right-2 bg-destructive/90 text-destructive-foreground border border-destructive">
                           CANCELLED
                         </Badge>
                       )}
                       {match.status === 'completed' && match.winner_id === user?.id && (
-                        <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground">
+                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white border border-amber-400">
                           <Trophy className="w-3 h-3 mr-1" />
                           WINNER
                         </Badge>
                       )}
                       {isCreatedRecently && match.status !== 'cancelled' && match.status !== 'completed' && (
-                        <Badge className="absolute -top-2 -right-2 bg-success text-success-foreground animate-pulse">
+                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse border border-green-400">
                           <Zap className="w-3 h-3 mr-1" />
                           NEW
                         </Badge>
@@ -400,25 +408,45 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       <CardContent className="space-y-4">
                         <div className="grid grid-cols-2 gap-4 text-sm">
                           <div className="flex items-center gap-2">
-                            <Clock className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-foreground">{formatMatchTime(match.scheduled_time)}</span>
+                            <Clock className="w-4 h-4 text-primary" />
+                            <span className="text-foreground font-medium">{formatMatchTime(match.scheduled_time)}</span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Users className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-foreground">{match.participant_count || 0}/{match.max_participants} filled</span>
+                            <Users className={cn("w-4 h-4", isFull ? "text-destructive" : "text-success")} />
+                            <span className={cn("font-medium", isFull ? "text-destructive" : "text-success")}>
+                              {match.participant_count || 0}/{match.max_participants} filled
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <DollarSign className="w-4 h-4 text-muted-foreground" />
-                            <span className="text-foreground">{formatBuyIn(match.buy_in_amount)} buy-in</span>
+                            <DollarSign className={cn(
+                              "w-4 h-4",
+                              isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-muted-foreground"
+                            )} />
+                            <span className={cn(
+                              "font-medium",
+                              isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-foreground"
+                            )}>
+                              {formatBuyIn(match.buy_in_amount)} buy-in
+                            </span>
                           </div>
                           <div className="flex items-center gap-2">
-                            <Trophy className="w-4 h-4 text-muted-foreground" />
+                            <Trophy className="w-4 h-4 text-accent" />
                             <span className="text-foreground">{formatHandicapRange(match.handicap_min, match.handicap_max)}</span>
                           </div>
                         </div>
                         
                         <div className="pt-2 space-y-2">
-                          <Badge variant="outline" className="text-xs">
+                          <Badge 
+                            variant="outline" 
+                            className={cn(
+                              "text-xs font-medium",
+                              match.format === 'stroke-play' && "border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/10",
+                              match.format === 'match-play' && "border-purple-500/50 text-purple-600 dark:text-purple-400 bg-purple-500/10",
+                              match.format === 'best-ball' && "border-green-500/50 text-green-600 dark:text-green-400 bg-green-500/10",
+                              match.format === 'skins' && "border-orange-500/50 text-orange-600 dark:text-orange-400 bg-orange-500/10",
+                              match.format === 'scramble' && "border-pink-500/50 text-pink-600 dark:text-pink-400 bg-pink-500/10"
+                            )}
+                          >
                             {formatMatchFormat(match.format)}
                           </Badge>
                         </div>
