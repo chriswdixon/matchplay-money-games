@@ -86,7 +86,9 @@ export function usePlayerAccount() {
       return { error: 'No account found' };
     }
 
-    if (amount <= 0 || amount > parseFloat(account.balance.toString())) {
+    // Balance is stored in cents, convert to dollars for comparison
+    const balanceInDollars = parseFloat(account.balance.toString()) / 100;
+    if (amount <= 0 || amount > balanceInDollars) {
       toast.error('Invalid payout amount');
       return { error: 'Invalid amount' };
     }

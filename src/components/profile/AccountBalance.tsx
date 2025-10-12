@@ -21,6 +21,11 @@ export function AccountBalance() {
       return;
     }
 
+    if (amount > balance) {
+      toast.error('Amount exceeds available balance');
+      return;
+    }
+
     setIsProcessing(true);
     const { error } = await requestPayout(amount);
     setIsProcessing(false);
@@ -44,7 +49,7 @@ export function AccountBalance() {
     );
   }
 
-  const balance = account ? parseFloat(account.balance.toString()) : 0;
+  const balance = account ? parseFloat(account.balance.toString()) / 100 : 0;
 
   return (
     <Card className="shadow-card">

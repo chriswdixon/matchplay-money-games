@@ -35,15 +35,15 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id });
 
-    const MAX_BUY_IN = 500;
+    const MAX_BUY_IN_CENTS = 50000; // $500 in cents
     const { matchId, buyInAmount } = await req.json();
     
     if (!matchId || !buyInAmount) {
       throw new Error("Missing matchId or buyInAmount");
     }
     
-    if (buyInAmount < 0 || buyInAmount > MAX_BUY_IN) {
-      throw new Error(`Buy-in amount must be between $0 and $${MAX_BUY_IN}`);
+    if (buyInAmount < 0 || buyInAmount > MAX_BUY_IN_CENTS) {
+      throw new Error(`Buy-in amount must be between $0 and $${MAX_BUY_IN_CENTS / 100}`);
     }
     
     logStep("Processing buy-in", { matchId, buyInAmount });
@@ -178,7 +178,7 @@ serve(async (req) => {
 
       // Create payment intent with idempotency key
       const paymentIntent = await stripe.paymentIntents.create({
-        amount: Math.round(buyInAmount * 100), // Convert to cents
+        amount: Math.round(buyInAmount), // Already in cents
         currency: 'usd',
         customer: customerId,
         description: `Match buy-in for ${matchId}`,

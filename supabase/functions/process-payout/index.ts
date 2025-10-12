@@ -35,12 +35,15 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id });
 
-    const MAX_PAYOUT = 10000; // $10,000 maximum payout per transaction
+    const MAX_PAYOUT = 10000; // $10,000 maximum payout per transaction (in dollars)
     const { amount } = await req.json();
     
     if (!amount || amount <= 0 || amount > MAX_PAYOUT) {
       throw new Error(`Invalid payout amount. Must be between $0.01 and $${MAX_PAYOUT.toLocaleString()}`);
     }
+
+    // Convert amount to cents for database operations (balance is stored in cents)
+    const amountInCents = Math.round(amount * 100);
 
     // Get player account
     const { data: account, error: accountError } = await supabaseClient
@@ -54,11 +57,11 @@ serve(async (req) => {
     }
 
     const balance = parseFloat(account.balance);
-    if (balance < amount) {
+    if (balance < amountInCents) {
       throw new Error("Insufficient balance for payout");
     }
 
-    logStep("Processing payout", { amount, currentBalance: balance });
+    logStep("Processing payout", { amount, amountInCents, currentBalance: balance });
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -90,7 +93,7 @@ serve(async (req) => {
     // Deduct from account
     const { error: updateError } = await supabaseClient
       .from('player_accounts')
-      .update({ balance: balance - amount })
+      .update({ balance: balance - amountInCents })
       .eq('user_id', user.id);
 
     if (updateError) throw updateError;
@@ -101,7 +104,7 @@ serve(async (req) => {
       .insert({
         user_id: user.id,
         account_id: account.id,
-        amount: -amount,
+        amount: -amountInCents,
         transaction_type: 'payout',
         description: `Payout to payment method`,
         stripe_payment_intent_id: paymentIntent.id,
@@ -111,7 +114,7 @@ serve(async (req) => {
     logStep("Payout processed successfully");
     return new Response(JSON.stringify({ 
       success: true, 
-      newBalance: balance - amount,
+      newBalance: balance - amountInCents,
       payoutId: paymentIntent.id
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
