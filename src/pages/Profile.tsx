@@ -1,7 +1,8 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useActiveMatch } from '@/hooks/useActiveMatch';
+import { useIsMobile } from '@/hooks/use-mobile';
 import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
@@ -12,11 +13,18 @@ import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
 import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PaymentMethods } from '@/components/profile/PaymentMethods';
+import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 
 export default function Profile() {
   const { user, loading } = useAuth();
   const { hasActiveMatch } = useActiveMatch();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
+  
+  const [activeTab, setActiveTab] = useState('profile');
+  const [showPasswordDialog, setShowPasswordDialog] = useState(false);
+  const [pendingTab, setPendingTab] = useState<string | null>(null);
+  const [isVerified, setIsVerified] = useState(false);
 
   useEffect(() => {
     if (!loading && !user) {
@@ -36,6 +44,30 @@ export default function Profile() {
     return null;
   }
 
+  const handleTabChange = (value: string) => {
+    // Require password for Account and Subscription tabs
+    if ((value === 'account' || value === 'subscription') && !isVerified) {
+      setPendingTab(value);
+      setShowPasswordDialog(true);
+      return;
+    }
+    setActiveTab(value);
+  };
+
+  const handlePasswordVerified = () => {
+    setIsVerified(true);
+    setShowPasswordDialog(false);
+    if (pendingTab) {
+      setActiveTab(pendingTab);
+      setPendingTab(null);
+    }
+  };
+
+  const handlePasswordCancel = () => {
+    setShowPasswordDialog(false);
+    setPendingTab(null);
+  };
+
   return (
     <div className="min-h-screen bg-gradient-subtle">
       {/* Header */}
@@ -49,7 +81,7 @@ export default function Profile() {
               className="text-muted-foreground hover:text-foreground"
             >
               <ArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
+              {!isMobile && "Back to Home"}
             </Button>
             
             {hasActiveMatch && (
@@ -75,27 +107,27 @@ export default function Profile() {
 
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
-        <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5">
-            <TabsTrigger value="profile" className="gap-2">
+        <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
+          <TabsList className={isMobile ? "inline-flex w-full overflow-x-auto" : "grid w-full grid-cols-5"}>
+            <TabsTrigger value="profile" className="gap-2 whitespace-nowrap">
               <User className="w-4 h-4" />
-              Profile
+              {!isMobile && "Profile"}
             </TabsTrigger>
-            <TabsTrigger value="account" className="gap-2">
+            <TabsTrigger value="account" className="gap-2 whitespace-nowrap">
               <DollarSign className="w-4 h-4" />
-              Account
+              {!isMobile && "Account"}
             </TabsTrigger>
-            <TabsTrigger value="settings" className="gap-2">
+            <TabsTrigger value="settings" className="gap-2 whitespace-nowrap">
               <Settings className="w-4 h-4" />
-              Settings
+              {!isMobile && "Settings"}
             </TabsTrigger>
-            <TabsTrigger value="security" className="gap-2">
+            <TabsTrigger value="security" className="gap-2 whitespace-nowrap">
               <Shield className="w-4 h-4" />
-              Security
+              {!isMobile && "Security"}
             </TabsTrigger>
-            <TabsTrigger value="subscription" className="gap-2">
+            <TabsTrigger value="subscription" className="gap-2 whitespace-nowrap">
               <CreditCard className="w-4 h-4" />
-              Subscription
+              {!isMobile && "Subscription"}
             </TabsTrigger>
           </TabsList>
 
@@ -118,10 +150,18 @@ export default function Profile() {
           </TabsContent>
 
           <TabsContent value="subscription">
-            <SubscriptionManagement />
+            <SubscriptionManagement isVerified={isVerified} onRequestVerification={() => setShowPasswordDialog(true)} />
           </TabsContent>
         </Tabs>
       </div>
+
+      <PasswordVerificationDialog
+        open={showPasswordDialog}
+        onVerified={handlePasswordVerified}
+        onCancel={handlePasswordCancel}
+        title="Verify Your Password"
+        description="For security, please verify your password to access sensitive account information."
+      />
     </div>
   );
 }

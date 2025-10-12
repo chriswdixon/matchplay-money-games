@@ -1,13 +1,18 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw, Star, Zap } from "lucide-react";
+import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw, Star, Zap, Lock } from "lucide-react";
 import { useSubscription, SUBSCRIPTION_TIERS } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useState } from "react";
 
-const SubscriptionManagement = () => {
+interface SubscriptionManagementProps {
+  isVerified?: boolean;
+  onRequestVerification?: () => void;
+}
+
+const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: SubscriptionManagementProps) => {
   const { subscribed, tierName, subscriptionEnd, loading, refreshSubscription } = useSubscription();
   const { toast } = useToast();
   const [portalLoading, setPortalLoading] = useState(false);
@@ -47,6 +52,11 @@ const SubscriptionManagement = () => {
   };
 
   const handleUpgrade = async (priceId: string) => {
+    if (!isVerified && onRequestVerification) {
+      onRequestVerification();
+      return;
+    }
+    
     setUpgradeLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
@@ -219,7 +229,8 @@ const SubscriptionManagement = () => {
                   className="w-full"
                   disabled={upgradeLoading}
                 >
-                  {upgradeLoading ? "Processing..." : "Upgrade to Local Player"}
+                  {!isVerified && <Lock className="w-4 h-4 mr-2" />}
+                  {upgradeLoading ? "Processing..." : (isVerified ? "Upgrade to Local Player" : "Verify to Upgrade")}
                 </Button>
               </div>
             )}
@@ -246,7 +257,8 @@ const SubscriptionManagement = () => {
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
                 disabled={upgradeLoading}
               >
-                {upgradeLoading ? "Processing..." : "Upgrade to Tournament Pro"}
+                {!isVerified && <Lock className="w-4 h-4 mr-2" />}
+                {upgradeLoading ? "Processing..." : (isVerified ? "Upgrade to Tournament Pro" : "Verify to Upgrade")}
               </Button>
             </div>
           </CardContent>
