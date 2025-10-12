@@ -85,17 +85,6 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
     }
   }, [open, courses.length, searchCoursesByName]);
 
-  const handleGetCurrentLocation = async () => {
-    try {
-      const location = await getCurrentLocation();
-      setLocationCoords(location);
-      searchNearbyCourses(location.latitude, location.longitude, searchRadius);
-      setZipcode('');
-      toast.success('Current location captured');
-    } catch (error) {
-      // Error is already handled by useLocation hook
-    }
-  };
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
@@ -224,22 +213,17 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
       {!locationCoords && (
         <div className="space-y-2">
           <div className="flex gap-2">
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGetCurrentLocation}
-              disabled={locationLoading}
+            <Input
+              type="text"
+              placeholder="Enter zipcode to find courses"
+              value={zipcode}
+              onChange={(e) => {
+                const value = e.target.value.replace(/\D/g, '');
+                setZipcode(value);
+              }}
+              maxLength={5}
               className="flex-1"
-            >
-              {locationLoading ? (
-                <Loader2 className="w-4 h-4 animate-spin mr-2" />
-              ) : (
-                <MapPin className="w-4 h-4 mr-2" />
-              )}
-              Find courses near me
-            </Button>
-            
+            />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
               <SelectTrigger className="w-[110px]">
                 <SelectValue />
@@ -251,20 +235,6 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 <SelectItem value="100">100 miles</SelectItem>
               </SelectContent>
             </Select>
-          </div>
-          
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              placeholder="Or enter zipcode"
-              value={zipcode}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, '');
-                setZipcode(value);
-              }}
-              maxLength={5}
-              className="flex-1"
-            />
             <Button
               type="button"
               variant="outline"
@@ -319,22 +289,10 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   {coursesLoading ? (
                     <div className="flex items-center justify-center py-4">
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      <span className="text-muted-foreground">Loading nearby courses...</span>
+                      <span className="text-muted-foreground">Loading courses...</span>
                     </div>
                   ) : (
-                    <div className="py-4 text-center space-y-2">
-                      <p className="text-sm text-muted-foreground mb-2">No courses found</p>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={handleGetCurrentLocation}
-                        disabled={locationLoading}
-                        className="mx-auto"
-                      >
-                        <MapPin className="w-4 h-4 mr-2" />
-                        Find nearby courses
-                      </Button>
-                    </div>
+                    <p className="text-sm text-muted-foreground py-4">No courses found. Try a different search.</p>
                   )}
                 </CommandEmpty>
                 <CommandGroup>
