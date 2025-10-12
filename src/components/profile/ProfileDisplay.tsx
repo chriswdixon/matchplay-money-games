@@ -4,15 +4,17 @@ import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
 import { useProfile } from '@/hooks/useProfile';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { useAuth } from '@/hooks/useAuth';
-import { User, Phone, Trophy, Calendar, Mail, Star } from 'lucide-react';
+import { useSubscription } from '@/hooks/useSubscription';
+import { User, Phone, Trophy, Calendar, Mail, Star, Crown, Zap } from 'lucide-react';
 import StarRating from '@/components/StarRating';
 
 export function ProfileDisplay() {
   const { profile, loading } = useProfile();
   const { privateData, loading: privateLoading } = usePrivateProfile();
   const { user } = useAuth();
+  const { tierName, loading: subscriptionLoading } = useSubscription();
 
-  if (loading || privateLoading) {
+  if (loading || privateLoading || subscriptionLoading) {
     return (
       <Card>
         <CardContent className="p-6">
@@ -32,19 +34,19 @@ export function ProfileDisplay() {
 
   const getMembershipColor = (tier: string | null | undefined) => {
     switch (tier) {
-      case 'pro': return 'bg-gradient-accent text-accent-foreground';
-      case 'premium': return 'bg-gradient-primary text-primary-foreground';
-      case 'tournament': return 'bg-destructive text-destructive-foreground';
+      case 'Tournament Pro': return 'bg-yellow-500 text-white';
+      case 'Local Player': return 'bg-gradient-primary text-primary-foreground';
+      case 'Free': return 'bg-secondary text-secondary-foreground';
       default: return 'bg-secondary text-secondary-foreground';
     }
   };
 
-  const getMembershipLabel = (tier: string | null | undefined) => {
+  const getMembershipIcon = (tier: string | null | undefined) => {
     switch (tier) {
-      case 'pro': return 'Pro Member';
-      case 'premium': return 'Premium Member';
-      case 'tournament': return 'Tournament Player';
-      default: return 'Local Player';
+      case 'Tournament Pro': return <Crown className="w-3 h-3" />;
+      case 'Local Player': return <Star className="w-3 h-3" />;
+      case 'Free': return <Zap className="w-3 h-3" />;
+      default: return <Zap className="w-3 h-3" />;
     }
   };
 
@@ -76,8 +78,9 @@ export function ProfileDisplay() {
               <span className="text-muted-foreground">{user?.email}</span>
             </div>
             <div className="mt-2">
-              <Badge className={getMembershipColor(privateData?.membership_tier)}>
-                {getMembershipLabel(privateData?.membership_tier)}
+              <Badge className={`${getMembershipColor(tierName)} flex items-center gap-1.5`}>
+                {getMembershipIcon(tierName)}
+                {tierName || 'Free'}
               </Badge>
             </div>
           </div>
