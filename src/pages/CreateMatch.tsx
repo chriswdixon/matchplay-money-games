@@ -196,7 +196,7 @@ const CreateMatch = () => {
         longitude: locationCoords?.longitude,
         scheduled_time: scheduledDateTime.toISOString(),
         format: formData.format,
-        buy_in_amount: parseInt(formData.buy_in_amount) * 100,
+        buy_in_amount: (parseInt(formData.buy_in_amount) || 0) * 100,
         handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
         handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
         max_participants: parseInt(formData.max_participants),
