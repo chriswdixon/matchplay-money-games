@@ -60,15 +60,14 @@ const CreateMatch = () => {
 
   // Check if current tab is complete
   const isTab1Complete = useMemo(() => {
-    return !!formData.course_name;
-  }, [formData.course_name]);
+    return !!formData.course_name && !!formData.scheduled_time;
+  }, [formData.course_name, formData.scheduled_time]);
 
   const isTab2Complete = useMemo(() => {
-    const hasScheduledTime = !!formData.scheduled_time;
     const hasFormat = !!formData.format;
     const hasTeesWhenRequired = formData.tee_selection_mode === 'individual' || !!formData.default_tees;
-    return hasScheduledTime && hasFormat && hasTeesWhenRequired;
-  }, [formData.scheduled_time, formData.format, formData.tee_selection_mode, formData.default_tees]);
+    return hasFormat && hasTeesWhenRequired;
+  }, [formData.format, formData.tee_selection_mode, formData.default_tees]);
 
   // Initialize search with all courses when page loads
   useEffect(() => {
@@ -493,6 +492,7 @@ const CreateMatch = () => {
               
               <TabsContent value="course" className="space-y-4 mt-4">
                 <CourseField />
+                <DateTimeField />
                 <div className="space-y-2">
                   <Label htmlFor="booking_url">Tee Time Booking URL (Optional)</Label>
                   <Input
@@ -506,7 +506,6 @@ const CreateMatch = () => {
               </TabsContent>
 
               <TabsContent value="format" className="space-y-4 mt-4">
-                <DateTimeField />
                 <div className="space-y-2">
                   <Label htmlFor="format">Match Format</Label>
                   <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
