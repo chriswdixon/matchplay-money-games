@@ -33,7 +33,7 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) throw new Error("Unauthorized");
     
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
     const MAX_PAYOUT = 10000; // $10,000 maximum payout per transaction
     const { amount } = await req.json();

@@ -54,9 +54,10 @@ export function MFAVerification({ onVerified, onCancel }: MFAVerificationProps) 
       
       onVerified();
     } catch (error: any) {
+      // Generic error message to prevent enumeration attacks
       toast({
         title: "Verification Failed",
-        description: error.message || "Invalid verification code. Please try again.",
+        description: "Unable to verify code. Please check your authenticator app and try again.",
         variant: "destructive",
       });
       setVerificationCode('');

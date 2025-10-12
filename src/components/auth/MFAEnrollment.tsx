@@ -47,23 +47,12 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
         setSecret(data.totp.secret);
       }
     } catch (error: any) {
-      // Handle specific error for missing sub claim
-      const errorMessage = error.message?.includes('missing sub claim') || error.message?.includes('invalid claim')
-        ? "Please confirm your email before setting up two-factor authentication. Check your inbox for the confirmation link."
-        : error.message || "Failed to initiate MFA enrollment";
-      
+      // Generic error message to prevent enumeration attacks
       toast({
-        title: "Enrollment Error",
-        description: errorMessage,
+        title: "Setup Failed",
+        description: "Unable to set up two-factor authentication. Please ensure your account is fully activated and try again.",
         variant: "destructive",
       });
-      
-      // If it's a session error, redirect back after a delay
-      if (error.message?.includes('confirm your email') || error.message?.includes('missing sub claim')) {
-        setTimeout(() => {
-          onComplete();
-        }, 3000);
-      }
     } finally {
       setEnrolling(false);
     }
