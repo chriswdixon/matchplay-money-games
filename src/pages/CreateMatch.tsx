@@ -8,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, X, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, X, ChevronRight, MapPin } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -40,6 +40,7 @@ const CreateMatch = () => {
   const [hourDisplay, setHourDisplay] = useState('');
   const [zipcode, setZipcode] = useState('');
   const [loadingZipcode, setLoadingZipcode] = useState(false);
+  const [loadingGPS, setLoadingGPS] = useState(false);
   const [searchRadius, setSearchRadius] = useState<number>(30);
 
   const { createMatch } = useMatches();
@@ -102,6 +103,40 @@ const CreateMatch = () => {
       toast.error('Failed to search by zipcode. Please try again.');
     } finally {
       setLoadingZipcode(false);
+    }
+  };
+
+  const handleGPSSearch = async () => {
+    if (!navigator.geolocation) {
+      toast.error('Geolocation is not supported by your browser');
+      return;
+    }
+
+    try {
+      setLoadingGPS(true);
+      navigator.geolocation.getCurrentPosition(
+        async (position) => {
+          const coords = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          };
+          setLocationCoords(coords);
+          await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
+          toast.success(`Location found - searching within ${searchRadius} miles`);
+          setLoadingGPS(false);
+        },
+        (error) => {
+          setLoadingGPS(false);
+          if (error.code === error.PERMISSION_DENIED) {
+            toast.error('Location access denied. Please enable location permissions.');
+          } else {
+            toast.error('Failed to get your location. Please try entering a zipcode.');
+          }
+        }
+      );
+    } catch (error) {
+      setLoadingGPS(false);
+      toast.error('Failed to access GPS. Please try entering a zipcode.');
     }
   };
 
@@ -188,7 +223,7 @@ const CreateMatch = () => {
               <SelectTrigger className="w-[110px]" id="search_radius">
                 <SelectValue />
               </SelectTrigger>
-              <SelectContent>
+              <SelectContent className="z-[100]">
                 <SelectItem value="15">15 miles</SelectItem>
                 <SelectItem value="30">30 miles</SelectItem>
                 <SelectItem value="50">50 miles</SelectItem>
@@ -206,6 +241,20 @@ const CreateMatch = () => {
                 <Loader2 className="w-4 h-4 animate-spin" />
               ) : (
                 'Search'
+              )}
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={handleGPSSearch}
+              disabled={loadingGPS}
+              title="Use my location"
+            >
+              {loadingGPS ? (
+                <Loader2 className="w-4 h-4 animate-spin" />
+              ) : (
+                <MapPin className="w-4 h-4" />
               )}
             </Button>
           </div>
@@ -237,8 +286,8 @@ const CreateMatch = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0" align="start" sideOffset={5}>
-          <Command className="border-0">
+        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 pointer-events-auto z-[100]" align="start" sideOffset={5}>
+          <Command className="border-0 pointer-events-auto">
             <CommandInput 
               placeholder="Search golf courses..." 
               onValueChange={handleCustomCourse}
@@ -310,8 +359,8 @@ const CreateMatch = () => {
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-4 space-y-4">
+        <PopoverContent className="w-auto p-0 pointer-events-auto z-[100]" align="start">
+          <div className="p-4 space-y-4 pointer-events-auto">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Pick Date & Time</Label>
               <Button 
@@ -354,7 +403,7 @@ const CreateMatch = () => {
                 }}
                 disabled={(date) => date < new Date()}
                 initialFocus
-                className="p-3"
+                className="p-3 pointer-events-auto"
               />
             </div>
             <div>
