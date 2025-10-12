@@ -37,6 +37,7 @@ const CreateMatch = () => {
     scheduled_time: '07:00',
     format: '',
     default_tees: '',
+    holes: '18',
     buy_in_amount: '50',
     handicap_min: '',
     handicap_max: '',
@@ -180,6 +181,15 @@ const CreateMatch = () => {
       return;
     }
 
+    // Validate 9-hole time restriction
+    if (formData.holes === '9' && formData.scheduled_time) {
+      const [hours] = formData.scheduled_time.split(':').map(Number);
+      if (hours < 18) {
+        toast.error('9-hole matches can only be scheduled at or after 6:00 PM');
+        return;
+      }
+    }
+
     try {
       setSubmitting(true);
 
@@ -196,6 +206,7 @@ const CreateMatch = () => {
         longitude: locationCoords?.longitude,
         scheduled_time: scheduledDateTime.toISOString(),
         format: formData.format,
+        holes: parseInt(formData.holes),
         buy_in_amount: (parseInt(formData.buy_in_amount) || 0) * 100,
         handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
         handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
@@ -391,42 +402,75 @@ const CreateMatch = () => {
     </div>
   );
 
-  const renderFormatTeesStep = () => (
-    <div className="space-y-4">
-      <div className="space-y-2">
-        <Label htmlFor="format">Match Format *</Label>
-        <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-          <SelectTrigger id="format">
-            <SelectValue placeholder="Select format" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Stroke Play">Stroke Play</SelectItem>
-            <SelectItem value="Match Play">Match Play</SelectItem>
-            <SelectItem value="Best Ball">Best Ball</SelectItem>
-            <SelectItem value="Skins Game">Skins Game</SelectItem>
-            <SelectItem value="Scramble">Scramble</SelectItem>
-          </SelectContent>
-        </Select>
-      </div>
+  const getTimeWarning = () => {
+    if (formData.holes === '9' && formData.scheduled_time) {
+      const [hours] = formData.scheduled_time.split(':').map(Number);
+      if (hours < 18) {
+        return '9-hole matches can only be scheduled at or after 6:00 PM';
+      }
+    }
+    return null;
+  };
 
-      <div className="space-y-2">
-        <Label htmlFor="tees">Tee Selection *</Label>
-        <Select value={formData.default_tees} onValueChange={(value) => setFormData({ ...formData, default_tees: value })}>
-          <SelectTrigger id="tees">
-            <SelectValue placeholder="Select tees" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="black">Black (Championship)</SelectItem>
-            <SelectItem value="blue">Blue (Back)</SelectItem>
-            <SelectItem value="white">White (Middle)</SelectItem>
-            <SelectItem value="gold">Gold (Senior)</SelectItem>
-            <SelectItem value="red">Red (Forward)</SelectItem>
-            <SelectItem value="pick-own">Pick Your Own</SelectItem>
-          </SelectContent>
-        </Select>
+  const renderFormatTeesStep = () => {
+    const timeWarning = getTimeWarning();
+    
+    return (
+      <div className="space-y-4">
+        <div className="space-y-2">
+          <Label htmlFor="format">Match Format *</Label>
+          <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+            <SelectTrigger id="format">
+              <SelectValue placeholder="Select format" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="Stroke Play">Stroke Play</SelectItem>
+              <SelectItem value="Match Play">Match Play</SelectItem>
+              <SelectItem value="Best Ball">Best Ball</SelectItem>
+              <SelectItem value="Skins Game">Skins Game</SelectItem>
+              <SelectItem value="Scramble">Scramble</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="holes">Number of Holes *</Label>
+          <Select value={formData.holes} onValueChange={(value) => setFormData({ ...formData, holes: value })}>
+            <SelectTrigger id="holes">
+              <SelectValue placeholder="Select holes" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="18">18 Holes</SelectItem>
+              <SelectItem value="9">9 Holes</SelectItem>
+            </SelectContent>
+          </Select>
+          {timeWarning && (
+            <p className="text-xs text-destructive flex items-center gap-1">
+              <Clock className="w-3 h-3" />
+              {timeWarning}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <Label htmlFor="tees">Tee Selection *</Label>
+          <Select value={formData.default_tees} onValueChange={(value) => setFormData({ ...formData, default_tees: value })}>
+            <SelectTrigger id="tees">
+              <SelectValue placeholder="Select tees" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="black">Black (Championship)</SelectItem>
+              <SelectItem value="blue">Blue (Back)</SelectItem>
+              <SelectItem value="white">White (Middle)</SelectItem>
+              <SelectItem value="gold">Gold (Senior)</SelectItem>
+              <SelectItem value="red">Red (Forward)</SelectItem>
+              <SelectItem value="pick-own">Pick Your Own</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
       </div>
-    </div>
-  );
+    );
+  };
 
   const renderDetailsStep = () => (
     <div className="space-y-4">
