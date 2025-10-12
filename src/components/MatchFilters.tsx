@@ -62,7 +62,7 @@ const MatchFilters = ({
     <div className="space-y-4">
       {/* Filter Toggle & Search Bar */}
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
-        <div className="flex-1 relative">
+        <div className="w-full sm:flex-1 relative">
           <div className="relative shadow-lg rounded-lg border-2 border-primary/20 bg-card hover:border-primary/40 transition-all duration-300">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary z-10" />
             <Input
@@ -74,7 +74,7 @@ const MatchFilters = ({
           </div>
         </div>
 
-        <div className="flex gap-2">
+        <div className="flex gap-2 w-full sm:w-auto justify-end">
           <div className="shadow-lg rounded-lg border-2 border-primary/20 bg-card hover:border-primary/40 transition-all duration-300">
             <Button
               variant="ghost"
