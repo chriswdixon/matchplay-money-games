@@ -575,234 +575,27 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           {user ? 'Create Match' : 'Sign In to Create Match'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] p-0 gap-0 max-h-[90vh] overflow-hidden flex flex-col">
-        <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh]">
+        <DialogHeader>
           <DialogTitle>Create New Match</DialogTitle>
           <DialogDescription>
             Set up a new golf match and invite others to join.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Mobile: Tabbed Interface */}
-          <div className="md:hidden flex-1 flex flex-col overflow-hidden">
-            {/* Tab Navigation */}
-            <div className="px-6 py-3 border-b shrink-0 bg-muted">
-              <div className="grid grid-cols-3 gap-2">
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('course')}
-                  className={cn(
-                    "px-3 py-2 text-xs font-medium rounded-md transition-colors",
-                    currentTab === 'course'
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Course
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('format')}
-                  className={cn(
-                    "px-3 py-2 text-xs font-medium rounded-md transition-colors",
-                    currentTab === 'format'
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Format
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setCurrentTab('details')}
-                  className={cn(
-                    "px-3 py-2 text-xs font-medium rounded-md transition-colors",
-                    currentTab === 'details'
-                      ? "bg-background text-foreground shadow-sm"
-                      : "text-muted-foreground hover:text-foreground"
-                  )}
-                >
-                  Details
-                </button>
-              </div>
-            </div>
+          <div className="md:hidden">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="course">Course</TabsTrigger>
+                <TabsTrigger value="format">Format</TabsTrigger>
+                <TabsTrigger value="details">Details</TabsTrigger>
+              </TabsList>
               
-            {/* Tab Content - scrollable area */}
-            <div className="flex-1 overflow-y-auto px-6 py-4">
-              {currentTab === 'course' && (
-                <div className="space-y-4">
-                  <CourseField />
-                  <DateTimeField />
-                  <div className="space-y-2">
-                    <Label htmlFor="booking_url">Tee Time Booking URL (Optional)</Label>
-                    <Input
-                      id="booking_url"
-                      type="url"
-                      value={formData.booking_url}
-                      onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
-                      placeholder="https://example.com/book-tee-time"
-                    />
-                  </div>
-                </div>
-              )}
-
-              {currentTab === 'format' && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="format">Match Format</Label>
-                    <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select format" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="stroke-play">Stroke Play</SelectItem>
-                        <SelectItem value="match-play">Match Play</SelectItem>
-                        <SelectItem value="best-ball">2v2 Best Ball</SelectItem>
-                        <SelectItem value="skins">Skins Game</SelectItem>
-                        <SelectItem value="scramble">Scramble</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-
-                  <div className="space-y-3">
-                    <Label>Tee Selection</Label>
-                    <Select 
-                      value={formData.tee_selection_mode} 
-                      onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
-                    >
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="fixed">Creator selects tees for everyone</SelectItem>
-                        <SelectItem value="individual">Each participant picks their own tees</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    
-                    {formData.tee_selection_mode === 'fixed' && (
-                      <div className="space-y-2">
-                        <Label htmlFor="default_tees">Which Tees?</Label>
-                        <Select 
-                          value={formData.default_tees} 
-                          onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select tees" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="Black">Black (Championship)</SelectItem>
-                            <SelectItem value="Blue">Blue (Tournament)</SelectItem>
-                            <SelectItem value="White">White (Men's)</SelectItem>
-                            <SelectItem value="Gold">Gold</SelectItem>
-                            <SelectItem value="Red">Red (Forward/Ladies)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    )}
-                    {formData.tee_selection_mode === 'individual' && (
-                      <p className="text-xs text-muted-foreground">
-                        Participants will select their preferred tees when they join the match
-                      </p>
-                    )}
-                  </div>
-                </div>
-              )}
-
-              {currentTab === 'details' && (
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
-                    <Input
-                      id="buy_in_amount"
-                      type="number"
-                      min="0"
-                      max="500"
-                      value={formData.buy_in_amount}
-                      onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
-                      placeholder="50"
-                      required
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="handicap_min">Min Handicap</Label>
-                      <Input
-                        id="handicap_min"
-                        type="number"
-                        min="0"
-                        max="54"
-                        value={formData.handicap_min}
-                        onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="handicap_max">Max Handicap</Label>
-                      <Input
-                        id="handicap_max"
-                        type="number"
-                        min="0"
-                        max="54"
-                        value={formData.handicap_max}
-                        onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
-                        placeholder="20"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="max_participants">Max Participants</Label>
-                    <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="1">1 Player (Testing)</SelectItem>
-                        <SelectItem value="2">2 Players</SelectItem>
-                        <SelectItem value="3">3 Players</SelectItem>
-                        <SelectItem value="4">4 Players</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {/* Fixed Bottom Buttons */}
-            <div className="flex gap-2 p-6 border-t bg-background shrink-0">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
-                Cancel
-              </Button>
-              {!isFormValid ? (
-                <Button 
-                  type="button" 
-                  onClick={handleNextTab}
-                  disabled={
-                    (currentTab === 'course' && !isTab1Complete) || 
-                    (currentTab === 'format' && !isTab2Complete)
-                  }
-                  className="flex-1 bg-gradient-primary text-primary-foreground"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              ) : (
-                <Button type="submit" className="flex-1 bg-gradient-primary text-primary-foreground">
-                  Create Match
-                </Button>
-              )}
-            </div>
-          </div>
-
-          {/* Desktop: Traditional Scrolling Form */}
-          <div className="hidden md:block">
-            <ScrollArea className="h-[500px] px-6">
-              <div className="space-y-4 pb-4">
+              <TabsContent value="course" className="space-y-4 mt-4">
                 <CourseField />
                 <DateTimeField />
-                
                 <div className="space-y-2">
                   <Label htmlFor="booking_url">Tee Time Booking URL (Optional)</Label>
                   <Input
@@ -813,7 +606,9 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                     placeholder="https://example.com/book-tee-time"
                   />
                 </div>
-                
+              </TabsContent>
+
+              <TabsContent value="format" className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="format">Match Format</Label>
                   <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
@@ -871,7 +666,9 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                     </p>
                   )}
                 </div>
-                
+              </TabsContent>
+
+              <TabsContent value="details" className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
                   <Input
@@ -927,10 +724,165 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                     </SelectContent>
                   </Select>
                 </div>
-              </div>
-            </ScrollArea>
+              </TabsContent>
+            </Tabs>
+
+            <div className="flex gap-2 pt-6">
+              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
+                Cancel
+              </Button>
+              {!isFormValid ? (
+                <Button 
+                  type="button" 
+                  onClick={handleNextTab}
+                  disabled={
+                    (currentTab === 'course' && !isTab1Complete) || 
+                    (currentTab === 'format' && !isTab2Complete)
+                  }
+                  className="flex-1 bg-gradient-primary text-primary-foreground"
+                >
+                  Next
+                  <ChevronRight className="w-4 h-4 ml-2" />
+                </Button>
+              ) : (
+                <Button type="submit" className="flex-1 bg-gradient-primary text-primary-foreground">
+                  Create Match
+                </Button>
+              )}
+            </div>
+          </div>
+
+          {/* Desktop: All fields visible */}
+          <div className="hidden md:block space-y-4">
+            <CourseField />
+            <DateTimeField />
             
-            <div className="flex justify-end space-x-2 px-6 py-4 border-t">
+            <div className="space-y-2">
+              <Label htmlFor="booking_url_desktop">Tee Time Booking URL (Optional)</Label>
+              <Input
+                id="booking_url_desktop"
+                type="url"
+                value={formData.booking_url}
+                onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
+                placeholder="https://example.com/book-tee-time"
+              />
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="format_desktop">Match Format</Label>
+              <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select format" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="stroke-play">Stroke Play</SelectItem>
+                  <SelectItem value="match-play">Match Play</SelectItem>
+                  <SelectItem value="best-ball">2v2 Best Ball</SelectItem>
+                  <SelectItem value="skins">Skins Game</SelectItem>
+                  <SelectItem value="scramble">Scramble</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-3">
+              <Label>Tee Selection</Label>
+              <Select 
+                value={formData.tee_selection_mode} 
+                onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
+              >
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="fixed">Creator selects tees for everyone</SelectItem>
+                  <SelectItem value="individual">Each participant picks their own tees</SelectItem>
+                </SelectContent>
+              </Select>
+              
+              {formData.tee_selection_mode === 'fixed' && (
+                <div className="space-y-2">
+                  <Label htmlFor="default_tees_desktop">Which Tees?</Label>
+                  <Select 
+                    value={formData.default_tees} 
+                    onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select tees" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="Black">Black (Championship)</SelectItem>
+                      <SelectItem value="Blue">Blue (Tournament)</SelectItem>
+                      <SelectItem value="White">White (Men's)</SelectItem>
+                      <SelectItem value="Gold">Gold</SelectItem>
+                      <SelectItem value="Red">Red (Forward/Ladies)</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              )}
+              {formData.tee_selection_mode === 'individual' && (
+                <p className="text-xs text-muted-foreground">
+                  Participants will select their preferred tees when they join the match
+                </p>
+              )}
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="buy_in_amount_desktop">Buy-in Amount ($)</Label>
+              <Input
+                id="buy_in_amount_desktop"
+                type="number"
+                min="0"
+                max="500"
+                value={formData.buy_in_amount}
+                onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
+                placeholder="50"
+                required
+              />
+            </div>
+            
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="handicap_min_desktop">Min Handicap</Label>
+                <Input
+                  id="handicap_min_desktop"
+                  type="number"
+                  min="0"
+                  max="54"
+                  value={formData.handicap_min}
+                  onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
+                  placeholder="0"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="handicap_max_desktop">Max Handicap</Label>
+                <Input
+                  id="handicap_max_desktop"
+                  type="number"
+                  min="0"
+                  max="54"
+                  value={formData.handicap_max}
+                  onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
+                  placeholder="20"
+                />
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Label htmlFor="max_participants_desktop">Max Participants</Label>
+              <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="1">1 Player (Testing)</SelectItem>
+                  <SelectItem value="2">2 Players</SelectItem>
+                  <SelectItem value="3">3 Players</SelectItem>
+                  <SelectItem value="4">4 Players</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="flex justify-end gap-2 pt-4">
               <Button type="button" variant="outline" onClick={() => setOpen(false)}>
                 Cancel
               </Button>
