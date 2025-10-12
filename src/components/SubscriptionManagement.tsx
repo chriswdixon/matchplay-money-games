@@ -164,21 +164,10 @@ const SubscriptionManagement = () => {
               </div>
             )}
 
-              <div className="flex gap-2 pt-2">
-              {canUpgrade && (
-                <Button 
-                  onClick={() => handleUpgrade(
-                    isFreeTier ? SUBSCRIPTION_TIERS.local.price_id : SUBSCRIPTION_TIERS.tournament.price_id
-                  )} 
-                  className={`flex-1 ${isLocalTier ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : ''}`}
-                  disabled={upgradeLoading}
-                >
-                  <Crown className="w-4 h-4 mr-2" />
-                  {upgradeLoading ? "Processing..." : (isFreeTier ? "Upgrade to Local Player" : "Upgrade to Tournament Pro")}
-                </Button>
-              )}
-              <Button onClick={refreshSubscription} variant="outline" size="icon">
-                <RefreshCw className="w-4 h-4" />
+            <div className="flex gap-2 pt-2">
+              <Button onClick={refreshSubscription} variant="outline" className="w-full">
+                <RefreshCw className="w-4 h-4 mr-2" />
+                Refresh Status
               </Button>
             </div>
           </>
