@@ -23,9 +23,6 @@ export default function VerifyEmail() {
         }
 
         if (session) {
-          // Clear the pending confirmation email from localStorage
-          localStorage.removeItem('pendingConfirmationEmail');
-          
           setStatus('success');
           
           // Check if user needs MFA setup

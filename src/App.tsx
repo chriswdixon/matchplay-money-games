@@ -3,6 +3,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActiveMatchProvider } from "@/hooks/useActiveMatch";
 import { Routes, Route } from "react-router-dom";
+import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBanner";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -17,6 +18,7 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <EmailConfirmationBanner />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />

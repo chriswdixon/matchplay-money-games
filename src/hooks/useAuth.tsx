@@ -100,11 +100,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       });
     } else {
-      // Store pending confirmation email in localStorage
-      localStorage.setItem('pendingConfirmationEmail', email);
       toast({
-        title: "Check your email",
-        description: "We've sent you a confirmation link. You must confirm your email before you can sign in.",
+        title: "Account created!",
+        description: "Check your email to confirm your account.",
       });
     }
 
@@ -118,21 +116,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      // Provide specific guidance for email confirmation errors
-      if (error.message.includes('Email not confirmed')) {
-        localStorage.setItem('pendingConfirmationEmail', email);
-        toast({
-          title: "Email not confirmed",
-          description: "Please confirm your email first. Check your inbox or request a new confirmation email.",
-          variant: "destructive",
-        });
-      } else {
-        toast({
-          title: "Sign in failed",
-          description: error.message,
-          variant: "destructive",
-        });
-      }
+      toast({
+        title: "Sign in failed",
+        description: error.message,
+        variant: "destructive",
+      });
     }
 
     return { error };
