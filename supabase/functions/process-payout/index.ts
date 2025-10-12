@@ -87,39 +87,8 @@ serve(async (req) => {
     // - Regulatory compliance (1099 forms, etc.)
     // - Use of stripe.transfers.create() or stripe.payouts.create()
     // 
-    // Current implementation using refunds is non-functional and insecure
+    // For proper implementation, see: https://stripe.com/docs/connect
     throw new Error("Payouts are temporarily disabled. Please contact support for manual payout processing.");
-
-    // Deduct from account
-    const { error: updateError } = await supabaseClient
-      .from('player_accounts')
-      .update({ balance: balance - amountInCents })
-      .eq('user_id', user.id);
-
-    if (updateError) throw updateError;
-
-    // Record transaction
-    await supabaseClient
-      .from('account_transactions')
-      .insert({
-        user_id: user.id,
-        account_id: account.id,
-        amount: -amountInCents,
-        transaction_type: 'payout',
-        description: `Payout to payment method`,
-        stripe_payment_intent_id: paymentIntent.id,
-        metadata: { payout_method: 'stripe_refund' }
-      });
-
-    logStep("Payout processed successfully");
-    return new Response(JSON.stringify({ 
-      success: true, 
-      newBalance: balance - amountInCents,
-      payoutId: paymentIntent.id
-    }), {
-      headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 200,
-    });
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
