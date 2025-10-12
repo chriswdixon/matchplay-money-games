@@ -583,20 +583,53 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="flex flex-col">
+        <form onSubmit={handleSubmit} className="flex flex-col h-full">
           {/* Mobile: Tabbed Interface */}
-          <div className="md:hidden">
-            <Tabs value={currentTab} onValueChange={setCurrentTab}>
-              <div className="px-6 pt-4 pb-2">
-                <TabsList className="grid w-full grid-cols-3">
-                  <TabsTrigger value="course" className="text-xs">Course</TabsTrigger>
-                  <TabsTrigger value="format" className="text-xs">Format</TabsTrigger>
-                  <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
-                </TabsList>
+          <div className="md:hidden flex flex-col h-full">
+            {/* Tab Navigation */}
+            <div className="px-6 pt-4 pb-2 border-b">
+              <div className="grid grid-cols-3 gap-2">
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('course')}
+                  className={cn(
+                    "px-3 py-2 text-xs font-medium rounded-md transition-colors",
+                    currentTab === 'course'
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Course
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('format')}
+                  className={cn(
+                    "px-3 py-2 text-xs font-medium rounded-md transition-colors",
+                    currentTab === 'format'
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Format
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentTab('details')}
+                  className={cn(
+                    "px-3 py-2 text-xs font-medium rounded-md transition-colors",
+                    currentTab === 'details'
+                      ? "bg-background text-foreground shadow-sm"
+                      : "text-muted-foreground hover:text-foreground"
+                  )}
+                >
+                  Details
+                </button>
               </div>
-            </Tabs>
+            </div>
               
-            <div className="overflow-y-auto max-h-[50vh] px-6 pb-4 pt-2">
+            {/* Tab Content */}
+            <div className="flex-1 overflow-y-auto px-6 py-4">
               {currentTab === 'course' && (
                 <div className="space-y-4">
                   <CourseField />
@@ -737,8 +770,8 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
               )}
             </div>
 
-            {/* Fixed Bottom Buttons for Mobile */}
-            <div className="flex gap-2 p-6 border-t bg-background md:hidden">
+            {/* Fixed Bottom Buttons */}
+            <div className="flex gap-2 p-6 border-t bg-background shrink-0">
               <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
                 Cancel
               </Button>
