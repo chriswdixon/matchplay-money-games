@@ -339,16 +339,22 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         {showPastMatches ? 'No past matches found.' : 'No matches match your filters.'}
                       </p>
                       {!showPastMatches && (
-                        <Button variant="outline" onClick={() => setFilters({
-                        search: '',
-                        format: 'all', 
-                        maxDistance: 30,
-                        buyInRange: [0, 500],
-                        dateRange: 'all',
-                        spots: 'all'
-                        })}>
-                          Clear Filters
-                        </Button>
+                        <div className="inline-block shadow-lg rounded-lg border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/20 to-yellow-500/20 hover:from-amber-500/30 hover:to-yellow-500/30 transition-all duration-300">
+                          <Button 
+                            variant="ghost" 
+                            onClick={() => setFilters({
+                              search: '',
+                              format: 'all', 
+                              maxDistance: 30,
+                              buyInRange: [0, 500],
+                              dateRange: 'all',
+                              spots: 'all'
+                            })}
+                            className="text-amber-700 hover:text-amber-800 dark:text-amber-400 dark:hover:text-amber-300 hover:bg-amber-500/10 border-0"
+                          >
+                            Clear Filters
+                          </Button>
+                        </div>
                       )}
                     </div>
                   )}
