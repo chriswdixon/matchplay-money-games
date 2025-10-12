@@ -583,18 +583,20 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="flex-1 flex flex-col min-h-0">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
           {/* Mobile: Tabbed Interface */}
-          <div className="flex-1 flex flex-col md:hidden">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col min-h-0">
-              <TabsList className="grid grid-cols-3 mx-auto">
-                <TabsTrigger value="course" className="text-xs">Course</TabsTrigger>
-                <TabsTrigger value="format" className="text-xs">Format</TabsTrigger>
-                <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
-              </TabsList>
+          <div className="flex-1 flex flex-col md:hidden overflow-hidden">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col overflow-hidden">
+              <div className="px-6 pt-4">
+                <TabsList className="grid w-full grid-cols-3">
+                  <TabsTrigger value="course" className="text-xs">Course</TabsTrigger>
+                  <TabsTrigger value="format" className="text-xs">Format</TabsTrigger>
+                  <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
+                </TabsList>
+              </div>
               
               <div className="flex-1 overflow-y-auto px-6 py-4">
-                <TabsContent value="course" className="space-y-4 mt-0">
+                <TabsContent value="course" className="space-y-4 mt-0 h-full">
                   <CourseField />
                   <DateTimeField />
                   <div className="space-y-2">
@@ -609,7 +611,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   </div>
                 </TabsContent>
 
-                <TabsContent value="format" className="space-y-4 mt-0">
+                <TabsContent value="format" className="space-y-4 mt-0 h-full">
                   <div className="space-y-2">
                     <Label htmlFor="format">Match Format</Label>
                     <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
@@ -669,7 +671,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   </div>
                 </TabsContent>
 
-                <TabsContent value="details" className="space-y-4 mt-0">
+                <TabsContent value="details" className="space-y-4 mt-0 h-full">
                   <div className="space-y-2">
                     <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
                     <Input
