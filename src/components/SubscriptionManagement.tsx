@@ -163,13 +163,6 @@ const SubscriptionManagement = () => {
                 </p>
               </div>
             )}
-
-            <div className="flex gap-2 pt-2">
-              <Button onClick={refreshSubscription} variant="outline" className="w-full">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Refresh Status
-              </Button>
-            </div>
           </>
         </CardContent>
       </Card>
