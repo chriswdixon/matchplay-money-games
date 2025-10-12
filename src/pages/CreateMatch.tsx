@@ -1,6 +1,5 @@
 import { useState, useEffect, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -9,7 +8,7 @@ import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, MapPin, Loader2, Check, ChevronsUpDown, Clock, X, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, X, ChevronRight } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -19,8 +18,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
-const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) => {
-  const [open, setOpen] = useState(false);
+const CreateMatch = () => {
   const [courseOpen, setCourseOpen] = useState(false);
   const [dateTimeOpen, setDateTimeOpen] = useState(false);
   const [currentTab, setCurrentTab] = useState('course');
@@ -46,7 +44,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
 
   const { createMatch } = useMatches();
   const { user } = useAuth();
-  const { getCurrentLocation, geocodeAddress, loading: locationLoading } = useLocation();
+  const { geocodeAddress } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
   const navigate = useNavigate();
 
@@ -72,20 +70,12 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
     return hasScheduledTime && hasFormat && hasTeesWhenRequired;
   }, [formData.scheduled_time, formData.format, formData.tee_selection_mode, formData.default_tees]);
 
-  // Search for nearby courses when location is available
+  // Initialize search with all courses when page loads
   useEffect(() => {
-    if (locationCoords && courses.length === 0) {
-      searchNearbyCourses(locationCoords.latitude, locationCoords.longitude, searchRadius);
+    if (courses.length === 0) {
+      searchCoursesByName('');
     }
-  }, [locationCoords, courses.length, searchNearbyCourses, searchRadius]);
-
-  // Initialize search with all courses when dialog opens
-  useEffect(() => {
-    if (open && courses.length === 0) {
-      searchCoursesByName(''); // This will show popular courses
-    }
-  }, [open, courses.length, searchCoursesByName]);
-
+  }, [courses.length, searchCoursesByName]);
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
@@ -136,40 +126,12 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
     searchCoursesByName(courseName);
   };
 
-  const resetForm = () => {
-    setFormData({
-      course_name: '',
-      scheduled_time: '',
-      format: '',
-      buy_in_amount: '50',
-      handicap_min: '',
-      handicap_max: '',
-      max_participants: '4',
-      booking_url: '',
-      tee_selection_mode: 'fixed',
-      default_tees: ''
-    });
-    setLocationCoords(null);
-    setSelectedCourse(null);
-    setCourseOpen(false);
-    setTimeManuallySet(false);
-    setHourDisplay('');
-    setZipcode('');
-    setCurrentTab('course');
-  };
-
-  const handleDialogChange = (isOpen: boolean) => {
-    setOpen(isOpen);
-    if (!isOpen) {
-      resetForm();
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!user) {
       toast.error('Please sign in to create a match');
+      navigate('/auth');
       return;
     }
 
@@ -193,9 +155,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
     const { error } = await createMatch(matchData, locationCoords || undefined);
     
     if (!error) {
-      setOpen(false);
-      resetForm();
-      onMatchCreated?.();
+      navigate('/');
     }
   };
 
@@ -207,7 +167,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
     }
   };
 
-  // Course selection field component (reused in tabs and desktop)
+  // Course selection field component
   const CourseField = () => (
     <div className="space-y-2">
       <Label htmlFor="course_name">Golf Course</Label>
@@ -223,10 +183,10 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 setZipcode(value);
               }}
               maxLength={5}
-              className="flex-1 pointer-events-auto relative z-10"
+              className="flex-1"
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
-              <SelectTrigger className="w-[110px] pointer-events-auto relative z-10">
+              <SelectTrigger className="w-[110px]">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -242,7 +202,6 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
               size="sm"
               onClick={handleZipcodeSearch}
               disabled={loadingZipcode || !zipcode || zipcode.length < 5}
-              className="pointer-events-auto relative z-10"
             >
               {loadingZipcode ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -259,7 +218,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
             variant="outline"
             role="combobox"
             aria-expanded={courseOpen}
-            className="w-full justify-between bg-background pointer-events-auto relative z-10"
+            className="w-full justify-between bg-background"
           >
             {selectedCourse ? (
               <div className="flex flex-col items-start text-left">
@@ -338,7 +297,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal pointer-events-auto relative z-10",
+              "w-full justify-start text-left font-normal",
               !formData.scheduled_time && "text-muted-foreground"
             )}
           >
@@ -412,37 +371,29 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   })() : '')}
                   onChange={(e) => {
                     const value = e.target.value;
-                    const inputHour = parseInt(value);
+                    setHourDisplay(value);
                     
-                    if (value === '' || (inputHour >= 1 && inputHour <= 12)) {
-                      setHourDisplay(value);
+                    if (value && formData.scheduled_time) {
+                      const currentDate = new Date(formData.scheduled_time);
+                      const currentHours = currentDate.getHours();
+                      const isPM = currentHours >= 12;
+                      let newHour = parseInt(value);
                       
-                      if (inputHour >= 1 && inputHour <= 12) {
-                        const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
-                        const isAM = currentDate.getHours() < 12;
-                        let hour24 = inputHour;
-                        
-                        if (isAM && inputHour === 12) hour24 = 0;
-                        else if (!isAM && inputHour !== 12) hour24 = inputHour + 12;
-                        
-                        currentDate.setHours(hour24);
-                        
-                        const year = currentDate.getFullYear();
-                        const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                        const day = String(currentDate.getDate()).padStart(2, '0');
-                        const hours = String(currentDate.getHours()).padStart(2, '0');
-                        const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-                        const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-                        
-                        setFormData({ ...formData, scheduled_time: localDateTime });
-                        setTimeManuallySet(true);
+                      if (isPM && newHour !== 12) {
+                        newHour += 12;
+                      } else if (!isPM && newHour === 12) {
+                        newHour = 0;
                       }
+                      
+                      currentDate.setHours(newHour);
+                      const localDateTime = currentDate.toISOString().slice(0, 16);
+                      setFormData({ ...formData, scheduled_time: localDateTime });
+                      setTimeManuallySet(true);
                     }
                   }}
-                  onBlur={() => setHourDisplay('')}
-                  className="w-16 text-center"
+                  className="w-16"
                 />
-                <span className="text-muted-foreground">:</span>
+                <span className="text-lg">:</span>
                 <Input
                   type="number"
                   min="0"
@@ -450,47 +401,38 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   placeholder="00"
                   value={formData.scheduled_time ? new Date(formData.scheduled_time).getMinutes().toString().padStart(2, '0') : ''}
                   onChange={(e) => {
-                    const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
-                    const minutes = parseInt(e.target.value) || 0;
-                    currentDate.setMinutes(minutes);
-                    
-                    const year = currentDate.getFullYear();
-                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                    const day = String(currentDate.getDate()).padStart(2, '0');
-                    const hours = String(currentDate.getHours()).padStart(2, '0');
-                    const mins = String(currentDate.getMinutes()).padStart(2, '0');
-                    const localDateTime = `${year}-${month}-${day}T${hours}:${mins}`;
-                    
-                    setFormData({ ...formData, scheduled_time: localDateTime });
-                    setTimeManuallySet(true);
-                  }}
-                  className="w-16 text-center"
-                />
-                <Select 
-                  value={formData.scheduled_time ? (new Date(formData.scheduled_time).getHours() < 12 ? 'AM' : 'PM') : 'PM'}
-                  onValueChange={(value) => {
-                    const currentDate = formData.scheduled_time ? new Date(formData.scheduled_time) : new Date();
-                    const currentHours = currentDate.getHours();
-                    const isCurrentlyAM = currentHours < 12;
-                    const newIsAM = value === 'AM';
-                    
-                    if (isCurrentlyAM !== newIsAM) {
-                      if (newIsAM) {
-                        currentDate.setHours(currentHours - 12);
-                      } else {
-                        currentDate.setHours(currentHours + 12);
-                      }
+                    const value = e.target.value;
+                    if (formData.scheduled_time) {
+                      const currentDate = new Date(formData.scheduled_time);
+                      currentDate.setMinutes(parseInt(value) || 0);
+                      const localDateTime = currentDate.toISOString().slice(0, 16);
+                      setFormData({ ...formData, scheduled_time: localDateTime });
+                      setTimeManuallySet(true);
                     }
-                    
-                    const year = currentDate.getFullYear();
-                    const month = String(currentDate.getMonth() + 1).padStart(2, '0');
-                    const day = String(currentDate.getDate()).padStart(2, '0');
-                    const hours = String(currentDate.getHours()).padStart(2, '0');
-                    const minutes = String(currentDate.getMinutes()).padStart(2, '0');
-                    const localDateTime = `${year}-${month}-${day}T${hours}:${minutes}`;
-                    
-                    setFormData({ ...formData, scheduled_time: localDateTime });
-                    setTimeManuallySet(true);
+                  }}
+                  className="w-16"
+                />
+                <Select
+                  value={formData.scheduled_time ? (new Date(formData.scheduled_time).getHours() >= 12 ? 'PM' : 'AM') : 'AM'}
+                  onValueChange={(value) => {
+                    if (formData.scheduled_time) {
+                      const currentDate = new Date(formData.scheduled_time);
+                      const currentHours = currentDate.getHours();
+                      const is24Hour = currentHours >= 12;
+                      const isPMSelected = value === 'PM';
+                      
+                      let newHours = currentHours % 12;
+                      if (isPMSelected && !is24Hour) {
+                        newHours += 12;
+                      } else if (!isPMSelected && is24Hour) {
+                        newHours = currentHours - 12;
+                      }
+                      
+                      currentDate.setHours(newHours);
+                      const localDateTime = currentDate.toISOString().slice(0, 16);
+                      setFormData({ ...formData, scheduled_time: localDateTime });
+                      setTimeManuallySet(true);
+                    }
                   }}
                 >
                   <SelectTrigger className="w-16">
@@ -520,29 +462,25 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
   );
 
   return (
-    <Dialog open={open} onOpenChange={handleDialogChange}>
-      <DialogTrigger asChild>
-        <Button 
-          className="bg-gradient-primary text-primary-foreground hover:shadow-premium"
-          onClick={(e) => {
-            if (!user) {
-              e.preventDefault();
-              navigate('/auth');
-            }
-          }}
-        >
-          <Plus className="w-4 h-4 mr-2" />
-          {user ? 'Create Match' : 'Sign In to Create Match'}
-        </Button>
-      </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        <DialogHeader>
-          <DialogTitle>Create New Match</DialogTitle>
-          <DialogDescription>
-            Set up a new golf match and invite others to join.
-          </DialogDescription>
-        </DialogHeader>
-        
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-14 items-center">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={() => navigate('/')}
+            className="mr-2"
+          >
+            <ArrowLeft className="h-4 w-4 mr-2" />
+            Back
+          </Button>
+          <h1 className="text-lg font-semibold">Create New Match</h1>
+        </div>
+      </header>
+
+      {/* Main Content */}
+      <main className="container max-w-2xl py-6 pb-20">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Mobile: Tabbed Interface */}
           <div className="md:hidden">
@@ -686,30 +624,6 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 </div>
               </TabsContent>
             </Tabs>
-
-            <div className="flex gap-2 pt-6">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)} className="flex-1">
-                Cancel
-              </Button>
-              {!isFormValid ? (
-                <Button 
-                  type="button" 
-                  onClick={handleNextTab}
-                  disabled={
-                    (currentTab === 'course' && !isTab1Complete) || 
-                    (currentTab === 'format' && !isTab2Complete)
-                  }
-                  className="flex-1 bg-gradient-primary text-primary-foreground"
-                >
-                  Next
-                  <ChevronRight className="w-4 h-4 ml-2" />
-                </Button>
-              ) : (
-                <Button type="submit" className="flex-1 bg-gradient-primary text-primary-foreground">
-                  Create Match
-                </Button>
-              )}
-            </div>
           </div>
 
           {/* Desktop: All fields visible */}
@@ -841,20 +755,59 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 </SelectContent>
               </Select>
             </div>
-
-            <div className="flex justify-end gap-2 pt-4">
-              <Button type="button" variant="outline" onClick={() => setOpen(false)}>
-                Cancel
-              </Button>
-              <Button type="submit" className="bg-gradient-primary text-primary-foreground" disabled={!isFormValid}>
-                Create Match
-              </Button>
-            </div>
           </div>
         </form>
-      </DialogContent>
-    </Dialog>
+      </main>
+
+      {/* Fixed Bottom Bar - Mobile Only */}
+      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4">
+        <div className="container flex gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
+            Cancel
+          </Button>
+          {!isFormValid ? (
+            <Button 
+              type="button" 
+              onClick={handleNextTab}
+              disabled={
+                (currentTab === 'course' && !isTab1Complete) || 
+                (currentTab === 'format' && !isTab2Complete)
+              }
+              className="flex-1 bg-gradient-primary text-primary-foreground"
+            >
+              Next
+              <ChevronRight className="w-4 h-4 ml-2" />
+            </Button>
+          ) : (
+            <Button 
+              type="submit" 
+              onClick={handleSubmit}
+              className="flex-1 bg-gradient-primary text-primary-foreground"
+            >
+              Create Match
+            </Button>
+          )}
+        </div>
+      </div>
+
+      {/* Desktop Submit Bar */}
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4">
+        <div className="container max-w-2xl flex justify-end gap-2">
+          <Button type="button" variant="outline" onClick={() => navigate('/')}>
+            Cancel
+          </Button>
+          <Button 
+            type="submit" 
+            onClick={handleSubmit}
+            className="bg-gradient-primary text-primary-foreground" 
+            disabled={!isFormValid}
+          >
+            Create Match
+          </Button>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default CreateMatchDialog;
+export default CreateMatch;

@@ -9,6 +9,7 @@ import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminConsole from "./pages/AdminConsole";
+import CreateMatch from "./pages/CreateMatch";
 
 const App = () => (
   <ActiveMatchProvider>
@@ -21,6 +22,7 @@ const App = () => (
         <Route path="/auth/reset-password" element={<ResetPassword />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<AdminConsole />} />
+        <Route path="/create-match" element={<CreateMatch />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>

@@ -7,7 +7,7 @@ import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
-import CreateMatchDialog from "./CreateMatchDialog";
+import CreateMatchButton from "./CreateMatchButton";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import PlayerRatingDialog from "./PlayerRatingDialog";
 import { MatchScorecard } from "./MatchScorecard";
@@ -279,7 +279,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           )}
           {!showPastMatches && (
             <div className="mt-8 flex flex-col items-center justify-center gap-2">
-              <CreateMatchDialog onMatchCreated={refetch} />
+              <CreateMatchButton onMatchCreated={refetch} />
               {location && (
                 <p className="text-sm text-muted-foreground">
                   📍 Location enabled • Showing matches within {searchRadius}mi
@@ -330,7 +330,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         <p className="text-muted-foreground text-lg mb-4">
                           {showPastMatches ? 'No past matches yet.' : 'No matches found. Be the first to create one!'}
                         </p>
-                        {!showPastMatches && <CreateMatchDialog />}
+                        {!showPastMatches && <CreateMatchButton />}
                       </div>
                     ) : null
                   ) : (
