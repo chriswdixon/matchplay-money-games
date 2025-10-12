@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter } from '@/lib/validation';
 import { checkPasswordSecurity } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { SubscriptionSelection } from './SubscriptionSelection';
+import { Dialog, DialogContent } from '@/components/ui/dialog';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -23,6 +25,7 @@ export function AuthForm() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [passwordWarnings, setPasswordWarnings] = useState<string[]>([]);
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const [showSubscriptionSelection, setShowSubscriptionSelection] = useState(false);
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   
@@ -89,8 +92,13 @@ export function AuthForm() {
     }
     
     setLoading(true);
-    await signUp(email, password, displayName);
+    const { error } = await signUp(email, password, displayName);
     setLoading(false);
+    
+    if (!error) {
+      // Show subscription selection dialog after successful sign up
+      setShowSubscriptionSelection(true);
+    }
   };
 
 
@@ -172,8 +180,15 @@ export function AuthForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">
-      <Card className="w-full max-w-md">
+    <>
+      <Dialog open={showSubscriptionSelection} onOpenChange={setShowSubscriptionSelection}>
+        <DialogContent className="max-w-5xl max-h-[90vh] overflow-y-auto">
+          <SubscriptionSelection onComplete={() => setShowSubscriptionSelection(false)} />
+        </DialogContent>
+      </Dialog>
+
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">
+        <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
             {showResetForm ? 'Reset Password' : 'Welcome to MatchPlay'}
@@ -368,5 +383,6 @@ export function AuthForm() {
         </CardContent>
       </Card>
     </div>
+    </>
   );
 }
