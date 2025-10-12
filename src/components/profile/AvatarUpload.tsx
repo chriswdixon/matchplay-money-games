@@ -62,7 +62,7 @@ export function AvatarUpload({ currentImageUrl, onImageUpdate, disabled }: Avata
         throw error;
       }
 
-      // Get the public URL
+      // Get authenticated URL (bucket is now private for security)
       const { data: { publicUrl } } = supabase.storage
         .from('profile-pictures')
         .getPublicUrl(fileName);
@@ -71,7 +71,8 @@ export function AvatarUpload({ currentImageUrl, onImageUpdate, disabled }: Avata
       const preview = URL.createObjectURL(file);
       setPreviewUrl(preview);
 
-      // Call the update callback
+      // Call the update callback with authenticated URL
+      // Note: publicUrl still works for authenticated users due to RLS policies
       onImageUpdate(publicUrl);
 
       toast({

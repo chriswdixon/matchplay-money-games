@@ -67,6 +67,19 @@ const ChartContainer = React.forwardRef<
 })
 ChartContainer.displayName = "Chart"
 
+/**
+ * ChartStyle Component - Security Hardened
+ * 
+ * SECURITY NOTE: This component uses dangerouslySetInnerHTML to inject CSS custom properties.
+ * Multiple layers of defense prevent CSS injection attacks:
+ * 
+ * 1. Key Sanitization: Only alphanumeric characters, hyphens, and underscores allowed
+ * 2. Color Validation: Strict regex validates colors match safe CSS formats
+ * 3. Source Trust: Chart config should only come from trusted application data
+ * 
+ * ⚠️ IMPORTANT: Do NOT pass user-controlled data directly to ChartConfig.
+ * Always validate and sanitize chart data at the application boundary.
+ */
 const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   const colorConfig = Object.entries(config).filter(
     ([_, config]) => config.theme || config.color
@@ -77,13 +90,14 @@ const ChartStyle = ({ id, config }: { id: string; config: ChartConfig }) => {
   }
 
   // Sanitize color values to prevent CSS injection
+  // Only allows: hex colors, hsl(), rgb(), and named CSS colors
   const sanitizeColor = (color: string): string => {
-    // Only allow valid CSS color formats (hex, hsl, rgb, named colors)
     const colorRegex = /^(#[0-9a-fA-F]{3,8}|hsl\([\d\s,%.]+\)|rgb\([\d\s,%.]+\)|[a-zA-Z]+)$/
     return colorRegex.test(color.trim()) ? color.trim() : 'transparent'
   }
 
-  // Sanitize key names to prevent CSS injection
+  // Sanitize key names to prevent CSS variable injection
+  // Only allows: alphanumeric, hyphens, underscores
   const sanitizeKey = (key: string): string => {
     return key.replace(/[^a-zA-Z0-9-_]/g, '')
   }
