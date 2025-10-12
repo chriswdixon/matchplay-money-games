@@ -10,12 +10,14 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
-import { User, LogOut, Settings } from 'lucide-react';
+import { useAdminRole } from '@/hooks/useAdminRole';
+import { User, LogOut, Settings, Shield } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export function UserMenu() {
   const { user, signOut } = useAuth();
   const { profile } = useProfile();
+  const { isAdmin } = useAdminRole();
   const navigate = useNavigate();
 
   const getInitials = (email: string) => {
@@ -54,6 +56,12 @@ export function UserMenu() {
           <Settings className="mr-2 h-4 w-4" />
           <span>Profile Settings</span>
         </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem onClick={() => navigate('/admin')}>
+            <Shield className="mr-2 h-4 w-4" />
+            <span>Admin Console</span>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem onClick={handleSignOut}>
           <LogOut className="mr-2 h-4 w-4" />
