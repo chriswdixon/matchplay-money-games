@@ -1,16 +1,17 @@
-import { useState, useEffect, useMemo } from 'react';
+import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, X, ChevronRight, MapPin } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
+import { useSubscription } from '@/hooks/useSubscription';
 import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { toast } from 'sonner';
@@ -19,71 +20,41 @@ import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 
 const CreateMatch = () => {
-  const [courseOpen, setCourseOpen] = useState(false);
-  const [dateTimeOpen, setDateTimeOpen] = useState(false);
-  const [currentTab, setCurrentTab] = useState('course');
+  const navigate = useNavigate();
+  const { user } = useAuth();
+  const { subscribed, tierName } = useSubscription();
+  const { createMatch } = useMatches();
+  const { geocodeAddress } = useLocation();
+  const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
+
+  const isPaidSubscription = subscribed && tierName !== 'free';
+
   const [formData, setFormData] = useState({
     course_name: '',
-    scheduled_time: '',
+    scheduled_date: null as Date | null,
+    scheduled_time: '07:00',
     format: '',
+    tee_selection_mode: 'fixed' as 'fixed' | 'individual',
+    default_tees: '',
     buy_in_amount: '50',
     handicap_min: '',
     handicap_max: '',
     max_participants: '4',
-    booking_url: '',
-    tee_selection_mode: 'fixed' as 'fixed' | 'individual',
-    default_tees: ''
+    booking_url: ''
   });
-  const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
+
+  const [courseOpen, setCourseOpen] = useState(false);
+  const [dateOpen, setDateOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
-  const [timeManuallySet, setTimeManuallySet] = useState(false);
-  const [hourDisplay, setHourDisplay] = useState('');
+  const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [zipcode, setZipcode] = useState('');
+  const [searchRadius] = useState(30);
   const [loadingZipcode, setLoadingZipcode] = useState(false);
   const [loadingGPS, setLoadingGPS] = useState(false);
-  const [searchRadius, setSearchRadius] = useState<number>(30);
-
-  const { createMatch } = useMatches();
-  const { user } = useAuth();
-  const { geocodeAddress } = useLocation();
-  const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
-  const navigate = useNavigate();
-
-  // Check if form is valid for submission
-  const isFormValid = useMemo(() => {
-    const hasCourseName = !!formData.course_name;
-    const hasScheduledTime = !!formData.scheduled_time;
-    const hasFormat = !!formData.format;
-    const hasTeesWhenRequired = formData.tee_selection_mode === 'individual' || !!formData.default_tees;
-    
-    return hasCourseName && hasScheduledTime && hasFormat && hasTeesWhenRequired;
-  }, [formData]);
-
-  // Check if current tab is complete
-  const isTab1Complete = useMemo(() => {
-    return !!formData.course_name && !!formData.scheduled_time;
-  }, [formData.course_name, formData.scheduled_time]);
-
-  const isTab2Complete = useMemo(() => {
-    const hasFormat = !!formData.format;
-    const hasTeesWhenRequired = formData.tee_selection_mode === 'individual' || !!formData.default_tees;
-    return hasFormat && hasTeesWhenRequired;
-  }, [formData.format, formData.tee_selection_mode, formData.default_tees]);
-
-  // Initialize search with all courses when page loads
-  useEffect(() => {
-    if (courses.length === 0) {
-      searchCoursesByName('');
-    }
-  }, [courses.length, searchCoursesByName]);
+  const [submitting, setSubmitting] = useState(false);
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
-      toast.error('Please enter a valid 5-digit zipcode');
-      return;
-    }
-
-    if (!/^\d{5}$/.test(zipcode)) {
       toast.error('Please enter a valid 5-digit zipcode');
       return;
     }
@@ -95,12 +66,12 @@ const CreateMatch = () => {
       if (coords) {
         setLocationCoords(coords);
         await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
-        toast.success(`Location found - searching within ${searchRadius} miles`);
+        toast.success(`Found courses within ${searchRadius} miles`);
       } else {
-        toast.error('Could not find location for this zipcode. Try a different zipcode.');
+        toast.error('Could not find location for this zipcode');
       }
     } catch (error) {
-      toast.error('Failed to search by zipcode. Please try again.');
+      toast.error('Failed to search by zipcode');
     } finally {
       setLoadingZipcode(false);
     }
@@ -122,21 +93,17 @@ const CreateMatch = () => {
           };
           setLocationCoords(coords);
           await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
-          toast.success(`Location found - searching within ${searchRadius} miles`);
+          toast.success(`Found courses within ${searchRadius} miles`);
           setLoadingGPS(false);
         },
-        (error) => {
+        () => {
           setLoadingGPS(false);
-          if (error.code === error.PERMISSION_DENIED) {
-            toast.error('Location access denied. Please enable location permissions.');
-          } else {
-            toast.error('Failed to get your location. Please try entering a zipcode.');
-          }
+          toast.error('Location access denied. Please enable location permissions.');
         }
       );
     } catch (error) {
       setLoadingGPS(false);
-      toast.error('Failed to access GPS. Please try entering a zipcode.');
+      toast.error('Failed to access GPS');
     }
   };
 
@@ -145,7 +112,7 @@ const CreateMatch = () => {
     setFormData({ 
       ...formData, 
       course_name: course.name,
-      booking_url: course.website || `https://www.google.com/search?q=${encodeURIComponent(course.name + ' tee time booking')}`
+      booking_url: course.website || ''
     });
     setLocationCoords({
       latitude: course.latitude,
@@ -169,685 +136,378 @@ const CreateMatch = () => {
       return;
     }
 
-    const matchData = {
-      course_name: formData.course_name,
-      location: selectedCourse?.address?.split(',').slice(-2).join(',').trim() || formData.course_name,
-      address: selectedCourse?.address || undefined,
-      latitude: locationCoords?.latitude,
-      longitude: locationCoords?.longitude,
-      scheduled_time: formData.scheduled_time,
-      format: formData.format,
-      buy_in_amount: parseInt(formData.buy_in_amount) * 100,
-      handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
-      handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
-      max_participants: parseInt(formData.max_participants),
-      booking_url: formData.booking_url || undefined,
-      tee_selection_mode: formData.tee_selection_mode,
-      default_tees: formData.tee_selection_mode === 'fixed' ? formData.default_tees : undefined
-    };
+    if (!formData.course_name) {
+      toast.error('Please select a golf course');
+      return;
+    }
 
-    const { error } = await createMatch(matchData, locationCoords || undefined);
-    
-    if (!error) {
-      navigate('/');
+    if (!formData.scheduled_date) {
+      toast.error('Please select a date');
+      return;
+    }
+
+    if (!formData.format) {
+      toast.error('Please select a match format');
+      return;
+    }
+
+    if (formData.tee_selection_mode === 'fixed' && !formData.default_tees) {
+      toast.error('Please select tees for all players');
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+
+      // Combine date and time
+      const [hours, minutes] = formData.scheduled_time.split(':');
+      const scheduledDateTime = new Date(formData.scheduled_date);
+      scheduledDateTime.setHours(parseInt(hours), parseInt(minutes));
+
+      const matchData = {
+        course_name: formData.course_name,
+        location: selectedCourse?.address?.split(',').slice(-2).join(',').trim() || formData.course_name,
+        address: selectedCourse?.address || undefined,
+        latitude: locationCoords?.latitude,
+        longitude: locationCoords?.longitude,
+        scheduled_time: scheduledDateTime.toISOString(),
+        format: formData.format,
+        buy_in_amount: parseInt(formData.buy_in_amount) * 100,
+        handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
+        handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
+        max_participants: parseInt(formData.max_participants),
+        booking_url: formData.booking_url || undefined,
+        tee_selection_mode: formData.tee_selection_mode,
+        default_tees: formData.tee_selection_mode === 'fixed' ? formData.default_tees : undefined
+      };
+
+      const { error } = await createMatch(matchData, locationCoords || undefined);
+      
+      if (!error) {
+        navigate('/');
+      }
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleNextTab = () => {
-    if (currentTab === 'course' && isTab1Complete) {
-      setCurrentTab('format');
-    } else if (currentTab === 'format' && isTab2Complete) {
-      setCurrentTab('details');
-    }
-  };
-
-  // Course selection field component
-  const CourseField = () => (
-    <div className="space-y-2">
-      <Label htmlFor="course-select">Golf Course</Label>
-      {!locationCoords && (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <Input
-              type="tel"
-              placeholder="Enter zipcode to find courses"
-              value={zipcode}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, '');
-                setZipcode(value);
-              }}
-              maxLength={5}
-              className="flex-1"
-            />
-            <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
-              <SelectTrigger className="w-[110px]" id="search_radius">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent className="z-[100]">
-                <SelectItem value="15">15 miles</SelectItem>
-                <SelectItem value="30">30 miles</SelectItem>
-                <SelectItem value="50">50 miles</SelectItem>
-                <SelectItem value="100">100 miles</SelectItem>
-              </SelectContent>
-            </Select>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleZipcodeSearch}
-              disabled={loadingZipcode || !zipcode || zipcode.length < 5}
-            >
-              {loadingZipcode ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                'Search'
-              )}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGPSSearch}
-              disabled={loadingGPS}
-              title="Use my location"
-            >
-              {loadingGPS ? (
-                <Loader2 className="w-4 h-4 animate-spin" />
-              ) : (
-                <MapPin className="w-4 h-4" />
-              )}
-            </Button>
-          </div>
-        </div>
-      )}
-      <Popover open={courseOpen} onOpenChange={setCourseOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id="course-select"
-            variant="outline"
-            role="combobox"
-            aria-expanded={courseOpen}
-            className="w-full justify-between bg-background"
-          >
-            {selectedCourse ? (
-              <div className="flex flex-col items-start text-left">
-                <span className="font-medium">{selectedCourse.name}</span>
-                {selectedCourse.distance && (
-                  <span className="text-xs text-muted-foreground">
-                    {formatDistance(selectedCourse.distance)} away
-                  </span>
-                )}
-              </div>
-            ) : formData.course_name ? (
-              formData.course_name
-            ) : (
-              "Select a golf course..."
-            )}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0" align="start" sideOffset={5}>
-          <Command className="border-0">
-            <CommandInput 
-              placeholder="Search golf courses..." 
-              onValueChange={handleCustomCourse}
-              className="border-0"
-            />
-            <ScrollArea className="h-[300px]">
-              <CommandList>
-                <CommandEmpty className="py-6 text-center">
-                  {coursesLoading ? (
-                    <div className="flex items-center justify-center py-4">
-                      <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      <span className="text-muted-foreground">Loading courses...</span>
-                    </div>
-                  ) : (
-                    <p className="text-sm text-muted-foreground py-4">No courses found. Try a different search.</p>
-                  )}
-                </CommandEmpty>
-                <CommandGroup>
-                  {courses.map((course) => (
-                    <CommandItem
-                      key={`${course.name}-${course.latitude}-${course.longitude}`}
-                      value={course.name}
-                      className="cursor-pointer rounded-sm px-2 py-3 text-sm outline-none aria-selected:bg-accent aria-selected:text-accent-foreground hover:bg-accent/50"
-                      onSelect={() => handleCourseSelect(course)}
-                    >
-                      <Check
-                        className={cn(
-                          "mr-2 h-4 w-4 flex-shrink-0",
-                          selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
-                        )}
-                      />
-                      <div className="flex flex-col flex-1 gap-1 overflow-hidden">
-                        <span className="font-medium truncate">{course.name}</span>
-                        <span className="text-xs text-muted-foreground truncate">
-                          {course.address}
-                          {course.distance && ` • ${formatDistance(course.distance)}`}
-                        </span>
-                      </div>
-                    </CommandItem>
-                  ))}
-                </CommandGroup>
-              </CommandList>
-            </ScrollArea>
-          </Command>
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
-
-  // Date/Time field component
-  const DateTimeField = () => (
-    <div className="space-y-2">
-      <Label htmlFor="datetime-select">Date & Time</Label>
-      <Popover open={dateTimeOpen} onOpenChange={setDateTimeOpen}>
-        <PopoverTrigger asChild>
-          <Button
-            id="datetime-select"
-            variant="outline"
-            className={cn(
-              "w-full justify-start text-left font-normal",
-              !formData.scheduled_time && "text-muted-foreground"
-            )}
-          >
-            <Clock className="mr-2 h-4 w-4" />
-            {formData.scheduled_time ? (
-              format(new Date(formData.scheduled_time), "PPP 'at' p")
-            ) : (
-              <span>Pick date and time</span>
-            )}
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
-          <div className="p-4 space-y-4">
-            <div className="flex items-center justify-between">
-              <Label className="text-sm font-medium">Pick Date & Time</Label>
-              <Button 
-                variant="ghost" 
-                size="sm" 
-                className="h-6 w-6 p-0"
-                onClick={() => setDateTimeOpen(false)}
-              >
-                <X className="h-4 w-4" />
-              </Button>
-            </div>
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Date</Label>
-              <Calendar
-                mode="single"
-                selected={formData.scheduled_time ? new Date(formData.scheduled_time) : undefined}
-                onSelect={(date) => {
-                  if (date) {
-                    let newDateTime = new Date(date);
-                    
-                    if (!timeManuallySet && !formData.scheduled_time) {
-                      const today = new Date();
-                      const selectedDate = new Date(date);
-                      const isToday = selectedDate.toDateString() === today.toDateString();
-                      
-                      if (isToday) {
-                        newDateTime.setHours(today.getHours(), today.getMinutes());
-                      } else {
-                        newDateTime.setHours(7, 0);
-                      }
-                    } else if (formData.scheduled_time) {
-                      const existingTime = new Date(formData.scheduled_time);
-                      newDateTime.setHours(existingTime.getHours(), existingTime.getMinutes());
-                    } else {
-                      newDateTime.setHours(7, 0);
-                    }
-                    
-                    setFormData({ ...formData, scheduled_time: newDateTime.toISOString().slice(0, 16) });
-                  }
-                }}
-                disabled={(date) => date < new Date()}
-                initialFocus
-              />
-            </div>
-            <div>
-              <Label className="text-sm font-medium mb-2 block">Time</Label>
-              <div className="flex gap-2 items-center">
-                <Input
-                  type="number"
-                  min="1"
-                  max="12"
-                  placeholder="12"
-                  value={hourDisplay || (formData.scheduled_time ? (() => {
-                    const date = new Date(formData.scheduled_time);
-                    const hours = date.getHours();
-                    return hours === 0 ? 12 : hours > 12 ? hours - 12 : hours;
-                  })() : '')}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    setHourDisplay(value);
-                    
-                    if (value && formData.scheduled_time) {
-                      const currentDate = new Date(formData.scheduled_time);
-                      const currentHours = currentDate.getHours();
-                      const isPM = currentHours >= 12;
-                      let newHour = parseInt(value);
-                      
-                      if (isPM && newHour !== 12) {
-                        newHour += 12;
-                      } else if (!isPM && newHour === 12) {
-                        newHour = 0;
-                      }
-                      
-                      currentDate.setHours(newHour);
-                      const localDateTime = currentDate.toISOString().slice(0, 16);
-                      setFormData({ ...formData, scheduled_time: localDateTime });
-                      setTimeManuallySet(true);
-                    }
-                  }}
-                  className="w-16"
-                />
-                <span className="text-lg">:</span>
-                <Input
-                  type="number"
-                  min="0"
-                  max="59"
-                  placeholder="00"
-                  value={formData.scheduled_time ? new Date(formData.scheduled_time).getMinutes().toString().padStart(2, '0') : ''}
-                  onChange={(e) => {
-                    const value = e.target.value;
-                    if (formData.scheduled_time) {
-                      const currentDate = new Date(formData.scheduled_time);
-                      currentDate.setMinutes(parseInt(value) || 0);
-                      const localDateTime = currentDate.toISOString().slice(0, 16);
-                      setFormData({ ...formData, scheduled_time: localDateTime });
-                      setTimeManuallySet(true);
-                    }
-                  }}
-                  className="w-16"
-                />
-                <Select
-                  value={formData.scheduled_time ? (new Date(formData.scheduled_time).getHours() >= 12 ? 'PM' : 'AM') : 'AM'}
-                  onValueChange={(value) => {
-                    if (formData.scheduled_time) {
-                      const currentDate = new Date(formData.scheduled_time);
-                      const currentHours = currentDate.getHours();
-                      const is24Hour = currentHours >= 12;
-                      const isPMSelected = value === 'PM';
-                      
-                      let newHours = currentHours % 12;
-                      if (isPMSelected && !is24Hour) {
-                        newHours += 12;
-                      } else if (!isPMSelected && is24Hour) {
-                        newHours = currentHours - 12;
-                      }
-                      
-                      currentDate.setHours(newHours);
-                      const localDateTime = currentDate.toISOString().slice(0, 16);
-                      setFormData({ ...formData, scheduled_time: localDateTime });
-                      setTimeManuallySet(true);
-                    }
-                  }}
-                >
-                  <SelectTrigger className="w-16" id="time_ampm">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="AM">AM</SelectItem>
-                    <SelectItem value="PM">PM</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-            <div className="flex justify-end pt-2">
-              <Button 
-                type="button"
-                size="sm"
-                onClick={() => setDateTimeOpen(false)}
-                className="bg-gradient-primary text-primary-foreground"
-              >
-                Done
-              </Button>
-            </div>
-          </div>
-        </PopoverContent>
-      </Popover>
-    </div>
-  );
+  const isFormValid = formData.course_name && formData.scheduled_date && formData.format && 
+    (formData.tee_selection_mode === 'individual' || formData.default_tees);
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background pb-20">
       {/* Header */}
-      <header className="sticky top-0 w-full border-b bg-background z-40">
-        <div className="container flex h-14 items-center">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="mr-2"
-          >
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back
+      <header className="sticky top-0 z-50 bg-background border-b">
+        <div className="container mx-auto px-4 py-3 flex items-center gap-3">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/')}>
+            <ArrowLeft className="h-5 w-5" />
           </Button>
-          <h1 className="text-lg font-semibold">Create New Match</h1>
+          <h1 className="text-xl font-bold">Create Match</h1>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="container max-w-2xl py-6 pb-32">
-        <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Mobile: Tabbed Interface */}
-          <div className="md:hidden">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="course">Course</TabsTrigger>
-                <TabsTrigger value="format">Format</TabsTrigger>
-                <TabsTrigger value="details">Details</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="course" className="space-y-4 mt-4">
-                <CourseField />
-                <DateTimeField />
-                <div className="space-y-2">
-                  <Label htmlFor="booking_url">Tee Time Booking URL (Optional)</Label>
-                  <Input
-                    id="booking_url"
-                    type="url"
-                    value={formData.booking_url}
-                    onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
-                    placeholder="https://example.com/book-tee-time"
-                  />
-                </div>
-              </TabsContent>
-
-              <TabsContent value="format" className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="format">Match Format</Label>
-                  <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-                    <SelectTrigger id="format">
-                      <SelectValue placeholder="Select format" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="stroke-play">Stroke Play</SelectItem>
-                      <SelectItem value="match-play">Match Play</SelectItem>
-                      <SelectItem value="best-ball">2v2 Best Ball</SelectItem>
-                      <SelectItem value="skins">Skins Game</SelectItem>
-                      <SelectItem value="scramble">Scramble</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-
-                <div className="space-y-3">
-                  <Label>Tee Selection</Label>
-                  <Select 
-                    value={formData.tee_selection_mode} 
-                    onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
-                  >
-                    <SelectTrigger id="tee_selection_mode">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="fixed">Creator selects tees for everyone</SelectItem>
-                      <SelectItem value="individual">Each participant picks their own tees</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  
-                  {formData.tee_selection_mode === 'fixed' && (
-                    <div className="space-y-2">
-                      <Label htmlFor="default_tees">Which Tees?</Label>
-                      <Select 
-                        value={formData.default_tees} 
-                        onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
-                      >
-                        <SelectTrigger id="default_tees">
-                          <SelectValue placeholder="Select tees" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="Black">Black (Championship)</SelectItem>
-                          <SelectItem value="Blue">Blue (Tournament)</SelectItem>
-                          <SelectItem value="White">White (Men's)</SelectItem>
-                          <SelectItem value="Gold">Gold</SelectItem>
-                          <SelectItem value="Red">Red (Forward/Ladies)</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  )}
-                  {formData.tee_selection_mode === 'individual' && (
-                    <p className="text-xs text-muted-foreground">
-                      Participants will select their preferred tees when they join the match
-                    </p>
-                  )}
-                </div>
-              </TabsContent>
-
-              <TabsContent value="details" className="space-y-4 mt-4">
-                <div className="space-y-2">
-                  <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
-                  <Input
-                    id="buy_in_amount"
-                    type="number"
-                    min="0"
-                    max="500"
-                    value={formData.buy_in_amount}
-                    onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
-                    placeholder="50"
-                    required
-                  />
-                </div>
-                
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label htmlFor="handicap_min">Min Handicap</Label>
-                    <Input
-                      id="handicap_min"
-                      type="number"
-                      min="0"
-                      max="54"
-                      value={formData.handicap_min}
-                      onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
-                      placeholder="0"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="handicap_max">Max Handicap</Label>
-                    <Input
-                      id="handicap_max"
-                      type="number"
-                      min="0"
-                      max="54"
-                      value={formData.handicap_max}
-                      onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
-                      placeholder="20"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="max_participants">Max Participants</Label>
-                  <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
-                    <SelectTrigger id="max_participants">
-                      <SelectValue />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="1">1 Player (Testing)</SelectItem>
-                      <SelectItem value="2">2 Players</SelectItem>
-                      <SelectItem value="3">3 Players</SelectItem>
-                      <SelectItem value="4">4 Players</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </TabsContent>
-            </Tabs>
-          </div>
-
-          {/* Desktop: All fields visible */}
-          <div className="hidden md:block space-y-4">
-            <CourseField />
-            <DateTimeField />
-            
+      {/* Form */}
+      <form onSubmit={handleSubmit} className="container mx-auto px-4 py-6 space-y-6 max-w-2xl">
+        {/* Golf Course */}
+        <div className="space-y-3">
+          <Label>Golf Course *</Label>
+          
+          {isPaidSubscription && (
             <div className="space-y-2">
-              <Label htmlFor="booking_url_desktop">Tee Time Booking URL (Optional)</Label>
+              <div className="flex gap-2">
+                <Input
+                  type="tel"
+                  placeholder="Enter zipcode"
+                  value={zipcode}
+                  onChange={(e) => setZipcode(e.target.value.replace(/\D/g, '').slice(0, 5))}
+                  maxLength={5}
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleZipcodeSearch}
+                  disabled={loadingZipcode || zipcode.length < 5}
+                >
+                  {loadingZipcode ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
+                </Button>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleGPSSearch}
+                  disabled={loadingGPS}
+                >
+                  {loadingGPS ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
+                </Button>
+              </div>
+              <p className="text-xs text-muted-foreground">Search courses within {searchRadius} miles</p>
+            </div>
+          )}
+
+          <Popover open={courseOpen} onOpenChange={setCourseOpen}>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                role="combobox"
+                className="w-full justify-between"
+              >
+                {selectedCourse ? (
+                  <div className="flex flex-col items-start text-left">
+                    <span className="font-medium">{selectedCourse.name}</span>
+                    {selectedCourse.distance && (
+                      <span className="text-xs text-muted-foreground">
+                        {formatDistance(selectedCourse.distance)} away
+                      </span>
+                    )}
+                  </div>
+                ) : formData.course_name || "Type or select a course..."}
+                <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
+              <Command>
+                <CommandInput 
+                  placeholder="Search courses..." 
+                  onValueChange={handleCustomCourse}
+                />
+                <ScrollArea className="h-[300px]">
+                  <CommandList>
+                    <CommandEmpty>
+                      {coursesLoading ? (
+                        <div className="flex items-center justify-center py-6">
+                          <Loader2 className="w-4 h-4 animate-spin mr-2" />
+                          <span>Loading...</span>
+                        </div>
+                      ) : (
+                        <p className="py-6 text-center text-sm">No courses found</p>
+                      )}
+                    </CommandEmpty>
+                    <CommandGroup>
+                      {courses.map((course) => (
+                        <CommandItem
+                          key={`${course.name}-${course.latitude}`}
+                          value={course.name}
+                          onSelect={() => handleCourseSelect(course)}
+                          className="cursor-pointer"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedCourse?.name === course.name ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium">{course.name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {course.address}
+                              {course.distance && ` • ${formatDistance(course.distance)}`}
+                            </div>
+                          </div>
+                        </CommandItem>
+                      ))}
+                    </CommandGroup>
+                  </CommandList>
+                </ScrollArea>
+              </Command>
+            </PopoverContent>
+          </Popover>
+        </div>
+
+        {/* Tee Time Booking */}
+        {isPaidSubscription && (
+          <div className="space-y-2">
+            <Label htmlFor="booking_url">Tee Time Booking (Optional)</Label>
+            <div className="flex gap-2">
               <Input
-                id="booking_url_desktop"
+                id="booking_url"
                 type="url"
+                placeholder="Enter booking URL or leave blank for Google search"
                 value={formData.booking_url}
                 onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
-                placeholder="https://example.com/book-tee-time"
               />
+              {formData.course_name && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(formData.course_name + ' tee time booking')}`, '_blank')}
+                >
+                  <ExternalLink className="h-4 w-4" />
+                </Button>
+              )}
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="format_desktop">Match Format</Label>
-              <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-                <SelectTrigger id="format_desktop">
-                  <SelectValue placeholder="Select format" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="stroke-play">Stroke Play</SelectItem>
-                  <SelectItem value="match-play">Match Play</SelectItem>
-                  <SelectItem value="best-ball">2v2 Best Ball</SelectItem>
-                  <SelectItem value="skins">Skins Game</SelectItem>
-                  <SelectItem value="scramble">Scramble</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
+          </div>
+        )}
 
-            <div className="space-y-3">
-              <Label>Tee Selection</Label>
-              <Select 
-                value={formData.tee_selection_mode} 
-                onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
-              >
-                <SelectTrigger id="tee_selection_mode_desktop">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="fixed">Creator selects tees for everyone</SelectItem>
-                  <SelectItem value="individual">Each participant picks their own tees</SelectItem>
-                </SelectContent>
-              </Select>
-              
-              {formData.tee_selection_mode === 'fixed' && (
-                <div className="space-y-2">
-                  <Label htmlFor="default_tees_desktop">Which Tees?</Label>
-                  <Select 
-                    value={formData.default_tees} 
-                    onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
-                  >
-                    <SelectTrigger id="default_tees_desktop">
-                      <SelectValue placeholder="Select tees" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="Black">Black (Championship)</SelectItem>
-                      <SelectItem value="Blue">Blue (Tournament)</SelectItem>
-                      <SelectItem value="White">White (Men's)</SelectItem>
-                      <SelectItem value="Gold">Gold</SelectItem>
-                      <SelectItem value="Red">Red (Forward/Ladies)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              )}
-              {formData.tee_selection_mode === 'individual' && (
-                <p className="text-xs text-muted-foreground">
-                  Participants will select their preferred tees when they join the match
-                </p>
-              )}
+        {/* Date & Time */}
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-2">
+            <Label>Date *</Label>
+            <Popover open={dateOpen} onOpenChange={setDateOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  className={cn("w-full justify-start", !formData.scheduled_date && "text-muted-foreground")}
+                >
+                  <Clock className="mr-2 h-4 w-4" />
+                  {formData.scheduled_date ? format(formData.scheduled_date, "MMM d") : "Pick date"}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-auto p-0" align="start">
+                <Calendar
+                  mode="single"
+                  selected={formData.scheduled_date || undefined}
+                  onSelect={(date) => {
+                    setFormData({ ...formData, scheduled_date: date || null });
+                    setDateOpen(false);
+                  }}
+                  disabled={(date) => date < new Date()}
+                  initialFocus
+                />
+              </PopoverContent>
+            </Popover>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="time">Time *</Label>
+            <Input
+              id="time"
+              type="time"
+              value={formData.scheduled_time}
+              onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
+            />
+          </div>
+        </div>
+
+        {/* Match Format */}
+        <div className="space-y-2">
+          <Label>Match Format *</Label>
+          <RadioGroup value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="stroke-play" id="stroke-play" />
+              <Label htmlFor="stroke-play" className="font-normal cursor-pointer">Stroke Play</Label>
             </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="buy_in_amount_desktop">Buy-in Amount ($)</Label>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="match-play" id="match-play" />
+              <Label htmlFor="match-play" className="font-normal cursor-pointer">Match Play</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="best-ball" id="best-ball" />
+              <Label htmlFor="best-ball" className="font-normal cursor-pointer">Best Ball</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="skins-game" id="skins-game" />
+              <Label htmlFor="skins-game" className="font-normal cursor-pointer">Skins Game</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="scramble" id="scramble" />
+              <Label htmlFor="scramble" className="font-normal cursor-pointer">Scramble</Label>
+            </div>
+          </RadioGroup>
+        </div>
+
+        {/* Tee Selection */}
+        <div className="space-y-3">
+          <Label>Tee Selection *</Label>
+          <RadioGroup 
+            value={formData.tee_selection_mode} 
+            onValueChange={(value) => setFormData({ ...formData, tee_selection_mode: value as 'fixed' | 'individual', default_tees: '' })}
+          >
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="fixed" id="fixed-tees" />
+              <Label htmlFor="fixed-tees" className="font-normal cursor-pointer">Everyone plays same tees</Label>
+            </div>
+            <div className="flex items-center space-x-2">
+              <RadioGroupItem value="individual" id="individual-tees" />
+              <Label htmlFor="individual-tees" className="font-normal cursor-pointer">Each player picks their own</Label>
+            </div>
+          </RadioGroup>
+
+          {formData.tee_selection_mode === 'fixed' && (
+            <Select value={formData.default_tees} onValueChange={(value) => setFormData({ ...formData, default_tees: value })}>
+              <SelectTrigger>
+                <SelectValue placeholder="Select tees" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="black">Black (Championship)</SelectItem>
+                <SelectItem value="blue">Blue (Back)</SelectItem>
+                <SelectItem value="white">White (Middle)</SelectItem>
+                <SelectItem value="gold">Gold (Senior)</SelectItem>
+                <SelectItem value="red">Red (Forward)</SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+        </div>
+
+        {/* Buy-In Amount */}
+        <div className="space-y-2">
+          <Label htmlFor="buy_in">Buy-In Amount ($)</Label>
+          <Input
+            id="buy_in"
+            type="number"
+            min="0"
+            max="500"
+            value={formData.buy_in_amount}
+            onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
+          />
+          <p className="text-xs text-muted-foreground">Default: $50 • Max: $500</p>
+        </div>
+
+        {/* Handicap Range */}
+        <div className="space-y-2">
+          <Label>Handicap Range (Optional)</Label>
+          <div className="grid grid-cols-2 gap-4">
+            <div>
               <Input
-                id="buy_in_amount_desktop"
                 type="number"
-                min="0"
-                max="500"
-                value={formData.buy_in_amount}
-                onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
-                placeholder="50"
-                required
+                placeholder="Min"
+                value={formData.handicap_min}
+                onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
               />
             </div>
-            
-            <div className="grid grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="handicap_min_desktop">Min Handicap</Label>
-                <Input
-                  id="handicap_min_desktop"
-                  type="number"
-                  min="0"
-                  max="54"
-                  value={formData.handicap_min}
-                  onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
-                  placeholder="0"
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="handicap_max_desktop">Max Handicap</Label>
-                <Input
-                  id="handicap_max_desktop"
-                  type="number"
-                  min="0"
-                  max="54"
-                  value={formData.handicap_max}
-                  onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
-                  placeholder="20"
-                />
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="max_participants_desktop">Max Participants</Label>
-              <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
-                <SelectTrigger id="max_participants_desktop">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="1">1 Player (Testing)</SelectItem>
-                  <SelectItem value="2">2 Players</SelectItem>
-                  <SelectItem value="3">3 Players</SelectItem>
-                  <SelectItem value="4">4 Players</SelectItem>
-                </SelectContent>
-              </Select>
+            <div>
+              <Input
+                type="number"
+                placeholder="Max"
+                value={formData.handicap_max}
+                onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
+              />
             </div>
           </div>
-          
-          {/* Fixed Bottom Bar - Mobile & Desktop */}
-          <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-30">
-            <div className="container max-w-2xl flex gap-2">
-              <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1 md:flex-none">
-                Cancel
-              </Button>
-              {/* Mobile: Show Next/Submit based on tab */}
-              <div className="md:hidden flex-1">
-                {!isFormValid ? (
-                  <Button 
-                    type="button" 
-                    onClick={handleNextTab}
-                    disabled={
-                      (currentTab === 'course' && !isTab1Complete) || 
-                      (currentTab === 'format' && !isTab2Complete)
-                    }
-                    className="w-full bg-gradient-primary text-primary-foreground"
-                  >
-                    Next
-                    <ChevronRight className="w-4 h-4 ml-2" />
-                  </Button>
-                ) : (
-                  <Button 
-                    type="submit"
-                    className="w-full bg-gradient-primary text-primary-foreground"
-                  >
-                    Create Match
-                  </Button>
-                )}
-              </div>
-              {/* Desktop: Show Submit */}
-              <Button 
-                type="submit"
-                disabled={!isFormValid}
-                className="hidden md:block bg-gradient-primary text-primary-foreground"
-              >
-                Create Match
-              </Button>
-            </div>
-          </div>
-        </form>
-      </main>
+        </div>
+
+        {/* Max Players */}
+        <div className="space-y-2">
+          <Label htmlFor="max_players">Max Players</Label>
+          <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
+            <SelectTrigger id="max_players">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="1">1 (Testing)</SelectItem>
+              <SelectItem value="2">2</SelectItem>
+              <SelectItem value="3">3</SelectItem>
+              <SelectItem value="4">4 (Default)</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        {/* Submit Button */}
+        <div className="pt-6">
+          <Button type="submit" className="w-full" disabled={!isFormValid || submitting}>
+            {submitting ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Creating Match...
+              </>
+            ) : (
+              'Create Match'
+            )}
+          </Button>
+        </div>
+      </form>
     </div>
   );
 };
