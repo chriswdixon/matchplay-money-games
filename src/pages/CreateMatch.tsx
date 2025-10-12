@@ -183,7 +183,6 @@ const CreateMatch = () => {
               }}
               maxLength={5}
               className="flex-1"
-              style={{ position: 'relative', zIndex: 10 }}
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
               <SelectTrigger className="w-[110px]">
@@ -218,7 +217,7 @@ const CreateMatch = () => {
             variant="outline"
             role="combobox"
             aria-expanded={courseOpen}
-            className="w-full justify-between bg-background"
+            className="w-full justify-between bg-background relative z-50"
           >
             {selectedCourse ? (
               <div className="flex flex-col items-start text-left">
@@ -237,7 +236,7 @@ const CreateMatch = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0" align="start" sideOffset={5}>
+        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 z-[100]" align="start" sideOffset={5}>
           <Command className="border-0">
             <CommandInput 
               placeholder="Search golf courses..." 
@@ -297,7 +296,7 @@ const CreateMatch = () => {
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal",
+              "w-full justify-start text-left font-normal relative z-50",
               !formData.scheduled_time && "text-muted-foreground"
             )}
           >
@@ -309,7 +308,7 @@ const CreateMatch = () => {
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0" align="start">
+        <PopoverContent className="w-auto p-0 z-[100]" align="start">
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Pick Date & Time</Label>
@@ -392,7 +391,6 @@ const CreateMatch = () => {
                     }
                   }}
                   className="w-16"
-                  style={{ position: 'relative', zIndex: 10 }}
                 />
                 <span className="text-lg">:</span>
                 <Input
@@ -412,7 +410,6 @@ const CreateMatch = () => {
                     }
                   }}
                   className="w-16"
-                  style={{ position: 'relative', zIndex: 10 }}
                 />
                 <Select
                   value={formData.scheduled_time ? (new Date(formData.scheduled_time).getHours() >= 12 ? 'PM' : 'AM') : 'AM'}
@@ -482,7 +479,7 @@ const CreateMatch = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-2xl py-6 pb-32">
+      <main className="container max-w-2xl py-6 pb-40 md:pb-32">
         {/* Mobile: Tabbed Interface */}
         <div className="md:hidden">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
@@ -492,7 +489,7 @@ const CreateMatch = () => {
               <TabsTrigger value="details">Details</TabsTrigger>
             </TabsList>
             
-            <TabsContent value="course" className="space-y-4 mt-4" style={{ position: 'relative', zIndex: 1 }}>
+            <TabsContent value="course" className="space-y-4 mt-4">
                 <CourseField />
                 <DateTimeField />
                 <div className="space-y-2">
@@ -503,12 +500,11 @@ const CreateMatch = () => {
                     value={formData.booking_url}
                     onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
                     placeholder="https://example.com/book-tee-time"
-                    style={{ position: 'relative', zIndex: 10 }}
                   />
                 </div>
               </TabsContent>
 
-              <TabsContent value="format" className="space-y-4 mt-4" style={{ position: 'relative', zIndex: 1 }}>
+              <TabsContent value="format" className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="format">Match Format</Label>
                   <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
@@ -568,7 +564,7 @@ const CreateMatch = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="details" className="space-y-4 mt-4" style={{ position: 'relative', zIndex: 1 }}>
+              <TabsContent value="details" className="space-y-4 mt-4">
                 <div className="space-y-2">
                   <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
                   <Input
@@ -580,7 +576,6 @@ const CreateMatch = () => {
                     onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
                     placeholder="50"
                     required
-                    style={{ position: 'relative', zIndex: 10 }}
                   />
                 </div>
                 
@@ -595,7 +590,6 @@ const CreateMatch = () => {
                       value={formData.handicap_min}
                       onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
                       placeholder="0"
-                      style={{ position: 'relative', zIndex: 10 }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -608,7 +602,6 @@ const CreateMatch = () => {
                       value={formData.handicap_max}
                       onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
                       placeholder="20"
-                      style={{ position: 'relative', zIndex: 10 }}
                     />
                   </div>
                 </div>
@@ -644,7 +637,6 @@ const CreateMatch = () => {
                 value={formData.booking_url}
                 onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
                 placeholder="https://example.com/book-tee-time"
-                style={{ position: 'relative', zIndex: 10 }}
               />
             </div>
             
@@ -717,7 +709,6 @@ const CreateMatch = () => {
                 onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
                 placeholder="50"
                 required
-                style={{ position: 'relative', zIndex: 10 }}
               />
             </div>
             
@@ -732,7 +723,6 @@ const CreateMatch = () => {
                   value={formData.handicap_min}
                   onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
                   placeholder="0"
-                  style={{ position: 'relative', zIndex: 10 }}
                 />
               </div>
               <div className="space-y-2">
@@ -745,7 +735,6 @@ const CreateMatch = () => {
                   value={formData.handicap_max}
                   onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
                   placeholder="20"
-                  style={{ position: 'relative', zIndex: 10 }}
                 />
               </div>
             </div>
