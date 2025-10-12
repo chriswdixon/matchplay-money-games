@@ -392,6 +392,7 @@ const CreateMatch = () => {
                     }
                   }}
                   className="w-16"
+                  style={{ position: 'relative', zIndex: 10 }}
                 />
                 <span className="text-lg">:</span>
                 <Input
@@ -411,6 +412,7 @@ const CreateMatch = () => {
                     }
                   }}
                   className="w-16"
+                  style={{ position: 'relative', zIndex: 10 }}
                 />
                 <Select
                   value={formData.scheduled_time ? (new Date(formData.scheduled_time).getHours() >= 12 ? 'PM' : 'AM') : 'AM'}
@@ -501,6 +503,7 @@ const CreateMatch = () => {
                     value={formData.booking_url}
                     onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
                     placeholder="https://example.com/book-tee-time"
+                    style={{ position: 'relative', zIndex: 10 }}
                   />
                 </div>
               </TabsContent>
@@ -577,6 +580,7 @@ const CreateMatch = () => {
                     onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
                     placeholder="50"
                     required
+                    style={{ position: 'relative', zIndex: 10 }}
                   />
                 </div>
                 
@@ -591,6 +595,7 @@ const CreateMatch = () => {
                       value={formData.handicap_min}
                       onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
                       placeholder="0"
+                      style={{ position: 'relative', zIndex: 10 }}
                     />
                   </div>
                   <div className="space-y-2">
@@ -603,6 +608,7 @@ const CreateMatch = () => {
                       value={formData.handicap_max}
                       onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
                       placeholder="20"
+                      style={{ position: 'relative', zIndex: 10 }}
                     />
                   </div>
                 </div>
@@ -638,6 +644,7 @@ const CreateMatch = () => {
                 value={formData.booking_url}
                 onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
                 placeholder="https://example.com/book-tee-time"
+                style={{ position: 'relative', zIndex: 10 }}
               />
             </div>
             
@@ -710,6 +717,7 @@ const CreateMatch = () => {
                 onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
                 placeholder="50"
                 required
+                style={{ position: 'relative', zIndex: 10 }}
               />
             </div>
             
@@ -724,6 +732,7 @@ const CreateMatch = () => {
                   value={formData.handicap_min}
                   onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
                   placeholder="0"
+                  style={{ position: 'relative', zIndex: 10 }}
                 />
               </div>
               <div className="space-y-2">
@@ -736,6 +745,7 @@ const CreateMatch = () => {
                   value={formData.handicap_max}
                   onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
                   placeholder="20"
+                  style={{ position: 'relative', zIndex: 10 }}
                 />
               </div>
             </div>
