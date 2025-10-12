@@ -183,6 +183,7 @@ const CreateMatch = () => {
               }}
               maxLength={5}
               className="flex-1"
+              style={{ position: 'relative', zIndex: 10 }}
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
               <SelectTrigger className="w-[110px]">
@@ -462,16 +463,6 @@ const CreateMatch = () => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Test Input - DELETE AFTER TESTING */}
-      <div className="fixed top-20 left-4 z-[9999] bg-red-500 p-4">
-        <input 
-          type="text" 
-          placeholder="TEST INPUT" 
-          className="border-2 border-black p-2"
-          style={{ position: 'relative', zIndex: 99999 }}
-        />
-      </div>
-      
       {/* Header */}
       <header className="sticky top-0 w-full border-b bg-background">
         <div className="container flex h-14 items-center">
@@ -490,17 +481,16 @@ const CreateMatch = () => {
 
       {/* Main Content */}
       <main className="container max-w-2xl py-6 pb-32">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Mobile: Tabbed Interface */}
-          <div className="md:hidden">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-3">
-                <TabsTrigger value="course">Course</TabsTrigger>
-                <TabsTrigger value="format">Format</TabsTrigger>
-                <TabsTrigger value="details">Details</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="course" className="space-y-4 mt-4">
+        {/* Mobile: Tabbed Interface */}
+        <div className="md:hidden">
+          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+            <TabsList className="grid w-full grid-cols-3">
+              <TabsTrigger value="course">Course</TabsTrigger>
+              <TabsTrigger value="format">Format</TabsTrigger>
+              <TabsTrigger value="details">Details</TabsTrigger>
+            </TabsList>
+            
+            <TabsContent value="course" className="space-y-4 mt-4" style={{ position: 'relative', zIndex: 1 }}>
                 <CourseField />
                 <DateTimeField />
                 <div className="space-y-2">
@@ -515,7 +505,7 @@ const CreateMatch = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="format" className="space-y-4 mt-4">
+              <TabsContent value="format" className="space-y-4 mt-4" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="space-y-2">
                   <Label htmlFor="format">Match Format</Label>
                   <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
@@ -575,7 +565,7 @@ const CreateMatch = () => {
                 </div>
               </TabsContent>
 
-              <TabsContent value="details" className="space-y-4 mt-4">
+              <TabsContent value="details" className="space-y-4 mt-4" style={{ position: 'relative', zIndex: 1 }}>
                 <div className="space-y-2">
                   <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
                   <Input
@@ -633,10 +623,10 @@ const CreateMatch = () => {
                 </div>
               </TabsContent>
             </Tabs>
-          </div>
+        </div>
 
-          {/* Desktop: All fields visible */}
-          <div className="hidden md:block space-y-4">
+        {/* Desktop: All fields visible */}
+        <form onSubmit={handleSubmit} className="hidden md:block space-y-4">
             <CourseField />
             <DateTimeField />
             
@@ -764,57 +754,60 @@ const CreateMatch = () => {
                 </SelectContent>
               </Select>
             </div>
-          </div>
         </form>
       </main>
 
       {/* Fixed Bottom Bar - Mobile Only */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4">
-        <div className="container flex gap-2">
-          <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
-            Cancel
-          </Button>
-          {!isFormValid ? (
-            <Button 
-              type="button" 
-              onClick={handleNextTab}
-              disabled={
-                (currentTab === 'course' && !isTab1Complete) || 
-                (currentTab === 'format' && !isTab2Complete)
-              }
-              className="flex-1 bg-gradient-primary text-primary-foreground"
-            >
-              Next
-              <ChevronRight className="w-4 h-4 ml-2" />
+      <form onSubmit={handleSubmit}>
+        <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4">
+          <div className="container flex gap-2">
+            <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
+              Cancel
             </Button>
-          ) : (
+            {!isFormValid ? (
+              <Button 
+                type="button" 
+                onClick={handleNextTab}
+                disabled={
+                  (currentTab === 'course' && !isTab1Complete) || 
+                  (currentTab === 'format' && !isTab2Complete)
+                }
+                className="flex-1 bg-gradient-primary text-primary-foreground"
+              >
+                Next
+                <ChevronRight className="w-4 h-4 ml-2" />
+              </Button>
+            ) : (
+              <Button 
+                type="submit" 
+                onClick={handleSubmit}
+                className="flex-1 bg-gradient-primary text-primary-foreground"
+              >
+                Create Match
+              </Button>
+            )}
+          </div>
+        </div>
+      </form>
+
+      {/* Desktop Submit Bar */}
+      <form onSubmit={handleSubmit}>
+        <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4">
+          <div className="container max-w-2xl flex justify-end gap-2">
+            <Button type="button" variant="outline" onClick={() => navigate('/')}>
+              Cancel
+            </Button>
             <Button 
               type="submit" 
               onClick={handleSubmit}
-              className="flex-1 bg-gradient-primary text-primary-foreground"
+              className="bg-gradient-primary text-primary-foreground" 
+              disabled={!isFormValid}
             >
               Create Match
             </Button>
-          )}
+          </div>
         </div>
-      </div>
-
-      {/* Desktop Submit Bar */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4">
-        <div className="container max-w-2xl flex justify-end gap-2">
-          <Button type="button" variant="outline" onClick={() => navigate('/')}>
-            Cancel
-          </Button>
-          <Button 
-            type="submit" 
-            onClick={handleSubmit}
-            className="bg-gradient-primary text-primary-foreground" 
-            disabled={!isFormValid}
-          >
-            Create Match
-          </Button>
-        </div>
-      </div>
+      </form>
     </div>
   );
 };
