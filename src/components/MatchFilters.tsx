@@ -106,9 +106,11 @@ const MatchFilters = ({
           </div>
         </div>
         
-        {/* Results Count - under search bar, right aligned */}
-        <div className="text-sm text-muted-foreground font-medium text-right">
-          {matchCount} match{matchCount !== 1 ? 'es' : ''} found
+        {/* Results Count - under and aligned with search bar */}
+        <div className="flex">
+          <div className="flex-1 text-sm text-muted-foreground font-medium text-right pr-2">
+            {matchCount} match{matchCount !== 1 ? 'es' : ''} found
+          </div>
         </div>
       </div>
 
