@@ -35,9 +35,11 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    const MAX_PAYOUT = 10000; // $10,000 maximum payout per transaction
     const { amount } = await req.json();
-    if (!amount || amount <= 0) {
-      throw new Error("Invalid payout amount");
+    
+    if (!amount || amount <= 0 || amount > MAX_PAYOUT) {
+      throw new Error(`Invalid payout amount. Must be between $0.01 and $${MAX_PAYOUT.toLocaleString()}`);
     }
 
     // Get player account

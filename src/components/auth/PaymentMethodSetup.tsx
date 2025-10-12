@@ -14,7 +14,10 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
 // Load Stripe with your publishable key
-const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY || 'pk_test_51QrTr0Bsm4lLlzSdHnWYC9xW9rpmZnZ2xZxhvqxGCjqcGJ0RI7dIkH8KQzQpfVhxJ2lEQUmI1SLCaXx5fGqGfqPh00pBWYn0vF');
+if (!import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY) {
+  throw new Error('Stripe publishable key not configured. Please set VITE_STRIPE_PUBLISHABLE_KEY in your environment variables.');
+}
+const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
 interface PaymentMethodSetupProps {
   onComplete: () => void;

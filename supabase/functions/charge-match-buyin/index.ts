@@ -35,12 +35,60 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id, email: user.email });
 
+    const MAX_BUY_IN = 500;
     const { matchId, buyInAmount } = await req.json();
+    
     if (!matchId || !buyInAmount) {
       throw new Error("Missing matchId or buyInAmount");
     }
     
+    if (buyInAmount < 0 || buyInAmount > MAX_BUY_IN) {
+      throw new Error(`Buy-in amount must be between $0 and $${MAX_BUY_IN}`);
+    }
+    
     logStep("Processing buy-in", { matchId, buyInAmount });
+
+    // Verify user is an active participant in the match
+    const { data: participant, error: participantError } = await supabaseClient
+      .from('match_participants')
+      .select('id')
+      .eq('match_id', matchId)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (participantError) throw participantError;
+    if (!participant) {
+      throw new Error('You must be an active participant to pay the buy-in for this match');
+    }
+
+    // Verify match is in correct state and buy-in amount matches
+    const { data: match, error: matchError } = await supabaseClient
+      .from('matches')
+      .select('status, buy_in_amount')
+      .eq('id', matchId)
+      .single();
+
+    if (matchError) throw matchError;
+    if (match.status !== 'open') {
+      throw new Error('Cannot pay buy-in for non-open matches');
+    }
+    if (match.buy_in_amount !== buyInAmount) {
+      throw new Error('Buy-in amount does not match match requirements');
+    }
+
+    // Check for existing payment to prevent duplicates
+    const { data: existingPayment } = await supabaseClient
+      .from('account_transactions')
+      .select('id')
+      .eq('match_id', matchId)
+      .eq('user_id', user.id)
+      .eq('transaction_type', 'match_buyin')
+      .maybeSingle();
+
+    if (existingPayment) {
+      throw new Error('Buy-in already paid for this match');
+    }
 
     // Get or create player account
     const { data: account, error: accountError } = await supabaseClient
