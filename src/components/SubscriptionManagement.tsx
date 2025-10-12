@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw, Star } from "lucide-react";
+import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw, Star, Zap } from "lucide-react";
 import { useSubscription, SUBSCRIPTION_TIERS } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -133,7 +133,9 @@ const SubscriptionManagement = () => {
             <div>
               <CardTitle className="flex items-center gap-2">
                 Current Subscription
-                {subscribed && !isLocalTier && <Crown className="w-5 h-5 text-accent" />}
+                {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
+                {isLocalTier && <Star className="w-5 h-5 text-primary" />}
+                {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
               </CardTitle>
               <CardDescription>Manage your membership and billing</CardDescription>
             </div>
