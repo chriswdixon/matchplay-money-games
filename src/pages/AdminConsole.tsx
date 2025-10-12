@@ -3,10 +3,11 @@ import { useNavigate } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Ticket, BarChart3 } from "lucide-react";
+import { Users, Ticket, BarChart3, DollarSign } from "lucide-react";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
+import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
 
 const AdminConsole = () => {
   const { isAdmin, loading } = useAdminRole();
@@ -43,10 +44,14 @@ const AdminConsole = () => {
         </div>
 
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-4 lg:w-auto">
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               User Management
+            </TabsTrigger>
+            <TabsTrigger value="accounts" className="gap-2">
+              <DollarSign className="h-4 w-4" />
+              Accounts
             </TabsTrigger>
             <TabsTrigger value="coupons" className="gap-2">
               <Ticket className="h-4 w-4" />
@@ -60,6 +65,10 @@ const AdminConsole = () => {
 
           <TabsContent value="users">
             <UserManagement />
+          </TabsContent>
+
+          <TabsContent value="accounts">
+            <UserAccountDetails />
           </TabsContent>
 
           <TabsContent value="coupons">

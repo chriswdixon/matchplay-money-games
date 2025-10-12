@@ -6,9 +6,11 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, User, Settings, CreditCard, Target, Shield } from 'lucide-react';
+import { ArrowLeft, User, Settings, CreditCard, Target, Shield, DollarSign } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
+import { AccountBalance } from '@/components/profile/AccountBalance';
+import { TransactionHistory } from '@/components/profile/TransactionHistory';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -73,10 +75,14 @@ export default function Profile() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-4">
+          <TabsList className="grid w-full grid-cols-5">
             <TabsTrigger value="profile" className="gap-2">
               <User className="w-4 h-4" />
               Profile
+            </TabsTrigger>
+            <TabsTrigger value="account" className="gap-2">
+              <DollarSign className="w-4 h-4" />
+              Account
             </TabsTrigger>
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
@@ -94,6 +100,11 @@ export default function Profile() {
 
           <TabsContent value="profile">
             <ProfileDisplay />
+          </TabsContent>
+
+          <TabsContent value="account" className="space-y-6">
+            <AccountBalance />
+            <TransactionHistory />
           </TabsContent>
 
           <TabsContent value="settings">

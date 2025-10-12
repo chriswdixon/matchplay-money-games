@@ -345,6 +345,21 @@ export const useMatches = () => {
       if (error) throw error;
       if (!data) throw new Error('Failed to create match - no data returned');
 
+      // Charge buy-in if amount > 0
+      if (data.buy_in_amount > 0) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const { error: chargeError } = await supabase.functions.invoke('charge-match-buyin', {
+          body: { matchId: data.id, buyInAmount: data.buy_in_amount },
+          headers: { Authorization: `Bearer ${session?.access_token}` }
+        });
+        
+        if (chargeError) {
+          // Rollback match creation
+          await supabase.from('matches').delete().eq('id', data.id);
+          throw new Error('Failed to charge buy-in: ' + chargeError.message);
+        }
+      }
+
       // Automatically join the creator to the match
       const { error: joinError } = await supabase
         .from('match_participants')

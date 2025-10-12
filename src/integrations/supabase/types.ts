@@ -14,6 +14,60 @@ export type Database = {
   }
   public: {
     Tables: {
+      account_transactions: {
+        Row: {
+          account_id: string
+          amount: number
+          created_at: string
+          description: string
+          id: string
+          match_id: string | null
+          metadata: Json | null
+          stripe_payment_intent_id: string | null
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Insert: {
+          account_id: string
+          amount: number
+          created_at?: string
+          description: string
+          id?: string
+          match_id?: string | null
+          metadata?: Json | null
+          stripe_payment_intent_id?: string | null
+          transaction_type: Database["public"]["Enums"]["transaction_type"]
+          user_id: string
+        }
+        Update: {
+          account_id?: string
+          amount?: number
+          created_at?: string
+          description?: string
+          id?: string
+          match_id?: string | null
+          metadata?: Json | null
+          stripe_payment_intent_id?: string | null
+          transaction_type?: Database["public"]["Enums"]["transaction_type"]
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "account_transactions_account_id_fkey"
+            columns: ["account_id"]
+            isOneToOne: false
+            referencedRelation: "player_accounts"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "account_transactions_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_cancellation_confirmations: {
         Row: {
           alternate_reason: string | null
@@ -258,6 +312,30 @@ export type Database = {
         }
         Relationships: []
       }
+      player_accounts: {
+        Row: {
+          balance: number
+          created_at: string
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       player_ratings: {
         Row: {
           created_at: string
@@ -490,6 +568,17 @@ export type Database = {
           user_id: string
         }[]
       }
+      get_user_account_info: {
+        Args: { target_user_id: string }
+        Returns: {
+          account_id: string
+          balance: number
+          total_buyins: number
+          total_payouts: number
+          total_winnings: number
+          transaction_count: number
+        }[]
+      }
       get_user_email: {
         Args: { _user_id: string }
         Returns: string
@@ -556,6 +645,13 @@ export type Database = {
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      transaction_type:
+        | "winning"
+        | "match_buyin"
+        | "match_cancellation"
+        | "subscription_charge"
+        | "coupon"
+        | "payout"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -684,6 +780,14 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      transaction_type: [
+        "winning",
+        "match_buyin",
+        "match_cancellation",
+        "subscription_charge",
+        "coupon",
+        "payout",
+      ],
     },
   },
 } as const
