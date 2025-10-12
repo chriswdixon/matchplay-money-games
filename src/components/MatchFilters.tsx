@@ -63,13 +63,15 @@ const MatchFilters = ({
       {/* Filter Toggle & Search Bar */}
       <div className="flex flex-col sm:flex-row gap-4">
         <div className="flex-1 relative">
-          <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search courses or locations..."
-            value={filters.search}
-            onChange={(e) => updateFilter('search', e.target.value)}
-            className="pl-10"
-          />
+          <div className="relative shadow-lg rounded-lg border-2 border-primary/20 bg-card hover:border-primary/40 transition-all duration-300">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-primary z-10" />
+            <Input
+              placeholder="Search courses or locations..."
+              value={filters.search}
+              onChange={(e) => updateFilter('search', e.target.value)}
+              className="pl-10 border-0 bg-transparent focus-visible:ring-0 focus-visible:ring-offset-0 h-12 text-base"
+            />
+          </div>
         </div>
         <div className="flex gap-2">
           <Button
