@@ -306,7 +306,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 border shadow-lg z-[9999] pointer-events-auto bg-background" align="start" sideOffset={5}>
+        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0" align="start" sideOffset={5}>
           <Command className="border-0">
             <CommandInput 
               placeholder="Search golf courses..." 
@@ -390,7 +390,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 bg-background border shadow-lg z-[100] pointer-events-auto" align="start">
+        <PopoverContent className="w-auto p-0" align="start">
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Pick Date & Time</Label>
@@ -434,7 +434,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 }}
                 disabled={(date) => date < new Date()}
                 initialFocus
-                className={cn("p-3 pointer-events-auto")}
+                className="p-3"
               />
             </div>
             <div>
