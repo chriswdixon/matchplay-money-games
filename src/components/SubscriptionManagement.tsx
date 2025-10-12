@@ -137,7 +137,7 @@ const SubscriptionManagement = () => {
               </CardTitle>
               <CardDescription>Manage your membership and billing</CardDescription>
             </div>
-            <Badge className={isFreeTier ? "bg-muted" : (isLocalTier ? "bg-primary/10" : "bg-accent/10")}>
+            <Badge className={isFreeTier ? "bg-muted text-white" : (isLocalTier ? "bg-primary/10" : "bg-accent/10")}>
               {tierName}
             </Badge>
           </div>
