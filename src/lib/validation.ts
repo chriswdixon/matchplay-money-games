@@ -69,7 +69,7 @@ export const profileUpdateSchema = z.object({
 // Create match validation schema
 export const createMatchSchema = z.object({
   course_name: z.string().trim().min(1, "Course name is required").max(200, "Course name must be less than 200 characters"),
-  buy_in_amount: z.number().int().min(0, "Buy-in must be at least $0").max(500, "Buy-in cannot exceed $500"),
+  buy_in_amount: z.number().int().min(0, "Buy-in must be at least $0").max(50000, "Buy-in cannot exceed $500"),
   handicap_min: z.number().int().min(-10, "Minimum handicap must be at least -10").max(54, "Minimum handicap must be at most 54").optional().nullable(),
   handicap_max: z.number().int().min(-10, "Maximum handicap must be at least -10").max(54, "Maximum handicap must be at most 54").optional().nullable(),
   booking_url: z.string().trim().max(500, "Booking URL must be less than 500 characters").optional().or(z.literal('')).refine((url) => {
