@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { mapDatabaseError } from '@/lib/errorHandling';
 
 export interface MatchScore {
   id: string;
@@ -391,12 +392,12 @@ export function useMatchScoring(matchId: string) {
         });
 
       if (error) {
-        console.error('Error updating score:', error);
         // Revert optimistic update on error
         await fetchMatchData();
+        const safeMessage = mapDatabaseError(error);
         toast({
           title: "Failed to update score",
-          description: error.message,
+          description: safeMessage,
           variant: "destructive",
         });
         return false;

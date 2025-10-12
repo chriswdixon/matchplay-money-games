@@ -3,6 +3,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
 import { validateHolePars, DEFAULT_HOLE_PARS } from '@/lib/matchValidation';
+import { createMatchSchema, sanitizeInput } from '@/lib/validation';
+import { mapDatabaseError } from '@/lib/errorHandling';
 
 export interface Match {
   id: string;
@@ -291,6 +293,23 @@ export const useMatches = () => {
     }
 
     try {
+      // Sanitize text inputs
+      const sanitizedData = {
+        ...matchData,
+        course_name: sanitizeInput(matchData.course_name),
+        location: sanitizeInput(matchData.location || ''),
+        address: matchData.address ? sanitizeInput(matchData.address) : undefined,
+        booking_url: matchData.booking_url ? sanitizeInput(matchData.booking_url) : undefined,
+      };
+
+      // Validate match data
+      const validationResult = createMatchSchema.safeParse(sanitizedData);
+      if (!validationResult.success) {
+        const errorMessage = validationResult.error.errors[0]?.message || "Invalid match data";
+        toast.error(errorMessage);
+        return { error: errorMessage };
+      }
+
       // Validate hole_pars if provided, otherwise use default
       const holeParsToUse = matchData.hole_pars || DEFAULT_HOLE_PARS;
       const holeParsValidation = validateHolePars(holeParsToUse);
@@ -303,7 +322,20 @@ export const useMatches = () => {
       const { data, error } = await supabase
         .from('matches')
         .insert({
-          ...matchData,
+          course_name: validationResult.data.course_name,
+          location: validationResult.data.location,
+          address: validationResult.data.address,
+          latitude: validationResult.data.latitude,
+          longitude: validationResult.data.longitude,
+          scheduled_time: matchData.scheduled_time,
+          format: validationResult.data.format,
+          buy_in_amount: validationResult.data.buy_in_amount,
+          handicap_min: validationResult.data.handicap_min,
+          handicap_max: validationResult.data.handicap_max,
+          max_participants: validationResult.data.max_participants,
+          booking_url: validationResult.data.booking_url,
+          tee_selection_mode: matchData.tee_selection_mode,
+          default_tees: matchData.default_tees,
           hole_pars: holeParsValidation.data,
           created_by: user.id
         })
@@ -322,18 +354,17 @@ export const useMatches = () => {
         });
 
       if (joinError) {
-        console.error('Failed to auto-join creator to match:', joinError);
-        // Don't fail the whole operation if auto-join fails
+        const safeMessage = mapDatabaseError(joinError);
+        console.error('Failed to auto-join creator:', safeMessage);
       }
 
       toast.success('Match created successfully!');
       
-      // Refresh will happen automatically via realtime subscription
       return { data, error: null };
-    } catch (error) {
-      console.error('Error creating match:', error);
-      toast.error('Failed to create match');
-      return { error, data: null };
+    } catch (error: any) {
+      const safeMessage = mapDatabaseError(error);
+      toast.error(safeMessage);
+      return { error: error.message, data: null };
     }
   };
 

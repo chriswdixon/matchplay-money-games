@@ -2,6 +2,7 @@ import { useState, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
 import { toast } from 'sonner';
+import { mapDatabaseError } from '@/lib/errorHandling';
 
 export interface RateablePlayer {
   user_id: string;
@@ -98,14 +99,13 @@ export const usePlayerRatings = () => {
 
       return true;
     } catch (error: any) {
-      console.error('Error rating player:', error);
-      
       if (error.message?.includes('no_self_rating')) {
         toast.error('You cannot rate yourself');
       } else if (error.message?.includes('not participated')) {
         toast.error('You can only rate players you played with');
       } else {
-        toast.error('Failed to rate player');
+        const safeMessage = mapDatabaseError(error);
+        toast.error(safeMessage);
       }
       
       return false;
