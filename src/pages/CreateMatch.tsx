@@ -169,7 +169,7 @@ const CreateMatch = () => {
   // Course selection field component
   const CourseField = () => (
     <div className="space-y-2">
-      <Label htmlFor="course_name">Golf Course</Label>
+      <Label>Golf Course</Label>
       {!locationCoords && (
         <div className="space-y-2">
           <div className="flex gap-2">
@@ -185,7 +185,7 @@ const CreateMatch = () => {
               className="flex-1"
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
-              <SelectTrigger className="w-[110px]">
+              <SelectTrigger className="w-[110px]" id="search_radius">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -290,7 +290,7 @@ const CreateMatch = () => {
   // Date/Time field component
   const DateTimeField = () => (
     <div className="space-y-2">
-      <Label htmlFor="scheduled_time">Date & Time</Label>
+      <Label>Date & Time</Label>
       <Popover open={dateTimeOpen} onOpenChange={setDateTimeOpen}>
         <PopoverTrigger asChild>
           <Button
@@ -434,7 +434,7 @@ const CreateMatch = () => {
                     }
                   }}
                 >
-                  <SelectTrigger className="w-16">
+                  <SelectTrigger className="w-16" id="time_ampm">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
@@ -508,7 +508,7 @@ const CreateMatch = () => {
                 <div className="space-y-2">
                   <Label htmlFor="format">Match Format</Label>
                   <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-                    <SelectTrigger>
+                    <SelectTrigger id="format">
                       <SelectValue placeholder="Select format" />
                     </SelectTrigger>
                     <SelectContent>
@@ -527,7 +527,7 @@ const CreateMatch = () => {
                     value={formData.tee_selection_mode} 
                     onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="tee_selection_mode">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -543,7 +543,7 @@ const CreateMatch = () => {
                         value={formData.default_tees} 
                         onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
                       >
-                        <SelectTrigger>
+                        <SelectTrigger id="default_tees">
                           <SelectValue placeholder="Select tees" />
                         </SelectTrigger>
                         <SelectContent>
@@ -609,7 +609,7 @@ const CreateMatch = () => {
                 <div className="space-y-2">
                   <Label htmlFor="max_participants">Max Participants</Label>
                   <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
-                    <SelectTrigger>
+                    <SelectTrigger id="max_participants">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
@@ -643,7 +643,7 @@ const CreateMatch = () => {
             <div className="space-y-2">
               <Label htmlFor="format_desktop">Match Format</Label>
               <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
-                <SelectTrigger>
+                <SelectTrigger id="format_desktop">
                   <SelectValue placeholder="Select format" />
                 </SelectTrigger>
                 <SelectContent>
@@ -662,7 +662,7 @@ const CreateMatch = () => {
                 value={formData.tee_selection_mode} 
                 onValueChange={(value: 'fixed' | 'individual') => setFormData({ ...formData, tee_selection_mode: value })}
               >
-                <SelectTrigger>
+                <SelectTrigger id="tee_selection_mode_desktop">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
@@ -678,7 +678,7 @@ const CreateMatch = () => {
                     value={formData.default_tees} 
                     onValueChange={(value) => setFormData({ ...formData, default_tees: value })}
                   >
-                    <SelectTrigger>
+                    <SelectTrigger id="default_tees_desktop">
                       <SelectValue placeholder="Select tees" />
                     </SelectTrigger>
                     <SelectContent>
@@ -742,7 +742,7 @@ const CreateMatch = () => {
             <div className="space-y-2">
               <Label htmlFor="max_participants_desktop">Max Participants</Label>
               <Select value={formData.max_participants} onValueChange={(value) => setFormData({ ...formData, max_participants: value })}>
-                <SelectTrigger>
+                <SelectTrigger id="max_participants_desktop">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
