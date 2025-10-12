@@ -575,19 +575,19 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           {user ? 'Create Match' : 'Sign In to Create Match'}
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[425px] p-0 gap-0 max-h-[90vh] flex flex-col">
-        <DialogHeader className="px-6 pt-6 pb-4">
+      <DialogContent className="sm:max-w-[425px] p-0 gap-0 max-h-[90vh] overflow-hidden flex flex-col">
+        <DialogHeader className="px-6 pt-6 pb-4 shrink-0">
           <DialogTitle>Create New Match</DialogTitle>
           <DialogDescription>
             Set up a new golf match and invite others to join.
           </DialogDescription>
         </DialogHeader>
         
-        <form onSubmit={handleSubmit} className="flex flex-col h-full">
+        <form onSubmit={handleSubmit} className="flex-1 flex flex-col overflow-hidden">
           {/* Mobile: Tabbed Interface */}
-          <div className="md:hidden flex flex-col h-full">
+          <div className="md:hidden flex-1 flex flex-col overflow-hidden">
             {/* Tab Navigation */}
-            <div className="px-6 pt-4 pb-2 border-b">
+            <div className="px-6 py-3 border-b shrink-0 bg-muted">
               <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
@@ -628,7 +628,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
               </div>
             </div>
               
-            {/* Tab Content */}
+            {/* Tab Content - scrollable area */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
               {currentTab === 'course' && (
                 <div className="space-y-4">
