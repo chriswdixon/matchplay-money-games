@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MFAEnrollment } from './MFAEnrollment';
 import { MFAVerification } from './MFAVerification';
 import { PaymentMethodSetup } from './PaymentMethodSetup';
+import { EmailConfirmationPending } from './EmailConfirmationPending';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -30,6 +31,8 @@ export function AuthForm() {
   const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [needsMFASetup, setNeedsMFASetup] = useState(false);
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
+  const [showEmailConfirmation, setShowEmailConfirmation] = useState(false);
+  const [pendingEmail, setPendingEmail] = useState('');
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   
@@ -48,6 +51,12 @@ export function AuthForm() {
       }
     };
     checkMFAStatus();
+
+    // Check for pending email confirmation
+    const pendingConfirmationEmail = localStorage.getItem('pendingConfirmationEmail');
+    if (pendingConfirmationEmail) {
+      setPendingEmail(pendingConfirmationEmail);
+    }
   }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
@@ -86,6 +95,10 @@ export function AuthForm() {
       if (data?.currentLevel === 'aal1' && data?.nextLevel === 'aal2') {
         setShowMFAVerification(true);
       }
+    } else if (error.message.includes('Email not confirmed')) {
+      // Show email confirmation screen
+      setPendingEmail(email);
+      setShowEmailConfirmation(true);
     }
     
     setLoading(false);
@@ -122,13 +135,9 @@ export function AuthForm() {
     const { error } = await signUp(email, password, displayName);
     
     if (!error) {
-      // Require MFA enrollment for new users
-      setShowMFAEnrollment(true);
-      setNeedsMFASetup(true);
-      toast({
-        title: "Account Created",
-        description: "Please set up two-factor authentication to secure your account",
-      });
+      // Show email confirmation screen instead of immediate MFA enrollment
+      setPendingEmail(email);
+      setShowEmailConfirmation(true);
     }
     
     setLoading(false);
@@ -211,6 +220,20 @@ export function AuthForm() {
     await signInWithMagicLink(email);
     setMagicLinkLoading(false);
   };
+
+  // Show email confirmation pending screen
+  if (showEmailConfirmation && pendingEmail) {
+    return (
+      <EmailConfirmationPending
+        email={pendingEmail}
+        onBack={() => {
+          setShowEmailConfirmation(false);
+          setPendingEmail('');
+          localStorage.removeItem('pendingConfirmationEmail');
+        }}
+      />
+    );
+  }
 
   // Show MFA enrollment after signup
   if (showPaymentSetup) {

@@ -10,6 +10,7 @@ import NotFound from "./pages/NotFound";
 import ResetPassword from "./pages/ResetPassword";
 import AdminConsole from "./pages/AdminConsole";
 import CreateMatch from "./pages/CreateMatch";
+import VerifyEmail from "./pages/VerifyEmail";
 
 const App = () => (
   <ActiveMatchProvider>
@@ -20,6 +21,7 @@ const App = () => (
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
         <Route path="/auth/reset-password" element={<ResetPassword />} />
+        <Route path="/verify" element={<VerifyEmail />} />
         <Route path="/profile" element={<Profile />} />
         <Route path="/admin" element={<AdminConsole />} />
         <Route path="/create-match" element={<CreateMatch />} />

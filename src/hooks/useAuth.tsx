@@ -13,6 +13,7 @@ interface AuthContextType {
   signInWithMagicLink: (email: string) => Promise<{ error: any }>;
   signOut: () => Promise<{ error: any }>;
   signInWithProvider: (provider: 'google' | 'github' | 'twitter') => Promise<{ error: any }>;
+  resendConfirmationEmail: (email: string) => Promise<{ error: any }>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -81,7 +82,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [toast]);
 
   const signUp = async (email: string, password: string, displayName?: string) => {
-    const redirectUrl = `${window.location.origin}/`;
+    const redirectUrl = `${window.location.origin}/verify`;
     
     const { error } = await supabase.auth.signUp({
       email,
@@ -99,9 +100,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         variant: "destructive",
       });
     } else {
+      // Store pending confirmation email in localStorage
+      localStorage.setItem('pendingConfirmationEmail', email);
       toast({
         title: "Check your email",
-        description: "We've sent you a confirmation link.",
+        description: "We've sent you a confirmation link. You must confirm your email before you can sign in.",
       });
     }
 
@@ -115,11 +118,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     });
 
     if (error) {
-      toast({
-        title: "Sign in failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      // Provide specific guidance for email confirmation errors
+      if (error.message.includes('Email not confirmed')) {
+        localStorage.setItem('pendingConfirmationEmail', email);
+        toast({
+          title: "Email not confirmed",
+          description: "Please confirm your email first. Check your inbox or request a new confirmation email.",
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Sign in failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
 
     return { error };
@@ -173,6 +186,31 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     return { error };
   };
 
+  const resendConfirmationEmail = async (email: string) => {
+    const { error } = await supabase.auth.resend({
+      type: 'signup',
+      email,
+      options: {
+        emailRedirectTo: `${window.location.origin}/verify`
+      }
+    });
+
+    if (error) {
+      toast({
+        title: "Failed to resend",
+        description: error.message,
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Email sent",
+        description: "Check your inbox for a new confirmation link.",
+      });
+    }
+
+    return { error };
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -182,7 +220,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       signIn,
       signInWithMagicLink,
       signOut,
-      signInWithProvider
+      signInWithProvider,
+      resendConfirmationEmail
     }}>
       {children}
     </AuthContext.Provider>
