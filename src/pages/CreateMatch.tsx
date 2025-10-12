@@ -169,7 +169,7 @@ const CreateMatch = () => {
   // Course selection field component
   const CourseField = () => (
     <div className="space-y-2">
-      <Label>Golf Course</Label>
+      <Label htmlFor="course-select">Golf Course</Label>
       {!locationCoords && (
         <div className="space-y-2">
           <div className="flex gap-2">
@@ -214,10 +214,11 @@ const CreateMatch = () => {
       <Popover open={courseOpen} onOpenChange={setCourseOpen}>
         <PopoverTrigger asChild>
           <Button
+            id="course-select"
             variant="outline"
             role="combobox"
             aria-expanded={courseOpen}
-            className="w-full justify-between bg-background relative z-50"
+            className="w-full justify-between bg-background"
           >
             {selectedCourse ? (
               <div className="flex flex-col items-start text-left">
@@ -236,7 +237,7 @@ const CreateMatch = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 z-[100]" align="start" sideOffset={5}>
+        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0" align="start" sideOffset={5}>
           <Command className="border-0">
             <CommandInput 
               placeholder="Search golf courses..." 
@@ -290,13 +291,14 @@ const CreateMatch = () => {
   // Date/Time field component
   const DateTimeField = () => (
     <div className="space-y-2">
-      <Label>Date & Time</Label>
+      <Label htmlFor="datetime-select">Date & Time</Label>
       <Popover open={dateTimeOpen} onOpenChange={setDateTimeOpen}>
         <PopoverTrigger asChild>
           <Button
+            id="datetime-select"
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal relative z-50",
+              "w-full justify-start text-left font-normal",
               !formData.scheduled_time && "text-muted-foreground"
             )}
           >
@@ -308,7 +310,7 @@ const CreateMatch = () => {
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 z-[100]" align="start">
+        <PopoverContent className="w-auto p-0" align="start">
           <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Pick Date & Time</Label>
@@ -479,7 +481,7 @@ const CreateMatch = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-2xl py-6 pb-40 md:pb-32">
+      <main className="container max-w-2xl py-6 pb-32">
         {/* Mobile: Tabbed Interface */}
         <div className="md:hidden">
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
