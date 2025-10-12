@@ -68,6 +68,36 @@ export type Database = {
           },
         ]
       }
+      favorite_courses: {
+        Row: {
+          address: string | null
+          course_name: string
+          created_at: string
+          id: string
+          latitude: number | null
+          longitude: number | null
+          user_id: string
+        }
+        Insert: {
+          address?: string | null
+          course_name: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          user_id: string
+        }
+        Update: {
+          address?: string | null
+          course_name?: string
+          created_at?: string
+          id?: string
+          latitude?: number | null
+          longitude?: number | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       match_cancellation_confirmations: {
         Row: {
           alternate_reason: string | null

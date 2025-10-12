@@ -7,12 +7,13 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
 import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
+import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -27,6 +28,7 @@ const CreateMatch = () => {
   const { createMatch } = useMatches();
   const { geocodeAddress } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
+  const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
 
   const isPaidSubscription = subscribed && tierName !== 'free';
 
@@ -121,6 +123,31 @@ const CreateMatch = () => {
       longitude: course.longitude
     });
     setCourseOpen(false);
+  };
+
+  const handleToggleFavorite = async (e: React.MouseEvent, course: any) => {
+    e.stopPropagation();
+    
+    if (!user) {
+      toast.error('Please sign in to favorite courses');
+      return;
+    }
+
+    const courseName = course.name;
+    
+    if (isFavorite(courseName)) {
+      const favoriteId = getFavoriteId(courseName);
+      if (favoriteId) {
+        await removeFavorite(favoriteId);
+      }
+    } else {
+      await addFavorite({
+        course_name: courseName,
+        address: course.address,
+        latitude: course.latitude,
+        longitude: course.longitude,
+      });
+    }
   };
 
   const handleCancel = () => {
@@ -304,7 +331,48 @@ const CreateMatch = () => {
                     <p className="py-6 text-center text-sm">No courses found</p>
                   )}
                 </CommandEmpty>
-                <CommandGroup>
+                
+                {/* Favorite Courses Section */}
+                {user && favorites.length > 0 && (
+                  <CommandGroup heading="Player Favorite Courses">
+                    {favorites.map((favCourse) => {
+                      const course = {
+                        name: favCourse.course_name,
+                        address: favCourse.address,
+                        latitude: favCourse.latitude,
+                        longitude: favCourse.longitude,
+                      };
+                      return (
+                        <CommandItem
+                          key={favCourse.id}
+                          value={favCourse.course_name}
+                          onSelect={() => handleCourseSelect(course)}
+                          className="cursor-pointer"
+                        >
+                          <Check
+                            className={cn(
+                              "mr-2 h-4 w-4",
+                              selectedCourse?.name === favCourse.course_name ? "opacity-100" : "opacity-0"
+                            )}
+                          />
+                          <div className="flex-1">
+                            <div className="font-medium">{favCourse.course_name}</div>
+                            <div className="text-xs text-muted-foreground">
+                              {favCourse.address}
+                            </div>
+                          </div>
+                          <Star
+                            className="h-4 w-4 fill-primary text-primary"
+                            onClick={(e) => handleToggleFavorite(e, course)}
+                          />
+                        </CommandItem>
+                      );
+                    })}
+                  </CommandGroup>
+                )}
+                
+                {/* All Courses Section */}
+                <CommandGroup heading={user && favorites.length > 0 ? "All Courses" : undefined}>
                   {courses.map((course) => (
                     <CommandItem
                       key={`${course.name}-${course.latitude}`}
@@ -325,6 +393,17 @@ const CreateMatch = () => {
                           {course.distance && ` • ${formatDistance(course.distance)}`}
                         </div>
                       </div>
+                      {user && (
+                        <Star
+                          className={cn(
+                            "h-4 w-4 transition-colors",
+                            isFavorite(course.name)
+                              ? "fill-primary text-primary"
+                              : "text-muted-foreground hover:text-primary"
+                          )}
+                          onClick={(e) => handleToggleFavorite(e, course)}
+                        />
+                      )}
                     </CommandItem>
                   ))}
                 </CommandGroup>
