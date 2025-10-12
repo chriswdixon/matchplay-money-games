@@ -62,14 +62,15 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
 
   // Check if current tab is complete
   const isTab1Complete = useMemo(() => {
-    return !!formData.course_name && !!formData.scheduled_time;
-  }, [formData.course_name, formData.scheduled_time]);
+    return !!formData.course_name;
+  }, [formData.course_name]);
 
   const isTab2Complete = useMemo(() => {
+    const hasScheduledTime = !!formData.scheduled_time;
     const hasFormat = !!formData.format;
     const hasTeesWhenRequired = formData.tee_selection_mode === 'individual' || !!formData.default_tees;
-    return hasFormat && hasTeesWhenRequired;
-  }, [formData.format, formData.tee_selection_mode, formData.default_tees]);
+    return hasScheduledTime && hasFormat && hasTeesWhenRequired;
+  }, [formData.scheduled_time, formData.format, formData.tee_selection_mode, formData.default_tees]);
 
   // Search for nearby courses when location is available
   useEffect(() => {
@@ -553,7 +554,6 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
               
               <TabsContent value="course" className="space-y-4 mt-4">
                 <CourseField />
-                <DateTimeField />
                 <div className="space-y-2">
                   <Label htmlFor="booking_url">Tee Time Booking URL (Optional)</Label>
                   <Input
@@ -567,6 +567,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
               </TabsContent>
 
               <TabsContent value="format" className="space-y-4 mt-4">
+                <DateTimeField />
                 <div className="space-y-2">
                   <Label htmlFor="format">Match Format</Label>
                   <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
