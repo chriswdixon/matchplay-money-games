@@ -462,6 +462,16 @@ const CreateMatch = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Test Input - DELETE AFTER TESTING */}
+      <div className="fixed top-20 left-4 z-[9999] bg-red-500 p-4">
+        <input 
+          type="text" 
+          placeholder="TEST INPUT" 
+          className="border-2 border-black p-2"
+          style={{ position: 'relative', zIndex: 99999 }}
+        />
+      </div>
+      
       {/* Header */}
       <header className="sticky top-0 w-full border-b bg-background">
         <div className="container flex h-14 items-center">
