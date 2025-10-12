@@ -13,6 +13,7 @@ import { checkPasswordSecurity } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MFAEnrollment } from './MFAEnrollment';
 import { MFAVerification } from './MFAVerification';
+import { PaymentMethodSetup } from './PaymentMethodSetup';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -28,6 +29,7 @@ export function AuthForm() {
   const [showMFAEnrollment, setShowMFAEnrollment] = useState(false);
   const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [needsMFASetup, setNeedsMFASetup] = useState(false);
+  const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   
@@ -211,13 +213,43 @@ export function AuthForm() {
   };
 
   // Show MFA enrollment after signup
+  if (showPaymentSetup) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+        <PaymentMethodSetup 
+          onComplete={() => {
+            setShowPaymentSetup(false);
+            toast({
+              title: "Setup Complete",
+              description: "Welcome to MatchPlay! You're all set to join matches.",
+            });
+          }}
+          onSkip={() => {
+            setShowPaymentSetup(false);
+            toast({
+              title: "Setup Complete",
+              description: "You can add a payment method later in your profile.",
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
   if (showMFAEnrollment) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
         <MFAEnrollment
           onComplete={() => {
             setShowMFAEnrollment(false);
-            if (!needsMFASetup) {
+            if (needsMFASetup) {
+              // After MFA setup for new users, show payment setup
+              setShowPaymentSetup(true);
+              toast({
+                title: "MFA Setup Complete",
+                description: "Now let's add a payment method",
+              });
+            } else {
               toast({
                 title: "Welcome to MatchPlay",
                 description: "Your account is now secured with two-factor authentication",

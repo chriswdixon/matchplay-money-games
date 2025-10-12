@@ -11,6 +11,7 @@ import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
 import { TransactionHistory } from '@/components/profile/TransactionHistory';
+import { PaymentMethods } from '@/components/profile/PaymentMethods';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -105,6 +106,7 @@ export default function Profile() {
           <TabsContent value="account" className="space-y-6">
             <AccountBalance />
             <TransactionHistory />
+            <PaymentMethods />
           </TabsContent>
 
           <TabsContent value="settings">

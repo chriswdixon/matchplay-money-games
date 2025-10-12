@@ -11,3 +11,5 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.charge-match-buyin]
 [functions.process-payout]
 [functions.credit-match-winnings]
+[functions.setup-payment-method]
+[functions.create-setup-intent]
