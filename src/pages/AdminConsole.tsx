@@ -9,6 +9,17 @@ import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
 import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
 
+/**
+ * SECURITY NOTE: Admin UI Access Control
+ * 
+ * This component checks admin status client-side for UI convenience only.
+ * All actual admin operations (disable user, create coupons, etc.) are 
+ * protected by server-side validation in edge functions using the has_role() 
+ * security definer function.
+ * 
+ * Even if a user bypasses this client-side check, they cannot execute any 
+ * admin operations without proper server-side authorization.
+ */
 const AdminConsole = () => {
   const { isAdmin, loading } = useAdminRole();
   const navigate = useNavigate();
