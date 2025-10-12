@@ -525,6 +525,14 @@ export type Database = {
         Args: { profile_user_id: string }
         Returns: boolean
       }
+      is_user_match_creator: {
+        Args: { p_match_id: string; p_user_id: string }
+        Returns: boolean
+      }
+      is_user_match_participant: {
+        Args: { p_match_id: string; p_user_id: string }
+        Returns: boolean
+      }
       leave_match_with_dnf: {
         Args: { p_match_id: string; p_reason: string; p_user_id: string }
         Returns: Json
