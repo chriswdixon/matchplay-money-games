@@ -66,6 +66,41 @@ export const profileUpdateSchema = z.object({
   handicap: z.number().min(-10, "Handicap must be at least -10").max(54, "Handicap must be at most 54").optional(),
 });
 
+// Create match validation schema
+export const createMatchSchema = z.object({
+  course_name: z.string().trim().min(1, "Course name is required").max(200, "Course name must be less than 200 characters"),
+  buy_in_amount: z.number().int().min(0, "Buy-in must be at least $0").max(500, "Buy-in cannot exceed $500"),
+  handicap_min: z.number().int().min(-10, "Minimum handicap must be at least -10").max(54, "Minimum handicap must be at most 54").optional().nullable(),
+  handicap_max: z.number().int().min(-10, "Maximum handicap must be at least -10").max(54, "Maximum handicap must be at most 54").optional().nullable(),
+  booking_url: z.string().trim().max(500, "Booking URL must be less than 500 characters").optional().or(z.literal('')).refine((url) => {
+    if (!url) return true;
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  }, "Invalid URL format"),
+  format: z.enum(['Stroke Play', 'Match Play', 'Best Ball', 'Skins Game', 'Scramble'], {
+    errorMap: () => ({ message: "Invalid match format" })
+  }),
+  max_participants: z.number().int().min(1, "Must have at least 1 participant").max(8, "Cannot exceed 8 participants"),
+  location: z.string().trim().min(1, "Location is required").max(200, "Location must be less than 200 characters"),
+  course_name_display: z.string().trim().optional(),
+  latitude: z.number().optional().nullable(),
+  longitude: z.number().optional().nullable(),
+  address: z.string().trim().max(500, "Address must be less than 500 characters").optional().nullable(),
+}).refine(
+  (data) => {
+    if (data.handicap_min !== undefined && data.handicap_min !== null && 
+        data.handicap_max !== undefined && data.handicap_max !== null) {
+      return data.handicap_min <= data.handicap_max;
+    }
+    return true;
+  },
+  { message: "Minimum handicap must be less than or equal to maximum handicap", path: ["handicap_min"] }
+);
+
 // Input sanitization function
 export function sanitizeInput(input: string): string {
   if (!input) return '';
