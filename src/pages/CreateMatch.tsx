@@ -286,8 +286,8 @@ const CreateMatch = () => {
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 pointer-events-auto z-[100]" align="start" sideOffset={5}>
-          <Command className="border-0 pointer-events-auto">
+        <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0" align="start" sideOffset={5}>
+          <Command className="border-0">
             <CommandInput 
               placeholder="Search golf courses..." 
               onValueChange={handleCustomCourse}
@@ -359,8 +359,8 @@ const CreateMatch = () => {
             )}
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-auto p-0 pointer-events-auto z-[100]" align="start">
-          <div className="p-4 space-y-4 pointer-events-auto">
+        <PopoverContent className="w-auto p-0" align="start">
+          <div className="p-4 space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-sm font-medium">Pick Date & Time</Label>
               <Button 
@@ -403,7 +403,6 @@ const CreateMatch = () => {
                 }}
                 disabled={(date) => date < new Date()}
                 initialFocus
-                className="p-3 pointer-events-auto"
               />
             </div>
             <div>
@@ -514,7 +513,7 @@ const CreateMatch = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 w-full border-b bg-background">
+      <header className="sticky top-0 w-full border-b bg-background z-40">
         <div className="container flex h-14 items-center">
           <Button
             variant="ghost"
@@ -531,16 +530,17 @@ const CreateMatch = () => {
 
       {/* Main Content */}
       <main className="container max-w-2xl py-6 pb-32">
-        {/* Mobile: Tabbed Interface */}
-        <div className="md:hidden">
-          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            <TabsList className="grid w-full grid-cols-3">
-              <TabsTrigger value="course">Course</TabsTrigger>
-              <TabsTrigger value="format">Format</TabsTrigger>
-              <TabsTrigger value="details">Details</TabsTrigger>
-            </TabsList>
-            
-            <TabsContent value="course" className="space-y-4 mt-4">
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Mobile: Tabbed Interface */}
+          <div className="md:hidden">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-3">
+                <TabsTrigger value="course">Course</TabsTrigger>
+                <TabsTrigger value="format">Format</TabsTrigger>
+                <TabsTrigger value="details">Details</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="course" className="space-y-4 mt-4">
                 <CourseField />
                 <DateTimeField />
                 <div className="space-y-2">
@@ -673,10 +673,10 @@ const CreateMatch = () => {
                 </div>
               </TabsContent>
             </Tabs>
-        </div>
+          </div>
 
-        {/* Desktop: All fields visible */}
-        <form onSubmit={handleSubmit} className="hidden md:block space-y-4">
+          {/* Desktop: All fields visible */}
+          <div className="hidden md:block space-y-4">
             <CourseField />
             <DateTimeField />
             
@@ -804,60 +804,50 @@ const CreateMatch = () => {
                 </SelectContent>
               </Select>
             </div>
-        </form>
-      </main>
-
-      {/* Fixed Bottom Bar - Mobile Only */}
-      <form onSubmit={handleSubmit}>
-        <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4">
-          <div className="container flex gap-2">
-            <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
-              Cancel
-            </Button>
-            {!isFormValid ? (
-              <Button 
-                type="button" 
-                onClick={handleNextTab}
-                disabled={
-                  (currentTab === 'course' && !isTab1Complete) || 
-                  (currentTab === 'format' && !isTab2Complete)
-                }
-                className="flex-1 bg-gradient-primary text-primary-foreground"
-              >
-                Next
-                <ChevronRight className="w-4 h-4 ml-2" />
+          </div>
+          
+          {/* Fixed Bottom Bar - Mobile & Desktop */}
+          <div className="fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-30">
+            <div className="container max-w-2xl flex gap-2">
+              <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1 md:flex-none">
+                Cancel
               </Button>
-            ) : (
+              {/* Mobile: Show Next/Submit based on tab */}
+              <div className="md:hidden flex-1">
+                {!isFormValid ? (
+                  <Button 
+                    type="button" 
+                    onClick={handleNextTab}
+                    disabled={
+                      (currentTab === 'course' && !isTab1Complete) || 
+                      (currentTab === 'format' && !isTab2Complete)
+                    }
+                    className="w-full bg-gradient-primary text-primary-foreground"
+                  >
+                    Next
+                    <ChevronRight className="w-4 h-4 ml-2" />
+                  </Button>
+                ) : (
+                  <Button 
+                    type="submit"
+                    className="w-full bg-gradient-primary text-primary-foreground"
+                  >
+                    Create Match
+                  </Button>
+                )}
+              </div>
+              {/* Desktop: Show Submit */}
               <Button 
-                type="submit" 
-                onClick={handleSubmit}
-                className="flex-1 bg-gradient-primary text-primary-foreground"
+                type="submit"
+                disabled={!isFormValid}
+                className="hidden md:block bg-gradient-primary text-primary-foreground"
               >
                 Create Match
               </Button>
-            )}
+            </div>
           </div>
-        </div>
-      </form>
-
-      {/* Desktop Submit Bar */}
-      <form onSubmit={handleSubmit}>
-        <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4">
-          <div className="container max-w-2xl flex justify-end gap-2">
-            <Button type="button" variant="outline" onClick={() => navigate('/')}>
-              Cancel
-            </Button>
-            <Button 
-              type="submit" 
-              onClick={handleSubmit}
-              className="bg-gradient-primary text-primary-foreground" 
-              disabled={!isFormValid}
-            >
-              Create Match
-            </Button>
-          </div>
-        </div>
-      </form>
+        </form>
+      </main>
     </div>
   );
 };
