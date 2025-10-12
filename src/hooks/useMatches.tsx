@@ -345,22 +345,7 @@ export const useMatches = () => {
       if (error) throw error;
       if (!data) throw new Error('Failed to create match - no data returned');
 
-      // Charge buy-in if amount > 0
-      if (data.buy_in_amount > 0) {
-        const { data: { session } } = await supabase.auth.getSession();
-        const { error: chargeError } = await supabase.functions.invoke('charge-match-buyin', {
-          body: { matchId: data.id, buyInAmount: data.buy_in_amount },
-          headers: { Authorization: `Bearer ${session?.access_token}` }
-        });
-        
-        if (chargeError) {
-          // Rollback match creation
-          await supabase.from('matches').delete().eq('id', data.id);
-          throw new Error('Failed to charge buy-in: ' + chargeError.message);
-        }
-      }
-
-      // Automatically join the creator to the match
+      // Automatically join the creator to the match FIRST (required for buy-in charge)
       const { error: joinError } = await supabase
         .from('match_participants')
         .insert({
@@ -369,8 +354,25 @@ export const useMatches = () => {
         });
 
       if (joinError) {
-        const safeMessage = mapDatabaseError(joinError);
-        console.error('Failed to auto-join creator:', safeMessage);
+        // Rollback match creation
+        await supabase.from('matches').delete().eq('id', data.id);
+        throw new Error('Failed to add creator as participant: ' + mapDatabaseError(joinError));
+      }
+
+      // Charge buy-in if amount > 0 (creator must be participant first)
+      if (data.buy_in_amount > 0) {
+        const { data: { session } } = await supabase.auth.getSession();
+        const { error: chargeError } = await supabase.functions.invoke('charge-match-buyin', {
+          body: { matchId: data.id, buyInAmount: data.buy_in_amount },
+          headers: { Authorization: `Bearer ${session?.access_token}` }
+        });
+        
+        if (chargeError) {
+          // Rollback match creation and participation
+          await supabase.from('match_participants').delete().eq('match_id', data.id);
+          await supabase.from('matches').delete().eq('id', data.id);
+          throw new Error('Failed to charge buy-in: ' + chargeError.message);
+        }
       }
 
       toast.success('Match created successfully!');
