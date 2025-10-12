@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw } from "lucide-react";
+import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw, Star } from "lucide-react";
 import { useSubscription, SUBSCRIPTION_TIERS } from "@/hooks/useSubscription";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
@@ -92,14 +92,20 @@ const SubscriptionManagement = () => {
   }
 
   const tierFeatures = {
+    'Local Basic': [
+      "Basic match booking",
+      "Local player matching",
+      "Simple handicap tracking",
+      "Live scoring",
+      "Match history"
+    ],
     'Local Player': [
-      "Local match booking",
+      "Everything in Local Basic",
       "GPS-based player matching",
-      "Handicap tracking & management",
+      "Advanced handicap management",
       "Friendly money games",
-      "Live scoring system",
       "Instant payouts",
-      "Basic match history"
+      "Detailed match history"
     ],
     'Tournament Pro': [
       "Everything in Local Player",
@@ -113,7 +119,10 @@ const SubscriptionManagement = () => {
     ]
   };
 
+  const isBasicTier = tierName === 'Local Basic';
   const isLocalTier = tierName === 'Local Player';
+  const isTournamentTier = tierName === 'Tournament Pro';
+  const canUpgrade = !isTournamentTier;
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
@@ -139,8 +148,8 @@ const SubscriptionManagement = () => {
           {!subscribed ? (
             <div className="text-center py-8">
               <p className="text-muted-foreground mb-4">No active subscription</p>
-              <Button onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local.price_id)}>
-                Subscribe to Local Player
+              <Button onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.basic.price_id)}>
+                Subscribe to Local Basic
               </Button>
             </div>
           ) : (
@@ -166,10 +175,16 @@ const SubscriptionManagement = () => {
               )}
 
               <div className="flex gap-2 pt-2">
-                {isLocalTier && (
-                  <Button onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament.price_id)} className="flex-1" disabled={upgradeLoading}>
+                {canUpgrade && (
+                  <Button 
+                    onClick={() => handleUpgrade(
+                      isBasicTier ? SUBSCRIPTION_TIERS.local.price_id : SUBSCRIPTION_TIERS.tournament.price_id
+                    )} 
+                    className="flex-1" 
+                    disabled={upgradeLoading}
+                  >
                     <Crown className="w-4 h-4 mr-2" />
-                    {upgradeLoading ? "Processing..." : "Upgrade to Tournament Pro"}
+                    {upgradeLoading ? "Processing..." : (isBasicTier ? "Upgrade to Local Player" : "Upgrade to Tournament Pro")}
                   </Button>
                 )}
                 <Button onClick={refreshSubscription} variant="outline" size="icon">
@@ -201,13 +216,41 @@ const SubscriptionManagement = () => {
       )}
 
       {/* Available Upgrades */}
-      {subscribed && isLocalTier && (
+      {subscribed && canUpgrade && (
         <Card>
           <CardHeader>
-            <CardTitle>Upgrade to Tournament Pro</CardTitle>
-            <CardDescription>Unlock premium features for serious competitors</CardDescription>
+            <CardTitle>Available Upgrades</CardTitle>
+            <CardDescription>Unlock more features for your golf game</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
+            {isBasicTier && (
+              <div className="p-4 border rounded-lg space-y-3">
+                <div className="flex items-center justify-between">
+                  <h4 className="font-semibold flex items-center gap-2">
+                    <Star className="w-5 h-5 text-primary" />
+                    Local Player
+                  </h4>
+                  <Badge variant="secondary">$29/month</Badge>
+                </div>
+                <ul className="space-y-1 text-sm text-muted-foreground">
+                  {tierFeatures['Local Player'].slice(1).map((feature, idx) => (
+                    <li key={idx} className="flex items-center gap-2">
+                      <CheckCircle className="w-3 h-3 text-accent" />
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+                <Button 
+                  onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local.price_id)} 
+                  size="sm" 
+                  className="w-full"
+                  disabled={upgradeLoading}
+                >
+                  {upgradeLoading ? "Processing..." : "Upgrade to Local Player"}
+                </Button>
+              </div>
+            )}
+            
             <div className="p-4 border rounded-lg space-y-3">
               <div className="flex items-center justify-between">
                 <h4 className="font-semibold flex items-center gap-2">
@@ -230,7 +273,7 @@ const SubscriptionManagement = () => {
                 className="w-full"
                 disabled={upgradeLoading}
               >
-                {upgradeLoading ? "Processing..." : "Upgrade Now"}
+                {upgradeLoading ? "Processing..." : "Upgrade to Tournament Pro"}
               </Button>
             </div>
           </CardContent>

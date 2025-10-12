@@ -17,22 +17,37 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
 
   const tiers = [
     {
+      key: 'basic' as const,
+      name: "Local Basic",
+      price: "$10",
+      period: "/month",
+      description: "Perfect for getting started",
+      features: [
+        "Basic match booking",
+        "Local player matching",
+        "Simple handicap tracking",
+        "Live scoring",
+        "Match history"
+      ],
+      icon: <Star className="w-6 h-6" />,
+      popular: false,
+    },
+    {
       key: 'local' as const,
       name: "Local Player",
       price: "$29",
       period: "/month",
       description: "Perfect for casual competitive play",
       features: [
-        "Local match booking",
+        "Everything in Local Basic",
         "GPS-based player matching",
-        "Handicap tracking & management",
+        "Advanced handicap management",
         "Friendly money games",
-        "Live scoring system",
         "Instant payouts",
-        "Basic match history"
+        "Detailed match history"
       ],
       icon: <Star className="w-6 h-6" />,
-      popular: false,
+      popular: true,
     },
     {
       key: 'tournament' as const,
@@ -51,11 +66,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
         "Premium customer support"
       ],
       icon: <Crown className="w-6 h-6" />,
-      popular: true,
+      popular: false,
     }
   ];
 
-  const handleSubscribe = async (tierKey: 'local' | 'tournament') => {
+  const handleSubscribe = async (tierKey: 'basic' | 'local' | 'tournament') => {
     setLoading(true);
 
     try {
@@ -116,7 +131,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
         </p>
       </div>
 
-      <div className="grid md:grid-cols-2 gap-6">
+      <div className="grid md:grid-cols-3 gap-6">
         {tiers.map((tier) => (
           <Card 
             key={tier.key}

@@ -4,6 +4,12 @@ import { useAuth } from '@/hooks/useAuth';
 
 // Subscription tier configuration
 export const SUBSCRIPTION_TIERS = {
+  basic: {
+    name: 'Local Basic',
+    price_id: 'price_1SHDgn8xKJwJeHGFaVUR6UdJ',
+    product_id: 'prod_TDf0Td1tkDLgZw',
+    price: 10,
+  },
   local: {
     name: 'Local Player',
     price_id: 'price_1SHDcH8xKJwJeHGFTc3dUlm8',

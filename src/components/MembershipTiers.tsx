@@ -6,21 +6,36 @@ import { Check, Star, Crown } from "lucide-react";
 const MembershipTiers = () => {
   const tiers = [
     {
+      name: "Local Basic",
+      price: "$10",
+      period: "/month",
+      description: "Perfect for getting started",
+      features: [
+        "Basic match booking",
+        "Local player matching",
+        "Simple handicap tracking",
+        "Live scoring",
+        "Match history"
+      ],
+      buttonText: "Start Basic",
+      popular: false,
+      icon: <Star className="w-6 h-6" />
+    },
+    {
       name: "Local Player",
       price: "$29",
       period: "/month",
       description: "Perfect for casual competitive play",
       features: [
-        "Local match booking",
+        "Everything in Local Basic",
         "GPS-based player matching",
-        "Handicap tracking & management",
+        "Advanced handicap management",
         "Friendly money games",
-        "Live scoring system",
         "Instant payouts",
-        "Basic match history"
+        "Detailed match history"
       ],
       buttonText: "Start Local Play",
-      popular: false,
+      popular: true,
       icon: <Star className="w-6 h-6" />
     },
     {
@@ -39,7 +54,7 @@ const MembershipTiers = () => {
         "Premium customer support"
       ],
       buttonText: "Join Tournament Circuit",
-      popular: true,
+      popular: false,
       icon: <Crown className="w-6 h-6" />
     }
   ];
@@ -60,7 +75,7 @@ const MembershipTiers = () => {
           </p>
         </div>
         
-        <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {tiers.map((tier, index) => (
             <Card 
               key={tier.name} 
