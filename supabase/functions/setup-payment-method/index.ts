@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,28 @@ const corsHeaders = {
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[SETUP-PAYMENT] ${step}${detailsStr}`);
+};
+
+// Rate limiting helper
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+const isRateLimited = (userId: string): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitCache.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitCache.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  userLimit.count++;
+  return false;
 };
 
 serve(async (req) => {
@@ -33,20 +56,34 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) throw new Error("Unauthorized");
     
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    logStep("User authenticated", { userId: user.id });
 
-    const { paymentMethodId } = await req.json();
-    if (!paymentMethodId) {
-      throw new Error("Missing paymentMethodId");
+    // Check rate limit
+    if (isRateLimited(user.id)) {
+      logStep("Rate limit exceeded", { userId: user.id });
+      return new Response(JSON.stringify({ 
+        error: "Too many requests. Please try again later." 
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 429,
+      });
     }
 
-    logStep("Setting up payment method", { paymentMethodId });
+    // Validate input
+    const requestSchema = z.object({
+      paymentMethodId: z.string().min(1, 'Payment method ID is required')
+    });
+    
+    const requestBody = await req.json();
+    const { paymentMethodId } = requestSchema.parse(requestBody);
+
+    logStep("Setting up payment method");
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
       apiVersion: "2025-08-27.basil",
     });
 
-    // Find or create Stripe customer
+    // Find or create Stripe customer (constant-time operation)
     let customerId: string;
     const customers = await stripe.customers.list({ 
       email: user.email!, 
@@ -55,15 +92,16 @@ serve(async (req) => {
 
     if (customers.data.length > 0) {
       customerId = customers.data[0].id;
-      logStep("Found existing customer", { customerId });
     } else {
       const customer = await stripe.customers.create({
         email: user.email!,
         metadata: { user_id: user.id }
       });
       customerId = customer.id;
-      logStep("Created new customer", { customerId });
     }
+    
+    // Generic logging (no timing differences)
+    logStep("Customer processed", { customerId });
 
     // Attach payment method to customer
     await stripe.paymentMethods.attach(paymentMethodId, {

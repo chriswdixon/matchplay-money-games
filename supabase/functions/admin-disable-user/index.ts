@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -36,8 +37,13 @@ serve(async (req) => {
 
     if (!roleData) throw new Error("Unauthorized: Admin access required");
 
-    // Get user ID from request
-    const { userId } = await req.json();
+    // Validate input
+    const requestSchema = z.object({
+      userId: z.string().uuid('Invalid user ID format')
+    });
+    
+    const requestBody = await req.json();
+    const { userId } = requestSchema.parse(requestBody);
 
     // Set membership_tier to 'disabled' which will suspend subscription access
     const { error: updateError } = await supabaseClient
