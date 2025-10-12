@@ -587,7 +587,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           {/* Mobile: Tabbed Interface */}
           <div className="flex-1 flex flex-col md:hidden">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col min-h-0">
-              <TabsList className="grid w-full grid-cols-3 mx-6">
+              <TabsList className="grid grid-cols-3 mx-auto">
                 <TabsTrigger value="course" className="text-xs">Course</TabsTrigger>
                 <TabsTrigger value="format" className="text-xs">Format</TabsTrigger>
                 <TabsTrigger value="details" className="text-xs">Details</TabsTrigger>
