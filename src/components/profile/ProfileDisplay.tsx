@@ -78,7 +78,7 @@ export function ProfileDisplay() {
               <span className="text-muted-foreground">{user?.email}</span>
             </div>
             <div className="mt-2">
-              <Badge className={`${getMembershipColor(tierName)} flex items-center gap-1.5`}>
+              <Badge className={`${getMembershipColor(tierName)} flex items-center gap-1 text-xs px-2 py-0.5`}>
                 {getMembershipIcon(tierName)}
                 {tierName || 'Free'}
               </Badge>
