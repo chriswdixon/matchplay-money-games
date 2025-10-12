@@ -400,11 +400,11 @@ const CreateMatch = () => {
             <SelectValue placeholder="Select format" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="stroke-play">Stroke Play</SelectItem>
-            <SelectItem value="match-play">Match Play</SelectItem>
-            <SelectItem value="best-ball">Best Ball</SelectItem>
-            <SelectItem value="skins-game">Skins Game</SelectItem>
-            <SelectItem value="scramble">Scramble</SelectItem>
+            <SelectItem value="Stroke Play">Stroke Play</SelectItem>
+            <SelectItem value="Match Play">Match Play</SelectItem>
+            <SelectItem value="Best Ball">Best Ball</SelectItem>
+            <SelectItem value="Skins Game">Skins Game</SelectItem>
+            <SelectItem value="Scramble">Scramble</SelectItem>
           </SelectContent>
         </Select>
       </div>
