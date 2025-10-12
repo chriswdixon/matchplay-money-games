@@ -223,10 +223,10 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 setZipcode(value);
               }}
               maxLength={5}
-              className="flex-1"
+              className="flex-1 pointer-events-auto relative z-10"
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
-              <SelectTrigger className="w-[110px]">
+              <SelectTrigger className="w-[110px] pointer-events-auto relative z-10">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -242,6 +242,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
               size="sm"
               onClick={handleZipcodeSearch}
               disabled={loadingZipcode || !zipcode || zipcode.length < 5}
+              className="pointer-events-auto relative z-10"
             >
               {loadingZipcode ? (
                 <Loader2 className="w-4 h-4 animate-spin" />
@@ -258,7 +259,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
             variant="outline"
             role="combobox"
             aria-expanded={courseOpen}
-            className="w-full justify-between bg-background"
+            className="w-full justify-between bg-background pointer-events-auto relative z-10"
           >
             {selectedCourse ? (
               <div className="flex flex-col items-start text-left">
@@ -337,7 +338,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
           <Button
             variant="outline"
             className={cn(
-              "w-full justify-start text-left font-normal",
+              "w-full justify-start text-left font-normal pointer-events-auto relative z-10",
               !formData.scheduled_time && "text-muted-foreground"
             )}
           >
