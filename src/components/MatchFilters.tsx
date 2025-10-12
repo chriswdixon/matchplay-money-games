@@ -93,7 +93,7 @@ const MatchFilters = ({
             </Button>
           </div>
           {hasActiveFilters && (
-            <div className="shadow-lg rounded-lg border-2 border-destructive/20 bg-card hover:border-destructive/40 transition-all duration-300">
+            <div className="shadow-[0_4px_20px_rgba(0,0,0,0.15)] rounded-lg border-2 border-destructive/20 bg-card hover:border-destructive/40 transition-all duration-300">
               <Button
                 variant="ghost"
                 size="sm"
