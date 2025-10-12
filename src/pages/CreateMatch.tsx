@@ -174,7 +174,7 @@ const CreateMatch = () => {
         <div className="space-y-2">
           <div className="flex gap-2">
             <Input
-              type="text"
+              type="tel"
               placeholder="Enter zipcode to find courses"
               value={zipcode}
               onChange={(e) => {
@@ -183,8 +183,6 @@ const CreateMatch = () => {
               }}
               maxLength={5}
               className="flex-1"
-              autoComplete="postal-code"
-              inputMode="numeric"
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
               <SelectTrigger className="w-[110px]">
@@ -465,7 +463,7 @@ const CreateMatch = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 w-full border-b bg-background">
         <div className="container flex h-14 items-center">
           <Button
             variant="ghost"
@@ -481,8 +479,8 @@ const CreateMatch = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-2xl py-6 pb-32 relative">
-        <form onSubmit={handleSubmit} className="space-y-6 relative z-0">
+      <main className="container max-w-2xl py-6 pb-32">
+        <form onSubmit={handleSubmit} className="space-y-6">
           {/* Mobile: Tabbed Interface */}
           <div className="md:hidden">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
@@ -492,7 +490,7 @@ const CreateMatch = () => {
                 <TabsTrigger value="details">Details</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="course" className="space-y-4 mt-4 relative z-0">
+              <TabsContent value="course" className="space-y-4 mt-4">
                 <CourseField />
                 <DateTimeField />
                 <div className="space-y-2">
@@ -761,7 +759,7 @@ const CreateMatch = () => {
       </main>
 
       {/* Fixed Bottom Bar - Mobile Only */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-40">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4">
         <div className="container flex gap-2">
           <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
             Cancel
@@ -792,7 +790,7 @@ const CreateMatch = () => {
       </div>
 
       {/* Desktop Submit Bar */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-40">
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4">
         <div className="container max-w-2xl flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => navigate('/')}>
             Cancel
