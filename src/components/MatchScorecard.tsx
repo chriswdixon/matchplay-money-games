@@ -306,7 +306,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-0 space-y-0 md:space-y-2">
+    <div className="w-full max-w-[1400px] mx-auto px-0 space-y-0 md:space-y-2 overflow-x-hidden">
       {/* Header with Course Name and Hamburger Menu */}
       <div className="px-4 md:px-6">
         <div className="flex items-center justify-between">
@@ -840,12 +840,12 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                                 )} />
                               </Button>
                             </CollapsibleTrigger>
-                            <CollapsibleContent className="pt-2">
+                             <CollapsibleContent className="pt-2">
                               <div className="flex flex-wrap gap-2">
                                 {otherPlayers.map((player) => (
-                                  <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
-                                    <span className="text-sm font-medium">{player.player_name}</span>
-                                    <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
+                                  <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1 min-w-0">
+                                    <span className="text-sm font-medium truncate max-w-[120px]">{player.player_name}</span>
+                                    <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium flex-shrink-0">
                                       {player.scores[hole] || '—'}
                                     </div>
                                   </div>
@@ -1148,9 +1148,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             <CollapsibleContent className="pt-2">
                               <div className="flex flex-wrap gap-2">
                                 {otherPlayers.map((player) => (
-                                  <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1">
-                                    <span className="text-sm font-medium">{player.player_name}</span>
-                                    <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium">
+                                  <div key={player.player_id} className="flex items-center gap-2 bg-muted/20 rounded-lg px-3 py-1 min-w-0">
+                                    <span className="text-sm font-medium truncate max-w-[120px]">{player.player_name}</span>
+                                    <div className="w-8 h-8 rounded bg-muted text-muted-foreground flex items-center justify-center text-sm font-medium flex-shrink-0">
                                       {player.scores[hole] || '—'}
                                     </div>
                                   </div>
