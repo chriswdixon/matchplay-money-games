@@ -77,18 +77,8 @@ serve(async (req) => {
       throw new Error('Buy-in amount does not match match requirements');
     }
 
-    // Check for existing payment to prevent duplicates
-    const { data: existingPayment } = await supabaseClient
-      .from('account_transactions')
-      .select('id')
-      .eq('match_id', matchId)
-      .eq('user_id', user.id)
-      .eq('transaction_type', 'match_buyin')
-      .maybeSingle();
-
-    if (existingPayment) {
-      throw new Error('Buy-in already paid for this match');
-    }
+    // Note: Unique constraint on (match_id, user_id, transaction_type) 
+    // will prevent duplicates at database level
 
     // Get or create player account
     const { data: account, error: accountError } = await supabaseClient
@@ -129,8 +119,8 @@ serve(async (req) => {
 
       if (updateError) throw updateError;
 
-      // Record transaction
-      await supabaseClient
+      // Record transaction - unique constraint prevents duplicates
+      const { error: txError } = await supabaseClient
         .from('account_transactions')
         .insert({
           user_id: user.id,
@@ -140,6 +130,22 @@ serve(async (req) => {
           match_id: matchId,
           description: `Buy-in for match ${matchId}`
         });
+      
+      if (txError) {
+        // Check if it's a duplicate transaction error
+        if (txError.code === '23505') {
+          logStep("Duplicate transaction detected");
+          return new Response(JSON.stringify({ 
+            success: true,
+            message: "Buy-in already processed",
+            chargedFrom: 'balance'
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+        throw txError;
+      }
 
       logStep("Buy-in charged from balance");
       return new Response(JSON.stringify({ 
@@ -170,7 +176,7 @@ serve(async (req) => {
 
       const customerId = customers.data[0].id;
 
-      // Create payment intent
+      // Create payment intent with idempotency key
       const paymentIntent = await stripe.paymentIntents.create({
         amount: Math.round(buyInAmount * 100), // Convert to cents
         currency: 'usd',
@@ -185,14 +191,16 @@ serve(async (req) => {
           enabled: true,
           allow_redirects: 'never'
         }
+      }, {
+        idempotencyKey: `match_buyin_${matchId}_${user.id}`,
       });
 
       if (paymentIntent.status !== 'succeeded') {
         throw new Error("Payment failed");
       }
 
-      // Record transaction
-      await supabaseClient
+      // Record transaction - unique constraint prevents duplicates
+      const { error: txError } = await supabaseClient
         .from('account_transactions')
         .insert({
           user_id: user.id,
@@ -203,6 +211,22 @@ serve(async (req) => {
           description: `Buy-in for match ${matchId} (charged to card)`,
           stripe_payment_intent_id: paymentIntent.id
         });
+      
+      if (txError) {
+        // Check if it's a duplicate transaction error
+        if (txError.code === '23505') {
+          logStep("Duplicate transaction detected");
+          return new Response(JSON.stringify({ 
+            success: true,
+            message: "Buy-in already processed",
+            chargedFrom: 'stripe'
+          }), {
+            headers: { ...corsHeaders, "Content-Type": "application/json" },
+            status: 200,
+          });
+        }
+        throw txError;
+      }
 
       logStep("Buy-in charged from Stripe");
       return new Response(JSON.stringify({ 
@@ -217,7 +241,21 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Sanitize error messages for security
+    let safeMessage = "Unable to process payment";
+    if (errorMessage.includes('Insufficient')) {
+      safeMessage = "Insufficient funds";
+    } else if (errorMessage.includes('not found') || errorMessage.includes('not authenticated')) {
+      safeMessage = "Resource not available";
+    } else if (errorMessage.includes('Payment')) {
+      safeMessage = "Payment processing failed";
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: safeMessage,
+      code: "PAYMENT_FAILED"
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

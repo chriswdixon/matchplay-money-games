@@ -69,26 +69,8 @@ serve(async (req) => {
     const totalPot = buyInAmount * (participants?.length || 0);
     logStep("Calculated pot", { participantCount: participants?.length, totalPot });
 
-    // Check if winnings already credited
-    const { data: existingTransaction } = await supabaseClient
-      .from('account_transactions')
-      .select('id')
-      .eq('match_id', matchId)
-      .eq('transaction_type', 'winning')
-      .eq('user_id', winnerId)
-      .maybeSingle();
-
-    if (existingTransaction) {
-      logStep("Winnings already credited");
-      return new Response(JSON.stringify({ 
-        success: true, 
-        message: "Winnings already credited",
-        alreadyProcessed: true
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
+    // Note: Unique constraint on (match_id, user_id, transaction_type) 
+    // will prevent duplicates at database level
 
     // Get winner's account
     const { data: account } = await supabaseClient
@@ -110,8 +92,8 @@ serve(async (req) => {
 
     if (updateError) throw updateError;
 
-    // Record transaction
-    await supabaseClient
+    // Record transaction - unique constraint prevents duplicates
+    const { error: txError } = await supabaseClient
       .from('account_transactions')
       .insert({
         user_id: winnerId,
@@ -125,6 +107,22 @@ serve(async (req) => {
           buy_in_amount: buyInAmount
         }
       });
+    
+    if (txError) {
+      // Check if it's a duplicate transaction error
+      if (txError.code === '23505') {
+        logStep("Duplicate winnings credit detected");
+        return new Response(JSON.stringify({ 
+          success: true,
+          message: "Winnings already credited",
+          amount: totalPot
+        }), {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 200,
+        });
+      }
+      throw txError;
+    }
 
     logStep("Winnings credited successfully");
     return new Response(JSON.stringify({ 
@@ -139,7 +137,19 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    
+    // Sanitize error messages for security
+    let safeMessage = "Unable to process winnings";
+    if (errorMessage.includes('not found') || errorMessage.includes('not authenticated')) {
+      safeMessage = "Resource not available";
+    } else if (errorMessage.includes('not completed')) {
+      safeMessage = "Operation not allowed";
+    }
+    
+    return new Response(JSON.stringify({ 
+      error: safeMessage,
+      code: "OPERATION_FAILED"
+    }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

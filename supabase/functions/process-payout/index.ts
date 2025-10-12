@@ -77,17 +77,15 @@ serve(async (req) => {
 
     const customerId = customers.data[0].id;
 
-    // Create payout using Stripe's refund/transfer mechanism
-    // Note: In production, you'd use Stripe Connect for actual payouts
-    // For now, we'll create a negative payment intent (refund simulation)
-    const paymentIntent = await stripe.refunds.create({
-      amount: Math.round(amount * 100),
-      reason: 'requested_by_customer',
-      metadata: {
-        user_id: user.id,
-        type: 'account_payout'
-      }
-    });
+    // SECURITY NOTICE: Payout functionality is disabled
+    // This requires Stripe Connect implementation with proper:
+    // - Identity verification (KYC)
+    // - Banking information collection
+    // - Regulatory compliance (1099 forms, etc.)
+    // - Use of stripe.transfers.create() or stripe.payouts.create()
+    // 
+    // Current implementation using refunds is non-functional and insecure
+    throw new Error("Payouts are temporarily disabled. Please contact support for manual payout processing.");
 
     // Deduct from account
     const { error: updateError } = await supabaseClient
