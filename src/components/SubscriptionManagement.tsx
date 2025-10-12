@@ -164,13 +164,13 @@ const SubscriptionManagement = () => {
               </div>
             )}
 
-            <div className="flex gap-2 pt-2">
+              <div className="flex gap-2 pt-2">
               {canUpgrade && (
                 <Button 
                   onClick={() => handleUpgrade(
                     isFreeTier ? SUBSCRIPTION_TIERS.local.price_id : SUBSCRIPTION_TIERS.tournament.price_id
                   )} 
-                  className="flex-1" 
+                  className={`flex-1 ${isLocalTier ? 'bg-yellow-500 hover:bg-yellow-600 text-white' : ''}`}
                   disabled={upgradeLoading}
                 >
                   <Crown className="w-4 h-4 mr-2" />
@@ -259,7 +259,7 @@ const SubscriptionManagement = () => {
               <Button 
                 onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament.price_id!)} 
                 size="sm" 
-                className="w-full"
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
                 disabled={upgradeLoading}
               >
                 {upgradeLoading ? "Processing..." : "Upgrade to Tournament Pro"}
