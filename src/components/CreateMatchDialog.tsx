@@ -585,9 +585,9 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
         
         <form onSubmit={handleSubmit} className="flex-1 flex flex-col">
           {/* Mobile: Tabbed Interface */}
-          <div className="flex-1 flex flex-col md:hidden">
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col">
-              <div className="px-6 pt-4 pb-2">
+          <div className="flex-1 flex flex-col md:hidden overflow-hidden">
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="flex-1 flex flex-col overflow-hidden">
+              <div className="px-6 pt-4 pb-2 shrink-0">
                 <TabsList className="grid w-full grid-cols-3">
                   <TabsTrigger value="course" className="text-xs">Course</TabsTrigger>
                   <TabsTrigger value="format" className="text-xs">Format</TabsTrigger>
@@ -595,8 +595,8 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 </TabsList>
               </div>
               
-              <ScrollArea className="flex-1 px-6 pointer-events-auto">
-                <TabsContent value="course" className="space-y-4 mt-0 pointer-events-auto">
+              <div className="flex-1 overflow-y-auto px-6 pb-4">
+                <TabsContent value="course" className="space-y-4 mt-0">
                   <CourseField />
                   <DateTimeField />
                   <div className="space-y-2">
@@ -611,7 +611,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   </div>
                 </TabsContent>
 
-                <TabsContent value="format" className="space-y-4 mt-0 pointer-events-auto">
+                <TabsContent value="format" className="space-y-4 mt-0">
                   <div className="space-y-2">
                     <Label htmlFor="format">Match Format</Label>
                     <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
@@ -671,7 +671,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   </div>
                 </TabsContent>
 
-                <TabsContent value="details" className="space-y-4 mt-0 pointer-events-auto">
+                <TabsContent value="details" className="space-y-4 mt-0">
                   <div className="space-y-2">
                     <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
                     <Input
@@ -728,7 +728,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                     </Select>
                   </div>
                 </TabsContent>
-              </ScrollArea>
+              </div>
             </Tabs>
 
             {/* Fixed Bottom Buttons for Mobile */}
