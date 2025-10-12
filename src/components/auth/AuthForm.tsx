@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +11,8 @@ import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter } from '@/lib/validation';
 import { checkPasswordSecurity } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { MFAEnrollment } from './MFAEnrollment';
+import { MFAVerification } from './MFAVerification';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -23,11 +25,28 @@ export function AuthForm() {
   const [validationErrors, setValidationErrors] = useState<Record<string, string>>({});
   const [passwordWarnings, setPasswordWarnings] = useState<string[]>([]);
   const [magicLinkLoading, setMagicLinkLoading] = useState(false);
+  const [showMFAEnrollment, setShowMFAEnrollment] = useState(false);
+  const [showMFAVerification, setShowMFAVerification] = useState(false);
+  const [needsMFASetup, setNeedsMFASetup] = useState(false);
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   
   // Initialize rate limiter for auth attempts
   const rateLimiter = new RateLimiter(3, 15 * 60 * 1000); // 3 attempts per 15 minutes
+
+  useEffect(() => {
+    // Check if user needs MFA setup after sign-in
+    const checkMFAStatus = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+        if (data?.currentLevel === 'aal1' && data?.nextLevel === 'aal2') {
+          setShowMFAVerification(true);
+        }
+      }
+    };
+    checkMFAStatus();
+  }, []);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -57,7 +76,16 @@ export function AuthForm() {
     }
     
     setLoading(true);
-    await signIn(email, password);
+    const { error } = await signIn(email, password);
+    
+    if (!error) {
+      // Check if MFA verification is required
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (data?.currentLevel === 'aal1' && data?.nextLevel === 'aal2') {
+        setShowMFAVerification(true);
+      }
+    }
+    
     setLoading(false);
   };
 
@@ -90,9 +118,18 @@ export function AuthForm() {
     
     setLoading(true);
     const { error } = await signUp(email, password, displayName);
-    setLoading(false);
     
-    // No longer need to show subscription selection - users start on Free tier
+    if (!error) {
+      // Require MFA enrollment for new users
+      setShowMFAEnrollment(true);
+      setNeedsMFASetup(true);
+      toast({
+        title: "Account Created",
+        description: "Please set up two-factor authentication to secure your account",
+      });
+    }
+    
+    setLoading(false);
   };
 
 
@@ -172,6 +209,47 @@ export function AuthForm() {
     await signInWithMagicLink(email);
     setMagicLinkLoading(false);
   };
+
+  // Show MFA enrollment after signup
+  if (showMFAEnrollment) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+        <MFAEnrollment
+          onComplete={() => {
+            setShowMFAEnrollment(false);
+            if (!needsMFASetup) {
+              toast({
+                title: "Welcome to MatchPlay",
+                description: "Your account is now secured with two-factor authentication",
+              });
+            }
+          }}
+          isRequired={needsMFASetup}
+        />
+      </div>
+    );
+  }
+
+  // Show MFA verification during sign-in
+  if (showMFAVerification) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">
+        <MFAVerification
+          onVerified={() => {
+            setShowMFAVerification(false);
+            toast({
+              title: "Welcome Back",
+              description: "You've successfully signed in",
+            });
+          }}
+          onCancel={async () => {
+            await supabase.auth.signOut();
+            setShowMFAVerification(false);
+          }}
+        />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">

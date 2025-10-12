@@ -6,8 +6,9 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, User, Settings, CreditCard, Target } from 'lucide-react';
+import { ArrowLeft, User, Settings, CreditCard, Target, Shield } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
+import { MFASettings } from '@/components/profile/MFASettings';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -72,7 +73,7 @@ export default function Profile() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Tabs defaultValue="profile" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="profile" className="gap-2">
               <User className="w-4 h-4" />
               Profile
@@ -80,6 +81,10 @@ export default function Profile() {
             <TabsTrigger value="settings" className="gap-2">
               <Settings className="w-4 h-4" />
               Settings
+            </TabsTrigger>
+            <TabsTrigger value="security" className="gap-2">
+              <Shield className="w-4 h-4" />
+              Security
             </TabsTrigger>
             <TabsTrigger value="subscription" className="gap-2">
               <CreditCard className="w-4 h-4" />
@@ -93,6 +98,10 @@ export default function Profile() {
 
           <TabsContent value="settings">
             <ProfileForm />
+          </TabsContent>
+
+          <TabsContent value="security">
+            <MFASettings />
           </TabsContent>
 
           <TabsContent value="subscription">
