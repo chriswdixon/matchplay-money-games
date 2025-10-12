@@ -29,6 +29,13 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
   const enrollMFA = async () => {
     setEnrolling(true);
     try {
+      // Check if user has a valid session first
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      if (!session) {
+        throw new Error("Please confirm your email before setting up MFA");
+      }
+
       const { data, error } = await supabase.auth.mfa.enroll({
         factorType: 'totp',
       });
@@ -40,11 +47,23 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
         setSecret(data.totp.secret);
       }
     } catch (error: any) {
+      // Handle specific error for missing sub claim
+      const errorMessage = error.message?.includes('missing sub claim') || error.message?.includes('invalid claim')
+        ? "Please confirm your email before setting up two-factor authentication. Check your inbox for the confirmation link."
+        : error.message || "Failed to initiate MFA enrollment";
+      
       toast({
         title: "Enrollment Error",
-        description: error.message || "Failed to initiate MFA enrollment",
+        description: errorMessage,
         variant: "destructive",
       });
+      
+      // If it's a session error, redirect back after a delay
+      if (error.message?.includes('confirm your email') || error.message?.includes('missing sub claim')) {
+        setTimeout(() => {
+          onComplete();
+        }, 3000);
+      }
     } finally {
       setEnrolling(false);
     }
