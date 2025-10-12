@@ -463,7 +463,7 @@ const CreateMatch = () => {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-10 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container flex h-14 items-center">
           <Button
             variant="ghost"
@@ -479,7 +479,7 @@ const CreateMatch = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-2xl py-6 pb-20">
+      <main className="container max-w-2xl py-6 pb-32">
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Mobile: Tabbed Interface */}
           <div className="md:hidden">
@@ -759,7 +759,7 @@ const CreateMatch = () => {
       </main>
 
       {/* Fixed Bottom Bar - Mobile Only */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-40">
         <div className="container flex gap-2">
           <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
             Cancel
@@ -790,7 +790,7 @@ const CreateMatch = () => {
       </div>
 
       {/* Desktop Submit Bar */}
-      <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4">
+      <div className="hidden md:block fixed bottom-0 left-0 right-0 border-t bg-background p-4 z-40">
         <div className="container max-w-2xl flex justify-end gap-2">
           <Button type="button" variant="outline" onClick={() => navigate('/')}>
             Cancel
