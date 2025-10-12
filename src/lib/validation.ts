@@ -86,7 +86,6 @@ export const createMatchSchema = z.object({
   }),
   max_participants: z.number().int().min(1, "Must have at least 1 participant").max(8, "Cannot exceed 8 participants"),
   location: z.string().trim().min(1, "Location is required").max(200, "Location must be less than 200 characters"),
-  course_name_display: z.string().trim().optional(),
   latitude: z.number().optional().nullable(),
   longitude: z.number().optional().nullable(),
   address: z.string().trim().max(500, "Address must be less than 500 characters").optional().nullable(),

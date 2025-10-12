@@ -449,12 +449,16 @@ const CreateMatch = () => {
           <Input
             type="number"
             placeholder="Min"
+            min="-10"
+            max="54"
             value={formData.handicap_min}
             onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
           />
           <Input
             type="number"
             placeholder="Max"
+            min="-10"
+            max="54"
             value={formData.handicap_max}
             onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
           />
@@ -472,6 +476,10 @@ const CreateMatch = () => {
             <SelectItem value="2">2</SelectItem>
             <SelectItem value="3">3</SelectItem>
             <SelectItem value="4">4 (Default)</SelectItem>
+            <SelectItem value="5">5</SelectItem>
+            <SelectItem value="6">6</SelectItem>
+            <SelectItem value="7">7</SelectItem>
+            <SelectItem value="8">8</SelectItem>
           </SelectContent>
         </Select>
       </div>
