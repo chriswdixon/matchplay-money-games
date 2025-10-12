@@ -595,8 +595,8 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                 </TabsList>
               </div>
               
-              <ScrollArea className="flex-1 px-6">
-                <TabsContent value="course" className="space-y-4 mt-0">
+              <ScrollArea className="flex-1 px-6 pointer-events-auto">
+                <TabsContent value="course" className="space-y-4 mt-0 pointer-events-auto">
                   <CourseField />
                   <DateTimeField />
                   <div className="space-y-2">
@@ -611,7 +611,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   </div>
                 </TabsContent>
 
-                <TabsContent value="format" className="space-y-4 mt-0">
+                <TabsContent value="format" className="space-y-4 mt-0 pointer-events-auto">
                   <div className="space-y-2">
                     <Label htmlFor="format">Match Format</Label>
                     <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
@@ -671,7 +671,7 @@ const CreateMatchDialog = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
                   </div>
                 </TabsContent>
 
-                <TabsContent value="details" className="space-y-4 mt-0">
+                <TabsContent value="details" className="space-y-4 mt-0 pointer-events-auto">
                   <div className="space-y-2">
                     <Label htmlFor="buy_in_amount">Buy-in Amount ($)</Label>
                     <Input
