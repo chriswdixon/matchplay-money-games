@@ -183,6 +183,8 @@ const CreateMatch = () => {
               }}
               maxLength={5}
               className="flex-1"
+              autoComplete="postal-code"
+              inputMode="numeric"
             />
             <Select value={String(searchRadius)} onValueChange={(value) => setSearchRadius(Number(value))}>
               <SelectTrigger className="w-[110px]">
@@ -479,8 +481,8 @@ const CreateMatch = () => {
       </header>
 
       {/* Main Content */}
-      <main className="container max-w-2xl py-6 pb-32">
-        <form onSubmit={handleSubmit} className="space-y-6">
+      <main className="container max-w-2xl py-6 pb-32 relative">
+        <form onSubmit={handleSubmit} className="space-y-6 relative z-0">
           {/* Mobile: Tabbed Interface */}
           <div className="md:hidden">
             <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
@@ -490,7 +492,7 @@ const CreateMatch = () => {
                 <TabsTrigger value="details">Details</TabsTrigger>
               </TabsList>
               
-              <TabsContent value="course" className="space-y-4 mt-4">
+              <TabsContent value="course" className="space-y-4 mt-4 relative z-0">
                 <CourseField />
                 <DateTimeField />
                 <div className="space-y-2">
