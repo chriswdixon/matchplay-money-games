@@ -92,7 +92,7 @@ const SubscriptionManagement = () => {
   }
 
   const tierFeatures = {
-    'Local Basic': [
+    'Free': [
       "Basic match booking",
       "Local player matching",
       "Simple handicap tracking",
@@ -100,7 +100,7 @@ const SubscriptionManagement = () => {
       "Match history"
     ],
     'Local Player': [
-      "Everything in Local Basic",
+      "Everything in Free",
       "GPS-based player matching",
       "Advanced handicap management",
       "Friendly money games",
@@ -119,7 +119,7 @@ const SubscriptionManagement = () => {
     ]
   };
 
-  const isBasicTier = tierName === 'Local Basic';
+  const isFreeTier = tierName === 'Free';
   const isLocalTier = tierName === 'Local Player';
   const isTournamentTier = tierName === 'Tournament Pro';
   const canUpgrade = !isTournamentTier;
@@ -137,67 +137,56 @@ const SubscriptionManagement = () => {
               </CardTitle>
               <CardDescription>Manage your membership and billing</CardDescription>
             </div>
-            {subscribed && (
-              <Badge className={isLocalTier ? "bg-primary/10" : "bg-accent/10"}>
-                {tierName}
-              </Badge>
-            )}
+            <Badge className={isFreeTier ? "bg-muted" : (isLocalTier ? "bg-primary/10" : "bg-accent/10")}>
+              {tierName}
+            </Badge>
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          {!subscribed ? (
-            <div className="text-center py-8">
-              <p className="text-muted-foreground mb-4">No active subscription</p>
-              <Button onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.basic.price_id)}>
-                Subscribe to Local Basic
+          <>
+            <div className="space-y-2">
+              <h4 className="font-medium">Your Features</h4>
+              <ul className="space-y-2">
+                {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
+                  <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <CheckCircle className="w-4 h-4 text-accent" />
+                    {feature}
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {subscriptionEnd && !isFreeTier && (
+              <div className="pt-4 border-t">
+                <p className="text-sm text-muted-foreground">
+                  Next billing date: {new Date(subscriptionEnd).toLocaleDateString()}
+                </p>
+              </div>
+            )}
+
+            <div className="flex gap-2 pt-2">
+              {canUpgrade && (
+                <Button 
+                  onClick={() => handleUpgrade(
+                    isFreeTier ? SUBSCRIPTION_TIERS.local.price_id : SUBSCRIPTION_TIERS.tournament.price_id
+                  )} 
+                  className="flex-1" 
+                  disabled={upgradeLoading}
+                >
+                  <Crown className="w-4 h-4 mr-2" />
+                  {upgradeLoading ? "Processing..." : (isFreeTier ? "Upgrade to Local Player" : "Upgrade to Tournament Pro")}
+                </Button>
+              )}
+              <Button onClick={refreshSubscription} variant="outline" size="icon">
+                <RefreshCw className="w-4 h-4" />
               </Button>
             </div>
-          ) : (
-            <>
-              <div className="space-y-2">
-                <h4 className="font-medium">Your Features</h4>
-                <ul className="space-y-2">
-                  {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Local Player']).map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <CheckCircle className="w-4 h-4 text-accent" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-
-              {subscriptionEnd && (
-                <div className="pt-4 border-t">
-                  <p className="text-sm text-muted-foreground">
-                    Next billing date: {new Date(subscriptionEnd).toLocaleDateString()}
-                  </p>
-                </div>
-              )}
-
-              <div className="flex gap-2 pt-2">
-                {canUpgrade && (
-                  <Button 
-                    onClick={() => handleUpgrade(
-                      isBasicTier ? SUBSCRIPTION_TIERS.local.price_id : SUBSCRIPTION_TIERS.tournament.price_id
-                    )} 
-                    className="flex-1" 
-                    disabled={upgradeLoading}
-                  >
-                    <Crown className="w-4 h-4 mr-2" />
-                    {upgradeLoading ? "Processing..." : (isBasicTier ? "Upgrade to Local Player" : "Upgrade to Tournament Pro")}
-                  </Button>
-                )}
-                <Button onClick={refreshSubscription} variant="outline" size="icon">
-                  <RefreshCw className="w-4 h-4" />
-                </Button>
-              </div>
-            </>
-          )}
+          </>
         </CardContent>
       </Card>
 
       {/* Billing & Card Management */}
-      {subscribed && (
+      {!isFreeTier && (
         <Card>
           <CardHeader>
             <CardTitle>Billing & Payment</CardTitle>
@@ -216,14 +205,14 @@ const SubscriptionManagement = () => {
       )}
 
       {/* Available Upgrades */}
-      {subscribed && canUpgrade && (
+      {canUpgrade && (
         <Card>
           <CardHeader>
             <CardTitle>Available Upgrades</CardTitle>
             <CardDescription>Unlock more features for your golf game</CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
-            {isBasicTier && (
+            {isFreeTier && (
               <div className="p-4 border rounded-lg space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="font-semibold flex items-center gap-2">
@@ -241,7 +230,7 @@ const SubscriptionManagement = () => {
                   ))}
                 </ul>
                 <Button 
-                  onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local.price_id)} 
+                  onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local.price_id!)} 
                   size="sm" 
                   className="w-full"
                   disabled={upgradeLoading}
@@ -268,7 +257,7 @@ const SubscriptionManagement = () => {
                 ))}
               </ul>
               <Button 
-                onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament.price_id)} 
+                onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament.price_id!)} 
                 size="sm" 
                 className="w-full"
                 disabled={upgradeLoading}

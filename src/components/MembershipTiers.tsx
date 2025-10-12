@@ -6,8 +6,8 @@ import { Check, Star, Crown } from "lucide-react";
 const MembershipTiers = () => {
   const tiers = [
     {
-      name: "Local Basic",
-      price: "$10",
+      name: "Free",
+      price: "$0",
       period: "/month",
       description: "Perfect for getting started",
       features: [
@@ -17,7 +17,7 @@ const MembershipTiers = () => {
         "Live scoring",
         "Match history"
       ],
-      buttonText: "Start Basic",
+      buttonText: "Start Free",
       popular: false,
       icon: <Star className="w-6 h-6" />
     },
@@ -27,7 +27,7 @@ const MembershipTiers = () => {
       period: "/month",
       description: "Perfect for casual competitive play",
       features: [
-        "Everything in Local Basic",
+        "Everything in Free",
         "GPS-based player matching",
         "Advanced handicap management",
         "Friendly money games",

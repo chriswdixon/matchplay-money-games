@@ -4,11 +4,11 @@ import { useAuth } from '@/hooks/useAuth';
 
 // Subscription tier configuration
 export const SUBSCRIPTION_TIERS = {
-  basic: {
-    name: 'Local Basic',
-    price_id: 'price_1SHDgn8xKJwJeHGFaVUR6UdJ',
-    product_id: 'prod_TDf0Td1tkDLgZw',
-    price: 10,
+  free: {
+    name: 'Free',
+    price_id: null, // No payment required
+    product_id: null,
+    price: 0,
   },
   local: {
     name: 'Local Player',
@@ -44,7 +44,7 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
   const checkSubscription = async () => {
     if (!user || !session) {
-      setSubscribed(false);
+      setSubscribed(true); // Default to subscribed (Free tier)
       setProductId(null);
       setSubscriptionEnd(null);
       setLoading(false);
@@ -61,17 +61,18 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
 
       if (error) {
         console.error('Error checking subscription:', error);
-        setSubscribed(false);
+        setSubscribed(true); // Default to Free tier on error
         setProductId(null);
         setSubscriptionEnd(null);
       } else {
-        setSubscribed(data.subscribed || false);
+        // If no paid subscription, user is on Free tier
+        setSubscribed(true);
         setProductId(data.product_id || null);
         setSubscriptionEnd(data.subscription_end || null);
       }
     } catch (error) {
       console.error('Exception checking subscription:', error);
-      setSubscribed(false);
+      setSubscribed(true); // Default to Free tier on error
       setProductId(null);
       setSubscriptionEnd(null);
     } finally {
@@ -87,10 +88,10 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
     return () => clearInterval(interval);
   }, [user, session]);
 
-  // Get tier name from product ID
+  // Get tier name from product ID, default to Free
   const tierName = productId
-    ? Object.entries(SUBSCRIPTION_TIERS).find(([_, tier]) => tier.product_id === productId)?.[1]?.name || null
-    : null;
+    ? Object.entries(SUBSCRIPTION_TIERS).find(([_, tier]) => tier.product_id === productId)?.[1]?.name || 'Free'
+    : 'Free';
 
   return (
     <SubscriptionContext.Provider
