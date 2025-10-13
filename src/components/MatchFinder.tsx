@@ -172,6 +172,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       });
     }
 
+    // Sort by scheduled_time - descending (newest first) for past matches
+    if (showPastMatches) {
+      filtered.sort((a, b) => 
+        new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime()
+      );
+    }
+
     return filtered;
   }, [matches, filters, showPastMatches]);
 
