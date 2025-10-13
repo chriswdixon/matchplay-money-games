@@ -220,13 +220,21 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       await refetch();
       
       // Show different messages based on outcome
-      const result = data as { status: string; remaining_players: number; match_status: string; refund_eligible: boolean };
+      const result = data as { 
+        status: string; 
+        remaining_players: number; 
+        match_status: string; 
+        refund_eligible: boolean;
+        refund_amount?: number;
+        cancellation_fee?: number;
+      };
       
       if (result.status === 'dnf') {
-        if (result.refund_eligible) {
+        if (result.refund_eligible && result.refund_amount !== undefined) {
+          const refundDollars = (result.refund_amount / 100).toFixed(2);
           toast({
             title: "Marked as DNF",
-            description: `You have been marked as Did Not Finish. Your buy-in will be refunded. The match will continue with ${result.remaining_players} remaining player${result.remaining_players !== 1 ? 's' : ''}.`,
+            description: `You have been marked as Did Not Finish. Refund of $${refundDollars} processed (minus $2 cancellation fee). The match will continue with ${result.remaining_players} remaining player${result.remaining_players !== 1 ? 's' : ''}.`,
           });
         } else {
           toast({
@@ -236,10 +244,11 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           });
         }
       } else {
-        if (result.refund_eligible) {
+        if (result.refund_amount !== undefined) {
+          const refundDollars = (result.refund_amount / 100).toFixed(2);
           toast({
             title: "Match Cancelled",
-            description: "All players have left. The match has been cancelled. Full refunds will be processed.",
+            description: `All players have left. The match has been cancelled. Refund of $${refundDollars} processed (minus $2 cancellation fee).`,
           });
         } else {
           toast({
@@ -1288,7 +1297,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             <AlertDialogDescription className="space-y-3">
               <p>Please select a reason for leaving this match. This action cannot be undone.</p>
               {(() => {
-                const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife', 'equipment'];
+                const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife'];
                 const isWeatherOrCourse = cancelReason && weatherOrCourseReasons.includes(cancelReason);
                 const otherPlayersCount = playerScores.filter(p => p.player_id !== user?.id).length;
                 
@@ -1309,11 +1318,11 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                     <ul className="text-sm space-y-1 pl-6 list-disc text-foreground text-left">
                       {isWeatherOrCourse ? (
                         <>
-                          <li>Your <strong>buy-in will be fully refunded</strong> ({formatBuyIn(matchData?.buy_in_amount)})</li>
+                          <li>Your buy-in will be <strong>refunded minus $2 cancellation fee</strong> ({formatBuyIn(matchData?.buy_in_amount)} - $2.00)</li>
                           {otherPlayersCount >= 2 ? (
                             <li>You will be marked as <strong>DNF</strong> and the match will continue</li>
                           ) : (
-                            <li>The match will be <strong>cancelled</strong> with full refunds to all players</li>
+                            <li>The match will be <strong>cancelled</strong> and all players will receive refunds minus $2 cancellation fee</li>
                           )}
                         </>
                       ) : (

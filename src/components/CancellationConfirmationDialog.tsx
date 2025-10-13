@@ -57,7 +57,7 @@ export function CancellationConfirmationDialog({
   };
 
   const reasonLabel = REASON_LABELS[confirmation.stated_reason] || confirmation.stated_reason;
-  const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife', 'equipment'];
+  const weatherOrCourseReasons = ['lightning', 'rain', 'temperature', 'course-closure', 'wildlife'];
   const isRefundEligible = weatherOrCourseReasons.includes(confirmation.stated_reason);
 
   return (
@@ -80,7 +80,7 @@ export function CancellationConfirmationDialog({
               {isRefundEligible && (
                 <div className="flex items-start gap-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-500/10 p-2 rounded">
                   <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                  <span>This reason qualifies for full buy-in refund</span>
+                  <span>This reason qualifies for buy-in refund (minus $2 cancellation fee)</span>
                 </div>
               )}
             </div>
