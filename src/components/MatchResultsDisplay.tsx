@@ -4,15 +4,17 @@ import { Trophy, DollarSign, Medal } from 'lucide-react';
 import { MatchResult, PlayerScore } from '@/hooks/useMatchScoring';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 
 interface MatchResultsDisplayProps {
   matchResult: MatchResult;
   playerScores: PlayerScore[];
   buyInAmount?: number;
   maxParticipants?: number;
+  inline?: boolean; // Indicates if displayed inline within a card
 }
 
-export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants }: MatchResultsDisplayProps) {
+export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, inline = false }: MatchResultsDisplayProps) {
   const isTestingMode = maxParticipants === 1;
   const isMobile = useIsMobile();
   
@@ -51,7 +53,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   };
 
   return (
-    <div className="space-y-6 px-4 md:px-6 py-6">
+    <div className="space-y-6 px-4 md:px-6 py-6 w-full overflow-hidden">
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
           <Trophy className="w-8 h-8 text-yellow-500" />
@@ -61,7 +63,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
       </div>
 
       {/* Podium Display */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-4xl mx-auto">
+      <div className={cn(
+        "grid grid-cols-1 md:grid-cols-3 gap-4",
+        !inline && "max-w-4xl mx-auto"
+      )}>
         {sortedPlayers.slice(0, 3).map((player, index) => (
           <Card 
             key={player.player_id}
@@ -114,7 +119,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
       {/* Remaining Players */}
       {sortedPlayers.length > 3 && (
-        <div className="space-y-2 max-w-4xl mx-auto">
+        <div className={cn(
+          "space-y-2",
+          !inline && "max-w-4xl mx-auto"
+        )}>
           <h3 className="text-lg font-semibold px-2">Other Finishers</h3>
           {sortedPlayers.slice(3).map((player, index) => (
             <Card key={player.player_id}>
@@ -140,7 +148,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
       {/* Pot Summary - Hide in testing mode */}
       {!isTestingMode && buyInAmount > 0 && (
-        <Card className="max-w-4xl mx-auto bg-primary/5">
+        <Card className={cn(
+          "bg-primary/5",
+          !inline && "max-w-4xl mx-auto"
+        )}>
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
@@ -160,7 +171,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
       {/* Testing Mode Notice */}
       {isTestingMode && (
-        <Card className="max-w-4xl mx-auto bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+        <Card className={cn(
+          "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800",
+          !inline && "max-w-4xl mx-auto"
+        )}>
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
               <Trophy className="w-6 h-6" />
@@ -174,7 +188,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
       )}
 
       {/* Detailed Scorecard */}
-      <Card className="max-w-4xl mx-auto">
+      <Card className={cn(!inline && "max-w-4xl mx-auto")}>
         <CardHeader>
           <CardTitle>Detailed Scorecard</CardTitle>
         </CardHeader>

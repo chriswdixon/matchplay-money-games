@@ -327,8 +327,8 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
   return (
     <div className={cn(
-      "w-full mx-auto space-y-0 md:space-y-2",
-      onClose ? "max-w-[1400px] px-0 overflow-x-hidden" : "overflow-hidden"
+      "w-full space-y-0 md:space-y-2",
+      onClose ? "max-w-[1400px] mx-auto px-0 overflow-x-hidden" : "overflow-hidden"
     )}>
       {/* Header with Course Name and Hamburger Menu */}
       <div className="px-4 md:px-6">
@@ -573,6 +573,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           playerScores={playerScores}
           buyInAmount={matchData?.buy_in_amount}
           maxParticipants={matchData?.max_participants}
+          inline={!onClose}
         />
       )}
 
