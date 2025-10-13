@@ -8,7 +8,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { ArrowLeft, Shield, AlertCircle } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter } from '@/lib/validation';
+import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter, inviteCodeSchema } from '@/lib/validation';
 import { checkPasswordSecurity } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MFAEnrollment } from './MFAEnrollment';
@@ -123,8 +123,11 @@ export function AuthForm() {
 
     // Validate invite code (unless @match-play.co email)
     if (!email.endsWith('@match-play.co')) {
-      if (!inviteCode.trim()) {
-        setValidationErrors({ inviteCode: 'Invite code is required' });
+      // Validate invite code format
+      try {
+        inviteCodeSchema.parse(inviteCode);
+      } catch (error: any) {
+        setValidationErrors({ inviteCode: error.errors?.[0]?.message || 'Invalid invite code format' });
         return;
       }
 
