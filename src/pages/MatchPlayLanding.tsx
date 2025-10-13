@@ -19,6 +19,7 @@ import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
+import { supabase } from "@/integrations/supabase/client";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
@@ -28,8 +29,51 @@ const MatchPlayLanding = () => {
   const [currentTab, setCurrentTab] = useState("matches");
   const [searchParams] = useSearchParams();
 
-  // Handle shared PIN links
+  // Handle shared PIN links and secure token links
   useEffect(() => {
+    const handleTokenJoin = async (token: string) => {
+      try {
+        const { data, error } = await supabase.rpc('validate_match_join_token', {
+          p_token: token
+        });
+
+        if (error) throw error;
+
+        if (!data || data.length === 0) {
+          toast.error('Invalid or expired join link');
+          return;
+        }
+
+        const tokenData = data[0];
+        // Navigate with match, team, and extracted PIN
+        const params = new URLSearchParams(window.location.search);
+        params.set('match', tokenData.match_id);
+        params.set('team', tokenData.team_number.toString());
+        if (tokenData.pin) params.set('pin', tokenData.pin);
+        
+        window.history.replaceState({}, '', `?${params.toString()}`);
+        toast.success('Secure join link validated! Find the match below to join.');
+        
+        setTimeout(() => {
+          const element = document.getElementById('matches-section');
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 500);
+      } catch (error: any) {
+        toast.error(error.message || 'Failed to validate join link');
+      }
+    };
+
+    // Check for secure token in URL path (e.g., /join/TOKEN)
+    const pathParts = window.location.pathname.split('/');
+    if (pathParts[1] === 'join' && pathParts[2]) {
+      const token = pathParts[2];
+      handleTokenJoin(token);
+      return;
+    }
+
+    // Handle legacy PIN-based links
     const matchId = searchParams.get('match');
     const pin = searchParams.get('pin');
 

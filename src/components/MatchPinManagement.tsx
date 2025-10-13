@@ -74,10 +74,23 @@ export const MatchPinManagement = ({
     setTimeout(() => setCopiedPin(null), 2000);
   };
 
-  const handleShareLink = (teamNumber: number, pin: string) => {
-    const shareLink = `${window.location.origin}/?match=${matchId}&team=${teamNumber}&pin=${pin}`;
-    navigator.clipboard.writeText(shareLink);
-    toast.success('Shareable link copied to clipboard');
+  const handleShareLink = async (teamNumber: number, pin: string) => {
+    try {
+      // Generate secure token that expires in 24 hours
+      const { data: token, error } = await supabase.rpc('create_match_join_token', {
+        p_match_id: matchId,
+        p_team_number: teamNumber,
+        p_expires_in_seconds: 86400 // 24 hours
+      });
+
+      if (error) throw error;
+
+      const shareLink = `${window.location.origin}/join/${token}`;
+      navigator.clipboard.writeText(shareLink);
+      toast.success('Secure join link copied! Valid for 24 hours.');
+    } catch (error: any) {
+      toast.error('Failed to generate share link: ' + error.message);
+    }
   };
 
   const getTeamName = (teamNumber: number) => {

@@ -199,6 +199,50 @@ export type Database = {
         }
         Relationships: []
       }
+      match_join_tokens: {
+        Row: {
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          match_id: string
+          team_number: number
+          token: string
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          match_id: string
+          team_number: number
+          token: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          match_id?: string
+          team_number?: number
+          token?: string
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_join_tokens_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_participants: {
         Row: {
           id: string
@@ -594,6 +638,18 @@ export type Database = {
         Args: { player_user_id: string }
         Returns: number
       }
+      cleanup_expired_join_tokens: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
+      create_match_join_token: {
+        Args: {
+          p_expires_in_seconds?: number
+          p_match_id: string
+          p_team_number: number
+        }
+        Returns: string
+      }
       finalize_match_results: {
         Args: { p_match_id: string }
         Returns: boolean
@@ -737,6 +793,14 @@ export type Database = {
       user_joined_match: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
+      }
+      validate_match_join_token: {
+        Args: { p_token: string }
+        Returns: {
+          match_id: string
+          pin: string
+          team_number: number
+        }[]
       }
     }
     Enums: {
