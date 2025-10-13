@@ -47,6 +47,19 @@ serve(async (req) => {
     if (matchError || !match) throw new Error("Match not found");
     if (match.status !== 'completed') throw new Error("Match not completed");
 
+    // Skip payouts for testing mode (1 player)
+    if (match.max_participants === 1) {
+      logStep("Testing mode detected - skipping payouts");
+      return new Response(JSON.stringify({ 
+        success: true,
+        testing_mode: true,
+        message: "Testing mode: No payouts processed"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
+    }
+
     const matchResults = match.match_results?.[0];
     if (!matchResults) {
       throw new Error("No results found for this match");

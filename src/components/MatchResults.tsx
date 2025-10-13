@@ -104,6 +104,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
           matchResult={matchResult}
           playerScores={playerScores}
           buyInAmount={matchData?.buy_in_amount}
+          maxParticipants={matchData?.max_participants}
         />
       </div>
     );

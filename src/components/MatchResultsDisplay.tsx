@@ -7,25 +7,30 @@ interface MatchResultsDisplayProps {
   matchResult: MatchResult;
   playerScores: PlayerScore[];
   buyInAmount?: number;
+  maxParticipants?: number;
 }
 
-export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0 }: MatchResultsDisplayProps) {
+export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants }: MatchResultsDisplayProps) {
+  const isTestingMode = maxParticipants === 1;
+  
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
   
-  // Calculate payouts
-  const totalPot = (buyInAmount / 100) * playerScores.length;
+  // Calculate payouts only if not testing mode
+  const totalPot = !isTestingMode ? (buyInAmount / 100) * playerScores.length : 0;
   
   // Winner takes 60%, second place 30%, third place 10%
   const payouts: { [playerId: string]: number } = {};
-  if (sortedPlayers.length >= 1) {
-    payouts[sortedPlayers[0].player_id] = totalPot * 0.6;
-  }
-  if (sortedPlayers.length >= 2) {
-    payouts[sortedPlayers[1].player_id] = totalPot * 0.3;
-  }
-  if (sortedPlayers.length >= 3) {
-    payouts[sortedPlayers[2].player_id] = totalPot * 0.1;
+  if (!isTestingMode) {
+    if (sortedPlayers.length >= 1) {
+      payouts[sortedPlayers[0].player_id] = totalPot * 0.6;
+    }
+    if (sortedPlayers.length >= 2) {
+      payouts[sortedPlayers[1].player_id] = totalPot * 0.3;
+    }
+    if (sortedPlayers.length >= 3) {
+      payouts[sortedPlayers[2].player_id] = totalPot * 0.1;
+    }
   }
 
   const getPositionIcon = (index: number) => {
@@ -130,8 +135,8 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
         </div>
       )}
 
-      {/* Pot Summary */}
-      {buyInAmount > 0 && (
+      {/* Pot Summary - Hide in testing mode */}
+      {!isTestingMode && buyInAmount > 0 && (
         <Card className="max-w-4xl mx-auto bg-primary/5">
           <CardContent className="p-6">
             <div className="flex items-center justify-between">
@@ -145,6 +150,21 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
             </div>
             <div className="mt-4 text-sm text-muted-foreground">
               Buy-in: ${(buyInAmount / 100).toFixed(0)} × {playerScores.length} players
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Testing Mode Notice */}
+      {isTestingMode && (
+        <Card className="max-w-4xl mx-auto bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+              <Trophy className="w-6 h-6" />
+              <span className="text-lg font-semibold">Testing Mode - No Payouts Processed</span>
+            </div>
+            <div className="mt-2 text-center text-sm text-amber-600/80 dark:text-amber-400/80">
+              This match was created in testing mode (1 player). Results are recorded but no money transactions occurred.
             </div>
           </CardContent>
         </Card>
