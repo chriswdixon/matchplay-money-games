@@ -329,8 +329,10 @@ export type Database = {
           location: string
           longitude: number | null
           max_participants: number
+          pin: string | null
           scheduled_time: string
           status: string
+          team2_pin: string | null
           tee_selection_mode: string
           updated_at: string
         }
@@ -353,8 +355,10 @@ export type Database = {
           location: string
           longitude?: number | null
           max_participants?: number
+          pin?: string | null
           scheduled_time: string
           status?: string
+          team2_pin?: string | null
           tee_selection_mode?: string
           updated_at?: string
         }
@@ -377,8 +381,10 @@ export type Database = {
           location?: string
           longitude?: number | null
           max_participants?: number
+          pin?: string | null
           scheduled_time?: string
           status?: string
+          team2_pin?: string | null
           tee_selection_mode?: string
           updated_at?: string
         }

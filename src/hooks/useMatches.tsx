@@ -31,6 +31,8 @@ export interface Match {
   tee_selection_mode: 'fixed' | 'individual';
   default_tees?: string;
   winner_id?: string;
+  pin?: string;
+  team2_pin?: string;
 }
 
 export const useMatches = () => {
@@ -340,6 +342,7 @@ export const useMatches = () => {
           tee_selection_mode: matchData.tee_selection_mode,
           default_tees: matchData.default_tees,
           hole_pars: holeParsValidation.data,
+          pin: (matchData as any).pin || null,
           created_by: user.id
         })
         .select()
@@ -388,13 +391,29 @@ export const useMatches = () => {
     }
   };
 
-  const joinMatch = async (matchId: string) => {
+  const joinMatch = async (matchId: string, pin?: string) => {
     if (!user) {
       toast.error('You must be logged in to join a match');
       return { error: 'Not authenticated' };
     }
 
     try {
+      // First, fetch match details to check PIN requirement
+      const { data: matchData, error: fetchError } = await supabase
+        .from('matches')
+        .select('pin, team2_pin, max_participants, is_team_format, created_by')
+        .eq('id', matchId)
+        .maybeSingle();
+
+      if (fetchError) throw fetchError;
+      if (!matchData) throw new Error('Match not found');
+
+      // Validate PIN if required
+      if (matchData.pin && matchData.pin !== pin) {
+        toast.error('Incorrect PIN');
+        return { error: 'Incorrect PIN' };
+      }
+
       const { error } = await supabase
         .from('match_participants')
         .insert({

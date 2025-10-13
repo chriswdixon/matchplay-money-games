@@ -44,7 +44,8 @@ const CreateMatch = () => {
     handicap_min: '',
     handicap_max: '',
     max_participants: '4',
-    booking_url: ''
+    booking_url: '',
+    pin: ''
   });
 
   const [courseOpen, setCourseOpen] = useState(false);
@@ -248,6 +249,7 @@ const CreateMatch = () => {
         longitude: locationCoords?.longitude,
         scheduled_time: scheduledDateTime.toISOString(),
         format: formData.format,
+        pin: formData.pin || undefined,
         holes: parseInt(formData.holes),
         buy_in_amount: (parseInt(formData.buy_in_amount) || 0) * 100,
         handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
@@ -652,6 +654,36 @@ const CreateMatch = () => {
         {formData.max_participants !== '1' && (formData.format === 'Best Ball' || formData.format === 'Scramble') && (
           <p className="text-xs text-muted-foreground">Teams of 2 will select teammates after joining</p>
         )}
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="pin">Match PIN (Optional)</Label>
+        <Input
+          id="pin"
+          type="text"
+          inputMode="numeric"
+          pattern="\d{4}"
+          maxLength={4}
+          value={formData.pin}
+          onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '') })}
+          placeholder="4-digit PIN"
+          className="text-center tracking-widest font-mono"
+        />
+        <p className="text-xs text-muted-foreground">
+          Set a 4-digit PIN to control who can join your match
+          {formData.format === 'Best Ball' || formData.format === 'Scramble' ? ' (Team 1 PIN)' : ''}
+        </p>
+      </div>
+
+      <div className="space-y-2">
+        <Label htmlFor="booking_url">Booking URL (Optional)</Label>
+        <Input
+          id="booking_url"
+          type="url"
+          value={formData.booking_url}
+          onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
+          placeholder="https://..."
+        />
       </div>
     </div>
   );

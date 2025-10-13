@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
@@ -12,6 +12,7 @@ import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import PlayerRatingDialog from "./PlayerRatingDialog";
 import { MatchScorecard } from "./MatchScorecard";
 import { MatchResults } from "./MatchResults";
+import { PinEntryDialog } from "./PinEntryDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import EditMatchDialog from "./EditMatchDialog";
@@ -37,6 +38,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     dateRange: 'all',
     spots: 'all'
   });
+  const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
 
   // Request location on component mount (only for current matches, not past)
   useEffect(() => {
@@ -213,7 +216,21 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     if (match.user_joined) {
       await leaveMatch(match.id);
     } else {
-      await joinMatch(match.id);
+      // Check if match requires PIN
+      if (match.pin) {
+        setSelectedMatchForPin(match);
+        setPinDialogOpen(true);
+      } else {
+        await joinMatch(match.id);
+      }
+    }
+  };
+
+  const handlePinSubmit = async (pin: string) => {
+    if (selectedMatchForPin) {
+      setPinDialogOpen(false);
+      await joinMatch(selectedMatchForPin.id, pin);
+      setSelectedMatchForPin(null);
     }
   };
 
@@ -453,6 +470,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           >
                             {formatMatchFormat(match.format)}
                           </Badge>
+                          {match.pin && (
+                            <Badge variant="outline" className="text-xs font-medium border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-500/10">
+                              <Lock className="w-3 h-3 mr-1" />
+                              PIN Required
+                            </Badge>
+                          )}
                         </div>
                         
                         {/* Action Buttons */}
@@ -536,7 +559,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               {!user ? "Sign In to Join" : 
                                isFull ? "Match Full" : 
                                match.user_joined ? "Leave Match" : 
-                               "Join Match"}
+                               match.pin ? (
+                                <>
+                                  <Lock className="w-4 h-4 mr-2" />
+                                  Join with PIN
+                                </>
+                               ) : "Join Match"}
                             </Button>
                           )}
                         </div>
@@ -573,6 +601,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             onClose={() => setResultsMatch(null)}
           />
         )}
+
+        {/* PIN Entry Dialog */}
+        <PinEntryDialog
+          open={pinDialogOpen}
+          onOpenChange={setPinDialogOpen}
+          onSubmit={handlePinSubmit}
+          title="Enter Match PIN"
+          description={`This match requires a PIN to join. Contact the match creator for access.`}
+        />
         
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (
