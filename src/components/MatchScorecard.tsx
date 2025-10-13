@@ -422,7 +422,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                     <DollarSign className="w-4 h-4 text-primary" />
                     <div className="text-xs text-muted-foreground">Buy-in</div>
                   </div>
-                  <div className="text-sm font-semibold">${((matchData?.buy_in_amount || 0) / 100).toFixed(0)}</div>
+                  <div className="text-sm font-semibold">{((matchData?.buy_in_amount || 0) / 100).toFixed(0)}</div>
                 </CardContent>
               </Card>
               
