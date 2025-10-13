@@ -16,7 +16,9 @@ import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
+import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
+import { toast } from "sonner";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
@@ -24,6 +26,23 @@ const MatchPlayLanding = () => {
   const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentTab, setCurrentTab] = useState("matches");
+  const [searchParams] = useSearchParams();
+
+  // Handle shared PIN links
+  useEffect(() => {
+    const matchId = searchParams.get('match');
+    const pin = searchParams.get('pin');
+
+    if (matchId && pin && user) {
+      toast.info('Match PIN detected in link. Find the match below to join.');
+      setTimeout(() => {
+        const element = document.getElementById('matches-section');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }, 500);
+    }
+  }, [searchParams, user]);
 
   // Navigation items for hamburger menu (dynamically includes active match)
   const navItems = useMemo(() => {
@@ -154,7 +173,9 @@ const MatchPlayLanding = () => {
       <MatchPlayHero />
       
       {/* Match Finder Section */}
-      <MatchFinder />
+      <div id="matches-section">
+        <MatchFinder />
+      </div>
       
       {/* App Features Section */}
       <AppFeatures />

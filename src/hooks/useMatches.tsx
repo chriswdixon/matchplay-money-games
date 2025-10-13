@@ -31,8 +31,15 @@ export interface Match {
   tee_selection_mode: 'fixed' | 'individual';
   default_tees?: string;
   winner_id?: string;
+  is_team_format?: boolean;
   pin?: string;
   team2_pin?: string;
+  team3_pin?: string;
+  team4_pin?: string;
+  team1_pin_creator?: string;
+  team2_pin_creator?: string;
+  team3_pin_creator?: string;
+  team4_pin_creator?: string;
 }
 
 export const useMatches = () => {
@@ -343,6 +350,7 @@ export const useMatches = () => {
           default_tees: matchData.default_tees,
           hole_pars: holeParsValidation.data,
           pin: (matchData as any).pin || null,
+          team1_pin_creator: (matchData as any).pin ? user.id : null,
           created_by: user.id
         })
         .select()
@@ -391,40 +399,61 @@ export const useMatches = () => {
     }
   };
 
-  const joinMatch = async (matchId: string, pin?: string) => {
+  const joinMatch = async (matchId: string, pin?: string, teamNumber?: number, setTeamPin?: string) => {
     if (!user) {
       toast.error('You must be logged in to join a match');
       return { error: 'Not authenticated' };
     }
 
     try {
-      // First, fetch match details to check PIN requirement
+      // First, fetch match details
       const { data: matchData, error: fetchError } = await supabase
         .from('matches')
-        .select('pin, team2_pin, max_participants, is_team_format, created_by')
+        .select('pin, team2_pin, team3_pin, team4_pin, max_participants, is_team_format, created_by')
         .eq('id', matchId)
         .maybeSingle();
 
       if (fetchError) throw fetchError;
       if (!matchData) throw new Error('Match not found');
 
+      // Determine which team PIN to check
+      let requiredPin = matchData.pin;
+      if (teamNumber === 2) requiredPin = matchData.team2_pin;
+      else if (teamNumber === 3) requiredPin = matchData.team3_pin;
+      else if (teamNumber === 4) requiredPin = matchData.team4_pin;
+
       // Validate PIN if required
-      if (matchData.pin && matchData.pin !== pin) {
+      if (requiredPin && requiredPin !== pin) {
         toast.error('Incorrect PIN');
         return { error: 'Incorrect PIN' };
+      }
+
+      // If setting a team PIN (first joiner on that team)
+      if (setTeamPin && teamNumber) {
+        const columnName = `team${teamNumber}_pin`;
+        const creatorColumnName = `team${teamNumber}_pin_creator`;
+        const { error: pinError } = await supabase
+          .from('matches')
+          .update({ 
+            [columnName]: setTeamPin,
+            [creatorColumnName]: user.id
+          })
+          .eq('id', matchId);
+
+        if (pinError) throw pinError;
       }
 
       const { error } = await supabase
         .from('match_participants')
         .insert({
           match_id: matchId,
-          user_id: user.id
+          user_id: user.id,
+          team_number: teamNumber || null
         });
 
       if (error) throw error;
 
       toast.success('Successfully joined the match!');
-      // Refresh the list with a small delay to ensure data consistency
       setTimeout(() => fetchMatches(), 500);
       return { error: null };
     } catch (error) {

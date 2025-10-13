@@ -13,6 +13,8 @@ import PlayerRatingDialog from "./PlayerRatingDialog";
 import { MatchScorecard } from "./MatchScorecard";
 import { MatchResults } from "./MatchResults";
 import { PinEntryDialog } from "./PinEntryDialog";
+import { TeamJoinDialog } from "./TeamJoinDialog";
+import { MatchPinManagement } from "./MatchPinManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import EditMatchDialog from "./EditMatchDialog";
@@ -39,6 +41,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     spots: 'all'
   });
   const [pinDialogOpen, setPinDialogOpen] = useState(false);
+  const [teamJoinDialogOpen, setTeamJoinDialogOpen] = useState(false);
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
 
   // Request location on component mount (only for current matches, not past)
@@ -216,8 +219,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     if (match.user_joined) {
       await leaveMatch(match.id);
     } else {
-      // Check if match requires PIN
-      if (match.pin) {
+      // Check if it's a team match
+      if (match.is_team_format && match.max_participants > 2) {
+        setSelectedMatchForPin(match);
+        setTeamJoinDialogOpen(true);
+      } else if (match.pin) {
+        // Non-team match with PIN
         setSelectedMatchForPin(match);
         setPinDialogOpen(true);
       } else {
@@ -230,6 +237,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     if (selectedMatchForPin) {
       setPinDialogOpen(false);
       await joinMatch(selectedMatchForPin.id, pin);
+      setSelectedMatchForPin(null);
+    }
+  };
+
+  const handleTeamJoin = async (teamNumber: number, pin?: string, setPin?: string) => {
+    if (selectedMatchForPin) {
+      setTeamJoinDialogOpen(false);
+      await joinMatch(selectedMatchForPin.id, pin, teamNumber, setPin);
       setSelectedMatchForPin(null);
     }
   };
@@ -480,13 +495,47 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         
                         {/* Action Buttons */}
                         <div className="space-y-2">
-                          {/* Edit button for match creators (only for open matches) */}
+                          {/* Edit and PIN Management buttons for match creators (only for open matches) */}
                           {match.status === 'open' && match.created_by === user?.id && (
-                            <div className="mb-2">
+                            <div className="mb-2 flex gap-2">
                               <EditMatchDialog 
                                 match={match} 
                                 onMatchUpdated={() => refetch()} 
                               />
+                              {(match.pin || match.is_team_format) && (
+                                <MatchPinManagement
+                                  matchId={match.id}
+                                  isCreator={true}
+                                  teamPins={[
+                                    { 
+                                      teamNumber: 1, 
+                                      pin: match.pin || null, 
+                                      pinCreator: match.team1_pin_creator || null,
+                                      canReset: match.team1_pin_creator === user?.id
+                                    },
+                                    ...(match.is_team_format && match.max_participants >= 4 ? [{
+                                      teamNumber: 2,
+                                      pin: match.team2_pin || null,
+                                      pinCreator: match.team2_pin_creator || null,
+                                      canReset: match.team2_pin_creator === user?.id
+                                    }] : []),
+                                    ...(match.is_team_format && match.max_participants >= 6 ? [{
+                                      teamNumber: 3,
+                                      pin: match.team3_pin || null,
+                                      pinCreator: match.team3_pin_creator || null,
+                                      canReset: match.team3_pin_creator === user?.id
+                                    }] : []),
+                                    ...(match.is_team_format && match.max_participants === 8 ? [{
+                                      teamNumber: 4,
+                                      pin: match.team4_pin || null,
+                                      pinCreator: match.team4_pin_creator || null,
+                                      canReset: match.team4_pin_creator === user?.id
+                                    }] : [])
+                                  ]}
+                                  maxParticipants={match.max_participants}
+                                  onPinUpdated={() => refetch()}
+                                />
+                              )}
                             </div>
                           )}
                           
@@ -610,6 +659,17 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           title="Enter Match PIN"
           description={`This match requires a PIN to join. Contact the match creator for access.`}
         />
+
+        {/* Team Join Dialog */}
+        {selectedMatchForPin && (
+          <TeamJoinDialog
+            open={teamJoinDialogOpen}
+            onOpenChange={setTeamJoinDialogOpen}
+            onSubmit={handleTeamJoin}
+            maxParticipants={selectedMatchForPin.max_participants}
+            occupiedTeams={[1]} // Team 1 is always occupied by creator
+          />
+        )}
         
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (

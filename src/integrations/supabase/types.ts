@@ -332,7 +332,13 @@ export type Database = {
           pin: string | null
           scheduled_time: string
           status: string
+          team1_pin_creator: string | null
           team2_pin: string | null
+          team2_pin_creator: string | null
+          team3_pin: string | null
+          team3_pin_creator: string | null
+          team4_pin: string | null
+          team4_pin_creator: string | null
           tee_selection_mode: string
           updated_at: string
         }
@@ -358,7 +364,13 @@ export type Database = {
           pin?: string | null
           scheduled_time: string
           status?: string
+          team1_pin_creator?: string | null
           team2_pin?: string | null
+          team2_pin_creator?: string | null
+          team3_pin?: string | null
+          team3_pin_creator?: string | null
+          team4_pin?: string | null
+          team4_pin_creator?: string | null
           tee_selection_mode?: string
           updated_at?: string
         }
@@ -384,7 +396,13 @@ export type Database = {
           pin?: string | null
           scheduled_time?: string
           status?: string
+          team1_pin_creator?: string | null
           team2_pin?: string | null
+          team2_pin_creator?: string | null
+          team3_pin?: string | null
+          team3_pin_creator?: string | null
+          team4_pin?: string | null
+          team4_pin_creator?: string | null
           tee_selection_mode?: string
           updated_at?: string
         }
