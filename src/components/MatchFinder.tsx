@@ -477,7 +477,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               "font-medium",
                               isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-foreground"
                             )}>
-                              {formatBuyIn(match.buy_in_amount)} buy-in
+                              {(match.buy_in_amount / 100).toFixed(0)} buy-in
                             </span>
                           </div>
                           <div className="flex items-center gap-2">
