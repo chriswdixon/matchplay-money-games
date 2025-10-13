@@ -2,6 +2,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Trophy, DollarSign, Medal } from 'lucide-react';
 import { MatchResult, PlayerScore } from '@/hooks/useMatchScoring';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 interface MatchResultsDisplayProps {
   matchResult: MatchResult;
@@ -12,6 +14,7 @@ interface MatchResultsDisplayProps {
 
 export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants }: MatchResultsDisplayProps) {
   const isTestingMode = maxParticipants === 1;
+  const isMobile = useIsMobile();
   
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
@@ -176,55 +179,142 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           <CardTitle>Detailed Scorecard</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2 font-medium">Player</th>
-                  {Array.from({ length: 18 }, (_, i) => (
-                    <th key={i + 1} className="text-center p-2 font-medium w-10">
-                      {i + 1}
-                    </th>
-                  ))}
-                  <th className="text-center p-2 font-medium">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedPlayers.map((player, index) => (
-                  <tr 
-                    key={player.player_id} 
-                    className={`border-b ${
-                      index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''
-                    }`}
-                  >
-                    <td className="p-2 font-medium">
-                      <div className="flex items-center gap-2">
-                        {getPositionIcon(index)}
-                        <span className="text-xs lg:text-sm">{player.player_name}</span>
+          {isMobile ? (
+            // Mobile: Vertical layout with tabs for Front 9 / Back 9
+            <Tabs defaultValue="front9" className="w-full">
+              <TabsList className="grid w-full grid-cols-2">
+                <TabsTrigger value="front9">Front 9</TabsTrigger>
+                <TabsTrigger value="back9">Back 9</TabsTrigger>
+              </TabsList>
+              
+              <TabsContent value="front9" className="space-y-4 mt-4">
+                {Array.from({ length: 9 }, (_, i) => {
+                  const hole = i + 1;
+                  return (
+                    <div key={hole} className="border rounded-lg p-3 space-y-2">
+                      <div className="font-semibold text-sm text-muted-foreground mb-2">
+                        Hole {hole}
                       </div>
-                    </td>
-                    {Array.from({ length: 18 }, (_, i) => {
-                      const hole = i + 1;
-                      const score = player.scores[hole];
-
-                      return (
-                        <td key={hole} className="text-center p-1">
-                          <div className={`w-7 h-7 rounded flex items-center justify-center text-xs ${
-                            score ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground'
-                          }`}>
-                            {score || '-'}
-                          </div>
-                        </td>
-                      );
-                    })}
-                    <td className="text-center p-2 font-bold">
-                      {player.total > 0 ? player.total : 'DNF'}
-                    </td>
+                      <div className="space-y-2">
+                        {sortedPlayers.map((player, index) => {
+                          const score = player.scores[hole];
+                          return (
+                            <div 
+                              key={player.player_id}
+                              className={`flex items-center justify-between p-2 rounded ${
+                                index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : 'bg-muted/30'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                {index < 3 && getPositionIcon(index)}
+                                <span className="text-sm font-medium truncate">
+                                  {player.player_name}
+                                </span>
+                              </div>
+                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${
+                                score ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                              }`}>
+                                {score || '-'}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </TabsContent>
+              
+              <TabsContent value="back9" className="space-y-4 mt-4">
+                {Array.from({ length: 9 }, (_, i) => {
+                  const hole = i + 10;
+                  return (
+                    <div key={hole} className="border rounded-lg p-3 space-y-2">
+                      <div className="font-semibold text-sm text-muted-foreground mb-2">
+                        Hole {hole}
+                      </div>
+                      <div className="space-y-2">
+                        {sortedPlayers.map((player, index) => {
+                          const score = player.scores[hole];
+                          return (
+                            <div 
+                              key={player.player_id}
+                              className={`flex items-center justify-between p-2 rounded ${
+                                index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : 'bg-muted/30'
+                              }`}
+                            >
+                              <div className="flex items-center gap-2 flex-1 min-w-0">
+                                {index < 3 && getPositionIcon(index)}
+                                <span className="text-sm font-medium truncate">
+                                  {player.player_name}
+                                </span>
+                              </div>
+                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${
+                                score ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
+                              }`}>
+                                {score || '-'}
+                              </div>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </TabsContent>
+            </Tabs>
+          ) : (
+            // Desktop: Horizontal table layout
+            <div className="overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2 font-medium">Player</th>
+                    {Array.from({ length: 18 }, (_, i) => (
+                      <th key={i + 1} className="text-center p-2 font-medium w-10">
+                        {i + 1}
+                      </th>
+                    ))}
+                    <th className="text-center p-2 font-medium">Total</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                </thead>
+                <tbody>
+                  {sortedPlayers.map((player, index) => (
+                    <tr 
+                      key={player.player_id} 
+                      className={`border-b ${
+                        index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''
+                      }`}
+                    >
+                      <td className="p-2 font-medium">
+                        <div className="flex items-center gap-2">
+                          {getPositionIcon(index)}
+                          <span className="text-xs lg:text-sm">{player.player_name}</span>
+                        </div>
+                      </td>
+                      {Array.from({ length: 18 }, (_, i) => {
+                        const hole = i + 1;
+                        const score = player.scores[hole];
+
+                        return (
+                          <td key={hole} className="text-center p-1">
+                            <div className={`w-7 h-7 rounded flex items-center justify-center text-xs ${
+                              score ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground'
+                            }`}>
+                              {score || '-'}
+                            </div>
+                          </td>
+                        );
+                      })}
+                      <td className="text-center p-2 font-bold">
+                        {player.total > 0 ? player.total : 'DNF'}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>
