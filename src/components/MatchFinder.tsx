@@ -416,6 +416,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       )}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
+                      {match.status === 'cancelled' && (
+                        <Badge className="absolute -top-2 -right-2 bg-destructive/90 text-destructive-foreground border border-destructive">
+                          CANCELLED
+                        </Badge>
+                      )}
                       {match.status === 'completed' && match.winner_id === user?.id && (
                         <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white border border-amber-400">
                           <Trophy className="w-3 h-3 mr-1" />

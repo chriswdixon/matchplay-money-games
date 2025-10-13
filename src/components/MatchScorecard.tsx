@@ -1217,7 +1217,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
         </div>
       )}
 
-      {!matchResult && !isMatchComplete && (
+      {!matchResult && !isMatchComplete && matchData?.status !== 'cancelled' && (
         <div className="text-center text-muted-foreground px-6 pb-8">
           <Clock className="w-5 h-5 mx-auto mb-2" />
           <p>Complete all 18 holes to finalize results</p>
