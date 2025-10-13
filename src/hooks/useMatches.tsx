@@ -406,59 +406,34 @@ export const useMatches = () => {
     }
 
     try {
-      // First, fetch match details
-      const { data: matchData, error: fetchError } = await supabase
-        .from('matches')
-        .select('pin, team2_pin, team3_pin, team4_pin, max_participants, is_team_format, created_by')
-        .eq('id', matchId)
-        .maybeSingle();
-
-      if (fetchError) throw fetchError;
-      if (!matchData) throw new Error('Match not found');
-
-      // Determine which team PIN to check
-      let requiredPin = matchData.pin;
-      if (teamNumber === 2) requiredPin = matchData.team2_pin;
-      else if (teamNumber === 3) requiredPin = matchData.team3_pin;
-      else if (teamNumber === 4) requiredPin = matchData.team4_pin;
-
-      // Validate PIN if required
-      if (requiredPin && requiredPin !== pin) {
-        toast.error('Incorrect PIN');
-        return { error: 'Incorrect PIN' };
-      }
-
-      // If setting a team PIN (first joiner on that team)
-      if (setTeamPin && teamNumber) {
-        const columnName = `team${teamNumber}_pin`;
-        const creatorColumnName = `team${teamNumber}_pin_creator`;
-        const { error: pinError } = await supabase
-          .from('matches')
-          .update({ 
-            [columnName]: setTeamPin,
-            [creatorColumnName]: user.id
-          })
-          .eq('id', matchId);
-
-        if (pinError) throw pinError;
-      }
-
-      const { error } = await supabase
-        .from('match_participants')
-        .insert({
-          match_id: matchId,
-          user_id: user.id,
-          team_number: teamNumber || null
-        });
+      // Call secure server-side function for PIN validation and join
+      const { data, error } = await supabase.rpc('validate_and_join_match', {
+        p_match_id: matchId,
+        p_pin: pin || null,
+        p_team_number: teamNumber || null,
+        p_set_team_pin: setTeamPin || null
+      });
 
       if (error) throw error;
 
-      toast.success('Successfully joined the match!');
-      setTimeout(() => fetchMatches(), 500);
-      return { error: null };
-    } catch (error) {
+      // Handle response
+      const result = data as { error?: string; success?: boolean; message?: string; retry_after?: number } | null;
+      
+      if (result && result.error) {
+        toast.error(result.error);
+        return { error: result.error };
+      }
+
+      if (result && result.success) {
+        toast.success(result.message || 'Successfully joined the match!');
+        setTimeout(() => fetchMatches(), 500);
+        return { error: null };
+      }
+
+      throw new Error('Unexpected response from server');
+    } catch (error: any) {
       console.error('Error joining match:', error);
-      toast.error('Failed to join match');
+      toast.error(error.message || 'Failed to join match');
       return { error };
     }
   };

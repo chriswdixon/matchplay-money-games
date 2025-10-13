@@ -452,6 +452,44 @@ export type Database = {
         }
         Relationships: []
       }
+      pin_attempts: {
+        Row: {
+          attempted_at: string
+          id: string
+          ip_address: string | null
+          match_id: string
+          success: boolean
+          team_number: number | null
+          user_id: string
+        }
+        Insert: {
+          attempted_at?: string
+          id?: string
+          ip_address?: string | null
+          match_id: string
+          success?: boolean
+          team_number?: number | null
+          user_id: string
+        }
+        Update: {
+          attempted_at?: string
+          id?: string
+          ip_address?: string | null
+          match_id?: string
+          success?: boolean
+          team_number?: number | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pin_attempts_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       player_accounts: {
         Row: {
           balance: number
@@ -793,6 +831,15 @@ export type Database = {
       user_joined_match: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
+      }
+      validate_and_join_match: {
+        Args: {
+          p_match_id: string
+          p_pin?: string
+          p_set_team_pin?: string
+          p_team_number?: number
+        }
+        Returns: Json
       }
       validate_match_join_token: {
         Args: { p_token: string }
