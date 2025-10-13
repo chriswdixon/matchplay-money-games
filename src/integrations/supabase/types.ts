@@ -68,6 +68,36 @@ export type Database = {
           },
         ]
       }
+      admin_access_log: {
+        Row: {
+          accessed_table: string
+          accessed_user_id: string | null
+          action: string
+          admin_user_id: string
+          created_at: string
+          id: string
+          metadata: Json | null
+        }
+        Insert: {
+          accessed_table: string
+          accessed_user_id?: string | null
+          action: string
+          admin_user_id: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Update: {
+          accessed_table?: string
+          accessed_user_id?: string | null
+          action?: string
+          admin_user_id?: string
+          created_at?: string
+          id?: string
+          metadata?: Json | null
+        }
+        Relationships: []
+      }
       favorite_courses: {
         Row: {
           address: string | null
