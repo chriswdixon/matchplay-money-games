@@ -227,14 +227,18 @@ const CreateMatch = () => {
 
       // Set max participants based on format
       let maxParticipants = parseInt(formData.max_participants);
-      if (formData.format === 'Match Play') {
-        maxParticipants = 2;
-      } else if (formData.format === 'Best Ball' || formData.format === 'Scramble') {
-        // Ensure even number for team formats
-        maxParticipants = Math.max(4, Math.floor(maxParticipants / 2) * 2);
+      
+      // Testing mode (1 player) bypasses all restrictions
+      if (maxParticipants !== 1) {
+        if (formData.format === 'Match Play') {
+          maxParticipants = 2;
+        } else if (formData.format === 'Best Ball' || formData.format === 'Scramble') {
+          // Ensure even number for team formats
+          maxParticipants = Math.max(4, Math.floor(maxParticipants / 2) * 2);
+        }
       }
 
-      const isTeamFormat = formData.format === 'Best Ball' || formData.format === 'Scramble';
+      const isTeamFormat = maxParticipants !== 1 && (formData.format === 'Best Ball' || formData.format === 'Scramble');
 
       const matchData = {
         course_name: formData.course_name,
@@ -604,13 +608,24 @@ const CreateMatch = () => {
         <Select 
           value={formData.max_participants} 
           onValueChange={(value) => setFormData({ ...formData, max_participants: value })}
-          disabled={formData.format === 'Match Play' || formData.format === 'Best Ball' || formData.format === 'Scramble'}
+          disabled={formData.max_participants !== '1' && (formData.format === 'Match Play' || formData.format === 'Best Ball' || formData.format === 'Scramble')}
         >
           <SelectTrigger id="max_players">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {formData.format === 'Match Play' ? (
+            <SelectItem value="1">1 (Testing - No Payouts)</SelectItem>
+            {formData.max_participants === '1' ? (
+              <>
+                <SelectItem value="2">2</SelectItem>
+                <SelectItem value="3">3</SelectItem>
+                <SelectItem value="4">4 (Default)</SelectItem>
+                <SelectItem value="5">5</SelectItem>
+                <SelectItem value="6">6</SelectItem>
+                <SelectItem value="7">7</SelectItem>
+                <SelectItem value="8">8</SelectItem>
+              </>
+            ) : formData.format === 'Match Play' ? (
               <SelectItem value="2">2 (Match Play)</SelectItem>
             ) : (formData.format === 'Best Ball' || formData.format === 'Scramble') ? (
               <>
@@ -620,7 +635,6 @@ const CreateMatch = () => {
               </>
             ) : (
               <>
-                <SelectItem value="1">1 (Testing)</SelectItem>
                 <SelectItem value="2">2</SelectItem>
                 <SelectItem value="3">3</SelectItem>
                 <SelectItem value="4">4 (Default)</SelectItem>
@@ -632,7 +646,10 @@ const CreateMatch = () => {
             )}
           </SelectContent>
         </Select>
-        {(formData.format === 'Best Ball' || formData.format === 'Scramble') && (
+        {formData.max_participants === '1' && (
+          <p className="text-xs text-amber-600 dark:text-amber-400">Testing mode: All format restrictions disabled, no payouts</p>
+        )}
+        {formData.max_participants !== '1' && (formData.format === 'Best Ball' || formData.format === 'Scramble') && (
           <p className="text-xs text-muted-foreground">Teams of 2 will select teammates after joining</p>
         )}
       </div>
