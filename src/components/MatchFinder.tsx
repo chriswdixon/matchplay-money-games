@@ -628,7 +628,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       
                       {/* Inline Scorecard for Past Matches */}
                       {showPastMatches && expandedMatchId === match.id && (
-                        <div className="border-t">
+                        <div className="border-t overflow-hidden">
                           <MatchScorecard
                             matchId={match.id}
                             matchName={match.course_name}

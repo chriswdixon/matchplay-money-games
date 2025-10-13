@@ -326,7 +326,10 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   }
 
   return (
-    <div className="w-full max-w-[1400px] mx-auto px-0 space-y-0 md:space-y-2 overflow-x-hidden">
+    <div className={cn(
+      "w-full mx-auto space-y-0 md:space-y-2",
+      onClose ? "max-w-[1400px] px-0 overflow-x-hidden" : "overflow-hidden"
+    )}>
       {/* Header with Course Name and Hamburger Menu */}
       <div className="px-4 md:px-6">
         <div className="flex items-center justify-between">
@@ -588,7 +591,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             
             <TabsContent value="front9" className="mt-4">
               {/* Desktop Table View */}
-              <div className="hidden md:block">
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-xs lg:text-sm">
                   <thead>
                     {/* Par Row */}
@@ -891,7 +894,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
             <TabsContent value="back9" className="mt-4">
               {/* Desktop Table View */}
-              <div className="hidden md:block">
+              <div className="hidden md:block overflow-x-auto">
                 <table className="w-full text-xs lg:text-sm">
                   <thead>
                     {/* Par Row */}
