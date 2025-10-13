@@ -42,6 +42,14 @@ export const displayNameSchema = z
   .regex(/^[a-zA-Z0-9\s_-]+$/, "Display name can only contain letters, numbers, spaces, underscores, and hyphens")
   .refine((name) => name.length > 0, "Display name cannot be empty");
 
+// Invite code validation schema
+export const inviteCodeSchema = z
+  .string()
+  .trim()
+  .min(6, "Invite code must be at least 6 characters")
+  .max(32, "Invite code must be less than 32 characters")
+  .regex(/^[A-Z0-9]+$/, "Invite code can only contain uppercase letters and numbers");
+
 // Sign up form validation schema
 export const signUpSchema = z.object({
   email: emailSchema,
