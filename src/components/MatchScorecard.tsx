@@ -54,6 +54,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   const [cancelDialogOpen, setCancelDialogOpen] = useState(false);
   const [cancelReason, setCancelReason] = useState<string>('');
   const [isLeaving, setIsLeaving] = useState(false);
+  const [showResults, setShowResults] = useState(false);
 
   // Debug: Log match status changes
   useEffect(() => {
@@ -333,14 +334,24 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             )}
           </div>
           
-          {/* Back Button for Cancelled/Completed Matches or Hamburger Menu */}
+          {/* Back/Toggle Button for Cancelled/Completed Matches or Hamburger Menu */}
           {matchData?.status === 'cancelled' || matchData?.status === 'completed' ? (
-            <Button
-              variant="success"
-              onClick={onClose}
-            >
-              Back to Matches
-            </Button>
+            <div className="flex gap-2">
+              {matchData?.status === 'completed' && matchResult && (
+                <Button
+                  variant="outline"
+                  onClick={() => setShowResults(!showResults)}
+                >
+                  {showResults ? 'Hide Results' : 'View Results'}
+                </Button>
+              )}
+              <Button
+                variant="success"
+                onClick={onClose}
+              >
+                Close Details
+              </Button>
+            </div>
           ) : (
             <Button
               variant="ghost"
@@ -543,16 +554,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       )}
 
       {/* Display Results when all confirmed */}
-      {matchResult && (
+      {matchResult && showResults && (
         <MatchResultsDisplay 
           matchResult={matchResult}
           playerScores={playerScores}
           buyInAmount={matchData?.buy_in_amount}
+          maxParticipants={matchData?.max_participants}
         />
       )}
 
       {/* Scorecard */}
-      {!matchResult && (
+      {(!matchResult || !showResults) && (
         <Card className="w-full border-0 md:border">
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs defaultValue="front9" className="w-full">
