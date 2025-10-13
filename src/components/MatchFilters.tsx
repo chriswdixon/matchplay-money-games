@@ -141,8 +141,7 @@ const MatchFilters = ({
                     <SelectItem value="all">Any Format</SelectItem>
                     <SelectItem value="stroke-play">Stroke Play</SelectItem>
                     <SelectItem value="match-play">Match Play</SelectItem>
-                    <SelectItem value="best-ball">2v2 Best Ball</SelectItem>
-                    <SelectItem value="skins">Skins Game</SelectItem>
+                    <SelectItem value="best-ball">Best Ball</SelectItem>
                     <SelectItem value="scramble">Scramble</SelectItem>
                   </SelectContent>
                 </Select>

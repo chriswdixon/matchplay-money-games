@@ -81,7 +81,7 @@ export const createMatchSchema = z.object({
       return false;
     }
   }, "Invalid URL format"),
-  format: z.enum(['Stroke Play', 'Match Play', 'Best Ball', 'Skins Game', 'Scramble'], {
+  format: z.enum(['Stroke Play', 'Match Play', 'Best Ball', 'Scramble'], {
     errorMap: () => ({ message: "Invalid match format" })
   }),
   holes: z.number().int().refine((val) => val === 9 || val === 18, {

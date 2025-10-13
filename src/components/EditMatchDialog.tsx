@@ -82,10 +82,9 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
 
   const formatOptions = [
     { value: 'stroke-play', label: 'Stroke Play' },
-    { value: 'match-play', label: 'Match Play' },
-    { value: 'best-ball', label: '2v2 Best Ball' },
-    { value: 'skins', label: 'Skins Game' },
-    { value: 'scramble', label: 'Scramble' }
+    { value: 'match-play', label: 'Match Play (1v1)' },
+    { value: 'best-ball', label: 'Best Ball (2v2)' },
+    { value: 'scramble', label: 'Scramble (2v2)' }
   ];
 
   const participantOptions = Array.from({ length: 4 }, (_, i) => ({

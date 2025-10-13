@@ -287,8 +287,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
     const formatMap: { [key: string]: string } = {
       'stroke-play': 'Stroke Play',
       'match-play': 'Match Play',
-      'best-ball': '2v2 Best Ball',
-      'skins': 'Skins Game',
+      'best-ball': 'Best Ball',
       'scramble': 'Scramble'
     };
     return formatMap[format] || format;

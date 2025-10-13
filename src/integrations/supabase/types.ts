@@ -206,6 +206,7 @@ export type Database = {
           match_id: string
           selected_tees: string | null
           status: string
+          team_number: number | null
           user_id: string
         }
         Insert: {
@@ -214,6 +215,7 @@ export type Database = {
           match_id: string
           selected_tees?: string | null
           status?: string
+          team_number?: number | null
           user_id: string
         }
         Update: {
@@ -222,6 +224,7 @@ export type Database = {
           match_id?: string
           selected_tees?: string | null
           status?: string
+          team_number?: number | null
           user_id?: string
         }
         Relationships: [
@@ -246,6 +249,7 @@ export type Database = {
           match_id: string
           updated_at: string
           winner_id: string | null
+          winners: string[] | null
         }
         Insert: {
           completed_at?: string | null
@@ -258,6 +262,7 @@ export type Database = {
           match_id: string
           updated_at?: string
           winner_id?: string | null
+          winners?: string[] | null
         }
         Update: {
           completed_at?: string | null
@@ -270,6 +275,7 @@ export type Database = {
           match_id?: string
           updated_at?: string
           winner_id?: string | null
+          winners?: string[] | null
         }
         Relationships: []
       }
@@ -318,6 +324,7 @@ export type Database = {
           hole_pars: Json | null
           holes: number
           id: string
+          is_team_format: boolean | null
           latitude: number | null
           location: string
           longitude: number | null
@@ -341,6 +348,7 @@ export type Database = {
           hole_pars?: Json | null
           holes?: number
           id?: string
+          is_team_format?: boolean | null
           latitude?: number | null
           location: string
           longitude?: number | null
@@ -364,6 +372,7 @@ export type Database = {
           hole_pars?: Json | null
           holes?: number
           id?: string
+          is_team_format?: boolean | null
           latitude?: number | null
           location?: string
           longitude?: number | null

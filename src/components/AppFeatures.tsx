@@ -55,7 +55,7 @@ const AppFeatures = () => {
     { icon: <BarChart3 className="w-6 h-6" />, title: "Performance Analytics", desc: "Track improvement over time" },
     { icon: <Users className="w-6 h-6" />, title: "Player Verification", desc: "Vetted member community" },
     { icon: <Zap className="w-6 h-6" />, title: "Live Scoring", desc: "Real-time match updates" },
-    { icon: <Target className="w-6 h-6" />, title: "Game Formats", desc: "Skins, stroke play, match play" },
+    { icon: <Target className="w-6 h-6" />, title: "Game Formats", desc: "Stroke play, match play, best ball, scramble" },
     { icon: <Clock className="w-6 h-6" />, title: "Flexible Scheduling", desc: "Book matches anytime" },
     { icon: <CreditCard className="w-6 h-6" />, title: "Multiple Payment", desc: "Various deposit methods" }
   ];

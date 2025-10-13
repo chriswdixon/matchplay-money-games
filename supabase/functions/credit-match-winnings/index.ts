@@ -48,14 +48,12 @@ serve(async (req) => {
     if (match.status !== 'completed') throw new Error("Match not completed");
 
     const matchResults = match.match_results?.[0];
-    if (!matchResults || !matchResults.winner_id) {
-      throw new Error("No winner found for this match");
+    if (!matchResults) {
+      throw new Error("No results found for this match");
     }
 
-    const winnerId = matchResults.winner_id;
     const buyInAmount = match.buy_in_amount;
-
-    logStep("Processing winnings", { matchId, winnerId, buyInAmount });
+    const isTeamFormat = match.is_team_format || false;
 
     // Count active participants (who actually paid buy-in)
     const { data: participants, error: participantsError } = await supabaseClient
@@ -67,69 +65,97 @@ serve(async (req) => {
     if (participantsError) throw participantsError;
 
     const totalPot = buyInAmount * (participants?.length || 0);
-    logStep("Calculated pot", { participantCount: participants?.length, totalPot });
+    logStep("Calculated pot", { participantCount: participants?.length, totalPot, isTeamFormat });
 
-    // Note: Unique constraint on (match_id, user_id, transaction_type) 
-    // will prevent duplicates at database level
-
-    // Get winner's account
-    const { data: account } = await supabaseClient
-      .from('player_accounts')
-      .select('*')
-      .eq('user_id', winnerId)
-      .single();
-
-    if (!account) throw new Error("Winner account not found");
-
-    const currentBalance = parseFloat(account.balance);
-    const newBalance = currentBalance + totalPot;
-
-    // Credit winnings
-    const { error: updateError } = await supabaseClient
-      .from('player_accounts')
-      .update({ balance: newBalance })
-      .eq('user_id', winnerId);
-
-    if (updateError) throw updateError;
-
-    // Record transaction - unique constraint prevents duplicates
-    const { error: txError } = await supabaseClient
-      .from('account_transactions')
-      .insert({
-        user_id: winnerId,
-        account_id: account.id,
-        amount: totalPot,
-        transaction_type: 'winning',
-        match_id: matchId,
-        description: `Match winnings for ${matchId}`,
-        metadata: { 
-          participant_count: participants?.length,
-          buy_in_amount: buyInAmount
-        }
-      });
+    // Get winners array (supports ties and team formats)
+    const winners = matchResults.winners || (matchResults.winner_id ? [matchResults.winner_id] : []);
     
-    if (txError) {
-      // Check if it's a duplicate transaction error
-      if (txError.code === '23505') {
-        logStep("Duplicate winnings credit detected");
-        return new Response(JSON.stringify({ 
-          success: true,
-          message: "Winnings already credited",
-          amount: totalPot
-        }), {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 200,
-        });
-      }
-      throw txError;
+    if (winners.length === 0) {
+      throw new Error("No winners found for this match");
     }
 
-    logStep("Winnings credited successfully");
+    logStep("Processing winnings", { matchId, winners, buyInAmount, isTeamFormat });
+
+    // Calculate payout per winner
+    let payoutPerWinner = totalPot;
+    
+    if (isTeamFormat) {
+      // Team formats: winning team splits the pot
+      // If it's a tie, all players split evenly
+      payoutPerWinner = Math.floor(totalPot / winners.length);
+    } else {
+      // Individual formats: winners split the pot evenly (handles ties)
+      payoutPerWinner = Math.floor(totalPot / winners.length);
+    }
+
+    logStep("Calculated payouts", { totalPot, winnerCount: winners.length, payoutPerWinner });
+
+    // Credit each winner
+    for (const winnerId of winners) {
+      // Get winner's account
+      const { data: account } = await supabaseClient
+        .from('player_accounts')
+        .select('*')
+        .eq('user_id', winnerId)
+        .single();
+
+      if (!account) {
+        logStep("Warning: Winner account not found", { winnerId });
+        continue;
+      }
+
+      const currentBalance = parseFloat(account.balance);
+      const newBalance = currentBalance + payoutPerWinner;
+
+      // Credit winnings
+      const { error: updateError } = await supabaseClient
+        .from('player_accounts')
+        .update({ balance: newBalance })
+        .eq('user_id', winnerId);
+
+      if (updateError) {
+        logStep("Error updating balance", { winnerId, error: updateError });
+        throw updateError;
+      }
+
+      // Record transaction - unique constraint prevents duplicates
+      const { error: txError } = await supabaseClient
+        .from('account_transactions')
+        .insert({
+          user_id: winnerId,
+          account_id: account.id,
+          amount: payoutPerWinner,
+          transaction_type: 'winning',
+          match_id: matchId,
+          description: `Match winnings for ${matchId}${winners.length > 1 ? ' (split)' : ''}`,
+          metadata: { 
+            participant_count: participants?.length,
+            buy_in_amount: buyInAmount,
+            winner_count: winners.length,
+            is_team_format: isTeamFormat,
+            is_tie: winners.length > 1 && !isTeamFormat
+          }
+        });
+      
+      if (txError) {
+        // Check if it's a duplicate transaction error
+        if (txError.code === '23505') {
+          logStep("Duplicate winnings credit detected for winner", { winnerId });
+          continue;
+        }
+        throw txError;
+      }
+
+      logStep("Winnings credited to winner", { winnerId, amount: payoutPerWinner, newBalance });
+    }
+
     return new Response(JSON.stringify({ 
       success: true, 
-      winnerId,
-      amount: totalPot,
-      newBalance
+      winners,
+      totalPot,
+      payoutPerWinner,
+      isTeamFormat,
+      message: winners.length > 1 ? "Winnings split among winners" : "Winner credited"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
@@ -144,6 +170,14 @@ serve(async (req) => {
       safeMessage = "Resource not available";
     } else if (errorMessage.includes('not completed')) {
       safeMessage = "Operation not allowed";
+    } else if (errorMessage.includes('already credited')) {
+      return new Response(JSON.stringify({ 
+        success: true,
+        message: "Winnings already credited"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 200,
+      });
     }
     
     return new Response(JSON.stringify({ 

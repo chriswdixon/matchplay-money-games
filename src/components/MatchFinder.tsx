@@ -201,8 +201,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     const formatMap: { [key: string]: string } = {
       'stroke-play': 'Stroke Play',
       'match-play': 'Match Play',
-      'best-ball': '2v2 Best Ball',
-      'skins': 'Skins Game',
+      'best-ball': 'Best Ball',
       'scramble': 'Scramble'
     };
     return formatMap[format] || format;
@@ -449,7 +448,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               match.format === 'stroke-play' && "border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/10",
                               match.format === 'match-play' && "border-purple-500/50 text-purple-600 dark:text-purple-400 bg-purple-500/10",
                               match.format === 'best-ball' && "border-green-500/50 text-green-600 dark:text-green-400 bg-green-500/10",
-                              match.format === 'skins' && "border-orange-500/50 text-orange-600 dark:text-orange-400 bg-orange-500/10",
                               match.format === 'scramble' && "border-pink-500/50 text-pink-600 dark:text-pink-400 bg-pink-500/10"
                             )}
                           >
