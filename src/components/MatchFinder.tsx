@@ -43,6 +43,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [pinDialogOpen, setPinDialogOpen] = useState(false);
   const [teamJoinDialogOpen, setTeamJoinDialogOpen] = useState(false);
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
+  const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
   // Request location on component mount (only for current matches, not past)
   useEffect(() => {
@@ -286,10 +287,16 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   const handleViewScorecard = (match: any) => {
-    if (match.status === 'completed') {
-      setResultsMatch(match);
+    // For past matches view, toggle inline display
+    if (showPastMatches) {
+      setExpandedMatchId(expandedMatchId === match.id ? null : match.id);
     } else {
-      setScorecardMatch(match);
+      // For current matches, use modal view
+      if (match.status === 'completed') {
+        setResultsMatch(match);
+      } else {
+        setScorecardMatch(match);
+      }
     }
   };
 
@@ -409,11 +416,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       )}
                       style={{ animationDelay: `${index * 0.1}s` }}
                     >
-                      {match.status === 'cancelled' && (
-                        <Badge className="absolute -top-2 -right-2 bg-destructive/90 text-destructive-foreground border border-destructive">
-                          CANCELLED
-                        </Badge>
-                      )}
                       {match.status === 'completed' && match.winner_id === user?.id && (
                         <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white border border-amber-400">
                           <Trophy className="w-3 h-3 mr-1" />
@@ -558,7 +560,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 onClick={() => handleViewScorecard(match)}
                               >
                                 <Trophy className="w-4 h-4 mr-2" />
-                                View Results
+                                {expandedMatchId === match.id ? 'Hide Results' : 'View Results'}
                               </Button>
                               <Button 
                                 variant="outline"
@@ -575,7 +577,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               onClick={() => handleViewScorecard(match)}
                             >
                               <Target className="w-4 h-4 mr-2" />
-                              View Scorecard
+                              {expandedMatchId === match.id ? 'Hide Scorecard' : 'View Scorecard'}
                             </Button>
                           ) : match.status === 'started' && match.user_joined ? (
                             <Button
@@ -618,6 +620,17 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           )}
                         </div>
                       </CardContent>
+                      
+                      {/* Inline Scorecard for Past Matches */}
+                      {showPastMatches && expandedMatchId === match.id && (
+                        <div className="border-t">
+                          <MatchScorecard
+                            matchId={match.id}
+                            matchName={match.course_name}
+                            readOnly={true}
+                          />
+                        </div>
+                      )}
                     </Card>
                   );
                 })

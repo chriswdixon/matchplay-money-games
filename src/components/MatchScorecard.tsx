@@ -337,9 +337,6 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             <h1 className="text-xl md:text-2xl font-bold">
               {matchData?.course_name || matchName || 'Golf Match'}
             </h1>
-            {matchData?.status === 'cancelled' && (
-              <Badge variant="destructive">Cancelled</Badge>
-            )}
             {matchResult?.winner_id && user?.id && matchResult.winner_id === user.id && (
               <Badge variant="success">Winner</Badge>
             )}
@@ -356,12 +353,14 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                   {showResults ? 'Hide Results' : 'View Results'}
                 </Button>
               )}
-              <Button
-                variant="success"
-                onClick={onClose}
-              >
-                Close Details
-              </Button>
+              {onClose && (
+                <Button
+                  variant="success"
+                  onClick={onClose}
+                >
+                  Close Details
+                </Button>
+              )}
             </div>
           ) : (
             <Button
