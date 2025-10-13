@@ -42,6 +42,8 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
     updateScore,
     finalizeResults,
     confirmResults,
+    recordDoubleDownVote,
+    processDoubleDownPayments,
     isMatchComplete,
     canFinalize
   } = useMatchScoring(matchId);
@@ -55,6 +57,11 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   const [cancelReason, setCancelReason] = useState<string>('');
   const [isLeaving, setIsLeaving] = useState(false);
   const [showResults, setShowResults] = useState(false);
+  const [doubleDownDialogOpen, setDoubleDownDialogOpen] = useState(false);
+  const [hasShownDoubleDown, setHasShownDoubleDown] = useState(false);
+  const [doubleDownStatuses, setDoubleDownStatuses] = useState<any[]>([]);
+  const [isProcessingDoubleDown, setIsProcessingDoubleDown] = useState(false);
+  const [activeTab, setActiveTab] = useState('front9');
 
   // Debug: Log match status changes
   useEffect(() => {
@@ -125,6 +132,84 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       setUserClosedSettings(false);
     }
   }, [currentUserScore]);
+
+  // Fetch double down statuses
+  useEffect(() => {
+    if (!matchId || !user) return;
+
+    const fetchDoubleDownStatuses = async () => {
+      const { data } = await supabase
+        .from('double_down_participants')
+        .select(`
+          *,
+          profiles!inner(display_name)
+        `)
+        .eq('match_id', matchId);
+
+      if (data) {
+        setDoubleDownStatuses(data);
+      }
+    };
+
+    fetchDoubleDownStatuses();
+
+    // Subscribe to real-time updates
+    const channel = supabase
+      .channel(`double_down_${matchId}`)
+      .on('postgres_changes', {
+        event: '*',
+        schema: 'public',
+        table: 'double_down_participants',
+        filter: `match_id=eq.${matchId}`
+      }, () => {
+        fetchDoubleDownStatuses();
+      })
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+  }, [matchId, user]);
+
+  // Check if should show double down dialog when switching to back 9
+  useEffect(() => {
+    if (
+      activeTab === 'back9' &&
+      !hasShownDoubleDown &&
+      matchData?.status === 'started' &&
+      matchData?.holes === 18 &&
+      !matchData?.double_down_finalized &&
+      user
+    ) {
+      // Check if current user has already responded
+      const myStatus = doubleDownStatuses.find(s => s.user_id === user.id);
+      if (!myStatus?.responded) {
+        setDoubleDownDialogOpen(true);
+        setHasShownDoubleDown(true);
+      }
+    }
+  }, [activeTab, hasShownDoubleDown, matchData, user, doubleDownStatuses]);
+
+  const handleDoubleDownVote = async (optedIn: boolean) => {
+    setIsProcessingDoubleDown(true);
+    try {
+      const result = await recordDoubleDownVote(optedIn);
+      
+      if (result.allAgreed && result.needsProcessing) {
+        // Payments will be processed automatically
+        toast({ title: "Success", description: "All players agreed! Processing payments..." });
+      } else if (result.doubleDownCancelled) {
+        toast({ title: "Declined", description: "Double down declined by one or more players" });
+        setDoubleDownDialogOpen(false);
+      } else if (result.waiting) {
+        toast({ title: "Vote Recorded", description: `Waiting for ${result.pendingCount} more player(s)...` });
+      }
+    } catch (error) {
+      console.error('Error voting on double down:', error);
+    } finally {
+      setIsProcessingDoubleDown(false);
+    }
+  };
 
   const handleScoreEdit = (hole: number, currentScore?: number) => {
     setEditingHole(hole);
@@ -586,7 +671,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           !onClose && "shadow-none"
         )}>
         <CardContent className="px-0 md:px-2 py-4">
-          <Tabs defaultValue="front9" className="w-full">
+          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Sticky Tabs Header */}
             <div className={cn(
               "sticky top-0 z-20 bg-background pb-2 px-2",
@@ -1504,6 +1589,86 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           }}
         />
       )}
+
+      {/* Double Down Dialog */}
+      <AlertDialog open={doubleDownDialogOpen} onOpenChange={setDoubleDownDialogOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="flex items-center gap-2">
+              🎲 Double Down on the Back 9?
+            </AlertDialogTitle>
+            <AlertDialogDescription>
+              <div className="space-y-4 text-left">
+                <p>All players must agree to double the stakes for the back 9!</p>
+                
+                <div className="bg-muted p-3 rounded-lg space-y-2">
+                  <div className="flex justify-between text-sm">
+                    <span>Original Buy-in:</span>
+                    <span className="font-semibold">${((matchData?.buy_in_amount || 0) / 100).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm">
+                    <span>Additional Buy-in:</span>
+                    <span className="font-semibold">${((matchData?.double_down_amount || matchData?.buy_in_amount || 0) / 100).toFixed(2)}</span>
+                  </div>
+                  <div className="border-t pt-2 flex justify-between font-bold">
+                    <span>New Total:</span>
+                    <span>${(((matchData?.buy_in_amount || 0) + (matchData?.double_down_amount || matchData?.buy_in_amount || 0)) / 100).toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 rounded-lg">
+                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                    ⚠️ Payment will only be processed if <strong>ALL</strong> players agree
+                  </p>
+                </div>
+
+                {doubleDownStatuses.length > 0 && (
+                  <div className="space-y-2">
+                    <h4 className="text-sm font-semibold">Player Status:</h4>
+                    <div className="space-y-1">
+                      {playerScores.map(player => {
+                        const status = doubleDownStatuses.find(s => s.user_id === player.player_id);
+                        const isCurrentUser = player.player_id === user?.id;
+                        
+                        return (
+                          <div key={player.player_id} className="flex items-center justify-between text-sm">
+                            <span className={isCurrentUser ? "font-semibold" : ""}>
+                              {player.player_name}{isCurrentUser && " (You)"}
+                            </span>
+                            {status?.responded ? (
+                              status.opted_in ? (
+                                <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+                                  <Check className="h-3 w-3" /> Agreed
+                                </span>
+                              ) : (
+                                <span className="text-red-600 dark:text-red-400">Declined</span>
+                              )
+                            ) : (
+                              <span className="text-muted-foreground">Waiting...</span>
+                            )}
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel onClick={() => handleDoubleDownVote(false)} disabled={isProcessingDoubleDown}>
+              Opt Out
+            </AlertDialogCancel>
+            <Button 
+              onClick={() => handleDoubleDownVote(true)} 
+              disabled={isProcessingDoubleDown}
+              className="bg-amber-500 hover:bg-amber-600 text-white"
+            >
+              {isProcessingDoubleDown ? "Processing..." : "Double Down 🎲"}
+            </Button>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       {/* Editing Instructions - Remove this since we're using a dialog now */}
     </div>

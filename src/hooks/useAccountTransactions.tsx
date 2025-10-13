@@ -7,7 +7,7 @@ export interface AccountTransaction {
   user_id: string;
   account_id: string;
   amount: number;
-  transaction_type: 'winning' | 'match_buyin' | 'match_cancellation' | 'subscription_charge' | 'coupon' | 'payout';
+  transaction_type: 'winning' | 'match_buyin' | 'match_cancellation' | 'subscription_charge' | 'coupon' | 'payout' | 'double_down';
   match_id?: string;
   description: string;
   stripe_payment_intent_id?: string;

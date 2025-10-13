@@ -42,6 +42,10 @@ export interface MatchData {
   participant_count?: number;
   max_participants?: number;
   status?: string;
+  holes?: number;
+  double_down_enabled?: boolean;
+  double_down_amount?: number;
+  double_down_finalized?: boolean;
 }
 
 export interface MatchResult {
@@ -658,6 +662,56 @@ export function useMatchScoring(matchId: string) {
     return playerScores.every(player => Object.keys(player.scores).length === 18);
   };
 
+  const recordDoubleDownVote = async (optedIn: boolean) => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke('record-double-down-vote', {
+        body: { matchId, optedIn },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      // Check if we need to process payments
+      if (data.allAgreed && data.needsProcessing) {
+        return processDoubleDownPayments();
+      }
+
+      return data;
+    } catch (error: any) {
+      console.error('Error recording double down vote:', error);
+      toast({ title: "Error", description: error.message || 'Failed to record vote', variant: "destructive" });
+      throw error;
+    }
+  };
+
+  const processDoubleDownPayments = async () => {
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      
+      const { data, error } = await supabase.functions.invoke('process-double-down-payments', {
+        body: { matchId },
+        headers: {
+          Authorization: `Bearer ${session?.access_token}`
+        }
+      });
+
+      if (error) throw error;
+
+      toast({ title: "Success", description: "Double down activated! Payments processed." });
+      await fetchMatchData(); // Refresh match data
+      
+      return data;
+    } catch (error: any) {
+      console.error('Error processing double down payments:', error);
+      toast({ title: "Error", description: error.message || 'Failed to process payments', variant: "destructive" });
+      throw error;
+    }
+  };
+
   return {
     scores,
     playerScores,
@@ -670,6 +724,8 @@ export function useMatchScoring(matchId: string) {
     updateScore,
     finalizeResults,
     confirmResults,
+    recordDoubleDownVote,
+    processDoubleDownPayments,
     isMatchComplete: isMatchComplete(),
     canFinalize: canFinalize(),
     refetch: fetchMatchData

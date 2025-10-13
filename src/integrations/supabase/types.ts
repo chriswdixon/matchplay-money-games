@@ -98,6 +98,53 @@ export type Database = {
         }
         Relationships: []
       }
+      double_down_participants: {
+        Row: {
+          additional_buyin: number
+          created_at: string
+          id: string
+          match_id: string
+          opted_in: boolean
+          payment_intent_id: string | null
+          payment_processed: boolean
+          responded: boolean
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          additional_buyin?: number
+          created_at?: string
+          id?: string
+          match_id: string
+          opted_in?: boolean
+          payment_intent_id?: string | null
+          payment_processed?: boolean
+          responded?: boolean
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          additional_buyin?: number
+          created_at?: string
+          id?: string
+          match_id?: string
+          opted_in?: boolean
+          payment_intent_id?: string | null
+          payment_processed?: boolean
+          responded?: boolean
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "double_down_participants_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       favorite_courses: {
         Row: {
           address: string | null
@@ -451,6 +498,9 @@ export type Database = {
           created_at: string
           created_by: string
           default_tees: string | null
+          double_down_amount: number | null
+          double_down_enabled: boolean | null
+          double_down_finalized: boolean | null
           format: string
           handicap_max: number | null
           handicap_min: number | null
@@ -483,6 +533,9 @@ export type Database = {
           created_at?: string
           created_by: string
           default_tees?: string | null
+          double_down_amount?: number | null
+          double_down_enabled?: boolean | null
+          double_down_finalized?: boolean | null
           format: string
           handicap_max?: number | null
           handicap_min?: number | null
@@ -515,6 +568,9 @@ export type Database = {
           created_at?: string
           created_by?: string
           default_tees?: string | null
+          double_down_amount?: number | null
+          double_down_enabled?: boolean | null
+          double_down_finalized?: boolean | null
           format?: string
           handicap_max?: number | null
           handicap_min?: number | null
@@ -964,6 +1020,7 @@ export type Database = {
         | "subscription_charge"
         | "coupon"
         | "payout"
+        | "double_down"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1099,6 +1156,7 @@ export const Constants = {
         "subscription_charge",
         "coupon",
         "payout",
+        "double_down",
       ],
     },
   },

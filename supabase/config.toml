@@ -13,3 +13,5 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.credit-match-winnings]
 [functions.setup-payment-method]
 [functions.create-setup-intent]
+[functions.record-double-down-vote]
+[functions.process-double-down-payments]
