@@ -339,7 +339,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         )}
 
             {/* Live Matches */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 py-3">
               {loading ? (
                 // Loading skeletons
                 Array.from({ length: 6 }, (_, index) => (
@@ -409,7 +409,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                     <Card 
                       key={match.id} 
                       className={cn(
-                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up overflow-x-hidden",
+                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up",
                         isHighStakes ? "bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/30 hover:border-amber-500/50" :
                         isMediumStakes ? "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50" :
                         "bg-card border-border hover:border-accent"
@@ -628,14 +628,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       
                       {/* Inline Scorecard for Past Matches */}
                       {showPastMatches && expandedMatchId === match.id && (
-                        <div className="border-t overflow-hidden w-full">
-                          <div className="max-w-full overflow-x-auto">
-                            <MatchScorecard
-                              matchId={match.id}
-                              matchName={match.course_name}
-                              readOnly={true}
-                            />
-                          </div>
+                        <div className="border-t overflow-x-auto w-full">
+                          <MatchScorecard
+                            matchId={match.id}
+                            matchName={match.course_name}
+                            readOnly={true}
+                          />
                         </div>
                       )}
                     </Card>
