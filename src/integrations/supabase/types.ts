@@ -128,6 +128,39 @@ export type Database = {
         }
         Relationships: []
       }
+      invites: {
+        Row: {
+          code: string
+          created_at: string
+          created_by: string
+          expires_at: string
+          id: string
+          metadata: Json | null
+          used_at: string | null
+          used_by: string | null
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          created_by: string
+          expires_at: string
+          id?: string
+          metadata?: Json | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          created_by?: string
+          expires_at?: string
+          id?: string
+          metadata?: Json | null
+          used_at?: string | null
+          used_by?: string | null
+        }
+        Relationships: []
+      }
       match_cancellation_confirmations: {
         Row: {
           alternate_reason: string | null
@@ -165,6 +198,62 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "match_cancellation_confirmations_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      match_cancellation_reviews: {
+        Row: {
+          admin_decision: string | null
+          admin_notes: string | null
+          cancelling_player_id: string
+          created_at: string
+          dispute_reasons: Json
+          disputed: boolean
+          id: string
+          match_id: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          stated_reason: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_decision?: string | null
+          admin_notes?: string | null
+          cancelling_player_id: string
+          created_at?: string
+          dispute_reasons?: Json
+          disputed?: boolean
+          id?: string
+          match_id: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stated_reason: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_decision?: string | null
+          admin_notes?: string | null
+          cancelling_player_id?: string
+          created_at?: string
+          dispute_reasons?: Json
+          disputed?: boolean
+          id?: string
+          match_id?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          stated_reason?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_cancellation_reviews_match_id_fkey"
             columns: ["match_id"]
             isOneToOne: false
             referencedRelation: "matches"
@@ -668,6 +757,14 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      admin_resolve_cancellation_review: {
+        Args: {
+          p_admin_notes?: string
+          p_decision: string
+          p_review_id: string
+        }
+        Returns: Json
+      }
       calculate_distance: {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
@@ -816,6 +913,10 @@ export type Database = {
         Args: { p_match_id: string; p_reason: string; p_user_id: string }
         Returns: Json
       }
+      link_invite_to_user: {
+        Args: { p_code: string; p_user_id: string }
+        Returns: undefined
+      }
       recalculate_player_handicap: {
         Args: { player_user_id: string }
         Returns: undefined
@@ -831,6 +932,10 @@ export type Database = {
       user_joined_match: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
+      }
+      validate_and_consume_invite: {
+        Args: { p_code: string; p_email: string }
+        Returns: Json
       }
       validate_and_join_match: {
         Args: {

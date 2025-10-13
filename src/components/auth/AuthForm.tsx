@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MFAEnrollment } from './MFAEnrollment';
 import { MFAVerification } from './MFAVerification';
 import { PaymentMethodSetup } from './PaymentMethodSetup';
+import { useInvites } from '@/hooks/useInvites';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -30,8 +31,10 @@ export function AuthForm() {
   const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [needsMFASetup, setNeedsMFASetup] = useState(false);
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
+  const { validateInvite, linkInviteToUser } = useInvites();
   
   // Initialize rate limiter for auth attempts
   const rateLimiter = new RateLimiter(3, 15 * 60 * 1000); // 3 attempts per 15 minutes
@@ -117,11 +120,31 @@ export function AuthForm() {
       setValidationErrors(errors);
       return;
     }
+
+    // Validate invite code (unless @match-play.co email)
+    if (!email.endsWith('@match-play.co')) {
+      if (!inviteCode.trim()) {
+        setValidationErrors({ inviteCode: 'Invite code is required' });
+        return;
+      }
+
+      const inviteResult = await validateInvite(inviteCode, email);
+      if (!inviteResult.valid) {
+        setValidationErrors({ inviteCode: inviteResult.error || 'Invalid invite code' });
+        return;
+      }
+    }
     
     setLoading(true);
     const { error } = await signUp(email, password, displayName);
     
     if (!error) {
+      // Link invite to user
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user && inviteCode) {
+        await linkInviteToUser(inviteCode, user.id);
+      }
+
       // Require MFA enrollment for new users
       setShowMFAEnrollment(true);
       setNeedsMFASetup(true);
@@ -438,6 +461,26 @@ export function AuthForm() {
                         <p className="text-sm text-destructive">{validationErrors.email}</p>
                       )}
                     </div>
+                    {!email.endsWith('@match-play.co') && (
+                      <div className="space-y-2">
+                        <Label htmlFor="invite-code">Invite Code</Label>
+                        <Input
+                          id="invite-code"
+                          type="text"
+                          placeholder="Enter your invite code"
+                          value={inviteCode}
+                          onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
+                          required
+                          className={validationErrors.inviteCode ? "border-destructive" : ""}
+                        />
+                        {validationErrors.inviteCode && (
+                          <p className="text-sm text-destructive">{validationErrors.inviteCode}</p>
+                        )}
+                        <p className="text-xs text-muted-foreground">
+                          Beta invites are required to sign up
+                        </p>
+                      </div>
+                    )}
                     <div className="space-y-2">
                       <Label htmlFor="signup-password" className="flex items-center gap-2">
                         Password

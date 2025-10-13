@@ -3,12 +3,13 @@ import { useNavigate } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Ticket, BarChart3, DollarSign, AlertCircle } from "lucide-react";
+import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail } from "lucide-react";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
 import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
 import { CancellationReviews } from "@/components/admin/CancellationReviews";
+import { InviteManagement } from "@/components/admin/InviteManagement";
 
 /**
  * SECURITY NOTE: Admin UI Access Control
@@ -56,7 +57,7 @@ const AdminConsole = () => {
         </div>
 
         <Tabs defaultValue="users" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-5 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-6 lg:w-auto">
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               User Management
@@ -64,6 +65,10 @@ const AdminConsole = () => {
             <TabsTrigger value="accounts" className="gap-2">
               <DollarSign className="h-4 w-4" />
               Accounts
+            </TabsTrigger>
+            <TabsTrigger value="invites" className="gap-2">
+              <Mail className="h-4 w-4" />
+              Invites
             </TabsTrigger>
             <TabsTrigger value="coupons" className="gap-2">
               <Ticket className="h-4 w-4" />
@@ -85,6 +90,10 @@ const AdminConsole = () => {
 
           <TabsContent value="accounts">
             <UserAccountDetails />
+          </TabsContent>
+
+          <TabsContent value="invites">
+            <InviteManagement />
           </TabsContent>
 
             <TabsContent value="coupons">
