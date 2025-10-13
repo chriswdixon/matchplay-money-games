@@ -328,11 +328,12 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   return (
     <div className={cn(
       "w-full space-y-0 md:space-y-2",
-      onClose ? "max-w-[1400px] mx-auto px-0 overflow-x-hidden" : "overflow-hidden"
+      onClose ? "max-w-[1400px] mx-auto px-0 overflow-x-hidden" : "max-w-full"
     )}>
       {/* Header with Course Name and Hamburger Menu */}
-      <div className="px-4 md:px-6">
-        <div className="flex items-center justify-between">
+      {onClose && (
+        <div className="px-4 md:px-6">
+          <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-gradient-primary rounded-lg">
               <Target className="w-5 h-5 text-primary-foreground" />
@@ -542,6 +543,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           </CollapsibleContent>
         </Collapsible>
       </div>
+      )}
 
       {/* Top Finalize Button - Shows when match is complete */}
       {isMatchComplete && canFinalize && !matchResult && (
@@ -579,11 +581,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
       {/* Scorecard */}
       {(!matchResult || !showResults) && (
-        <Card className="w-full border-0 md:border">
+        <Card className={cn(
+          "w-full border-0 md:border",
+          !onClose && "shadow-none"
+        )}>
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs defaultValue="front9" className="w-full">
             {/* Sticky Tabs Header */}
-            <div className="sticky top-0 z-20 bg-background pb-2 px-2">
+            <div className={cn(
+              "sticky top-0 z-20 bg-background pb-2 px-2",
+              !onClose && "static"
+            )}>
               <TabsList className="grid w-full grid-cols-2 h-10">
                 <TabsTrigger value="front9" className="text-sm">Front 9</TabsTrigger>
                 <TabsTrigger value="back9" className="text-sm">Back 9</TabsTrigger>

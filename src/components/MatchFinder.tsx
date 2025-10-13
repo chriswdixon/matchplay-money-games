@@ -409,7 +409,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                     <Card 
                       key={match.id} 
                       className={cn(
-                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up",
+                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up overflow-hidden",
                         isHighStakes ? "bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/30 hover:border-amber-500/50" :
                         isMediumStakes ? "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50" :
                         "bg-card border-border hover:border-accent"
@@ -628,12 +628,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       
                       {/* Inline Scorecard for Past Matches */}
                       {showPastMatches && expandedMatchId === match.id && (
-                        <div className="border-t overflow-hidden">
-                          <MatchScorecard
-                            matchId={match.id}
-                            matchName={match.course_name}
-                            readOnly={true}
-                          />
+                        <div className="border-t overflow-hidden w-full">
+                          <div className="max-w-full overflow-x-auto">
+                            <MatchScorecard
+                              matchId={match.id}
+                              matchName={match.course_name}
+                              readOnly={true}
+                            />
+                          </div>
                         </div>
                       )}
                     </Card>

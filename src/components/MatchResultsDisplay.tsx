@@ -53,7 +53,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   };
 
   return (
-    <div className="space-y-6 px-4 md:px-6 py-6 w-full overflow-hidden">
+    <div className={cn(
+      "space-y-6 py-6 w-full overflow-hidden",
+      inline ? "px-2 md:px-4" : "px-4 md:px-6"
+    )}>
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
           <Trophy className="w-8 h-8 text-yellow-500" />
