@@ -409,7 +409,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                     <Card 
                       key={match.id} 
                       className={cn(
-                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up overflow-hidden",
+                        "relative border transition-all duration-300 hover:shadow-lg animate-slide-up overflow-x-hidden",
                         isHighStakes ? "bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/30 hover:border-amber-500/50" :
                         isMediumStakes ? "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50" :
                         "bg-card border-border hover:border-accent"
