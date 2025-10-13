@@ -95,6 +95,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
 
+  // Helper function to determine if a hole should be displayed for cancelled matches
+  const shouldShowHole = (hole: number): boolean => {
+    if (matchData?.status !== 'cancelled') return true;
+    // For cancelled matches, only show holes that have at least one score
+    return playerScores.some(player => player.scores[hole] !== undefined && player.scores[hole] !== null);
+  };
+
+  // Get displayable holes for each nine
+  const front9Holes = Array.from({ length: 9 }, (_, i) => i + 1).filter(shouldShowHole);
+  const back9Holes = Array.from({ length: 9 }, (_, i) => i + 10).filter(shouldShowHole);
+
   // Scroll to active hole on mobile
   useEffect(() => {
     if (activeHoleRef.current && window.innerWidth < 768) {
@@ -584,9 +595,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                     {/* Par Row */}
                     <tr className="border-b bg-muted/20">
                       <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium text-muted-foreground">PAR</th>
-                      {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 1} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10 text-muted-foreground">
-                          {matchData?.hole_pars?.[String(i + 1)] || 4}
+                      {front9Holes.map(hole => (
+                        <th key={hole} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10 text-muted-foreground">
+                          {matchData?.hole_pars?.[String(hole)] || 4}
                         </th>
                       ))}
                       <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
@@ -600,9 +611,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           <span className="text-muted-foreground">Hole</span>
                         </div>
                       </th>
-                      {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 1} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10">
-                          {i + 1}
+                      {front9Holes.map(hole => (
+                        <th key={hole} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10">
+                          {hole}
                         </th>
                       ))}
                       <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-muted">Strokes</th>
@@ -621,8 +632,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           </div>
                         </td>
                         {/* Front 9 holes */}
-                        {Array.from({ length: 9 }, (_, i) => {
-                          const hole = i + 1;
+                        {front9Holes.map(hole => {
                           const score = currentUserScore.scores[hole];
                           const isEditing = editingHole === hole;
                           
@@ -695,8 +705,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           </div>
                         </td>
                         {/* Front 9 holes */}
-                        {Array.from({ length: 9 }, (_, i) => {
-                          const hole = i + 1;
+                        {front9Holes.map(hole => {
                           const score = player.scores[hole];
 
                           return (
@@ -787,8 +796,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
                 {/* Holes 1-9 */}
                 <div className="space-y-4 px-2">
-                {Array.from({ length: 9 }, (_, i) => {
-                  const hole = i + 1;
+                {front9Holes.map(hole => {
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
                   const currentScore = currentUserScore?.scores[hole];
                   
@@ -890,9 +898,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                     {/* Par Row */}
                     <tr className="border-b bg-muted/20">
                       <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium text-muted-foreground">PAR</th>
-                      {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 10} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10 text-muted-foreground">
-                          {matchData?.hole_pars?.[String(i + 10)] || 4}
+                      {back9Holes.map(hole => (
+                        <th key={hole} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10 text-muted-foreground">
+                          {matchData?.hole_pars?.[String(hole)] || 4}
                         </th>
                       ))}
                       <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
@@ -906,9 +914,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           <span className="text-muted-foreground">Hole</span>
                         </div>
                       </th>
-                      {Array.from({ length: 9 }, (_, i) => (
-                        <th key={i + 10} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10">
-                          {i + 10}
+                      {back9Holes.map(hole => (
+                        <th key={hole} className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium w-7 lg:w-10">
+                          {hole}
                         </th>
                       ))}
                       <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-muted">Strokes</th>
@@ -927,8 +935,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           </div>
                         </td>
                         {/* Back 9 holes */}
-                        {Array.from({ length: 9 }, (_, i) => {
-                          const hole = i + 10;
+                        {back9Holes.map(hole => {
                           const score = currentUserScore.scores[hole];
                           
                           // Find the active hole (first hole after last scored hole)
@@ -1000,8 +1007,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           </div>
                         </td>
                         {/* Back 9 holes */}
-                        {Array.from({ length: 9 }, (_, i) => {
-                          const hole = i + 10;
+                        {back9Holes.map(hole => {
                           const score = player.scores[hole];
 
                           return (
@@ -1092,8 +1098,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
                 {/* Holes 10-18 */}
                 <div className="space-y-4 px-2">
-                {Array.from({ length: 9 }, (_, i) => {
-                  const hole = i + 10;
+                {back9Holes.map(hole => {
                   const par = matchData?.hole_pars?.[String(hole)] || 4;
                   const currentScore = currentUserScore?.scores[hole];
                   
