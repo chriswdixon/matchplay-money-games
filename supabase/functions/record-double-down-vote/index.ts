@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from 'https://esm.sh/zod@3.22.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -34,8 +35,14 @@ serve(async (req) => {
     
     logStep('User authenticated', { userId: user.id });
 
-    const { matchId, optedIn } = await req.json();
-    if (!matchId) throw new Error('matchId is required');
+    // SECURITY: Validate input with Zod schema
+    const requestSchema = z.object({
+      matchId: z.string().uuid('Invalid match ID format'),
+      optedIn: z.boolean()
+    });
+
+    const body = await req.json();
+    const { matchId, optedIn } = requestSchema.parse(body);
 
     // Verify user is an active participant
     const { data: participant, error: participantError } = await supabaseClient

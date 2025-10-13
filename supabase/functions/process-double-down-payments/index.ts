@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import Stripe from 'https://esm.sh/stripe@14.21.0?target=deno';
+import { z } from 'https://esm.sh/zod@3.22.4';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -37,10 +38,42 @@ serve(async (req) => {
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) throw new Error('Authentication failed');
 
-    const { matchId } = await req.json();
-    if (!matchId) throw new Error('matchId is required');
+    // SECURITY: Validate input with Zod schema
+    const requestSchema = z.object({
+      matchId: z.string().uuid('Invalid match ID format')
+    });
 
-    logStep('Processing payments for match', { matchId });
+    const body = await req.json();
+    const { matchId } = requestSchema.parse(body);
+
+    logStep('Processing payments for match', { matchId, userId: user.id });
+
+    // SECURITY: Verify user is an active participant in this match
+    const { data: userParticipant, error: participantError } = await supabaseClient
+      .from('match_participants')
+      .select('user_id')
+      .eq('match_id', matchId)
+      .eq('user_id', user.id)
+      .eq('status', 'active')
+      .maybeSingle();
+
+    if (participantError || !userParticipant) {
+      throw new Error('You are not a participant in this match');
+    }
+
+    // SECURITY: Verify user has voted and opted in
+    const { data: userVote, error: voteError } = await supabaseClient
+      .from('double_down_participants')
+      .select('responded, opted_in')
+      .eq('match_id', matchId)
+      .eq('user_id', user.id)
+      .maybeSingle();
+
+    if (voteError || !userVote?.responded || !userVote?.opted_in) {
+      throw new Error('You have not voted for double down or did not opt in');
+    }
+
+    logStep('User authorization verified', { userId: user.id });
 
     // CRITICAL VALIDATION: Verify match state
     const { data: match, error: matchError } = await supabaseClient
@@ -64,6 +97,23 @@ serve(async (req) => {
       .eq('match_id', matchId);
 
     if (participantsError) throw participantsError;
+
+    // SECURITY: Validate participant count
+    if (!participants || participants.length === 0 || participants.length > 8) {
+      throw new Error('Invalid participant count');
+    }
+
+    // SECURITY: Validate payment amounts for all participants
+    const paymentSchema = z.object({
+      additional_buyin: z.number()
+        .int('Amount must be an integer')
+        .min(100, 'Minimum buy-in is $1')
+        .max(50000, 'Maximum buy-in is $500')
+    });
+
+    for (const participant of participants) {
+      paymentSchema.parse({ additional_buyin: participant.additional_buyin });
+    }
 
     // CRITICAL: Verify ALL opted in and responded
     const allOptedIn = participants.every(p => p.opted_in && p.responded);
