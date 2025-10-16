@@ -242,6 +242,7 @@ const UserManagement = () => {
             <Table>
               <TableHeader>
                 <TableRow>
+                  <TableHead>UUID</TableHead>
                   <TableHead>Name</TableHead>
                   <TableHead>Email</TableHead>
                   <TableHead>Phone</TableHead>
@@ -253,6 +254,28 @@ const UserManagement = () => {
               <TableBody>
                 {filteredUsers.map((user) => (
                   <TableRow key={user.user_id}>
+                    <TableCell className="font-mono text-xs">
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard.writeText(user.user_id);
+                              toast({
+                                title: "Copied",
+                                description: "User UUID copied to clipboard",
+                              });
+                            }}
+                            className="hover:text-primary truncate max-w-[100px] block"
+                          >
+                            {user.user_id.substring(0, 8)}...
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent>
+                          <p className="font-mono text-xs">{user.user_id}</p>
+                          <p className="text-xs text-muted-foreground mt-1">Click to copy</p>
+                        </TooltipContent>
+                      </Tooltip>
+                    </TableCell>
                     <TableCell className="font-medium">{user.display_name}</TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone || 'N/A'}</TableCell>
