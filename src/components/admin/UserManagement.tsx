@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Ban, CheckCircle, Search, Loader2 } from "lucide-react";
+import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy } from "lucide-react";
 import {
   Dialog,
   DialogContent,
@@ -255,26 +255,33 @@ const UserManagement = () => {
                 {filteredUsers.map((user) => (
                   <TableRow key={user.user_id}>
                     <TableCell className="font-mono text-xs">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <button
-                            onClick={() => {
-                              navigator.clipboard.writeText(user.user_id);
-                              toast({
-                                title: "Copied",
-                                description: "User UUID copied to clipboard",
-                              });
-                            }}
-                            className="hover:text-primary truncate max-w-[100px] block"
-                          >
-                            {user.user_id.substring(0, 8)}...
-                          </button>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          <p className="font-mono text-xs">{user.user_id}</p>
-                          <p className="text-xs text-muted-foreground mt-1">Click to copy</p>
-                        </TooltipContent>
-                      </Tooltip>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate max-w-[100px]">
+                          {user.user_id.substring(0, 8)}...
+                        </span>
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="h-6 w-6 p-0"
+                              onClick={() => {
+                                navigator.clipboard.writeText(user.user_id);
+                                toast({
+                                  title: "Copied",
+                                  description: "User UUID copied to clipboard",
+                                });
+                              }}
+                            >
+                              <Copy className="h-3 w-3" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p className="font-mono text-xs">{user.user_id}</p>
+                            <p className="text-xs text-muted-foreground mt-1">Click to copy</p>
+                          </TooltipContent>
+                        </Tooltip>
+                      </div>
                     </TableCell>
                     <TableCell className="font-medium">{user.display_name}</TableCell>
                     <TableCell>{user.email}</TableCell>
