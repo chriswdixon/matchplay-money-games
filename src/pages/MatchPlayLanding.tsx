@@ -211,8 +211,6 @@ const MatchPlayLanding = () => {
   // Landing page for non-logged-in users
   return (
     <div className="min-h-screen bg-background">
-      <AppHeader onReturnToMatch={handleReturnToMatch} />
-      
       {/* Hero Section */}
       <MatchPlayHero />
       
