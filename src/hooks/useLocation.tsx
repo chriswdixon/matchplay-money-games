@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useCallback } from 'react';
 import { toast } from 'sonner';
 
 export interface Location {
@@ -73,7 +73,7 @@ export const useLocation = () => {
     }
   };
 
-  const requestLocation = async () => {
+  const requestLocation = useCallback(async () => {
     try {
       await getCurrentLocation();
       toast.success('Location found successfully');
@@ -81,7 +81,7 @@ export const useLocation = () => {
       const locationError = error as LocationError;
       toast.error(locationError.message);
     }
-  };
+  }, []);
 
   // Convert address to coordinates using a geocoding service
   const geocodeAddress = async (address: string): Promise<Location | null> => {
