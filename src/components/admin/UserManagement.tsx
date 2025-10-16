@@ -23,6 +23,7 @@ interface UserData {
   email: string;
   phone: string | null;
   membership_tier: string;
+  is_admin: boolean;
   created_at: string;
 }
 
@@ -287,14 +288,18 @@ const UserManagement = () => {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone || 'N/A'}</TableCell>
                     <TableCell>
-                      <Badge variant={
-                        user.membership_tier?.toLowerCase() === 'free' || user.membership_tier?.toLowerCase() === 'local (free)' ? 'secondary' : 
-                        user.membership_tier?.toLowerCase() === 'tournament' ? 'warning' : 
-                        user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local play' ? 'success' :
-                        'default'
-                      }>
-                        {user.membership_tier}
-                      </Badge>
+                      {user.is_admin ? (
+                        <Badge variant="destructive">Admin</Badge>
+                      ) : (
+                        <Badge variant={
+                          user.membership_tier?.toLowerCase() === 'free' || user.membership_tier?.toLowerCase() === 'local (free)' ? 'secondary' : 
+                          user.membership_tier?.toLowerCase() === 'tournament' ? 'warning' : 
+                          user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local play' ? 'success' :
+                          'default'
+                        }>
+                          {user.membership_tier}
+                        </Badge>
+                      )}
                     </TableCell>
                     <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">

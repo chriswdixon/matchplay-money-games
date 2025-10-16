@@ -70,12 +70,21 @@ serve(async (req) => {
           .eq('user_id', profile.user_id)
           .maybeSingle();
 
+        // Check if user is admin
+        const { data: userRole } = await supabaseClient
+          .from('user_roles')
+          .select('role')
+          .eq('user_id', profile.user_id)
+          .eq('role', 'admin')
+          .maybeSingle();
+
         return {
           user_id: profile.user_id,
           display_name: profile.display_name || 'Unknown',
           email: authUser?.user?.email || 'N/A',
           phone: privateData?.phone || null,
-          membership_tier: privateData?.membership_tier || 'local',
+          membership_tier: privateData?.membership_tier || 'Free',
+          is_admin: !!userRole,
           created_at: profile.created_at
         };
       })
