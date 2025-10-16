@@ -73,8 +73,8 @@ const AdminReporting = () => {
 
       const adminUsers = usersWithTiers.filter(u => u.isAdmin).length;
       const freeUsers = usersWithTiers.filter(u => u.tier.toLowerCase() === 'free').length;
-      const localUsers = usersWithTiers.filter(u => (u.tier.toLowerCase() === 'local' || u.tier.toLowerCase() === 'local play')).length;
-      const tournamentUsers = usersWithTiers.filter(u => u.tier.toLowerCase() === 'tournament').length;
+      const localUsers = usersWithTiers.filter(u => (u.tier.toLowerCase() === 'local' || u.tier.toLowerCase() === 'local player')).length;
+      const tournamentUsers = usersWithTiers.filter(u => u.tier.toLowerCase().includes('tournament')).length;
 
       // Fetch match statistics
       const { data: matches, error: matchesError } = await supabase
