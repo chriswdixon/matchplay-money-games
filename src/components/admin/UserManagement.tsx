@@ -305,7 +305,9 @@ const UserManagement = () => {
                           user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local play' ? 'success' :
                           'default'
                         }>
-                          {user.membership_tier}
+                          {user.membership_tier?.toLowerCase() === 'tournament' 
+                            ? 'Tournament' 
+                            : user.membership_tier}
                         </Badge>
                       )}
                     </TableCell>
