@@ -45,30 +45,18 @@ const UserManagement = () => {
 
   const fetchUsers = async () => {
     try {
-      const { data: profiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('user_id, display_name, created_at');
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
 
-      if (profilesError) throw profilesError;
+      const { data, error } = await supabase.functions.invoke('admin-list-users', {
+        headers: {
+          Authorization: `Bearer ${session.access_token}`,
+        },
+      });
 
-      const usersWithDetails = await Promise.all(
-        profiles.map(async (profile) => {
-          const { data: privateData } = await supabase.rpc('get_user_private_data', {
-            _user_id: profile.user_id
-          });
+      if (error) throw error;
 
-          return {
-            user_id: profile.user_id,
-            display_name: profile.display_name || 'Unknown',
-            email: privateData?.[0]?.email || 'N/A',
-            phone: privateData?.[0]?.phone || null,
-            membership_tier: privateData?.[0]?.membership_tier || 'Free',
-            created_at: profile.created_at
-          };
-        })
-      );
-
-      setUsers(usersWithDetails);
+      setUsers(data.users || []);
     } catch (error) {
       console.error('Error fetching users:', error);
       toast({
