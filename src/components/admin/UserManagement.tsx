@@ -299,13 +299,11 @@ const UserManagement = () => {
                       <div className="flex items-center gap-2">
                         <Badge variant={
                           user.membership_tier?.toLowerCase() === 'free' || user.membership_tier?.toLowerCase() === 'local (free)' ? 'secondary' : 
-                          user.membership_tier?.toLowerCase() === 'tournament' ? 'warning' : 
-                          user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local play' ? 'success' :
+                          user.membership_tier?.toLowerCase().includes('tournament') ? 'warning' : 
+                          user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local player' ? 'success' :
                           'default'
                         }>
-                          {user.membership_tier?.toLowerCase() === 'tournament' 
-                            ? 'Tournament' 
-                            : user.membership_tier}
+                          {user.membership_tier}
                         </Badge>
                         {user.is_admin && (
                           <Badge variant="destructive">Admin</Badge>

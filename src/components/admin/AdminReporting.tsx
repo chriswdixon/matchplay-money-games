@@ -226,10 +226,10 @@ const AdminReporting = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-success" />
-                  <span className="text-sm">Local Play</span>
+                  <span className="text-sm">Local Player</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{reportData.localUsers}</span>
@@ -238,10 +238,10 @@ const AdminReporting = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-warning" />
-                  <span className="text-sm">Tournament</span>
+                  <span className="text-sm">Tournament Pro</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{reportData.tournamentUsers}</span>
