@@ -303,7 +303,13 @@ const UserManagement = () => {
                           user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local player' ? 'success' :
                           'default'
                         }>
-                          {user.membership_tier}
+                          {user.membership_tier?.toLowerCase().includes('tournament') 
+                            ? 'Tournament Pro' 
+                            : user.membership_tier?.toLowerCase() === 'local' || user.membership_tier?.toLowerCase() === 'local player'
+                            ? 'Local Player'
+                            : user.membership_tier?.toLowerCase() === 'free' || user.membership_tier?.toLowerCase() === 'local (free)'
+                            ? 'Free'
+                            : user.membership_tier}
                         </Badge>
                         {user.is_admin && (
                           <Badge variant="destructive">Admin</Badge>
