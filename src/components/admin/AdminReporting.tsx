@@ -60,9 +60,9 @@ const AdminReporting = () => {
       );
 
       const adminUsers = usersWithTiers.filter(u => u.isAdmin).length;
-      const freeUsers = usersWithTiers.filter(u => !u.isAdmin && u.tier.toLowerCase() === 'free').length;
-      const localUsers = usersWithTiers.filter(u => !u.isAdmin && (u.tier.toLowerCase() === 'local' || u.tier.toLowerCase() === 'local play')).length;
-      const tournamentUsers = usersWithTiers.filter(u => !u.isAdmin && u.tier.toLowerCase() === 'tournament').length;
+      const freeUsers = usersWithTiers.filter(u => u.tier.toLowerCase() === 'free').length;
+      const localUsers = usersWithTiers.filter(u => (u.tier.toLowerCase() === 'local' || u.tier.toLowerCase() === 'local play')).length;
+      const tournamentUsers = usersWithTiers.filter(u => u.tier.toLowerCase() === 'tournament').length;
 
       // Fetch match statistics
       const { data: matches, error: matchesError } = await supabase
@@ -136,7 +136,7 @@ const AdminReporting = () => {
     );
   }
 
-  const monthlyRevenue = (reportData.localUsers * 29) + (reportData.tournamentUsers * 79) + (reportData.adminUsers * 79);
+  const monthlyRevenue = (reportData.localUsers * 29) + (reportData.tournamentUsers * 79);
 
   return (
     <div className="space-y-6">
@@ -149,7 +149,7 @@ const AdminReporting = () => {
           <CardContent>
             <div className="text-2xl font-bold">{reportData.totalUsers}</div>
             <p className="text-xs text-muted-foreground">
-              {reportData.freeUsers} free, {reportData.localUsers + reportData.tournamentUsers + reportData.adminUsers} paid
+              {reportData.freeUsers} free, {reportData.localUsers + reportData.tournamentUsers} paid ({reportData.adminUsers} admins)
             </p>
           </CardContent>
         </Card>
