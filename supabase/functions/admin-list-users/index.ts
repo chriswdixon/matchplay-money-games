@@ -60,7 +60,7 @@ serve(async (req) => {
     // Fetch additional data for each user
     const usersWithDetails = await Promise.all(
       (profiles || []).map(async (profile) => {
-        // Get email from auth.users
+        // Get email and ban status from auth.users
         const { data: authUser } = await supabaseClient.auth.admin.getUserById(profile.user_id);
         
         // Get phone and membership from private_profile_data
@@ -85,6 +85,7 @@ serve(async (req) => {
           phone: privateData?.phone || null,
           membership_tier: privateData?.membership_tier || 'Free',
           is_admin: !!userRole,
+          is_disabled: authUser?.user?.banned_until ? new Date(authUser.user.banned_until) > new Date() : false,
           created_at: profile.created_at
         };
       })

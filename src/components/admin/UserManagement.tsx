@@ -24,6 +24,7 @@ interface UserData {
   phone: string | null;
   membership_tier: string;
   is_admin: boolean;
+  is_disabled: boolean;
   created_at: string;
 }
 
@@ -284,7 +285,14 @@ const UserManagement = () => {
                         </Tooltip>
                       </div>
                     </TableCell>
-                    <TableCell className="font-medium">{user.display_name}</TableCell>
+                    <TableCell className="font-medium">
+                      <div className="flex items-center gap-2">
+                        {user.display_name}
+                        {user.is_disabled && (
+                          <Badge variant="outline" className="bg-muted">Disabled</Badge>
+                        )}
+                      </div>
+                    </TableCell>
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone || 'N/A'}</TableCell>
                     <TableCell>
