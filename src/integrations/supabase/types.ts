@@ -953,6 +953,10 @@ export type Database = {
         Args: { match_id: string; user_id: string }
         Returns: boolean
       }
+      is_match_play_email: {
+        Args: { email: string }
+        Returns: boolean
+      }
       is_profile_owner: {
         Args: { profile_user_id: string }
         Returns: boolean
