@@ -39,15 +39,46 @@ serve(async (req) => {
     
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError) throw new Error(`Authentication error: ${userError.message}`);
-    const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
-    logStep("User authenticated", { userId: user.id, email: user.email });
+    const requestingUser = userData.user;
+    if (!requestingUser) throw new Error("User not authenticated");
+    logStep("User authenticated", { userId: requestingUser.id });
+
+    // Check if request includes user_id (admin checking another user)
+    let targetUserId = requestingUser.id;
+    let targetEmail = requestingUser.email;
+    
+    const body = await req.json().catch(() => ({}));
+    if (body.user_id && body.user_id !== requestingUser.id) {
+      // Verify requesting user is admin
+      const { data: adminCheck } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', requestingUser.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      
+      if (!adminCheck) {
+        throw new Error("Only admins can check other users' subscriptions");
+      }
+      
+      // Get target user's email
+      const { data: targetUserData, error: targetError } = await supabaseClient.auth.admin.getUserById(body.user_id);
+      if (targetError || !targetUserData.user?.email) {
+        throw new Error("Target user not found");
+      }
+      
+      targetUserId = body.user_id;
+      targetEmail = targetUserData.user.email;
+      logStep("Admin checking another user", { targetUserId, targetEmail });
+    }
+
+    if (!targetEmail) throw new Error("User email not available");
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
-    const customers = await stripe.customers.list({ email: user.email, limit: 1 });
+    const customers = await stripe.customers.list({ email: targetEmail, limit: 1 });
     
     if (customers.data.length === 0) {
-      logStep("No customer found, updating unsubscribed state");
+      logStep("No customer found, returning free tier");
       return new Response(JSON.stringify({ subscribed: false }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

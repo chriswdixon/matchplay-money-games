@@ -3,6 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { Loader2, Users, CreditCard, Target, TrendingUp, DollarSign } from "lucide-react";
+import { SUBSCRIPTION_TIERS } from "@/hooks/useSubscription";
 
 interface ReportData {
   totalUsers: number;
@@ -36,12 +37,33 @@ const AdminReporting = () => {
 
       if (profilesError) throw profilesError;
 
-      // Fetch private profile data and admin roles
+      // Get current session for check-subscription calls
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) throw new Error('Not authenticated');
+
+      // Fetch actual subscription data from Stripe and admin roles for each user
       const usersWithTiers = await Promise.all(
         profiles.map(async (profile) => {
-          const { data: privateData } = await supabase.rpc('get_user_private_data', {
-            _user_id: profile.user_id
-          });
+          // Check actual Stripe subscription
+          let tier = 'Free';
+          try {
+            const { data: subData } = await supabase.functions.invoke('check-subscription', {
+              body: { user_id: profile.user_id },
+              headers: {
+                Authorization: `Bearer ${session.access_token}`,
+              },
+            });
+            
+            // Determine tier from product_id
+            if (subData?.product_id) {
+              const tierEntry = Object.entries(SUBSCRIPTION_TIERS).find(
+                ([_, t]) => t.product_id === subData.product_id
+              );
+              tier = tierEntry?.[1]?.name || 'Free';
+            }
+          } catch (error) {
+            console.error('Error checking subscription for user:', profile.user_id, error);
+          }
           
           // Check if user is admin
           const { data: adminRole } = await supabase
@@ -50,18 +72,6 @@ const AdminReporting = () => {
             .eq('user_id', profile.user_id)
             .eq('role', 'admin')
             .maybeSingle();
-          
-          const tier = privateData?.[0]?.membership_tier || 'Free';
-          
-          // Log specific user for debugging
-          if (profile.user_id === '19a51ba2-1b49-475d-82f4-29c7b4d1b190') {
-            console.log('DEBUG: Tournament user data:', {
-              user_id: profile.user_id,
-              rawPrivateData: privateData,
-              extractedTier: tier,
-              isAdmin: !!adminRole
-            });
-          }
           
           return {
             ...profile,
@@ -72,9 +82,9 @@ const AdminReporting = () => {
       );
 
       const adminUsers = usersWithTiers.filter(u => u.isAdmin).length;
-      const freeUsers = usersWithTiers.filter(u => u.tier.toLowerCase() === 'free').length;
-      const localUsers = usersWithTiers.filter(u => (u.tier.toLowerCase() === 'local' || u.tier.toLowerCase() === 'local player')).length;
-      const tournamentUsers = usersWithTiers.filter(u => u.tier.toLowerCase().includes('tournament')).length;
+      const freeUsers = usersWithTiers.filter(u => u.tier === 'Free').length;
+      const localUsers = usersWithTiers.filter(u => u.tier === 'Local Player').length;
+      const tournamentUsers = usersWithTiers.filter(u => u.tier === 'Tournament Pro').length;
 
       // Fetch match statistics
       const { data: matches, error: matchesError } = await supabase
