@@ -287,7 +287,11 @@ const UserManagement = () => {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone || 'N/A'}</TableCell>
                     <TableCell>
-                      <Badge variant={user.membership_tier === 'Free' ? 'secondary' : 'default'}>
+                      <Badge variant={
+                        user.membership_tier === 'Free' ? 'secondary' : 
+                        user.membership_tier === 'Tournament' ? 'warning' : 
+                        'default'
+                      }>
                         {user.membership_tier}
                       </Badge>
                     </TableCell>
