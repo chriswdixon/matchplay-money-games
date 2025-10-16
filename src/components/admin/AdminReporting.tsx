@@ -13,6 +13,7 @@ interface ReportData {
   totalMatches: number;
   completedMatches: number;
   activeMatches: number;
+  cancelledMatches: number;
   userGrowth: Array<{ date: string; count: number }>;
 }
 
@@ -72,6 +73,7 @@ const AdminReporting = () => {
 
       const completedMatches = matches.filter(m => m.status === 'completed').length;
       const activeMatches = matches.filter(m => m.status === 'started').length;
+      const cancelledMatches = matches.filter(m => m.status === 'cancelled').length;
 
       // Calculate user growth (last 30 days)
       const thirtyDaysAgo = new Date();
@@ -99,6 +101,7 @@ const AdminReporting = () => {
         totalMatches: matches.length,
         completedMatches,
         activeMatches,
+        cancelledMatches,
         userGrowth,
       });
     } catch (error) {
@@ -172,7 +175,7 @@ const AdminReporting = () => {
           <CardContent>
             <div className="text-2xl font-bold">{reportData.totalMatches}</div>
             <p className="text-xs text-muted-foreground">
-              {reportData.completedMatches} completed, {reportData.activeMatches} active
+              {reportData.completedMatches} completed, {reportData.activeMatches} active, {reportData.cancelledMatches} cancelled
             </p>
           </CardContent>
         </Card>
@@ -267,10 +270,14 @@ const AdminReporting = () => {
                 <span className="text-sm font-medium">{reportData.activeMatches}</span>
               </div>
               <div className="flex items-center justify-between">
-                <span className="text-sm">Completion Rate</span>
+                <span className="text-sm">Cancelled Matches</span>
+                <span className="text-sm font-medium">{reportData.cancelledMatches}</span>
+              </div>
+              <div className="flex items-center justify-between border-t pt-4">
+                <span className="text-sm font-medium">Completion Rate</span>
                 <span className="text-sm font-medium">
-                  {reportData.totalMatches > 0
-                    ? Math.round((reportData.completedMatches / reportData.totalMatches) * 100)
+                  {(reportData.completedMatches + reportData.cancelledMatches) > 0
+                    ? Math.round((reportData.completedMatches / (reportData.completedMatches + reportData.cancelledMatches)) * 100)
                     : 0}%
                 </span>
               </div>
