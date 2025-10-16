@@ -296,9 +296,7 @@ const UserManagement = () => {
                     <TableCell>{user.email}</TableCell>
                     <TableCell>{user.phone || 'N/A'}</TableCell>
                     <TableCell>
-                      {user.is_admin ? (
-                        <Badge variant="destructive">Admin</Badge>
-                      ) : (
+                      <div className="flex items-center gap-2">
                         <Badge variant={
                           user.membership_tier?.toLowerCase() === 'free' || user.membership_tier?.toLowerCase() === 'local (free)' ? 'secondary' : 
                           user.membership_tier?.toLowerCase() === 'tournament' ? 'warning' : 
@@ -309,7 +307,10 @@ const UserManagement = () => {
                             ? 'Tournament' 
                             : user.membership_tier}
                         </Badge>
-                      )}
+                        {user.is_admin && (
+                          <Badge variant="destructive">Admin</Badge>
+                        )}
+                      </div>
                     </TableCell>
                     <TableCell>{new Date(user.created_at).toLocaleDateString()}</TableCell>
                     <TableCell className="text-right">
