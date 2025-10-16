@@ -247,16 +247,13 @@ const AdminReporting = () => {
                   </span>
                 </div>
               </div>
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between border-t pt-4">
                 <div className="flex items-center gap-2">
                   <div className="h-3 w-3 rounded-full bg-destructive" />
-                  <span className="text-sm">Admin</span>
+                  <span className="text-sm font-medium">Admin Users</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{reportData.adminUsers}</span>
-                  <span className="text-sm text-muted-foreground">
-                    ({reportData.totalUsers > 0 ? Math.round((reportData.adminUsers / reportData.totalUsers) * 100) : 0}%)
-                  </span>
                 </div>
               </div>
             </div>
