@@ -9,6 +9,7 @@ interface ReportData {
   freeUsers: number;
   localUsers: number;
   tournamentUsers: number;
+  adminUsers: number;
   totalMatches: number;
   completedMatches: number;
   activeMatches: number;
@@ -34,22 +35,33 @@ const AdminReporting = () => {
 
       if (profilesError) throw profilesError;
 
-      // Fetch private profile data to get subscription tiers
+      // Fetch private profile data and admin roles
       const usersWithTiers = await Promise.all(
         profiles.map(async (profile) => {
-          const { data } = await supabase.rpc('get_user_private_data', {
+          const { data: privateData } = await supabase.rpc('get_user_private_data', {
             _user_id: profile.user_id
           });
+          
+          // Check if user is admin
+          const { data: adminRole } = await supabase
+            .from('user_roles')
+            .select('role')
+            .eq('user_id', profile.user_id)
+            .eq('role', 'admin')
+            .maybeSingle();
+          
           return {
             ...profile,
-            tier: data?.[0]?.membership_tier || 'Free'
+            tier: privateData?.[0]?.membership_tier || 'Free',
+            isAdmin: !!adminRole
           };
         })
       );
 
-      const freeUsers = usersWithTiers.filter(u => u.tier === 'Free').length;
-      const localUsers = usersWithTiers.filter(u => u.tier === 'local').length;
-      const tournamentUsers = usersWithTiers.filter(u => u.tier === 'tournament').length;
+      const adminUsers = usersWithTiers.filter(u => u.isAdmin).length;
+      const freeUsers = usersWithTiers.filter(u => !u.isAdmin && u.tier.toLowerCase() === 'free').length;
+      const localUsers = usersWithTiers.filter(u => !u.isAdmin && (u.tier.toLowerCase() === 'local' || u.tier.toLowerCase() === 'local play')).length;
+      const tournamentUsers = usersWithTiers.filter(u => !u.isAdmin && u.tier.toLowerCase() === 'tournament').length;
 
       // Fetch match statistics
       const { data: matches, error: matchesError } = await supabase
@@ -83,6 +95,7 @@ const AdminReporting = () => {
         freeUsers,
         localUsers,
         tournamentUsers,
+        adminUsers,
         totalMatches: matches.length,
         completedMatches,
         activeMatches,
@@ -120,7 +133,7 @@ const AdminReporting = () => {
     );
   }
 
-  const monthlyRevenue = (reportData.localUsers * 29) + (reportData.tournamentUsers * 79);
+  const monthlyRevenue = (reportData.localUsers * 29) + (reportData.tournamentUsers * 79) + (reportData.adminUsers * 79);
 
   return (
     <div className="space-y-6">
@@ -133,7 +146,7 @@ const AdminReporting = () => {
           <CardContent>
             <div className="text-2xl font-bold">{reportData.totalUsers}</div>
             <p className="text-xs text-muted-foreground">
-              {reportData.freeUsers} free, {reportData.localUsers + reportData.tournamentUsers} paid
+              {reportData.freeUsers} free, {reportData.localUsers + reportData.tournamentUsers + reportData.adminUsers} paid
             </p>
           </CardContent>
         </Card>
@@ -188,7 +201,7 @@ const AdminReporting = () => {
             <div className="space-y-4">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-muted" />
+                  <div className="h-3 w-3 rounded-full bg-secondary" />
                   <span className="text-sm">Free</span>
                 </div>
                 <div className="flex items-center gap-2">
@@ -200,8 +213,8 @@ const AdminReporting = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-primary" />
-                  <span className="text-sm">Local Player</span>
+                  <div className="h-3 w-3 rounded-full bg-success" />
+                  <span className="text-sm">Local Play</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{reportData.localUsers}</span>
@@ -212,13 +225,25 @@ const AdminReporting = () => {
               </div>
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
-                  <div className="h-3 w-3 rounded-full bg-accent" />
-                  <span className="text-sm">Tournament Pro</span>
+                  <div className="h-3 w-3 rounded-full bg-warning" />
+                  <span className="text-sm">Tournament</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-sm font-medium">{reportData.tournamentUsers}</span>
                   <span className="text-sm text-muted-foreground">
                     ({Math.round((reportData.tournamentUsers / reportData.totalUsers) * 100)}%)
+                  </span>
+                </div>
+              </div>
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <div className="h-3 w-3 rounded-full bg-destructive" />
+                  <span className="text-sm">Admin</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-medium">{reportData.adminUsers}</span>
+                  <span className="text-sm text-muted-foreground">
+                    ({reportData.totalUsers > 0 ? Math.round((reportData.adminUsers / reportData.totalUsers) * 100) : 0}%)
                   </span>
                 </div>
               </div>
