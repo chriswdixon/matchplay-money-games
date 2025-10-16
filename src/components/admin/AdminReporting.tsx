@@ -51,9 +51,21 @@ const AdminReporting = () => {
             .eq('role', 'admin')
             .maybeSingle();
           
+          const tier = privateData?.[0]?.membership_tier || 'Free';
+          
+          // Log specific user for debugging
+          if (profile.user_id === '19a51ba2-1b49-475d-82f4-29c7b4d1b190') {
+            console.log('DEBUG: Tournament user data:', {
+              user_id: profile.user_id,
+              rawPrivateData: privateData,
+              extractedTier: tier,
+              isAdmin: !!adminRole
+            });
+          }
+          
           return {
             ...profile,
-            tier: privateData?.[0]?.membership_tier || 'Free',
+            tier,
             isAdmin: !!adminRole
           };
         })
