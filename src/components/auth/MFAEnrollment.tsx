@@ -20,6 +20,7 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
   const [loading, setLoading] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [enrollmentError, setEnrollmentError] = useState<string | null>(null);
   const { toast } = useToast();
 
   useEffect(() => {
@@ -28,6 +29,7 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
 
   const enrollMFA = async () => {
     setEnrolling(true);
+    setEnrollmentError(null);
     try {
       // Check if user has a valid session first
       const { data: { session } } = await supabase.auth.getSession();
@@ -45,12 +47,17 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
       if (data) {
         setQrCode(data.totp.qr_code);
         setSecret(data.totp.secret);
+        console.log('MFA enrollment successful', { hasQR: !!data.totp.qr_code, hasSecret: !!data.totp.secret });
+      } else {
+        throw new Error("No enrollment data returned");
       }
     } catch (error: any) {
-      // Generic error message to prevent enumeration attacks
+      console.error('MFA enrollment error:', error);
+      const errorMessage = error.message || "Unable to set up two-factor authentication. Please ensure your account is fully activated and try again.";
+      setEnrollmentError(errorMessage);
       toast({
         title: "Setup Failed",
-        description: "Unable to set up two-factor authentication. Please ensure your account is fully activated and try again.",
+        description: errorMessage,
         variant: "destructive",
       });
     } finally {
@@ -123,6 +130,58 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
       <Card className="w-full max-w-md mx-auto">
         <CardContent className="flex items-center justify-center py-12">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show error state if enrollment failed
+  if (enrollmentError) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-destructive" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Setup Failed</CardTitle>
+          <CardDescription>{enrollmentError}</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button onClick={enrollMFA} className="w-full">
+            Try Again
+          </Button>
+          {!isRequired && (
+            <Button variant="ghost" onClick={onComplete} className="w-full">
+              Skip for Now
+            </Button>
+          )}
+        </CardContent>
+      </Card>
+    );
+  }
+
+  // Show error if QR code or secret is missing
+  if (!qrCode || !secret) {
+    return (
+      <Card className="w-full max-w-md mx-auto">
+        <CardHeader className="text-center">
+          <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+            <Shield className="w-6 h-6 text-destructive" />
+          </div>
+          <CardTitle className="text-2xl font-bold">Setup Incomplete</CardTitle>
+          <CardDescription>
+            Unable to generate MFA credentials. Please try again.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <Button onClick={enrollMFA} className="w-full">
+            Retry Setup
+          </Button>
+          {!isRequired && (
+            <Button variant="ghost" onClick={onComplete} className="w-full">
+              Skip for Now
+            </Button>
+          )}
         </CardContent>
       </Card>
     );
