@@ -8,6 +8,7 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.admin-disable-user]
 [functions.admin-create-coupon]
 [functions.admin-list-coupons]
+[functions.admin-list-users]
 [functions.charge-match-buyin]
 [functions.process-payout]
 [functions.credit-match-winnings]
