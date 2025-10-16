@@ -16,6 +16,7 @@ interface MFAEnrollmentProps {
 export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentProps) {
   const [qrCode, setQrCode] = useState<string>('');
   const [secret, setSecret] = useState<string>('');
+  const [factorId, setFactorId] = useState<string>('');
   const [verificationCode, setVerificationCode] = useState('');
   const [loading, setLoading] = useState(false);
   const [enrolling, setEnrolling] = useState(false);
@@ -47,7 +48,8 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
       if (data) {
         setQrCode(data.totp.qr_code);
         setSecret(data.totp.secret);
-        console.log('MFA enrollment successful', { hasQR: !!data.totp.qr_code, hasSecret: !!data.totp.secret });
+        setFactorId(data.id); // Save the factor ID for verification
+        console.log('MFA enrollment successful', { hasQR: !!data.totp.qr_code, hasSecret: !!data.totp.secret, factorId: data.id });
       } else {
         throw new Error("No enrollment data returned");
       }
@@ -75,16 +77,20 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
       return;
     }
 
+    if (!factorId) {
+      toast({
+        title: "Setup Error",
+        description: "MFA enrollment not completed. Please try again.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
     try {
-      const factors = await supabase.auth.mfa.listFactors();
-      if (factors.error) throw factors.error;
-
-      const totpFactor = factors.data?.totp?.[0];
-      if (!totpFactor) throw new Error("No MFA factor found");
-
+      // Use the factor ID from enrollment instead of listing factors
       const { data, error } = await supabase.auth.mfa.challengeAndVerify({
-        factorId: totpFactor.id,
+        factorId: factorId,
         code: verificationCode,
       });
 
@@ -97,6 +103,7 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
       
       onComplete();
     } catch (error: any) {
+      console.error('MFA verification error:', error);
       toast({
         title: "Verification Failed",
         description: error.message || "Invalid verification code. Please try again.",
@@ -160,8 +167,8 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
     );
   }
 
-  // Show error if QR code or secret is missing
-  if (!qrCode || !secret) {
+  // Show error if QR code, secret, or factor ID is missing
+  if (!qrCode || !secret || !factorId) {
     return (
       <Card className="w-full max-w-md mx-auto">
         <CardHeader className="text-center">
