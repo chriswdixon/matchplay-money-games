@@ -56,8 +56,12 @@ const AdminConsole = () => {
           <p className="text-muted-foreground">Manage users, coupons, and view reports</p>
         </div>
 
-        <Tabs defaultValue="users" className="space-y-6">
+        <Tabs defaultValue="reports" className="space-y-6">
           <TabsList className="grid w-full grid-cols-6 lg:w-auto">
+            <TabsTrigger value="reports" className="gap-2">
+              <BarChart3 className="h-4 w-4" />
+              Reports
+            </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
               User Management
@@ -77,10 +81,6 @@ const AdminConsole = () => {
             <TabsTrigger value="reviews" className="gap-2">
               <AlertCircle className="h-4 w-4" />
               Reviews
-            </TabsTrigger>
-            <TabsTrigger value="reports" className="gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Reports
             </TabsTrigger>
           </TabsList>
 
