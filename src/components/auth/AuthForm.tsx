@@ -14,6 +14,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { MFAEnrollment } from './MFAEnrollment';
 import { MFAVerification } from './MFAVerification';
 import { PaymentMethodSetup } from './PaymentMethodSetup';
+import { SubscriptionSelection } from './SubscriptionSelection';
 import { useInvites } from '@/hooks/useInvites';
 
 export function AuthForm() {
@@ -33,6 +34,7 @@ export function AuthForm() {
   const [showMFAEnrollment, setShowMFAEnrollment] = useState(false);
   const [showMFAVerification, setShowMFAVerification] = useState(false);
   const [needsMFASetup, setNeedsMFASetup] = useState(false);
+  const [showSubscriptionSelection, setShowSubscriptionSelection] = useState(false);
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const { signIn, signUp, signInWithMagicLink } = useAuth();
@@ -260,7 +262,25 @@ export function AuthForm() {
     setMagicLinkLoading(false);
   };
 
-  // Show MFA enrollment after signup
+  // Show subscription selection after signup
+  if (showSubscriptionSelection) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+        <SubscriptionSelection 
+          onComplete={() => {
+            setShowSubscriptionSelection(false);
+            setShowPaymentSetup(true);
+            toast({
+              title: "Subscription Selected",
+              description: "Now let's add a payment method to complete your setup",
+            });
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Show payment setup after subscription
   if (showPaymentSetup) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
@@ -291,11 +311,11 @@ export function AuthForm() {
           onComplete={() => {
             setShowMFAEnrollment(false);
             if (needsMFASetup) {
-              // After MFA setup for new users, show payment setup
-              setShowPaymentSetup(true);
+              // After MFA setup for new users, show subscription selection
+              setShowSubscriptionSelection(true);
               toast({
                 title: "MFA Setup Complete",
-                description: "Now let's add a payment method",
+                description: "Now let's choose your subscription plan",
               });
             } else {
               toast({

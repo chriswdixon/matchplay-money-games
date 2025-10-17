@@ -4,9 +4,19 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Star, Crown } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const MembershipTiers = () => {
   const [billingPeriod, setBillingPeriod] = useState<"annual" | "monthly">("annual");
+  const navigate = useNavigate();
+
+  const handleSubscribe = (tier: string, billing: "annual" | "monthly") => {
+    if (tier === "free") {
+      navigate("/auth");
+    } else {
+      navigate(`/auth?tier=${tier}&billing=${billing}`);
+    }
+  };
 
   const tiers = [
     {
@@ -25,7 +35,8 @@ const MembershipTiers = () => {
       popular: false,
       icon: <Star className="w-6 h-6" />,
       colorScheme: "secondary",
-      showTabs: false
+      showTabs: false,
+      tierKey: "free"
     },
     {
       name: "Local Player",
@@ -45,7 +56,8 @@ const MembershipTiers = () => {
       popular: true,
       icon: <Star className="w-6 h-6" />,
       colorScheme: "primary",
-      showTabs: true
+      showTabs: true,
+      tierKey: "local"
     },
     {
       name: "Tournament Pro",
@@ -67,7 +79,8 @@ const MembershipTiers = () => {
       popular: false,
       icon: <Crown className="w-6 h-6" />,
       colorScheme: "warning",
-      showTabs: true
+      showTabs: true,
+      tierKey: "tournament"
     }
   ];
 
@@ -170,6 +183,7 @@ const MembershipTiers = () => {
               
               <CardFooter>
                 <Button 
+                  onClick={() => handleSubscribe(tier.tierKey, billingPeriod)}
                   className={`w-full transform hover:scale-105 transition-all duration-300 ${
                     tier.colorScheme === 'primary' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' :
                     tier.colorScheme === 'warning' ? 'bg-warning hover:bg-warning/90 text-warning-foreground' :

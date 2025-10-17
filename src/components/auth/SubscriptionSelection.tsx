@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -16,9 +17,19 @@ interface SubscriptionSelectionProps {
 }
 
 export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps) {
+  const [searchParams] = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [userAge21Plus, setUserAge21Plus] = useState<boolean | null>(null);
-  const [billingPeriod, setBillingPeriod] = useState<"annual" | "monthly">("annual");
+  
+  // Get tier and billing from URL params
+  const urlTier = searchParams.get('tier');
+  const urlBilling = searchParams.get('billing') as "annual" | "monthly" | null;
+  
+  // Set initial billing period based on URL or default to annual
+  const [billingPeriod, setBillingPeriod] = useState<"annual" | "monthly">(
+    urlBilling || "annual"
+  );
+  
   const { toast } = useToast();
   const { privateData, loading: privateDataLoading } = usePrivateProfile();
 
@@ -32,6 +43,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
     {
       key: 'local_annual' as const,
       monthlyKey: 'local_monthly' as const,
+      tierName: 'local',
       name: "Local Player",
       annualPrice: "$49",
       monthlyPrice: "$59",
@@ -51,6 +63,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
     {
       key: 'tournament_annual' as const,
       monthlyKey: 'tournament_monthly' as const,
+      tierName: 'tournament',
       name: "Tournament Pro",
       annualPrice: "$99",
       monthlyPrice: "$109",
@@ -71,6 +84,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       colorScheme: "warning" as const,
     }
   ];
+
+  // Filter tiers based on URL parameter if present
+  const displayTiers = urlTier 
+    ? tiers.filter(tier => tier.tierName === urlTier)
+    : tiers;
 
   const handleSubscribe = async (tierKey: 'local_annual' | 'local_monthly' | 'tournament_annual' | 'tournament_monthly') => {
     // Check age requirement for paid subscriptions
@@ -153,7 +171,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       )}
 
       <div className="grid md:grid-cols-2 gap-6">
-        {tiers.map((tier) => (
+        {displayTiers.map((tier) => (
           <Card 
             key={tier.key}
             className={`relative transition-all duration-300 hover:shadow-lg ${
