@@ -43,6 +43,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       ],
       icon: <Star className="w-6 h-6" />,
       popular: true,
+      colorScheme: "success" as const,
     },
     {
       key: 'tournament_annual' as const,
@@ -63,6 +64,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       ],
       icon: <Crown className="w-6 h-6" />,
       popular: false,
+      colorScheme: "warning" as const,
     }
   ];
 
@@ -152,19 +154,21 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
             key={tier.key}
             className={`relative transition-all duration-300 hover:shadow-lg ${
               tier.popular 
-                ? 'border-accent shadow-md scale-105' 
-                : 'border-border hover:border-primary/30'
+                ? 'border-success shadow-premium scale-105' 
+                : 'border-warning shadow-premium'
             }`}
           >
             {tier.popular && (
-              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-accent text-accent-foreground shadow-md border-0">
+              <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-success text-success-foreground shadow-premium border-0">
                 Most Popular
               </Badge>
             )}
             
             <CardHeader className="text-center pb-4">
               <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                tier.popular ? 'bg-accent text-accent-foreground' : 'bg-primary/10 text-primary'
+                tier.colorScheme === 'success' ? 'bg-success text-success-foreground' :
+                tier.colorScheme === 'warning' ? 'bg-warning text-warning-foreground' :
+                'bg-primary/10 text-primary'
               }`}>
                 {tier.icon}
               </div>
@@ -173,7 +177,9 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               <div className="flex flex-col items-center mt-4">
                 <div className="flex items-baseline">
                   <span className={`text-4xl font-bold ${
-                    tier.popular ? 'text-accent' : 'text-primary'
+                    tier.colorScheme === 'success' ? 'text-success' :
+                    tier.colorScheme === 'warning' ? 'text-warning' :
+                    'text-primary'
                   }`}>
                     {tier.price}
                   </span>
@@ -195,7 +201,9 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
                 {tier.features.map((feature, featureIndex) => (
                   <li key={featureIndex} className="flex items-start gap-3">
                     <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                      tier.popular ? 'text-accent' : 'text-success'
+                      tier.colorScheme === 'success' ? 'text-success' :
+                      tier.colorScheme === 'warning' ? 'text-warning' :
+                      'text-success'
                     }`} />
                     <span className="text-sm">{feature}</span>
                   </li>
@@ -205,7 +213,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               <Button 
                 onClick={() => handleSubscribe(tier.key)}
                 disabled={loading || privateDataLoading || userAge21Plus === false}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white disabled:opacity-50"
+                className={`w-full transform hover:scale-105 transition-all duration-300 disabled:opacity-50 ${
+                  tier.colorScheme === 'success' ? 'bg-success hover:bg-success/90 text-success-foreground' :
+                  tier.colorScheme === 'warning' ? 'bg-warning hover:bg-warning/90 text-warning-foreground' :
+                  'bg-primary hover:bg-primary/90 text-primary-foreground'
+                }`}
                 size="lg"
               >
                 {loading ? "Processing..." : userAge21Plus === false ? "Age 21+ Required" : `Start ${tier.name} Trial`}
