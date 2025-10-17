@@ -213,7 +213,10 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
                     <Star className="w-5 h-5 text-primary" />
                     Local Player
                   </h4>
-                  <Badge variant="secondary">$29/month</Badge>
+                  <div className="text-right">
+                    <Badge variant="secondary">$49/year</Badge>
+                    <p className="text-xs text-muted-foreground mt-1">or $59/mo</p>
+                  </div>
                 </div>
                 <ul className="space-y-1 text-sm text-muted-foreground">
                   {tierFeatures['Local Player'].slice(1).map((feature, idx) => (
@@ -224,7 +227,7 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
                   ))}
                 </ul>
                 <Button 
-                  onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local.price_id!)} 
+                  onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local_annual.price_id!)} 
                   size="sm" 
                   className="w-full"
                   disabled={upgradeLoading}
@@ -241,7 +244,10 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
                   <Crown className="w-5 h-5 text-accent" />
                   Tournament Pro
                 </h4>
-                <Badge variant="secondary">$79/month</Badge>
+                <div className="text-right">
+                  <Badge variant="secondary">$99/year</Badge>
+                  <p className="text-xs text-muted-foreground mt-1">or $109/mo</p>
+                </div>
               </div>
               <ul className="space-y-1 text-sm text-muted-foreground">
                 {tierFeatures['Tournament Pro'].slice(1).map((feature, idx) => (
@@ -252,7 +258,7 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
                 ))}
               </ul>
               <Button 
-                onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament.price_id!)} 
+                onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament_annual.price_id!)} 
                 size="sm" 
                 className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
                 disabled={upgradeLoading}

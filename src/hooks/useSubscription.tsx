@@ -6,22 +6,45 @@ import { useAuth } from '@/hooks/useAuth';
 export const SUBSCRIPTION_TIERS = {
   free: {
     name: 'Free',
-    price_id: null, // No payment required
+    price_id: null,
     product_id: null,
     price: 0,
+    interval: 'year',
   },
-  local: {
+  local_annual: {
     name: 'Local Player',
-    price_id: 'price_1SHDcH8xKJwJeHGFTc3dUlm8',
-    product_id: 'prod_TDewuwDjEVBGe0',
-    price: 29,
+    price_id: 'price_1SJKak8xKJwJeHGFTvtjUAN6',
+    product_id: 'prod_TFqHOyYbr5oO5S',
+    price: 49,
+    interval: 'year',
   },
-  tournament: {
+  local_monthly: {
+    name: 'Local Player',
+    price_id: 'price_1SJKb58xKJwJeHGFrgLznWvC',
+    product_id: 'prod_TFqHFDP5Q6rmQK',
+    price: 59,
+    interval: 'month',
+  },
+  tournament_annual: {
     name: 'Tournament Pro',
-    price_id: 'price_1SHDca8xKJwJeHGFVOBSfXP2',
-    product_id: 'prod_TDew5HBjzhYDUz',
-    price: 79,
+    price_id: 'price_1SJKbH8xKJwJeHGFdsaayRaB',
+    product_id: 'prod_TFqHu6HXnZcRPZ',
+    price: 99,
+    interval: 'year',
   },
+  tournament_monthly: {
+    name: 'Tournament Pro',
+    price_id: 'price_1SJKbW8xKJwJeHGFCjYcQJde',
+    product_id: 'prod_TFqI7RhgmTZxN5',
+    price: 109,
+    interval: 'month',
+  },
+} as const;
+
+// Legacy tier mapping for backwards compatibility
+export const LEGACY_TIERS = {
+  local: SUBSCRIPTION_TIERS.local_annual,
+  tournament: SUBSCRIPTION_TIERS.tournament_annual,
 } as const;
 
 interface SubscriptionContextType {

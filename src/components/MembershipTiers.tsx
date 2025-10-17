@@ -8,7 +8,7 @@ const MembershipTiers = () => {
     {
       name: "Free",
       price: "$0",
-      period: "/month",
+      period: "/year",
       description: "Perfect for getting started",
       features: [
         "Basic match booking",
@@ -23,8 +23,9 @@ const MembershipTiers = () => {
     },
     {
       name: "Local Player",
-      price: "$29",
-      period: "/month",
+      price: "$49",
+      period: "/year",
+      monthlyPrice: "$59/mo",
       description: "Perfect for casual competitive play",
       features: [
         "Everything in Free",
@@ -40,8 +41,9 @@ const MembershipTiers = () => {
     },
     {
       name: "Tournament Pro",
-      price: "$79",
-      period: "/month",
+      price: "$99",
+      period: "/year",
+      monthlyPrice: "$109/mo",
       description: "For serious competitors who want it all",
       features: [
         "Everything in Local Player",
@@ -100,13 +102,20 @@ const MembershipTiers = () => {
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground">{tier.name}</CardTitle>
                 <CardDescription className="text-muted-foreground">{tier.description}</CardDescription>
-                <div className="flex items-baseline justify-center mt-4">
-                  <span className={`text-5xl font-bold ${
-                    tier.popular ? 'text-accent' : 'text-primary'
-                  }`}>
-                    {tier.price}
-                  </span>
-                  <span className="text-muted-foreground ml-1">{tier.period}</span>
+                <div className="flex flex-col items-center mt-4">
+                  <div className="flex items-baseline">
+                    <span className={`text-5xl font-bold ${
+                      tier.popular ? 'text-accent' : 'text-primary'
+                    }`}>
+                      {tier.price}
+                    </span>
+                    <span className="text-muted-foreground ml-1">{tier.period}</span>
+                  </div>
+                  {'monthlyPrice' in tier && tier.monthlyPrice && (
+                    <p className="text-sm text-muted-foreground mt-2">
+                      or {tier.monthlyPrice}
+                    </p>
+                  )}
                 </div>
               </CardHeader>
               

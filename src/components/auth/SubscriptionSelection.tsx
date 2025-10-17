@@ -17,29 +17,13 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
 
   const tiers = [
     {
-      key: 'basic' as const,
-      name: "Local Basic",
-      price: "$10",
-      period: "/month",
-      description: "Perfect for getting started",
-      features: [
-        "Basic match booking",
-        "Local player matching",
-        "Simple handicap tracking",
-        "Live scoring",
-        "Match history"
-      ],
-      icon: <Star className="w-6 h-6" />,
-      popular: false,
-    },
-    {
-      key: 'local' as const,
+      key: 'local_annual' as const,
       name: "Local Player",
-      price: "$29",
-      period: "/month",
+      price: "$49",
+      period: "/year",
+      monthlyPrice: "or $59/mo",
       description: "Perfect for casual competitive play",
       features: [
-        "Everything in Local Basic",
         "GPS-based player matching",
         "Advanced handicap management",
         "Friendly money games",
@@ -50,10 +34,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       popular: true,
     },
     {
-      key: 'tournament' as const,
+      key: 'tournament_annual' as const,
       name: "Tournament Pro",
-      price: "$79",
-      period: "/month",
+      price: "$99",
+      period: "/year",
+      monthlyPrice: "or $109/mo",
       description: "For serious competitors who want it all",
       features: [
         "Everything in Local Player",
@@ -70,7 +55,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
     }
   ];
 
-  const handleSubscribe = async (tierKey: 'basic' | 'local' | 'tournament') => {
+  const handleSubscribe = async (tierKey: 'local_annual' | 'local_monthly' | 'tournament_annual' | 'tournament_monthly') => {
     setLoading(true);
 
     try {
@@ -131,7 +116,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
         </p>
       </div>
 
-      <div className="grid md:grid-cols-3 gap-6">
+      <div className="grid md:grid-cols-2 gap-6">
         {tiers.map((tier) => (
           <Card 
             key={tier.key}
@@ -155,13 +140,20 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               </div>
               <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
               <CardDescription>{tier.description}</CardDescription>
-              <div className="flex items-baseline justify-center mt-4">
-                <span className={`text-4xl font-bold ${
-                  tier.popular ? 'text-accent' : 'text-primary'
-                }`}>
-                  {tier.price}
-                </span>
-                <span className="text-muted-foreground ml-1">{tier.period}</span>
+              <div className="flex flex-col items-center mt-4">
+                <div className="flex items-baseline">
+                  <span className={`text-4xl font-bold ${
+                    tier.popular ? 'text-accent' : 'text-primary'
+                  }`}>
+                    {tier.price}
+                  </span>
+                  <span className="text-muted-foreground ml-1">{tier.period}</span>
+                </div>
+                {'monthlyPrice' in tier && tier.monthlyPrice && (
+                  <p className="text-sm text-muted-foreground mt-1">
+                    {tier.monthlyPrice}
+                  </p>
+                )}
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 7-day free trial included
