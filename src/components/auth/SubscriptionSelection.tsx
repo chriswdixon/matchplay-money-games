@@ -1,11 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Check, Star, Crown } from 'lucide-react';
+import { Check, Star, Crown, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import { SUBSCRIPTION_TIERS } from '@/hooks/useSubscription';
+import { isOver21 } from '@/lib/validation';
+import { Alert, AlertDescription } from '@/components/ui/alert';
+import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 
 interface SubscriptionSelectionProps {
   onComplete: () => void;
@@ -13,7 +16,15 @@ interface SubscriptionSelectionProps {
 
 export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps) {
   const [loading, setLoading] = useState(false);
+  const [userAge21Plus, setUserAge21Plus] = useState<boolean | null>(null);
   const { toast } = useToast();
+  const { privateData, loading: privateDataLoading } = usePrivateProfile();
+
+  useEffect(() => {
+    if (privateData?.date_of_birth) {
+      setUserAge21Plus(isOver21(privateData.date_of_birth));
+    }
+  }, [privateData]);
 
   const tiers = [
     {
@@ -56,6 +67,16 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
   ];
 
   const handleSubscribe = async (tierKey: 'local_annual' | 'local_monthly' | 'tournament_annual' | 'tournament_monthly') => {
+    // Check age requirement for paid subscriptions
+    if (userAge21Plus === false) {
+      toast({
+        title: "Age Requirement Not Met",
+        description: "You must be 21 or older to purchase a paid subscription.",
+        variant: "destructive",
+      });
+      return;
+    }
+
     setLoading(true);
 
     try {
@@ -116,6 +137,15 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
         </p>
       </div>
 
+      {userAge21Plus === false && (
+        <Alert variant="destructive">
+          <AlertCircle className="h-4 w-4" />
+          <AlertDescription>
+            Paid subscriptions require users to be 21 years or older. You are currently restricted to the free tier.
+          </AlertDescription>
+        </Alert>
+      )}
+
       <div className="grid md:grid-cols-2 gap-6">
         {tiers.map((tier) => (
           <Card 
@@ -174,11 +204,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               
               <Button 
                 onClick={() => handleSubscribe(tier.key)}
-                disabled={loading}
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
+                disabled={loading || privateDataLoading || userAge21Plus === false}
+                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white disabled:opacity-50"
                 size="lg"
               >
-                {loading ? "Processing..." : `Start ${tier.name} Trial`}
+                {loading ? "Processing..." : userAge21Plus === false ? "Age 21+ Required" : `Start ${tier.name} Trial`}
               </Button>
             </CardContent>
           </Card>

@@ -20,6 +20,7 @@ export function AuthForm() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [displayName, setDisplayName] = useState('');
+  const [dateOfBirth, setDateOfBirth] = useState('');
   const [loading, setLoading] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
   const [showResetForm, setShowResetForm] = useState(false);
@@ -111,7 +112,7 @@ export function AuthForm() {
     }
     
     // Validate input
-    const validation = signUpSchema.safeParse({ email, password, displayName });
+    const validation = signUpSchema.safeParse({ email, password, displayName, dateOfBirth });
     if (!validation.success) {
       const errors: Record<string, string> = {};
       validation.error.errors.forEach((error) => {
@@ -142,10 +143,21 @@ export function AuthForm() {
     const { error } = await signUp(email, password, displayName);
     
     if (!error) {
-      // Link invite to user
+      // Store date of birth in private profile data
       const { data: { user } } = await supabase.auth.getUser();
-      if (user && inviteCode) {
-        await linkInviteToUser(inviteCode, user.id);
+      if (user) {
+        // Create private profile with date of birth
+        await supabase
+          .from('private_profile_data')
+          .insert({
+            user_id: user.id,
+            date_of_birth: dateOfBirth,
+          });
+
+        // Link invite to user
+        if (inviteCode) {
+          await linkInviteToUser(inviteCode, user.id);
+        }
       }
 
       // Require MFA enrollment for new users
@@ -463,6 +475,23 @@ export function AuthForm() {
                       {validationErrors.email && (
                         <p className="text-sm text-destructive">{validationErrors.email}</p>
                       )}
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-dob">Date of Birth</Label>
+                      <Input
+                        id="signup-dob"
+                        type="date"
+                        value={dateOfBirth}
+                        onChange={(e) => setDateOfBirth(e.target.value)}
+                        required
+                        className={validationErrors.dateOfBirth ? "border-destructive" : ""}
+                      />
+                      {validationErrors.dateOfBirth && (
+                        <p className="text-sm text-destructive">{validationErrors.dateOfBirth}</p>
+                      )}
+                      <p className="text-xs text-muted-foreground">
+                        Paid subscriptions require you to be 21 or older
+                      </p>
                     </div>
                     {!email.endsWith('@match-play.co') && (
                       <div className="space-y-2">

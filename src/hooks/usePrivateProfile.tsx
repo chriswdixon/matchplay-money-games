@@ -8,6 +8,7 @@ interface PrivateProfileData {
   user_id: string;
   phone: string | null;
   membership_tier: string | null;
+  date_of_birth: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -60,7 +61,7 @@ export function usePrivateProfile() {
     }
   };
 
-  const updatePrivateData = async (updates: Partial<Pick<PrivateProfileData, 'phone' | 'membership_tier'>>) => {
+  const updatePrivateData = async (updates: Partial<Pick<PrivateProfileData, 'phone' | 'membership_tier' | 'date_of_birth'>>) => {
     if (!user) return { error: 'No user found' };
 
     try {

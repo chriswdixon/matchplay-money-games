@@ -692,6 +692,7 @@ export type Database = {
       private_profile_data: {
         Row: {
           created_at: string
+          date_of_birth: string | null
           id: string
           membership_tier: string | null
           phone: string | null
@@ -700,6 +701,7 @@ export type Database = {
         }
         Insert: {
           created_at?: string
+          date_of_birth?: string | null
           id?: string
           membership_tier?: string | null
           phone?: string | null
@@ -708,6 +710,7 @@ export type Database = {
         }
         Update: {
           created_at?: string
+          date_of_birth?: string | null
           id?: string
           membership_tier?: string | null
           phone?: string | null

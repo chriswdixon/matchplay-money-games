@@ -42,6 +42,23 @@ export const displayNameSchema = z
   .regex(/^[a-zA-Z0-9\s_-]+$/, "Display name can only contain letters, numbers, spaces, underscores, and hyphens")
   .refine((name) => name.length > 0, "Display name cannot be empty");
 
+// Date of birth validation schema
+export const dateOfBirthSchema = z
+  .string()
+  .refine((date) => {
+    const birthDate = new Date(date);
+    const today = new Date();
+    return birthDate < today;
+  }, "Date of birth must be in the past")
+  .refine((date) => {
+    const birthDate = new Date(date);
+    const today = new Date();
+    const age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    const isOldEnough = age > 13 || (age === 13 && monthDiff >= 0);
+    return isOldEnough;
+  }, "You must be at least 13 years old to sign up");
+
 // Invite code validation schema
 export const inviteCodeSchema = z
   .string()
@@ -55,6 +72,7 @@ export const signUpSchema = z.object({
   email: emailSchema,
   password: passwordSchema,
   displayName: displayNameSchema.optional(),
+  dateOfBirth: dateOfBirthSchema,
 });
 
 // Sign in form validation schema  
@@ -180,4 +198,23 @@ export function validateSessionToken(token: string): boolean {
   // Check if parts are base64-like strings
   const base64Regex = /^[A-Za-z0-9_-]+$/;
   return parts.every(part => base64Regex.test(part) && part.length > 0);
+}
+
+// Calculate age from date of birth
+export function calculateAge(dateOfBirth: string): number {
+  const birthDate = new Date(dateOfBirth);
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const monthDiff = today.getMonth() - birthDate.getMonth();
+  
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  
+  return age;
+}
+
+// Check if user is 21 or older
+export function isOver21(dateOfBirth: string): boolean {
+  return calculateAge(dateOfBirth) >= 21;
 }
