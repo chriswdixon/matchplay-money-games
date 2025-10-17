@@ -31,8 +31,8 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       key: 'local_annual' as const,
       name: "Local Player",
       price: "$49",
-      period: "/year",
-      monthlyPrice: "or $59/mo",
+      period: "/mo",
+      annualPrice: "billed annually at $588",
       description: "Perfect for casual competitive play",
       features: [
         "GPS-based player matching",
@@ -49,8 +49,8 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
       key: 'tournament_annual' as const,
       name: "Tournament Pro",
       price: "$99",
-      period: "/year",
-      monthlyPrice: "or $109/mo",
+      period: "/mo",
+      annualPrice: "billed annually at $1,188",
       description: "For serious competitors who want it all",
       features: [
         "Everything in Local Player",
@@ -185,9 +185,9 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
                   </span>
                   <span className="text-muted-foreground ml-1">{tier.period}</span>
                 </div>
-                {'monthlyPrice' in tier && tier.monthlyPrice && (
+                {'annualPrice' in tier && tier.annualPrice && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    {tier.monthlyPrice}
+                    {tier.annualPrice}
                   </p>
                 )}
               </div>

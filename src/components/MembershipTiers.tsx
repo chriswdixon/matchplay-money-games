@@ -25,8 +25,8 @@ const MembershipTiers = () => {
     {
       name: "Local Player",
       price: "$49",
-      period: "/year",
-      monthlyPrice: "$59/mo",
+      period: "/mo",
+      annualPrice: "billed annually at $588",
       description: "Perfect for casual competitive play",
       features: [
         "Everything in Free",
@@ -44,8 +44,8 @@ const MembershipTiers = () => {
     {
       name: "Tournament Pro",
       price: "$99",
-      period: "/year",
-      monthlyPrice: "$109/mo",
+      period: "/mo",
+      annualPrice: "billed annually at $1,188",
       description: "For serious competitors who want it all",
       features: [
         "Everything in Local Player",
@@ -120,9 +120,9 @@ const MembershipTiers = () => {
                     </span>
                     <span className="text-muted-foreground ml-1">{tier.period}</span>
                   </div>
-                  {'monthlyPrice' in tier && tier.monthlyPrice && (
+                  {'annualPrice' in tier && tier.annualPrice && (
                     <p className="text-sm text-muted-foreground mt-2">
-                      or {tier.monthlyPrice}
+                      {tier.annualPrice}
                     </p>
                   )}
                 </div>
