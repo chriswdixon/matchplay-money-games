@@ -86,7 +86,7 @@ const MembershipTiers = () => {
               key={tier.name} 
               className={`relative transition-all duration-300 hover:shadow-premium animate-slide-up ${
                 tier.popular 
-                  ? 'border-accent shadow-accent bg-gradient-card scale-105' 
+                  ? 'border-success shadow-premium bg-gradient-card scale-105' 
                   : 'border-border hover:border-primary/30'
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
