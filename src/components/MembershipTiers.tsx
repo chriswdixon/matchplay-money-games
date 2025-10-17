@@ -19,7 +19,8 @@ const MembershipTiers = () => {
       ],
       buttonText: "Start Free",
       popular: false,
-      icon: <Star className="w-6 h-6" />
+      icon: <Star className="w-6 h-6" />,
+      colorScheme: "default"
     },
     {
       name: "Local Player",
@@ -37,7 +38,8 @@ const MembershipTiers = () => {
       ],
       buttonText: "Start Local Play",
       popular: true,
-      icon: <Star className="w-6 h-6" />
+      icon: <Star className="w-6 h-6" />,
+      colorScheme: "success"
     },
     {
       name: "Tournament Pro",
@@ -57,7 +59,8 @@ const MembershipTiers = () => {
       ],
       buttonText: "Join Tournament Circuit",
       popular: false,
-      icon: <Crown className="w-6 h-6" />
+      icon: <Crown className="w-6 h-6" />,
+      colorScheme: "warning"
     }
   ];
 
@@ -89,14 +92,16 @@ const MembershipTiers = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {tier.popular && (
-                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-gradient-accent text-accent-foreground shadow-accent border-0">
+                <Badge className="absolute -top-3 left-1/2 -translate-x-1/2 bg-success text-success-foreground shadow-premium border-0">
                   Most Popular
                 </Badge>
               )}
               
               <CardHeader className="text-center pb-4">
                 <div className={`w-12 h-12 mx-auto mb-4 rounded-full flex items-center justify-center ${
-                  tier.popular ? 'bg-gradient-accent text-accent-foreground' : 'bg-primary/10 text-primary'
+                  tier.colorScheme === 'success' ? 'bg-success text-success-foreground' :
+                  tier.colorScheme === 'warning' ? 'bg-warning text-warning-foreground' :
+                  'bg-primary/10 text-primary'
                 }`}>
                   {tier.icon}
                 </div>
@@ -105,7 +110,9 @@ const MembershipTiers = () => {
                 <div className="flex flex-col items-center mt-4">
                   <div className="flex items-baseline">
                     <span className={`text-5xl font-bold ${
-                      tier.popular ? 'text-accent' : 'text-primary'
+                      tier.colorScheme === 'success' ? 'text-success' :
+                      tier.colorScheme === 'warning' ? 'text-warning' :
+                      'text-primary'
                     }`}>
                       {tier.price}
                     </span>
@@ -124,7 +131,9 @@ const MembershipTiers = () => {
                   {tier.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-3">
                       <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
-                        tier.popular ? 'text-accent' : 'text-success'
+                        tier.colorScheme === 'success' ? 'text-success' :
+                        tier.colorScheme === 'warning' ? 'text-warning' :
+                        'text-success'
                       }`} />
                       <span className="text-foreground">{feature}</span>
                     </li>
@@ -134,7 +143,11 @@ const MembershipTiers = () => {
               
               <CardFooter>
                 <Button 
-                  className="w-full bg-yellow-500 hover:bg-yellow-600 text-white transform hover:scale-105 transition-all duration-300"
+                  className={`w-full transform hover:scale-105 transition-all duration-300 ${
+                    tier.colorScheme === 'success' ? 'bg-success hover:bg-success/90 text-success-foreground' :
+                    tier.colorScheme === 'warning' ? 'bg-warning hover:bg-warning/90 text-warning-foreground' :
+                    'bg-primary hover:bg-primary/90 text-primary-foreground'
+                  }`}
                   size="lg"
                 >
                   {tier.buttonText}
