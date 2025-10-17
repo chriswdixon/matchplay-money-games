@@ -8,6 +8,7 @@ import AppFooter from "@/components/AppFooter";
 import SubscriptionManagement from "@/components/SubscriptionManagement";
 import { HandicapSettings } from "@/components/profile/HandicapSettings";
 import { MatchScorecard } from "@/components/MatchScorecard";
+import { InstallPrompt } from "@/components/InstallPrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -143,6 +144,7 @@ const MatchPlayLanding = () => {
           hideReturnButton={currentTab === "active-match"}
         />
         <main className="container flex-1 py-8">
+          <InstallPrompt />
           <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
             {/* Desktop/Tablet Tabs - Dynamically adjusts based on active match */}
             <TabsList className={cn(
