@@ -145,11 +145,8 @@ const MembershipTiers = () => {
         </div>
         
         <div className="text-center mt-12 p-6 bg-muted/50 rounded-2xl max-w-2xl mx-auto">
-          <p className="text-sm text-muted-foreground mb-2">
-            🔒 <strong>Secure & Legal:</strong> Operating in licensed gambling states only
-          </p>
           <p className="text-sm text-muted-foreground">
-            All transactions are protected by bank-level security. Cancel anytime.
+            🔒 All transactions are protected by bank-level security. Cancel anytime.
           </p>
         </div>
       </div>
