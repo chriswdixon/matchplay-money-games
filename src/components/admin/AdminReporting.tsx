@@ -41,28 +41,50 @@ const AdminReporting = () => {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
-      // Fetch actual subscription data from Stripe and admin roles for each user
+      // Fetch actual subscription data from database and admin roles for each user
       const usersWithTiers = await Promise.all(
         profiles.map(async (profile) => {
-          // Check actual Stripe subscription
+          // First check the database for membership_tier
           let tier = 'Free';
-          try {
-            const { data: subData } = await supabase.functions.invoke('check-subscription', {
-              body: { user_id: profile.user_id },
-              headers: {
-                Authorization: `Bearer ${session.access_token}`,
-              },
-            });
-            
-            // Determine tier from product_id
-            if (subData?.product_id) {
-              const tierEntry = Object.entries(SUBSCRIPTION_TIERS).find(
-                ([_, t]) => t.product_id === subData.product_id
-              );
-              tier = tierEntry?.[1]?.name || 'Free';
+          
+          const { data: privateData } = await supabase
+            .from('private_profile_data')
+            .select('membership_tier')
+            .eq('user_id', profile.user_id)
+            .maybeSingle();
+          
+          // Map database tier to display name
+          if (privateData?.membership_tier) {
+            const dbTier = privateData.membership_tier.toLowerCase();
+            if (dbTier === 'local' || dbTier === 'local_player') {
+              tier = 'Local Player';
+            } else if (dbTier === 'tournament' || dbTier === 'tournament_pro') {
+              tier = 'Tournament Pro';
+            } else if (dbTier === 'free') {
+              tier = 'Free';
             }
-          } catch (error) {
-            console.error('Error checking subscription for user:', profile.user_id, error);
+          }
+          
+          // If still Free, check Stripe subscription as fallback
+          if (tier === 'Free') {
+            try {
+              const { data: subData } = await supabase.functions.invoke('check-subscription', {
+                body: { user_id: profile.user_id },
+                headers: {
+                  Authorization: `Bearer ${session.access_token}`,
+                },
+              });
+              
+              // Determine tier from product_id
+              if (subData?.product_id) {
+                const tierEntry = Object.entries(SUBSCRIPTION_TIERS).find(
+                  ([_, t]) => t.product_id === subData.product_id
+                );
+                tier = tierEntry?.[1]?.name || 'Free';
+              }
+            } catch (error) {
+              console.error('Error checking subscription for user:', profile.user_id, error);
+            }
           }
           
           // Check if user is admin
