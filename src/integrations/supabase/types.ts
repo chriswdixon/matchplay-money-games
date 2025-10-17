@@ -762,8 +762,10 @@ export type Database = {
           average_rating: number | null
           created_at: string
           display_name: string | null
+          first_name: string | null
           handicap: number | null
           id: string
+          last_name: string | null
           profile_picture_url: string | null
           updated_at: string
           user_id: string
@@ -772,8 +774,10 @@ export type Database = {
           average_rating?: number | null
           created_at?: string
           display_name?: string | null
+          first_name?: string | null
           handicap?: number | null
           id?: string
+          last_name?: string | null
           profile_picture_url?: string | null
           updated_at?: string
           user_id: string
@@ -782,8 +786,10 @@ export type Database = {
           average_rating?: number | null
           created_at?: string
           display_name?: string | null
+          first_name?: string | null
           handicap?: number | null
           id?: string
+          last_name?: string | null
           profile_picture_url?: string | null
           updated_at?: string
           user_id?: string
