@@ -114,7 +114,15 @@ export function AuthForm() {
     }
     
     // Validate input
-    const validation = signUpSchema.safeParse({ email, password, firstName, lastName, displayName, dateOfBirth });
+    const finalDisplayName = displayName.trim() || `${firstName} ${lastName}`.trim();
+    const validation = signUpSchema.safeParse({ 
+      email, 
+      password, 
+      firstName,
+      lastName,
+      displayName: finalDisplayName,
+      dateOfBirth 
+    });
     if (!validation.success) {
       const errors: Record<string, string> = {};
       validation.error.errors.forEach((error) => {
@@ -142,7 +150,7 @@ export function AuthForm() {
     }
     
     setLoading(true);
-    const { error } = await signUp(email, password, displayName, firstName, lastName);
+    const { error } = await signUp(email, password, finalDisplayName, firstName, lastName);
     
     if (!error) {
       // Store date of birth in private profile data
@@ -449,42 +457,44 @@ export function AuthForm() {
                 
                 <TabsContent value="signup">
                   <form onSubmit={handleSignUp} className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-firstname">First Name</Label>
-                      <Input
-                        id="signup-firstname"
-                        type="text"
-                        placeholder="John"
-                        value={firstName}
-                        onChange={(e) => setFirstName(e.target.value)}
-                        required
-                        className={validationErrors.firstName ? "border-destructive" : ""}
-                      />
-                      {validationErrors.firstName && (
-                        <p className="text-sm text-destructive">{validationErrors.firstName}</p>
-                      )}
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-firstname">First Name</Label>
+                        <Input
+                          id="signup-firstname"
+                          type="text"
+                          placeholder="John"
+                          value={firstName}
+                          onChange={(e) => setFirstName(e.target.value)}
+                          required
+                          className={validationErrors.firstName ? "border-destructive" : ""}
+                        />
+                        {validationErrors.firstName && (
+                          <p className="text-sm text-destructive">{validationErrors.firstName}</p>
+                        )}
+                      </div>
+                      <div className="space-y-2">
+                        <Label htmlFor="signup-lastname">Last Name</Label>
+                        <Input
+                          id="signup-lastname"
+                          type="text"
+                          placeholder="Doe"
+                          value={lastName}
+                          onChange={(e) => setLastName(e.target.value)}
+                          required
+                          className={validationErrors.lastName ? "border-destructive" : ""}
+                        />
+                        {validationErrors.lastName && (
+                          <p className="text-sm text-destructive">{validationErrors.lastName}</p>
+                        )}
+                      </div>
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="signup-lastname">Last Name</Label>
-                      <Input
-                        id="signup-lastname"
-                        type="text"
-                        placeholder="Doe"
-                        value={lastName}
-                        onChange={(e) => setLastName(e.target.value)}
-                        required
-                        className={validationErrors.lastName ? "border-destructive" : ""}
-                      />
-                      {validationErrors.lastName && (
-                        <p className="text-sm text-destructive">{validationErrors.lastName}</p>
-                      )}
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-name">Display Name</Label>
+                      <Label htmlFor="signup-name">Display Name (Optional)</Label>
                       <Input
                         id="signup-name"
                         type="text"
-                        placeholder="Your golf name"
+                        placeholder="Leave blank to use First + Last"
                         value={displayName}
                         onChange={(e) => setDisplayName(e.target.value)}
                         className={validationErrors.displayName ? "border-destructive" : ""}
@@ -492,6 +502,9 @@ export function AuthForm() {
                       {validationErrors.displayName && (
                         <p className="text-sm text-destructive">{validationErrors.displayName}</p>
                       )}
+                      <p className="text-xs text-muted-foreground">
+                        This is how other players will see you
+                      </p>
                     </div>
                     <div className="space-y-2">
                       <Label htmlFor="signup-email">Email</Label>
