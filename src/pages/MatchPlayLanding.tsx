@@ -12,7 +12,7 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";
+import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
@@ -21,6 +21,13 @@ import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { useTheme } from "@/components/ThemeProvider";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
@@ -29,6 +36,7 @@ const MatchPlayLanding = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentTab, setCurrentTab] = useState("matches");
   const [searchParams] = useSearchParams();
+  const { setTheme } = useTheme();
 
   // Handle shared PIN links and secure token links
   useEffect(() => {
@@ -213,6 +221,30 @@ const MatchPlayLanding = () => {
   // Landing page for non-logged-in users
   return (
     <div className="min-h-screen bg-background">
+      {/* Dark Mode Toggle for Landing Page */}
+      <div className="fixed top-4 right-4 z-50">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="ghost" size="icon" className="bg-background/80 backdrop-blur-sm border border-border">
+              <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
+              <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
+              <span className="sr-only">Toggle theme</span>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            <DropdownMenuItem onClick={() => setTheme("light")}>
+              Light
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("dark")}>
+              Dark
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => setTheme("system")}>
+              System
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
+      
       {/* Hero Section */}
       <MatchPlayHero />
       

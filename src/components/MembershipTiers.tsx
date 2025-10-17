@@ -75,12 +75,13 @@ const MembershipTiers = () => {
         "Tournament history & stats",
         "Premium customer support"
       ],
-      buttonText: "Join Tournament Circuit",
+      buttonText: "Contact Us",
       popular: false,
       icon: <Crown className="w-6 h-6" />,
       colorScheme: "warning",
       showTabs: true,
-      tierKey: "tournament"
+      tierKey: "tournament",
+      isContactOnly: true
     }
   ];
 
@@ -183,7 +184,8 @@ const MembershipTiers = () => {
               
               <CardFooter>
                 <Button 
-                  onClick={() => handleSubscribe(tier.tierKey, billingPeriod)}
+                  onClick={() => 'isContactOnly' in tier && tier.isContactOnly ? undefined : handleSubscribe(tier.tierKey, billingPeriod)}
+                  disabled={'isContactOnly' in tier && tier.isContactOnly}
                   className={`w-full transform hover:scale-105 transition-all duration-300 ${
                     tier.colorScheme === 'primary' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' :
                     tier.colorScheme === 'warning' ? 'bg-warning hover:bg-warning/90 text-warning-foreground' :
