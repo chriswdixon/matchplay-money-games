@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Check, Star, Crown, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -17,6 +18,7 @@ interface SubscriptionSelectionProps {
 export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps) {
   const [loading, setLoading] = useState(false);
   const [userAge21Plus, setUserAge21Plus] = useState<boolean | null>(null);
+  const [billingPeriod, setBillingPeriod] = useState<"annual" | "monthly">("annual");
   const { toast } = useToast();
   const { privateData, loading: privateDataLoading } = usePrivateProfile();
 
@@ -29,10 +31,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
   const tiers = [
     {
       key: 'local_annual' as const,
+      monthlyKey: 'local_monthly' as const,
       name: "Local Player",
-      price: "$49",
-      period: "/mo",
-      annualPrice: "billed annually at $588",
+      annualPrice: "$49",
+      monthlyPrice: "$59",
+      annualTotal: "$588",
       description: "Perfect for casual competitive play",
       features: [
         "GPS-based player matching",
@@ -47,10 +50,11 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
     },
     {
       key: 'tournament_annual' as const,
+      monthlyKey: 'tournament_monthly' as const,
       name: "Tournament Pro",
-      price: "$99",
-      period: "/mo",
-      annualPrice: "billed annually at $1,188",
+      annualPrice: "$99",
+      monthlyPrice: "$109",
+      annualTotal: "$1,188",
       description: "For serious competitors who want it all",
       features: [
         "Everything in Local Player",
@@ -174,6 +178,16 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               </div>
               <CardTitle className="text-2xl font-bold">{tier.name}</CardTitle>
               <CardDescription>{tier.description}</CardDescription>
+              
+              <div className="mt-4">
+                <Tabs value={billingPeriod} onValueChange={(value) => setBillingPeriod(value as "annual" | "monthly")} className="w-full">
+                  <TabsList className="grid w-full grid-cols-2">
+                    <TabsTrigger value="annual">Annual</TabsTrigger>
+                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                  </TabsList>
+                </Tabs>
+              </div>
+              
               <div className="flex flex-col items-center mt-4">
                 <div className="flex items-baseline">
                   <span className={`text-4xl font-bold ${
@@ -181,13 +195,13 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
                     tier.colorScheme === 'warning' ? 'text-warning' :
                     'text-muted-foreground'
                   }`}>
-                    {tier.price}
+                    {billingPeriod === "annual" ? tier.annualPrice : tier.monthlyPrice}
                   </span>
-                  <span className="text-muted-foreground ml-1">{tier.period}</span>
+                  <span className="text-muted-foreground ml-1">/mo</span>
                 </div>
-                {'annualPrice' in tier && tier.annualPrice && (
+                {billingPeriod === "annual" && (
                   <p className="text-sm text-muted-foreground mt-1">
-                    {tier.annualPrice}
+                    billed annually at {tier.annualTotal}
                   </p>
                 )}
               </div>
@@ -211,7 +225,7 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               </ul>
               
               <Button 
-                onClick={() => handleSubscribe(tier.key)}
+                onClick={() => handleSubscribe(billingPeriod === "annual" ? tier.key : tier.monthlyKey)}
                 disabled={loading || privateDataLoading || userAge21Plus === false}
                 className={`w-full transform hover:scale-105 transition-all duration-300 disabled:opacity-50 ${
                   tier.colorScheme === 'primary' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' :

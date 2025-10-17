@@ -1,9 +1,13 @@
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Check, Star, Crown } from "lucide-react";
+import { useState } from "react";
 
 const MembershipTiers = () => {
+  const [billingPeriod, setBillingPeriod] = useState<"annual" | "monthly">("annual");
+
   const tiers = [
     {
       name: "Free",
@@ -20,13 +24,14 @@ const MembershipTiers = () => {
       buttonText: "Start Free",
       popular: false,
       icon: <Star className="w-6 h-6" />,
-      colorScheme: "secondary"
+      colorScheme: "secondary",
+      showTabs: false
     },
     {
       name: "Local Player",
-      price: "$49",
-      period: "/mo",
-      annualPrice: "billed annually at $588",
+      annualPrice: "$49",
+      monthlyPrice: "$59",
+      annualTotal: "$588",
       description: "Perfect for casual competitive play",
       features: [
         "Everything in Free",
@@ -39,13 +44,14 @@ const MembershipTiers = () => {
       buttonText: "Start Local Play",
       popular: true,
       icon: <Star className="w-6 h-6" />,
-      colorScheme: "primary"
+      colorScheme: "primary",
+      showTabs: true
     },
     {
       name: "Tournament Pro",
-      price: "$99",
-      period: "/mo",
-      annualPrice: "billed annually at $1,188",
+      annualPrice: "$99",
+      monthlyPrice: "$109",
+      annualTotal: "$1,188",
       description: "For serious competitors who want it all",
       features: [
         "Everything in Local Player",
@@ -60,7 +66,8 @@ const MembershipTiers = () => {
       buttonText: "Join Tournament Circuit",
       popular: false,
       icon: <Crown className="w-6 h-6" />,
-      colorScheme: "warning"
+      colorScheme: "warning",
+      showTabs: true
     }
   ];
 
@@ -109,6 +116,18 @@ const MembershipTiers = () => {
                 </div>
                 <CardTitle className="text-2xl font-bold text-foreground">{tier.name}</CardTitle>
                 <CardDescription className="text-muted-foreground">{tier.description}</CardDescription>
+                
+                {tier.showTabs && (
+                  <div className="mt-4">
+                    <Tabs value={billingPeriod} onValueChange={(value) => setBillingPeriod(value as "annual" | "monthly")} className="w-full">
+                      <TabsList className="grid w-full grid-cols-2">
+                        <TabsTrigger value="annual">Annual</TabsTrigger>
+                        <TabsTrigger value="monthly">Monthly</TabsTrigger>
+                      </TabsList>
+                    </Tabs>
+                  </div>
+                )}
+                
                 <div className="flex flex-col items-center mt-4">
                   <div className="flex items-baseline">
                     <span className={`text-5xl font-bold ${
@@ -116,14 +135,20 @@ const MembershipTiers = () => {
                       tier.colorScheme === 'warning' ? 'text-warning' :
                       'text-muted-foreground'
                     }`}>
-                      {tier.price}
+                      {tier.showTabs 
+                        ? (billingPeriod === "annual" ? tier.annualPrice : tier.monthlyPrice)
+                        : tier.price
+                      }
                     </span>
-                    <span className="text-muted-foreground ml-1">{tier.period}</span>
+                    <span className="text-muted-foreground ml-1">/mo</span>
                   </div>
-                  {'annualPrice' in tier && tier.annualPrice && (
+                  {tier.showTabs && billingPeriod === "annual" && (
                     <p className="text-sm text-muted-foreground mt-2">
-                      {tier.annualPrice}
+                      billed annually at {tier.annualTotal}
                     </p>
+                  )}
+                  {!tier.showTabs && 'period' in tier && (
+                    <span className="text-sm text-muted-foreground mt-2">Forever free</span>
                   )}
                 </div>
               </CardHeader>
