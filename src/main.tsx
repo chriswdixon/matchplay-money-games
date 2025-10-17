@@ -6,6 +6,7 @@ import App from "./App.tsx";
 import "./index.css";
 import { AuthProvider } from "@/hooks/useAuth";
 import { SubscriptionProvider } from "@/hooks/useSubscription";
+import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 
 const queryClient = new QueryClient({
@@ -21,12 +22,14 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <AuthProvider>
-          <SubscriptionProvider>
-            <App />
-            <Toaster />
-          </SubscriptionProvider>
-        </AuthProvider>
+        <ThemeProvider defaultTheme="system" storageKey="matchplay-theme">
+          <AuthProvider>
+            <SubscriptionProvider>
+              <App />
+              <Toaster />
+            </SubscriptionProvider>
+          </AuthProvider>
+        </ThemeProvider>
       </BrowserRouter>
     </QueryClientProvider>
   </StrictMode>

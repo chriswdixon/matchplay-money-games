@@ -2,9 +2,11 @@ import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useMatchScoring } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
-import { Trophy, Crown, Medal, CheckCircle, Clock, Users, DollarSign } from 'lucide-react';
+import { useFreeTier } from '@/hooks/useFreeTier';
+import { Trophy, Crown, Medal, CheckCircle, Clock, Users, DollarSign, Lock } from 'lucide-react';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 
 interface MatchResultsProps {
@@ -15,6 +17,7 @@ interface MatchResultsProps {
 
 export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps) {
   const { user } = useAuth();
+  const { hasAccess } = useFreeTier();
   const {
     playerScores,
     matchResult,
@@ -25,6 +28,8 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
   } = useMatchScoring(matchId);
 
   const [hasConfirmed, setHasConfirmed] = useState(false);
+  
+  const canViewDetails = hasAccess('match_details');
 
   const handleConfirm = async () => {
     const success = await confirmResults();
@@ -82,6 +87,35 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
 
   // If match is finalized, show the full results display
   if (matchResult) {
+    if (!canViewDetails) {
+      return (
+        <div className="max-w-[1400px] mx-auto p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-gradient-primary rounded-lg">
+                <Trophy className="w-5 h-5 text-primary-foreground" />
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold">Match Results</h1>
+                <p className="text-muted-foreground">{matchName}</p>
+              </div>
+            </div>
+            <Button variant="outline" onClick={onClose}>
+              Back to Matches
+            </Button>
+          </div>
+          
+          <Alert>
+            <Lock className="h-4 w-4" />
+            <AlertDescription>
+              <strong>Upgrade Required</strong>
+              <p className="mt-2">Detailed match results are available for Local Player and Tournament Pro members. Upgrade to view complete scorecards, statistics, and payout information.</p>
+            </AlertDescription>
+          </Alert>
+        </div>
+      );
+    }
+    
     return (
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}

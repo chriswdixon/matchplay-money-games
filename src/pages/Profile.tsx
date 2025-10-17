@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { useActiveMatch } from '@/hooks/useActiveMatch';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useFreeTier } from '@/hooks/useFreeTier';
 import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
@@ -20,11 +21,14 @@ export default function Profile() {
   const { hasActiveMatch } = useActiveMatch();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
+  const { hasAccess } = useFreeTier();
   
   const [activeTab, setActiveTab] = useState('profile');
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<string | null>(null);
   const [isVerified, setIsVerified] = useState(false);
+  
+  const showAccountTab = hasAccess('account_tab');
 
   useEffect(() => {
     if (!loading && !user) {
@@ -108,15 +112,17 @@ export default function Profile() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className={isMobile ? "inline-flex w-full overflow-x-auto" : "grid w-full grid-cols-5"}>
+          <TabsList className={isMobile ? "inline-flex w-full overflow-x-auto" : showAccountTab ? "grid w-full grid-cols-5" : "grid w-full grid-cols-4"}>
             <TabsTrigger value="profile" className="gap-2 whitespace-nowrap">
               <User className="w-4 h-4" />
               {!isMobile && "Profile"}
             </TabsTrigger>
-            <TabsTrigger value="account" className="gap-2 whitespace-nowrap">
-              <DollarSign className="w-4 h-4" />
-              {!isMobile && "Account"}
-            </TabsTrigger>
+            {showAccountTab && (
+              <TabsTrigger value="account" className="gap-2 whitespace-nowrap">
+                <DollarSign className="w-4 h-4" />
+                {!isMobile && "Account"}
+              </TabsTrigger>
+            )}
             <TabsTrigger value="settings" className="gap-2 whitespace-nowrap">
               <Settings className="w-4 h-4" />
               {!isMobile && "Settings"}
@@ -135,11 +141,13 @@ export default function Profile() {
             <ProfileDisplay />
           </TabsContent>
 
-          <TabsContent value="account" className="space-y-6">
-            <AccountBalance />
-            <TransactionHistory />
-            <PaymentMethods />
-          </TabsContent>
+          {showAccountTab && (
+            <TabsContent value="account" className="space-y-6">
+              <AccountBalance />
+              <TransactionHistory />
+              <PaymentMethods />
+            </TabsContent>
+          )}
 
           <TabsContent value="settings">
             <ProfileForm />

@@ -7,6 +7,7 @@ import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
+import { useFreeTier } from "@/hooks/useFreeTier";
 import CreateMatchButton from "./CreateMatchButton";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
 import PlayerRatingDialog from "./PlayerRatingDialog";
@@ -25,6 +26,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
+  const { hasAccess } = useFreeTier();
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
@@ -45,12 +47,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
-  // Request location on component mount (only for current matches, not past)
+  // Request location on component mount (only for current matches, not past, and only if user has access)
   useEffect(() => {
-    if (user && !location && !showPastMatches) {
+    if (user && !location && !showPastMatches && hasAccess('gps_matching')) {
       requestLocation();
     }
-  }, [user, location, requestLocation, showPastMatches]);
+  }, [user, location, requestLocation, showPastMatches, hasAccess]);
 
   // Refetch matches when location changes (with debouncing)
   useEffect(() => {
@@ -448,7 +450,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         <CardDescription className="flex items-center gap-2">
                           <MapPin className="w-4 h-4" />
                           {match.location}
-                          {match.distance_km && (
+                          {hasAccess('gps_matching') && match.distance_km && (
                             <span className="text-primary font-medium">
                               • {formatDistance(match.distance_km)}
                             </span>

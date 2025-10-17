@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -15,6 +15,7 @@ import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useFreeTier } from '@/hooks/useFreeTier';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -25,6 +26,7 @@ const CreateMatch = () => {
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { subscribed, tierName } = useSubscription();
+  const { isFree, hasAccess } = useFreeTier();
   const { createMatch } = useMatches();
   const { geocodeAddress } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
@@ -251,7 +253,7 @@ const CreateMatch = () => {
         format: formData.format,
         pin: formData.pin || undefined,
         holes: parseInt(formData.holes),
-        buy_in_amount: (parseInt(formData.buy_in_amount) || 0) * 100,
+        buy_in_amount: !hasAccess('buy_in') ? 0 : (parseInt(formData.buy_in_amount) || 0) * 100,
         handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
         handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
         max_participants: maxParticipants,
@@ -302,11 +304,15 @@ const CreateMatch = () => {
               variant="outline"
               size="sm"
               onClick={handleGPSSearch}
-              disabled={loadingGPS}
+              disabled={loadingGPS || !hasAccess('gps_matching')}
+              title={!hasAccess('gps_matching') ? 'Upgrade to enable GPS matching' : 'Use GPS location'}
             >
               {loadingGPS ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
             </Button>
           </div>
+          {!hasAccess('gps_matching') && (
+            <p className="text-xs text-warning">🔒 Upgrade to Local Player or Tournament Pro for GPS-based matching</p>
+          )}
           <p className="text-xs text-muted-foreground">Search courses within {searchRadius} miles</p>
         </div>
       )}
@@ -571,16 +577,25 @@ const CreateMatch = () => {
   const renderDetailsStep = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="buy_in">Buy-In Amount ($)</Label>
+        <Label htmlFor="buy_in" className="flex items-center gap-2">
+          Buy-In Amount ($)
+          {!hasAccess('buy_in') && <Lock className="w-4 h-4 text-muted-foreground" />}
+        </Label>
         <Input
           id="buy_in"
           type="number"
           min="0"
           max="500"
-          value={formData.buy_in_amount}
+          value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
           onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
+          disabled={!hasAccess('buy_in')}
+          className={!hasAccess('buy_in') ? 'bg-muted cursor-not-allowed' : ''}
         />
-        <p className="text-xs text-muted-foreground">Default: $50 • Max: $500</p>
+        {hasAccess('buy_in') ? (
+          <p className="text-xs text-muted-foreground">Default: $50 • Max: $500</p>
+        ) : (
+          <p className="text-xs text-warning">Upgrade to Local Player or Tournament Pro to enable buy-ins</p>
+        )}
       </div>
 
       <div className="space-y-2">

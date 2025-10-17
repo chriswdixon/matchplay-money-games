@@ -8,6 +8,7 @@ import { Separator } from '@/components/ui/separator';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useProfile } from '@/hooks/useProfile';
 import { useHandicapCalculation } from '@/hooks/useHandicapCalculation';
+import { useFreeTier } from '@/hooks/useFreeTier';
 import { Trophy, Calculator, Lock, Info, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
@@ -15,6 +16,7 @@ import { format } from 'date-fns';
 
 export function HandicapSettings() {
   const { profile, loading, updateProfile } = useProfile();
+  const { isFree, hasAccess } = useFreeTier();
   const { 
     matchCount, 
     loading: matchLoading, 
@@ -40,6 +42,8 @@ export function HandicapSettings() {
   const [courseHandicapInput, setCourseHandicapInput] = useState('');
   const [handicapAllowance, setHandicapAllowance] = useState('100');
   const [playingHandicap, setPlayingHandicap] = useState<number | null>(null);
+  
+  const allowAutoCalculation = hasAccess('handicap_calculation');
 
   useEffect(() => {
     if (profile) {
@@ -48,9 +52,9 @@ export function HandicapSettings() {
     }
   }, [profile]);
 
-  // Auto-calculate handicap when user has 3+ matches
+  // Auto-calculate handicap when user has 3+ matches (only for paid tiers)
   useEffect(() => {
-    if (!canEditHandicap && matchCount >= 3) {
+    if (allowAutoCalculation && !canEditHandicap && matchCount >= 3) {
       const calculated = calculateHandicapIndex();
       if (calculated !== null) {
         setAutoCalculatedHandicap(calculated);
@@ -62,7 +66,7 @@ export function HandicapSettings() {
         }
       }
     }
-  }, [matchCount, canEditHandicap, calculateHandicapIndex, completedMatches]);
+  }, [matchCount, canEditHandicap, calculateHandicapIndex, completedMatches, allowAutoCalculation]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -185,7 +189,12 @@ export function HandicapSettings() {
           <Alert className="mb-6">
             <Info className="h-4 w-4" />
             <AlertDescription className="space-y-2">
-              {matchCount < 3 ? (
+              {!allowAutoCalculation ? (
+                <>
+                  <p className="font-semibold text-warning">Free Tier: Manual Handicap Only</p>
+                  <p>You can manually set your handicap. Upgrade to Local Player or Tournament Pro for automatic handicap calculation based on USGA rules.</p>
+                </>
+              ) : matchCount < 3 ? (
                 <>
                   <p>You have completed <strong>{matchCount}</strong> of 3 matches needed for automatic handicap calculation.</p>
                   <p>You can manually set your handicap until you complete 3 matches.</p>
