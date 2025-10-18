@@ -19,3 +19,4 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.search-golf-courses]
 [functions.export-all-courses]
 [functions.import-golf-courses]
+[functions.create-golf-course]

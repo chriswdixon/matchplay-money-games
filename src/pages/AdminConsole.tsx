@@ -11,6 +11,7 @@ import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
 import { CancellationReviews } from "@/components/admin/CancellationReviews";
 import { InviteManagement } from "@/components/admin/InviteManagement";
 import { GolfDataImport } from "@/components/admin/GolfDataImport";
+import { GolfCourseManagement } from "@/components/admin/GolfCourseManagement";
 
 /**
  * SECURITY NOTE: Admin UI Access Control
@@ -114,7 +115,10 @@ const AdminConsole = () => {
             </TabsContent>
 
             <TabsContent value="golf-data">
-              <GolfDataImport />
+              <div className="space-y-6">
+                <GolfDataImport />
+                <GolfCourseManagement />
+              </div>
             </TabsContent>
         </Tabs>
       </main>

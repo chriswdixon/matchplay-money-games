@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock, Plus } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
+import { CreateCourseDialog } from '@/components/CreateCourseDialog';
 
 const CreateMatch = () => {
   const navigate = useNavigate();
@@ -59,6 +60,8 @@ const CreateMatch = () => {
   const [loadingZipcode, setLoadingZipcode] = useState(false);
   const [loadingGPS, setLoadingGPS] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [createCourseOpen, setCreateCourseOpen] = useState(false);
+  const [customSearchTerm, setCustomSearchTerm] = useState('');
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
@@ -177,9 +180,24 @@ const CreateMatch = () => {
   };
 
   const handleCustomCourse = (courseName: string) => {
+    setCustomSearchTerm(courseName);
     setFormData({ ...formData, course_name: courseName });
     setSelectedCourse(null);
-    searchCoursesByName(courseName);
+    if (courseName.length >= 2) {
+      searchCoursesByName(courseName);
+    }
+  };
+
+  const handleCourseCreated = (newCourse: any) => {
+    const course = {
+      name: newCourse.name,
+      address: newCourse.address,
+      latitude: newCourse.latitude,
+      longitude: newCourse.longitude,
+      website: newCourse.website,
+    };
+    handleCourseSelect(course);
+    toast.success('Course created and selected!');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -352,7 +370,20 @@ const CreateMatch = () => {
                       <span>Loading...</span>
                     </div>
                   ) : (
-                    <p className="py-6 text-center text-sm">No courses found</p>
+                    <div className="py-6 px-4 text-center space-y-3">
+                      <p className="text-sm text-muted-foreground">No courses found</p>
+                      {user && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCreateCourseOpen(true)}
+                          className="w-full"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create New Course
+                        </Button>
+                      )}
+                    </div>
                   )}
                 </CommandEmpty>
                 
@@ -811,6 +842,13 @@ const CreateMatch = () => {
           </div>
         )}
       </form>
+
+      <CreateCourseDialog
+        open={createCourseOpen}
+        onOpenChange={setCreateCourseOpen}
+        onCourseCreated={handleCourseCreated}
+        initialName={customSearchTerm}
+      />
     </div>
   );
 };
