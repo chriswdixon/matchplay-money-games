@@ -495,20 +495,36 @@ export const useMatches = () => {
     };
   }, []);
 
-  // Set up realtime subscription for match updates
+  // Set up realtime subscription for match updates - only for user's matches
   useEffect(() => {
+    if (!user) return;
+
+    // Subscribe to matches where user is creator or participant
     const channel = supabase
-      .channel('matches-changes')
+      .channel(`matches-${user.id}`)
       .on(
         'postgres_changes',
         {
           event: '*',
           schema: 'public',
-          table: 'matches'
+          table: 'matches',
+          filter: `created_by=eq.${user.id}`
         },
         (payload) => {
-          console.log('Match change detected:', payload);
-          // Refresh matches when any change occurs
+          console.log('Match change detected (creator):', payload);
+          setTimeout(() => fetchMatches(), 500);
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'match_participants',
+          filter: `user_id=eq.${user.id}`
+        },
+        (payload) => {
+          console.log('Match participation change:', payload);
           setTimeout(() => fetchMatches(), 500);
         }
       )
@@ -517,7 +533,7 @@ export const useMatches = () => {
     return () => {
       supabase.removeChannel(channel);
     };
-  }, [fetchMatches]);
+  }, [fetchMatches, user]);
 
   // Initial load
   useEffect(() => {
