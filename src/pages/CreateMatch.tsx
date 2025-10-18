@@ -374,32 +374,19 @@ const CreateMatch = () => {
                       <p className="text-sm text-muted-foreground">
                         {customSearchTerm.length < 3 
                           ? "Type at least 3 characters to search"
-                          : "No courses found in database or API"
+                          : "No courses found"
                         }
                       </p>
-                      {customSearchTerm.length >= 3 && (
-                        <>
-                          <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(customSearchTerm + ' golf course')}`, '_blank')}
-                            className="w-full"
-                          >
-                            <ExternalLink className="h-4 w-4 mr-2" />
-                            Search Google
-                          </Button>
-                          {user && (
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setCreateCourseOpen(true)}
-                              className="w-full"
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              Create New Course
-                            </Button>
-                          )}
-                        </>
+                      {user && customSearchTerm.length >= 3 && (
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setCreateCourseOpen(true)}
+                          className="w-full"
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Create New Course
+                        </Button>
                       )}
                     </div>
                   )}
