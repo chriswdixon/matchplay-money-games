@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import heroImage from "@/assets/hero-golf-course.jpg";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
@@ -146,73 +147,87 @@ const MatchPlayLanding = () => {
           onReturnToMatch={handleReturnToMatch}
           hideReturnButton={currentTab === "active-match"}
         />
-        <main className="container flex-1 py-8">
-          <InstallPrompt />
-          <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-            {/* Desktop/Tablet Tabs - Dynamically adjusts based on active match */}
-            <TabsList className={cn(
-              "hidden md:grid w-full max-w-[1400px] mx-auto mb-8",
-              hasActiveMatch ? "grid-cols-5" : "grid-cols-4"
-            )}>
-              {hasActiveMatch && (
-                <TabsTrigger value="active-match" className="flex items-center gap-2">
-                  <Target className="w-4 h-4" />
-                  <span className="hidden lg:inline">Active Match</span>
-                  <span className="lg:hidden">Active</span>
+        <main className="container flex-1 py-8 relative">
+          {/* Background for matches tab */}
+          {currentTab === "matches" && (
+            <div className="fixed inset-0 z-0 pointer-events-none">
+              <img 
+                src={heroImage} 
+                alt="Golf course background"
+                className="w-full h-full object-cover opacity-20"
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-background/60 via-background/80 to-background" />
+            </div>
+          )}
+          
+          <div className="relative z-10">
+            <InstallPrompt />
+            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
+              {/* Desktop/Tablet Tabs - Dynamically adjusts based on active match */}
+              <TabsList className={cn(
+                "hidden md:grid w-full max-w-[1400px] mx-auto mb-8",
+                hasActiveMatch ? "grid-cols-5" : "grid-cols-4"
+              )}>
+                {hasActiveMatch && (
+                  <TabsTrigger value="active-match" className="flex items-center gap-2">
+                    <Target className="w-4 h-4" />
+                    <span className="hidden lg:inline">Active Match</span>
+                    <span className="lg:hidden">Active</span>
+                  </TabsTrigger>
+                )}
+                <TabsTrigger value="matches" className="flex items-center gap-2">
+                  <Search className="w-4 h-4" />
+                  <span className="hidden lg:inline">Find Matches</span>
+                  <span className="lg:hidden">Matches</span>
                 </TabsTrigger>
+                <TabsTrigger value="past" className="flex items-center gap-2">
+                  <History className="w-4 h-4" />
+                  <span className="hidden lg:inline">Past Matches</span>
+                  <span className="lg:hidden">Past</span>
+                </TabsTrigger>
+                <TabsTrigger value="handicap" className="flex items-center gap-2">
+                  <Trophy className="w-4 h-4" />
+                  Handicap
+                </TabsTrigger>
+                <TabsTrigger value="subscription" className="flex items-center gap-2">
+                  <Crown className="w-4 h-4" />
+                  <span className="hidden lg:inline">Subscription</span>
+                  <span className="lg:hidden">Sub</span>
+                </TabsTrigger>
+              </TabsList>
+              
+              {hasActiveMatch && (
+                <TabsContent value="active-match">
+                  <MatchScorecard
+                    matchId={activeMatchId!}
+                    matchName={activeMatchName || 'Active Match'}
+                  />
+                </TabsContent>
               )}
-              <TabsTrigger value="matches" className="flex items-center gap-2">
-                <Search className="w-4 h-4" />
-                <span className="hidden lg:inline">Find Matches</span>
-                <span className="lg:hidden">Matches</span>
-              </TabsTrigger>
-              <TabsTrigger value="past" className="flex items-center gap-2">
-                <History className="w-4 h-4" />
-                <span className="hidden lg:inline">Past Matches</span>
-                <span className="lg:hidden">Past</span>
-              </TabsTrigger>
-              <TabsTrigger value="handicap" className="flex items-center gap-2">
-                <Trophy className="w-4 h-4" />
-                Handicap
-              </TabsTrigger>
-              <TabsTrigger value="subscription" className="flex items-center gap-2">
-                <Crown className="w-4 h-4" />
-                <span className="hidden lg:inline">Subscription</span>
-                <span className="lg:hidden">Sub</span>
-              </TabsTrigger>
-            </TabsList>
-            
-            {hasActiveMatch && (
-              <TabsContent value="active-match">
-                <MatchScorecard
-                  matchId={activeMatchId!}
-                  matchName={activeMatchName || 'Active Match'}
-                />
+              
+              <TabsContent value="matches">
+                <Alert className="mb-6 border-primary/20 bg-background/90 backdrop-blur-sm">
+                  <Scale className="h-4 w-4" />
+                  <AlertDescription className="text-sm">
+                    <strong className="font-semibold">Rules Advisory:</strong> All players are expected to follow USGA rules during matches. Players may agree upon rule modifications before play begins. Adverse or unfair changes to established rules can be grounds for removal from Match Play. Play fairly, play honestly.
+                  </AlertDescription>
+                </Alert>
+                <MatchFinder hideHowItWorks />
               </TabsContent>
-            )}
-            
-            <TabsContent value="matches">
-              <Alert className="mb-6 border-primary/20 bg-primary/5">
-                <Scale className="h-4 w-4" />
-                <AlertDescription className="text-sm">
-                  <strong className="font-semibold">Rules Advisory:</strong> All players are expected to follow USGA rules during matches. Players may agree upon rule modifications before play begins. Adverse or unfair changes to established rules can be grounds for removal from Match Play. Play fairly, play honestly.
-                </AlertDescription>
-              </Alert>
-              <MatchFinder hideHowItWorks />
-            </TabsContent>
-            
-            <TabsContent value="past">
-              <MatchFinder hideHowItWorks showPastMatches />
-            </TabsContent>
-            
-            <TabsContent value="handicap">
-              <HandicapSettings />
-            </TabsContent>
-            
-            <TabsContent value="subscription">
-              <SubscriptionManagement />
-            </TabsContent>
-          </Tabs>
+              
+              <TabsContent value="past">
+                <MatchFinder hideHowItWorks showPastMatches />
+              </TabsContent>
+              
+              <TabsContent value="handicap">
+                <HandicapSettings />
+              </TabsContent>
+              
+              <TabsContent value="subscription">
+                <SubscriptionManagement />
+              </TabsContent>
+            </Tabs>
+          </div>
         </main>
         <AppFooter />
       </div>
