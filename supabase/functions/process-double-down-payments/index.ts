@@ -295,11 +295,61 @@ serve(async (req) => {
   } catch (error: any) {
     logStep('ERROR', { message: error.message });
     
-    // TODO: Implement rollback logic for partial failures
+    // Rollback any successful payments
+    if (processedPayments.length > 0) {
+      logStep('Rolling back payments', { count: processedPayments.length });
+      
+      for (const payment of processedPayments) {
+        try {
+          if (payment.chargedVia === 'stripe' && payment.paymentIntentId) {
+            // Refund Stripe payment
+            await stripe.refunds.create({
+              payment_intent: payment.paymentIntentId,
+              reason: 'requested_by_customer',
+            });
+            logStep('Refunded Stripe payment', { userId: payment.userId });
+          } else {
+            // Restore balance deduction
+            const { data: account } = await supabaseClient
+              .from('player_accounts')
+              .select('id, balance')
+              .eq('user_id', payment.userId)
+              .single();
+            
+            if (account) {
+              await supabaseClient
+                .from('player_accounts')
+                .update({ balance: parseInt(account.balance.toString()) + payment.amount })
+                .eq('id', account.id);
+              logStep('Restored balance', { userId: payment.userId, amount: payment.amount });
+            }
+          }
+          
+          // Remove transaction record
+          await supabaseClient
+            .from('account_transactions')
+            .delete()
+            .eq('user_id', payment.userId)
+            .eq('match_id', matchId)
+            .eq('transaction_type', 'double_down')
+            .eq('stripe_payment_intent_id', payment.paymentIntentId);
+          
+          // Mark as not processed
+          await supabaseClient
+            .from('double_down_participants')
+            .update({ payment_processed: false, payment_intent_id: null })
+            .eq('match_id', matchId)
+            .eq('user_id', payment.userId);
+            
+        } catch (rollbackError: any) {
+          logStep('Rollback failed', { userId: payment.userId, error: rollbackError.message });
+        }
+      }
+    }
     
     return new Response(JSON.stringify({ 
       error: error.message,
-      needsRollback: true
+      rolledBack: processedPayments.length
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,

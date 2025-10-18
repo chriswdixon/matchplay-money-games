@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { Resend } from "npm:resend@2.0.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -9,11 +10,13 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-interface InviteRequest {
-  firstName: string;
-  lastName: string;
-  email: string;
-}
+const inviteRequestSchema = z.object({
+  firstName: z.string().trim().min(1).max(50),
+  lastName: z.string().trim().min(1).max(50),
+  email: z.string().trim().email().max(255),
+});
+
+type InviteRequest = z.infer<typeof inviteRequestSchema>;
 
 const handler = async (req: Request): Promise<Response> => {
   // Handle CORS preflight requests
@@ -22,20 +25,24 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
-    const { firstName, lastName, email }: InviteRequest = await req.json();
-
-    console.log("Invite request received:", { firstName, lastName, email });
-
-    // Validate input
-    if (!firstName || !lastName || !email) {
+    const body = await req.json();
+    
+    // Validate and sanitize input
+    const validationResult = inviteRequestSchema.safeParse(body);
+    
+    if (!validationResult.success) {
+      console.error("Validation failed:", validationResult.error);
       return new Response(
-        JSON.stringify({ error: "Missing required fields" }),
+        JSON.stringify({ error: "Invalid input data" }),
         {
           status: 400,
           headers: { "Content-Type": "application/json", ...corsHeaders },
         }
       );
     }
+
+    const { firstName, lastName, email } = validationResult.data;
+    console.log("Invite request received:", { firstName, lastName, email });
 
     // Send email to support
     const emailResponse = await resend.emails.send({
