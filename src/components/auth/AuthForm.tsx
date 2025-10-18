@@ -11,6 +11,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter, inviteCodeSchema } from '@/lib/validation';
 import { checkPasswordSecurity } from '@/lib/utils';
 import { Alert, AlertDescription } from '@/components/ui/alert';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { MFAEnrollment } from './MFAEnrollment';
 import { MFAVerification } from './MFAVerification';
 import { PaymentMethodSetup } from './PaymentMethodSetup';
@@ -39,6 +40,8 @@ export function AuthForm() {
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
+  const [showRequestInvite, setShowRequestInvite] = useState(false);
+  const [requestInviteLoading, setRequestInviteLoading] = useState(false);
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   const { validateInvite, linkInviteToUser } = useInvites();
@@ -262,6 +265,49 @@ export function AuthForm() {
     setMagicLinkLoading(true);
     await signInWithMagicLink(email);
     setMagicLinkLoading(false);
+  };
+
+  const handleRequestInvite = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setValidationErrors({});
+    
+    if (!firstName || !lastName || !email) {
+      toast({
+        title: "Missing Information",
+        description: "Please fill in all fields to request an invite",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    setRequestInviteLoading(true);
+
+    try {
+      const { error } = await supabase.functions.invoke('request-invite', {
+        body: {
+          firstName,
+          lastName,
+          email,
+        },
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Request Submitted",
+        description: "We'll send you an invite code shortly. Check your email!",
+      });
+      setShowRequestInvite(false);
+    } catch (error: any) {
+      console.error('Error requesting invite:', error);
+      toast({
+        title: "Request Failed",
+        description: error.message || "Failed to submit invite request. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setRequestInviteLoading(false);
+    }
   };
 
   // Show subscription selection after signup
@@ -599,15 +645,25 @@ export function AuthForm() {
                           placeholder="Enter your invite code"
                           value={inviteCode}
                           onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                          required
+                          required={!showRequestInvite}
                           className={validationErrors.inviteCode ? "border-destructive" : ""}
                         />
                         {validationErrors.inviteCode && (
                           <p className="text-sm text-destructive">{validationErrors.inviteCode}</p>
                         )}
-                        <p className="text-xs text-muted-foreground">
-                          Beta invites are required to sign up
-                        </p>
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs text-muted-foreground">
+                            Beta invites are required to sign up
+                          </p>
+                          <Button
+                            type="button"
+                            variant="link"
+                            onClick={() => setShowRequestInvite(true)}
+                            className="p-0 h-auto text-xs"
+                          >
+                            Request an Invite
+                          </Button>
+                        </div>
                       </div>
                     )}
                     <div className="space-y-2">
@@ -651,6 +707,72 @@ export function AuthForm() {
           )}
         </CardContent>
       </Card>
+
+      {/* Request Invite Dialog */}
+      <Dialog open={showRequestInvite} onOpenChange={setShowRequestInvite}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>Request an Invite Code</DialogTitle>
+            <DialogDescription>
+              Fill out your information and we'll send you an invite code via email
+            </DialogDescription>
+          </DialogHeader>
+          <form onSubmit={handleRequestInvite} className="space-y-4">
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label htmlFor="request-firstname">First Name</Label>
+                <Input
+                  id="request-firstname"
+                  type="text"
+                  placeholder="John"
+                  value={firstName}
+                  onChange={(e) => setFirstName(e.target.value)}
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="request-lastname">Last Name</Label>
+                <Input
+                  id="request-lastname"
+                  type="text"
+                  placeholder="Doe"
+                  value={lastName}
+                  onChange={(e) => setLastName(e.target.value)}
+                  required
+                />
+              </div>
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="request-email">Email</Label>
+              <Input
+                id="request-email"
+                type="email"
+                placeholder="your@email.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setShowRequestInvite(false)}
+                className="flex-1"
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={requestInviteLoading}
+                className="flex-1"
+              >
+                {requestInviteLoading ? "Submitting..." : "Submit Request"}
+              </Button>
+            </div>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

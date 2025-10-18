@@ -20,3 +20,5 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.export-all-courses]
 [functions.import-golf-courses]
 [functions.create-golf-course]
+[functions.request-invite]
+verify_jwt = false
