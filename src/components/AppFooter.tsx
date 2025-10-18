@@ -50,7 +50,7 @@ const AppFooter = () => {
           {/* Support */}
           <div className="flex items-center gap-2">
             <Button variant="ghost" size="sm" asChild>
-              <a href="mailto:support@matchplay.com" className="flex items-center gap-2">
+              <a href="mailto:support@match-play.co" className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />
                 Support
               </a>
