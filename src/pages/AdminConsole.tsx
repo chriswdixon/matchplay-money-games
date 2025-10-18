@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database } from "lucide-react";
+import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2 } from "lucide-react";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
@@ -12,6 +12,7 @@ import { CancellationReviews } from "@/components/admin/CancellationReviews";
 import { InviteManagement } from "@/components/admin/InviteManagement";
 import { GolfDataImport } from "@/components/admin/GolfDataImport";
 import { GolfCourseManagement } from "@/components/admin/GolfCourseManagement";
+import { SocialLinksManagement } from "@/components/admin/SocialLinksManagement";
 
 /**
  * SECURITY NOTE: Admin UI Access Control
@@ -59,7 +60,7 @@ const AdminConsole = () => {
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-7 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-8 lg:w-auto">
             <TabsTrigger value="reports" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               Reports
@@ -87,6 +88,10 @@ const AdminConsole = () => {
             <TabsTrigger value="golf-data" className="gap-2">
               <Database className="h-4 w-4" />
               Golf Data
+            </TabsTrigger>
+            <TabsTrigger value="social" className="gap-2">
+              <Share2 className="h-4 w-4" />
+              Social
             </TabsTrigger>
           </TabsList>
 
@@ -119,6 +124,10 @@ const AdminConsole = () => {
                 <GolfDataImport />
                 <GolfCourseManagement />
               </div>
+            </TabsContent>
+
+            <TabsContent value="social">
+              <SocialLinksManagement />
             </TabsContent>
         </Tabs>
       </main>
