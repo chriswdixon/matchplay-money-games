@@ -4,19 +4,17 @@ import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { useIsMobile } from "@/hooks/use-mobile";
 
-export const InstallPrompt = () => {
+interface InstallPromptProps {
+  forceShow?: boolean;
+  onDismiss?: () => void;
+}
+
+export const InstallPrompt = ({ forceShow = false, onDismiss }: InstallPromptProps) => {
   const [isVisible, setIsVisible] = useState(false);
   const [isIOS, setIsIOS] = useState(false);
   const isMobile = useIsMobile();
 
   useEffect(() => {
-    // Check if already dismissed
-    const dismissed = localStorage.getItem("installPromptDismissed");
-    if (dismissed) {
-      setIsVisible(false);
-      return;
-    }
-
     // Check if running in standalone mode (already installed)
     const isStandalone = window.matchMedia("(display-mode: standalone)").matches;
     if (isStandalone) {
@@ -28,15 +26,29 @@ export const InstallPrompt = () => {
     const ios = /iPad|iPhone|iPod/.test(navigator.userAgent);
     setIsIOS(ios);
 
+    // Force show overrides dismissal check
+    if (forceShow && isMobile) {
+      setIsVisible(true);
+      return;
+    }
+
+    // Check if already dismissed (only when not forced)
+    const dismissed = localStorage.getItem("installPromptDismissed");
+    if (dismissed) {
+      setIsVisible(false);
+      return;
+    }
+
     // Show prompt on mobile only
     if (isMobile) {
       setIsVisible(true);
     }
-  }, [isMobile]);
+  }, [isMobile, forceShow]);
 
   const handleDismiss = () => {
     localStorage.setItem("installPromptDismissed", "true");
     setIsVisible(false);
+    onDismiss?.();
   };
 
   if (!isVisible) return null;

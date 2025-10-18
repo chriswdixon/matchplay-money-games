@@ -16,6 +16,7 @@ import { MFAVerification } from './MFAVerification';
 import { PaymentMethodSetup } from './PaymentMethodSetup';
 import { SubscriptionSelection } from './SubscriptionSelection';
 import { useInvites } from '@/hooks/useInvites';
+import { InstallPrompt } from '@/components/InstallPrompt';
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -36,6 +37,7 @@ export function AuthForm() {
   const [needsMFASetup, setNeedsMFASetup] = useState(false);
   const [showSubscriptionSelection, setShowSubscriptionSelection] = useState(false);
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
+  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
@@ -287,6 +289,7 @@ export function AuthForm() {
         <PaymentMethodSetup 
           onComplete={() => {
             setShowPaymentSetup(false);
+            setShowInstallPrompt(true);
             toast({
               title: "Setup Complete",
               description: "Welcome to MatchPlay! You're all set to join matches.",
@@ -294,12 +297,41 @@ export function AuthForm() {
           }}
           onSkip={() => {
             setShowPaymentSetup(false);
+            setShowInstallPrompt(true);
             toast({
               title: "Setup Complete",
               description: "You can add a payment method later in your profile.",
             });
           }}
         />
+      </div>
+    );
+  }
+
+  // Show install prompt after signup completion
+  if (showInstallPrompt) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+        <div className="w-full max-w-md space-y-4">
+          <InstallPrompt 
+            forceShow={true}
+            onDismiss={() => setShowInstallPrompt(false)}
+          />
+          <Card>
+            <CardContent className="pt-6 text-center space-y-4">
+              <h3 className="text-lg font-semibold">You're All Set! 🎉</h3>
+              <p className="text-sm text-muted-foreground">
+                Install MatchPlay on your device for the best experience on the course.
+              </p>
+              <Button 
+                onClick={() => setShowInstallPrompt(false)}
+                className="w-full"
+              >
+                Continue to App
+              </Button>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
