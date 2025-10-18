@@ -281,8 +281,8 @@ export const useGolfCourses = () => {
         return dbResults;
       }
 
-      // Otherwise, supplement with API results
-      console.log('🌐 Querying API for additional courses');
+      // Step 3: Query external API
+      console.log('🌐 Querying external API for additional courses');
       
       const { data, error } = await supabase.functions.invoke('search-golf-courses', {
         body: { 

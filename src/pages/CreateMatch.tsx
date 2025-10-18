@@ -367,26 +367,39 @@ const CreateMatch = () => {
                   {coursesLoading ? (
                     <div className="flex items-center justify-center py-6">
                       <Loader2 className="w-4 h-4 animate-spin mr-2" />
-                      <span>Loading...</span>
+                      <span>Searching all sources...</span>
                     </div>
                   ) : (
                     <div className="py-6 px-4 text-center space-y-3">
                       <p className="text-sm text-muted-foreground">
                         {customSearchTerm.length < 3 
                           ? "Type at least 3 characters to search"
-                          : "No courses found"
+                          : "No courses found in database or API"
                         }
                       </p>
-                      {user && customSearchTerm.length >= 3 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCreateCourseOpen(true)}
-                          className="w-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create New Course
-                        </Button>
+                      {customSearchTerm.length >= 3 && (
+                        <>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(customSearchTerm + ' golf course')}`, '_blank')}
+                            className="w-full"
+                          >
+                            <ExternalLink className="h-4 w-4 mr-2" />
+                            Search Google
+                          </Button>
+                          {user && (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setCreateCourseOpen(true)}
+                              className="w-full"
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              Create New Course
+                            </Button>
+                          )}
+                        </>
                       )}
                     </div>
                   )}
