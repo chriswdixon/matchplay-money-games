@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock, Plus } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock, Plus, Info } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { CreateCourseDialog } from '@/components/CreateCourseDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const CreateMatch = () => {
   const navigate = useNavigate();
@@ -556,10 +557,65 @@ const CreateMatch = () => {
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="Stroke Play">Stroke Play</SelectItem>
-              <SelectItem value="Match Play">Match Play (1v1)</SelectItem>
-              <SelectItem value="Best Ball">Best Ball (2v2)</SelectItem>
-              <SelectItem value="Scramble">Scramble (2v2)</SelectItem>
+              <TooltipProvider>
+                <div className="space-y-1">
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative">
+                        <SelectItem value="Stroke Play" className="pr-8">
+                          Stroke Play
+                        </SelectItem>
+                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p className="text-sm">Traditional golf scoring. Each player counts all strokes. Lowest total score wins.</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative">
+                        <SelectItem value="Match Play" className="pr-8">
+                          Match Play (1v1)
+                        </SelectItem>
+                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p className="text-sm">Head-to-head competition where each player compares their score on each hole. Lowest score wins the hole.</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative">
+                        <SelectItem value="Best Ball" className="pr-8">
+                          Best Ball (2v2)
+                        </SelectItem>
+                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p className="text-sm">Each player plays their own ball. The best score from each team on each hole is used for the team score.</p>
+                    </TooltipContent>
+                  </Tooltip>
+
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <div className="relative">
+                        <SelectItem value="Scramble" className="pr-8">
+                          Scramble (2v2)
+                        </SelectItem>
+                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+                      </div>
+                    </TooltipTrigger>
+                    <TooltipContent side="right" className="max-w-xs">
+                      <p className="text-sm">All teammates hit from each spot. After each shot, the team selects the best ball position and all players hit from there.</p>
+                    </TooltipContent>
+                  </Tooltip>
+                </div>
+              </TooltipProvider>
             </SelectContent>
           </Select>
         </div>
