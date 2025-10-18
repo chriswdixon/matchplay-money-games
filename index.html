@@ -2,10 +2,23 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="MatchPlay" />
     <title>MatchPlay - Competitive Golf Reimagined</title>
-    <meta name="description" content="The ultimate platform for competitive golfers. Book money matches, track real handicaps, and get paid instantly. Join the future of golf." />
+    <meta name="description" content="Track golf scores offline on the course. Book money matches, track real handicaps, and get paid instantly." />
     <meta name="author" content="MatchPlay" />
+    
+    <!-- PWA Theme Colors -->
+    <meta name="theme-color" content="#0F172A" />
+    <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#0F172A" />
+    <meta name="theme-color" media="(prefers-color-scheme: light)" content="#0F172A" />
+    
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+    <link rel="mask-icon" href="/pwa-192x192.png" color="#0F172A" />
     
     <!-- Security Headers -->
     <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https: blob:; font-src 'self' data:; connect-src 'self' https://rgdegvpfnilzkqpexgij.supabase.co wss://rgdegvpfnilzkqpexgij.supabase.co https://nominatim.openstreetmap.org https://geocode.xyz https://geocoding.geo.census.gov https://overpass-api.de; media-src 'self'; object-src 'none'; frame-src 'none'; base-uri 'self'; form-action 'self';" />

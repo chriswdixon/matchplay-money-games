@@ -3,6 +3,9 @@ import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
 import { mapDatabaseError } from '@/lib/errorHandling';
+import { saveScoreOffline, getAllOfflineScores } from '@/lib/offlineDb';
+import { syncOfflineScores } from '@/lib/scoreSync';
+import { useOnlineStatus } from '@/hooks/useOnlineStatus';
 
 export interface MatchScore {
   id: string;
@@ -75,6 +78,23 @@ export function useMatchScoring(matchId: string) {
   const [saving, setSaving] = useState(false);
   const { user } = useAuth();
   const { toast } = useToast();
+  const isOnline = useOnlineStatus();
+
+  // Sync offline scores when coming back online
+  useEffect(() => {
+    if (isOnline && matchId && user) {
+      const syncScores = async () => {
+        try {
+          await syncOfflineScores(matchId);
+          // Refresh data after sync
+          await fetchMatchData();
+        } catch (error) {
+          console.error('Error syncing offline scores:', error);
+        }
+      };
+      syncScores();
+    }
+  }, [isOnline, matchId, user]);
 
   // Fetch match scores and results
   const fetchMatchData = async () => {
@@ -383,28 +403,41 @@ export function useMatchScoring(matchId: string) {
         });
       });
 
-      // Then save to database
-      const { error } = await supabase
-        .from('match_scores')
-        .upsert({
-          match_id: matchId,
-          player_id: user.id,
-          hole_number: holeNumber,
-          strokes: strokes
-        }, {
-          onConflict: 'match_id,player_id,hole_number'
-        });
+      // Save offline first (always)
+      await saveScoreOffline(matchId, user.id, holeNumber, strokes);
+      console.log('💾 Score saved offline');
 
-      if (error) {
-        // Revert optimistic update on error
-        await fetchMatchData();
-        const safeMessage = mapDatabaseError(error);
+      // If online, try to sync immediately
+      if (isOnline) {
+        const { error } = await supabase
+          .from('match_scores')
+          .upsert({
+            match_id: matchId,
+            player_id: user.id,
+            hole_number: holeNumber,
+            strokes: strokes
+          }, {
+            onConflict: 'match_id,player_id,hole_number'
+          });
+
+        if (error) {
+          // Revert optimistic update on error
+          await fetchMatchData();
+          const safeMessage = mapDatabaseError(error);
+          toast({
+            title: "Failed to update score",
+            description: safeMessage + " Score saved offline.",
+            variant: "destructive",
+          });
+          return false;
+        }
+        console.log('✅ Score synced to server');
+      } else {
+        // Offline - score already saved to IndexedDB
         toast({
-          title: "Failed to update score",
-          description: safeMessage,
-          variant: "destructive",
+          title: "Score saved offline",
+          description: "Your score will sync when you're back online.",
         });
-        return false;
       }
 
       return true;
@@ -429,6 +462,16 @@ export function useMatchScoring(matchId: string) {
       toast({
         title: "Authentication required",
         description: "You must be logged in to finalize results",
+        variant: "destructive",
+      });
+      return false;
+    }
+
+    // Block finalization when offline
+    if (!isOnline) {
+      toast({
+        title: "Cannot finalize offline",
+        description: "You must be online to finalize match results. Your scores are saved and will sync when you reconnect.",
         variant: "destructive",
       });
       return false;
