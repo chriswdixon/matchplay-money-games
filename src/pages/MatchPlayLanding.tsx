@@ -12,7 +12,7 @@ import { InstallPrompt } from "@/components/InstallPrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun, Scale } from "lucide-react";
+import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
@@ -22,7 +22,6 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
-import { Alert, AlertDescription } from "@/components/ui/alert";
 import heroImage from "@/assets/hero-golf-course.jpg";
 
 const MatchPlayLanding = () => {
@@ -208,12 +207,6 @@ const MatchPlayLanding = () => {
               )}
               
               <TabsContent value="matches">
-                <Alert className="mb-6 border-primary/20 bg-background/90 backdrop-blur-sm">
-                  <Scale className="h-4 w-4" />
-                  <AlertDescription className="text-sm">
-                    <strong className="font-semibold">Rules Advisory:</strong> All players are expected to follow USGA rules during matches. Players may agree upon rule modifications before play begins. Adverse or unfair changes to established rules can be grounds for removal from Match Play. Play fairly, play honestly.
-                  </AlertDescription>
-                </Alert>
                 <MatchFinder hideHowItWorks />
               </TabsContent>
               
@@ -259,14 +252,6 @@ const MatchPlayLanding = () => {
       
       {/* Match Finder Section */}
       <div id="matches-section">
-        <div className="container py-8">
-          <Alert className="mb-6 border-primary/20 bg-primary/5 max-w-4xl mx-auto">
-            <Scale className="h-4 w-4" />
-            <AlertDescription className="text-sm">
-              <strong className="font-semibold">Rules Advisory:</strong> All players are expected to follow USGA rules during matches. Players may agree upon rule modifications before play begins. Adverse or unfair changes to established rules can be grounds for removal from Match Play. Play fairly, play honestly.
-            </AlertDescription>
-          </Alert>
-        </div>
         <MatchFinder />
       </div>
       
