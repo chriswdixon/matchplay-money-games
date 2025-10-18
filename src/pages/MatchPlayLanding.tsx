@@ -109,6 +109,8 @@ const MatchPlayLanding = () => {
     return items;
   }, [hasActiveMatch]);
 
+  const isLightMode = theme === "light";
+
   // Check if user has an active match
   const activeMatch = useMemo(() => {
     if (!user) return null;
@@ -148,8 +150,8 @@ const MatchPlayLanding = () => {
           hideReturnButton={currentTab === "active-match"}
         />
         <main className="container flex-1 py-8 relative">
-          {/* Background for matches tab */}
-          {currentTab === "matches" && (
+          {/* Background for logged-in users in light mode */}
+          {isLightMode && (
             <div className="fixed inset-0 z-0 pointer-events-none">
               <img 
                 src={heroImage} 
