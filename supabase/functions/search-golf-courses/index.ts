@@ -78,7 +78,7 @@ serve(async (req) => {
     console.log('[SEARCH-GOLF-COURSES] API response:', data);
 
     // Map the API response to our GolfCourse format
-    const courses: GolfCourse[] = (data.courses || []).map((course: GolfCourseAPIResponse) => {
+    let courses: GolfCourse[] = (data.courses || []).map((course: GolfCourseAPIResponse) => {
       // Build address string
       const addressParts = [
         course.address,
@@ -108,12 +108,33 @@ serve(async (req) => {
       return mappedCourse;
     });
 
+    // Also query OpenStreetMap for additional open data
+    try {
+      console.log('[SEARCH-GOLF-COURSES] Querying OpenStreetMap...');
+      const osmCourses = await queryOpenStreetMap(type, lat, lon, radius, name);
+      console.log('[SEARCH-GOLF-COURSES] OpenStreetMap returned', osmCourses.length, 'courses');
+      
+      // Merge OSM results, avoiding duplicates
+      osmCourses.forEach(osmCourse => {
+        const isDuplicate = courses.some(existing => 
+          existing.name.toLowerCase().includes(osmCourse.name.toLowerCase()) ||
+          osmCourse.name.toLowerCase().includes(existing.name.toLowerCase())
+        );
+        if (!isDuplicate) {
+          courses.push(osmCourse);
+        }
+      });
+    } catch (osmError) {
+      console.log('[SEARCH-GOLF-COURSES] OpenStreetMap query failed:', osmError.message);
+      // Continue without OSM data
+    }
+
     // Sort by distance if it's a nearby search
     if (type === 'nearby') {
       courses.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     }
 
-    console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'courses');
+    console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'total courses');
 
     return new Response(
       JSON.stringify({ courses }),
@@ -162,4 +183,71 @@ function calculateDistance(
 
 function toRad(degrees: number): number {
   return degrees * (Math.PI / 180);
+}
+
+// Query OpenStreetMap Nominatim API for golf courses
+async function queryOpenStreetMap(
+  type: string,
+  lat?: number,
+  lon?: number,
+  radius?: number,
+  name?: string
+): Promise<GolfCourse[]> {
+  let osmUrl: string;
+  
+  if (type === 'nearby' && lat && lon) {
+    // Search by coordinates using viewbox
+    const radiusDegrees = (radius || 30) / 69; // Approximate miles to degrees
+    const south = lat - radiusDegrees;
+    const west = lon - radiusDegrees;
+    const north = lat + radiusDegrees;
+    const east = lon + radiusDegrees;
+    
+    osmUrl = `https://nominatim.openstreetmap.org/search?` +
+      `q=golf+course&` +
+      `viewbox=${west},${south},${east},${north}&` +
+      `bounded=1&` +
+      `format=json&` +
+      `limit=20`;
+  } else if (type === 'name' && name) {
+    // Search by name
+    osmUrl = `https://nominatim.openstreetmap.org/search?` +
+      `q=${encodeURIComponent(name)}+golf+course&` +
+      `format=json&` +
+      `limit=10`;
+  } else {
+    return [];
+  }
+
+  const response = await fetch(osmUrl, {
+    headers: {
+      'User-Agent': 'MatchPlay-Golf-App/1.0'
+    }
+  });
+
+  if (!response.ok) {
+    throw new Error(`OpenStreetMap API error: ${response.status}`);
+  }
+
+  const data = await response.json();
+  
+  return data.map((place: any) => {
+    const course: GolfCourse = {
+      name: place.display_name.split(',')[0] || place.name || 'Golf Course',
+      address: place.display_name || 'Address not available',
+      latitude: parseFloat(place.lat),
+      longitude: parseFloat(place.lon),
+    };
+
+    // Calculate distance for nearby searches
+    if (type === 'nearby' && lat && lon) {
+      course.distance = calculateDistance(lat, lon, course.latitude!, course.longitude!);
+    }
+
+    return course;
+  }).filter((course: GolfCourse) => 
+    course.latitude !== undefined && 
+    course.longitude !== undefined &&
+    course.name.toLowerCase().includes('golf')
+  );
 }
