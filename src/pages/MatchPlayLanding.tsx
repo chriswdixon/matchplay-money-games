@@ -156,7 +156,7 @@ const MatchPlayLanding = () => {
               <img 
                 src={heroImage} 
                 alt="Golf course background"
-                className="w-full h-full object-cover opacity-30"
+                className="w-full h-full object-cover opacity-45"
               />
               <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
             </div>
