@@ -18,3 +18,4 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.process-double-down-payments]
 [functions.search-golf-courses]
 [functions.export-all-courses]
+[functions.import-golf-courses]

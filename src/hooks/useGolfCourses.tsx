@@ -41,6 +41,41 @@ export const useGolfCourses = () => {
       setLoading(true);
       console.log('🔍 Searching for golf courses near:', { latitude, longitude, radius });
       
+      // First, query our database
+      const { data: dbCourses, error: dbError } = await supabase
+        .from('golf_courses')
+        .select('*')
+        .not('latitude', 'is', null)
+        .not('longitude', 'is', null);
+
+      if (dbError) {
+        console.error('❌ Database error:', dbError);
+      }
+
+      // Calculate distances for database courses
+      const coursesWithDistance = (dbCourses || []).map(course => ({
+        name: course.name,
+        address: course.address || '',
+        latitude: course.latitude!,
+        longitude: course.longitude!,
+        distance: calculateDistance(latitude, longitude, course.latitude!, course.longitude!),
+        website: course.website || undefined,
+      })).filter(course => course.distance <= radius)
+        .sort((a, b) => a.distance - b.distance);
+
+      console.log(`🏌️ Found ${coursesWithDistance.length} courses in database within ${radius} miles`);
+
+      // If we have enough database results, use them
+      if (coursesWithDistance.length >= 10) {
+        setCourses(coursesWithDistance);
+        setAllCourses(coursesWithDistance);
+        showToastOnce(`Found ${coursesWithDistance.length} golf courses nearby`, 'success');
+        return coursesWithDistance;
+      }
+
+      // Otherwise, supplement with API results
+      console.log('🌐 Querying API for additional courses');
+      
       const { data, error } = await supabase.functions.invoke('search-golf-courses', {
         body: { 
           type: 'nearby',
@@ -55,46 +90,51 @@ export const useGolfCourses = () => {
         throw error;
       }
 
-      console.log('📊 Golf Course API response:', data);
+      const apiCourses: GolfCourse[] = data.courses || [];
       
-      const foundCourses: GolfCourse[] = data.courses || [];
-      console.log('🏌️ Found courses from API:', foundCourses.length);
+      // Merge database and API results
+      const allCourses: GolfCourse[] = [...coursesWithDistance];
+      apiCourses.forEach((apiCourse: GolfCourse) => {
+        if (!allCourses.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
+          // Calculate distance for API courses
+          const courseWithDistance: GolfCourse = {
+            ...apiCourse,
+            distance: apiCourse.distance || calculateDistance(latitude, longitude, apiCourse.latitude, apiCourse.longitude)
+          };
+          allCourses.push(courseWithDistance);
+        }
+      });
 
-      // Always include popular courses after API results
+      // Add popular courses as final fallback
       const popularCourses = getPopularCourses(latitude, longitude);
-      
-      // Combine API and popular courses
-      const allCourses = [...foundCourses];
       popularCourses.forEach(popular => {
-        if (!allCourses.some(course => course.name === popular.name)) {
+        if (!allCourses.some(c => c.name.toLowerCase() === popular.name.toLowerCase())) {
           allCourses.push(popular);
         }
       });
 
-      console.log('📋 Total courses (API + popular):', allCourses.length);
-
-      if (allCourses.length === 0) {
-        console.warn('⚠️ No courses found at all');
-        showToastOnce('No golf courses found nearby. Try entering a course name manually.', 'warning');
-      } else if (foundCourses.length === 0) {
-        console.log('ℹ️ Only showing popular courses');
-        showToastOnce('Showing popular golf courses. Try searching by name for more options.', 'info');
-      } else {
-        showToastOnce(`Found ${foundCourses.length} golf courses from GolfCourseAPI`, 'success');
-      }
-
+      allCourses.sort((a, b) => (a.distance || 999) - (b.distance || 999));
+      
+      console.log('📋 Total courses:', allCourses.length);
       setCourses(allCourses);
       setAllCourses(allCourses);
+      
+      if (allCourses.length > 0) {
+        showToastOnce(`Found ${allCourses.length} golf courses nearby`, 'success');
+      } else {
+        showToastOnce('No golf courses found nearby. Try entering a course name manually.', 'warning');
+      }
+      
       return allCourses;
     } catch (error: any) {
       console.error('❌ Error fetching golf courses:', error);
       
-      // Always provide fallback popular courses
+      // Fallback to popular courses
       const popularCourses = getPopularCourses(latitude, longitude);
       setCourses(popularCourses);
       setAllCourses(popularCourses);
       
-      showToastOnce('Using popular courses. GolfCourseAPI unavailable.', 'info');
+      showToastOnce('Using popular courses. API unavailable.', 'info');
       
       return popularCourses;
     } finally {
@@ -195,6 +235,36 @@ export const useGolfCourses = () => {
     try {
       console.log('🔍 Searching courses by name:', searchTermInput);
       
+      // First, query our database
+      const { data: dbCourses, error: dbError } = await supabase
+        .from('golf_courses')
+        .select('*')
+        .ilike('name', `%${searchTermInput}%`)
+        .limit(50);
+
+      if (dbError) {
+        console.error('❌ Database search error:', dbError);
+      }
+
+      const dbResults = (dbCourses || []).map(course => ({
+        name: course.name,
+        address: course.address || '',
+        latitude: course.latitude!,
+        longitude: course.longitude!,
+        website: course.website || undefined,
+      }));
+
+      console.log(`🏌️ Found ${dbResults.length} courses in database`);
+
+      // If we have enough database results, use them
+      if (dbResults.length >= 15) {
+        setCourses(dbResults);
+        return dbResults;
+      }
+
+      // Otherwise, supplement with API results
+      console.log('🌐 Querying API for additional courses');
+      
       const { data, error } = await supabase.functions.invoke('search-golf-courses', {
         body: { 
           type: 'name',
@@ -208,8 +278,15 @@ export const useGolfCourses = () => {
         throw error;
       }
 
-      const foundCourses: GolfCourse[] = data.courses || [];
-      console.log('🏌️ Found courses from API:', foundCourses.length);
+      const apiCourses: GolfCourse[] = data.courses || [];
+      
+      // Merge database and API results
+      const allResults: GolfCourse[] = [...dbResults];
+      apiCourses.forEach((apiCourse: GolfCourse) => {
+        if (!allResults.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
+          allResults.push(apiCourse);
+        }
+      });
 
       // Also search local and popular courses for supplementary results
       const lowerSearchTerm = searchTermInput.toLowerCase();
@@ -227,25 +304,22 @@ export const useGolfCourses = () => {
         course.address.toLowerCase().includes(lowerSearchTerm)
       );
 
-      // Combine all results, API first
-      const combinedResults = [...foundCourses];
-      
       // Add local matches that aren't duplicates
       localMatches.forEach(local => {
-        if (!combinedResults.some(course => course.name.toLowerCase() === local.name.toLowerCase())) {
-          combinedResults.push(local);
+        if (!allResults.some(course => course.name.toLowerCase() === local.name.toLowerCase())) {
+          allResults.push(local);
         }
       });
 
       // Add popular matches that aren't duplicates
       popularMatches.forEach(popular => {
-        if (!combinedResults.some(course => course.name.toLowerCase() === popular.name.toLowerCase())) {
-          combinedResults.push(popular);
+        if (!allResults.some(course => course.name.toLowerCase() === popular.name.toLowerCase())) {
+          allResults.push(popular);
         }
       });
 
       // Sort by relevance
-      const sortedResults = combinedResults.sort((a, b) => {
+      const sortedResults = allResults.sort((a, b) => {
         const aExactMatch = a.name.toLowerCase().startsWith(lowerSearchTerm);
         const bExactMatch = b.name.toLowerCase().startsWith(lowerSearchTerm);
         
