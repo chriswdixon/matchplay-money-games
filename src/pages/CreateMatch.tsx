@@ -371,8 +371,13 @@ const CreateMatch = () => {
                     </div>
                   ) : (
                     <div className="py-6 px-4 text-center space-y-3">
-                      <p className="text-sm text-muted-foreground">No courses found</p>
-                      {user && (
+                      <p className="text-sm text-muted-foreground">
+                        {customSearchTerm.length < 3 
+                          ? "Type at least 3 characters to search"
+                          : "No courses found"
+                        }
+                      </p>
+                      {user && customSearchTerm.length >= 3 && (
                         <Button
                           variant="outline"
                           size="sm"

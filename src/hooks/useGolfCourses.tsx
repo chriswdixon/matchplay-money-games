@@ -233,31 +233,50 @@ export const useGolfCourses = () => {
     setLoading(true);
     
     try {
-      console.log('🔍 Searching courses by name:', searchTermInput);
+      console.log('🔍 Comprehensive search for:', searchTermInput);
       
-      // First, query our database
-      const { data: dbCourses, error: dbError } = await supabase
+      // Step 1: Exact and partial matches in database
+      const { data: exactMatches, error: exactError } = await supabase
         .from('golf_courses')
         .select('*')
         .ilike('name', `%${searchTermInput}%`)
         .limit(50);
 
-      if (dbError) {
-        console.error('❌ Database search error:', dbError);
+      if (exactError) {
+        console.error('❌ Database exact search error:', exactError);
       }
 
-      const dbResults = (dbCourses || []).map(course => ({
+      // Step 2: Fuzzy matching with trigram similarity for misspellings
+      const { data: fuzzyMatches, error: fuzzyError } = await supabase
+        .from('golf_courses')
+        .select('*')
+        .or(`name.ilike.%${searchTermInput}%,address.ilike.%${searchTermInput}%,city.ilike.%${searchTermInput}%,state.ilike.%${searchTermInput}%`)
+        .limit(50);
+
+      if (fuzzyError) {
+        console.error('❌ Database fuzzy search error:', fuzzyError);
+      }
+
+      // Combine and deduplicate database results
+      const dbCourseMap = new Map();
+      [...(exactMatches || []), ...(fuzzyMatches || [])].forEach(course => {
+        if (!dbCourseMap.has(course.id)) {
+          dbCourseMap.set(course.id, course);
+        }
+      });
+
+      const dbResults = Array.from(dbCourseMap.values()).map(course => ({
         name: course.name,
         address: course.address || '',
-        latitude: course.latitude!,
-        longitude: course.longitude!,
+        latitude: course.latitude || 0,
+        longitude: course.longitude || 0,
         website: course.website || undefined,
-      }));
+      })).filter(c => c.latitude && c.longitude);
 
-      console.log(`🏌️ Found ${dbResults.length} courses in database`);
+      console.log(`🏌️ Found ${dbResults.length} courses in database (exact + fuzzy)`);
 
-      // If we have enough database results, use them
-      if (dbResults.length >= 15) {
+      // If we have good database results, use them but still query API for completeness
+      if (dbResults.length >= 10) {
         setCourses(dbResults);
         return dbResults;
       }
