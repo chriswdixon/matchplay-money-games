@@ -244,7 +244,8 @@ const MatchPlayLanding = () => {
         <Button 
           variant="ghost" 
           size="icon" 
-          className="bg-background/80 backdrop-blur-sm border border-border"
+          className="bg-background/80 backdrop-blur-sm border border-border min-w-[44px] min-h-[44px] touch-manipulation relative"
+          style={{ WebkitTapHighlightColor: 'transparent' }}
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
           <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
