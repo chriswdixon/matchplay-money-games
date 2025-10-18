@@ -122,7 +122,7 @@ const CreateMatch = () => {
     setFormData({ 
       ...formData, 
       course_name: course.name,
-      booking_url: course.website || ''
+      booking_url: course.website || `https://www.google.com/search?q=${encodeURIComponent(course.name + ' tee time booking')}`
     });
     setLocationCoords({
       latitude: course.latitude,
@@ -473,28 +473,21 @@ const CreateMatch = () => {
         </PopoverContent>
       </Popover>
 
-      {isPaidSubscription && (
+      {isPaidSubscription && formData.booking_url && (
         <div className="space-y-2">
-          <Label htmlFor="booking_url">Tee Time Booking (Optional)</Label>
-          <div className="flex gap-2">
-            <Input
-              id="booking_url"
-              type="url"
-              placeholder="Enter booking URL or leave blank for Google search"
-              value={formData.booking_url}
-              onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
-            />
-            {formData.course_name && (
-              <Button
-                type="button"
-                variant="outline"
-                size="icon"
-                onClick={() => window.open(`https://www.google.com/search?q=${encodeURIComponent(formData.course_name + ' tee time booking')}`, '_blank')}
-              >
-                <ExternalLink className="h-4 w-4" />
-              </Button>
-            )}
-          </div>
+          <Label>Tee Time Booking</Label>
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full justify-start"
+            onClick={() => window.open(formData.booking_url, '_blank')}
+          >
+            <ExternalLink className="h-4 w-4 mr-2" />
+            Book Tee Time
+          </Button>
+          <p className="text-xs text-muted-foreground">
+            Auto-populated from course website
+          </p>
         </div>
       )}
     </div>
@@ -726,16 +719,6 @@ const CreateMatch = () => {
         </p>
       </div>
 
-      <div className="space-y-2">
-        <Label htmlFor="booking_url">Booking URL (Optional)</Label>
-        <Input
-          id="booking_url"
-          type="url"
-          value={formData.booking_url}
-          onChange={(e) => setFormData({ ...formData, booking_url: e.target.value })}
-          placeholder="https://..."
-        />
-      </div>
     </div>
   );
 
