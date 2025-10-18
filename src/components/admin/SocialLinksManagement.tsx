@@ -1,12 +1,12 @@
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { Facebook, Twitter, Instagram, Linkedin, Youtube, Music, Loader2 } from "lucide-react";
+import { Facebook, X, Instagram, Linkedin, Youtube, Music, Loader2 } from "lucide-react";
 
 interface SocialLink {
   id: string;
@@ -18,14 +18,14 @@ interface SocialLink {
 
 const platformIcons = {
   facebook: Facebook,
-  x: Twitter,
+  x: X,
   instagram: Instagram,
   linkedin: Linkedin,
   youtube: Youtube,
   tiktok: Music,
 };
 
-const platformLabels = {
+const platformNames = {
   facebook: "Facebook",
   x: "X (Twitter)",
   instagram: "Instagram",
@@ -41,22 +41,23 @@ export const SocialLinksManagement = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    fetchLinks();
+    fetchSocialLinks();
   }, []);
 
-  const fetchLinks = async () => {
+  const fetchSocialLinks = async () => {
     try {
       const { data, error } = await supabase
-        .from('social_links')
-        .select('*')
-        .order('display_order');
+        .from("social_links")
+        .select("*")
+        .order("display_order");
 
       if (error) throw error;
       setLinks(data || []);
     } catch (error: any) {
+      console.error("Error fetching social links:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to load social links",
         variant: "destructive",
       });
     } finally {
@@ -64,24 +65,18 @@ export const SocialLinksManagement = () => {
     }
   };
 
-  const updateLink = (id: string, field: keyof SocialLink, value: any) => {
-    setLinks(links.map(link => 
-      link.id === id ? { ...link, [field]: value } : link
-    ));
-  };
-
-  const saveLinks = async () => {
+  const handleSave = async () => {
     try {
       setSaving(true);
 
       for (const link of links) {
         const { error } = await supabase
-          .from('social_links')
+          .from("social_links")
           .update({
             url: link.url,
             is_active: link.is_active,
           })
-          .eq('id', link.id);
+          .eq("id", link.id);
 
         if (error) throw error;
       }
@@ -91,9 +86,10 @@ export const SocialLinksManagement = () => {
         description: "Social links updated successfully",
       });
     } catch (error: any) {
+      console.error("Error saving social links:", error);
       toast({
         title: "Error",
-        description: error.message,
+        description: "Failed to save social links",
         variant: "destructive",
       });
     } finally {
@@ -101,11 +97,19 @@ export const SocialLinksManagement = () => {
     }
   };
 
+  const updateLink = (id: string, field: keyof SocialLink, value: any) => {
+    setLinks(links.map(link => 
+      link.id === id ? { ...link, [field]: value } : link
+    ));
+  };
+
   if (loading) {
     return (
       <Card>
-        <CardContent className="flex items-center justify-center py-8">
-          <Loader2 className="h-8 w-8 animate-spin" />
+        <CardContent className="py-8">
+          <div className="flex items-center justify-center">
+            <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+          </div>
         </CardContent>
       </Card>
     );
@@ -116,53 +120,56 @@ export const SocialLinksManagement = () => {
       <CardHeader>
         <CardTitle>Social Media Links</CardTitle>
         <CardDescription>
-          Manage your social media links displayed in the footer
+          Manage social media links displayed in the footer
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         {links.map((link) => {
           const Icon = platformIcons[link.platform as keyof typeof platformIcons];
+          const platformName = platformNames[link.platform as keyof typeof platformNames];
+
           return (
             <div key={link.id} className="space-y-3 p-4 border rounded-lg">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2">
                   <Icon className="h-5 w-5" />
-                  <span className="font-medium">
-                    {platformLabels[link.platform as keyof typeof platformLabels]}
-                  </span>
+                  <h3 className="font-semibold">{platformName}</h3>
                 </div>
                 <div className="flex items-center gap-2">
-                  <Label htmlFor={`active-${link.id}`}>Active</Label>
+                  <Label htmlFor={`${link.platform}-active`} className="text-sm">
+                    Active
+                  </Label>
                   <Switch
-                    id={`active-${link.id}`}
+                    id={`${link.platform}-active`}
                     checked={link.is_active}
                     onCheckedChange={(checked) => 
-                      updateLink(link.id, 'is_active', checked)
+                      updateLink(link.id, "is_active", checked)
                     }
                   />
                 </div>
               </div>
               <div className="space-y-2">
-                <Label htmlFor={`url-${link.id}`}>URL</Label>
+                <Label htmlFor={`${link.platform}-url`}>URL</Label>
                 <Input
-                  id={`url-${link.id}`}
+                  id={`${link.platform}-url`}
                   type="url"
                   value={link.url}
-                  onChange={(e) => updateLink(link.id, 'url', e.target.value)}
-                  placeholder={`https://${link.platform}.com/yourprofile`}
+                  onChange={(e) => updateLink(link.id, "url", e.target.value)}
+                  placeholder={`https://${link.platform}.com/yourpage`}
                 />
               </div>
             </div>
           );
         })}
-        <Button onClick={saveLinks} disabled={saving} className="w-full">
+
+        <Button onClick={handleSave} disabled={saving} className="w-full">
           {saving ? (
             <>
               <Loader2 className="mr-2 h-4 w-4 animate-spin" />
               Saving...
             </>
           ) : (
-            'Save Changes'
+            "Save Changes"
           )}
         </Button>
       </CardContent>
