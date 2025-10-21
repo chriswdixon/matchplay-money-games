@@ -69,6 +69,17 @@ export const SocialLinksManagement = () => {
     try {
       setSaving(true);
 
+      // Debug: Check auth status
+      const { data: { user } } = await supabase.auth.getUser();
+      console.log("Current user:", user);
+      
+      // Debug: Check admin role
+      const { data: roleCheck } = await supabase.rpc('has_role', {
+        _user_id: user?.id,
+        _role: 'admin'
+      });
+      console.log("Has admin role:", roleCheck);
+
       for (const link of links) {
         const { error } = await supabase
           .from("social_links")
