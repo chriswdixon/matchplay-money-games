@@ -7,6 +7,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+// Rate limiting for admin auth operations
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 3;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
+const isRateLimited = (userId: string): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitCache.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitCache.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  userLimit.count++;
+  return false;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -37,6 +59,17 @@ serve(async (req) => {
 
     if (!roleData) throw new Error("Unauthorized: Admin access required");
 
+    // Check rate limit
+    if (isRateLimited(user.id)) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Too many authentication attempts. Please try again later.",
+          code: "RATE_LIMIT_EXCEEDED"
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 429 }
+      );
+    }
+
     // Validate input
     const requestSchema = z.object({
       userEmail: z.string().email('Invalid email format').max(254, 'Email too long')
@@ -61,8 +94,24 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Error in admin-magic-link:", error);
+    
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid email address",
+          code: "VALIDATION_ERROR"
+        }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+    
+    // Sanitize all other errors
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
+      JSON.stringify({ 
+        error: "Unable to process request",
+        code: "OPERATION_FAILED"
+      }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
     );
   }

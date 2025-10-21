@@ -1,5 +1,6 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -9,6 +10,28 @@ const corsHeaders = {
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREDIT-WINNINGS] ${step}${detailsStr}`);
+};
+
+// Rate limiting
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+const isRateLimited = (userId: string): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitCache.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitCache.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  userLimit.count++;
+  return false;
 };
 
 serve(async (req) => {
@@ -34,8 +57,25 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id });
 
-    const { matchId } = await req.json();
-    if (!matchId) throw new Error("Missing matchId");
+    // Check rate limit
+    if (isRateLimited(user.id)) {
+      logStep("Rate limit exceeded", { userId: user.id });
+      return new Response(JSON.stringify({ 
+        error: "Too many requests. Please try again later.",
+        code: "RATE_LIMIT_EXCEEDED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 429,
+      });
+    }
+
+    // Validate input with Zod
+    const requestSchema = z.object({
+      matchId: z.string().uuid({ message: 'Invalid match ID format' })
+    });
+
+    const requestBody = await req.json();
+    const { matchId } = requestSchema.parse(requestBody);
 
     // Get match details
     const { data: match, error: matchError } = await supabaseClient
@@ -177,24 +217,20 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
     
-    // Sanitize error messages for security
-    let safeMessage = "Unable to process winnings";
-    if (errorMessage.includes('not found') || errorMessage.includes('not authenticated')) {
-      safeMessage = "Resource not available";
-    } else if (errorMessage.includes('not completed')) {
-      safeMessage = "Operation not allowed";
-    } else if (errorMessage.includes('already credited')) {
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
       return new Response(JSON.stringify({ 
-        success: true,
-        message: "Winnings already credited"
+        error: "Invalid request data",
+        code: "VALIDATION_ERROR"
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
+        status: 400,
       });
     }
     
+    // Sanitize all error messages - never expose internal details
     return new Response(JSON.stringify({ 
-      error: safeMessage,
+      error: "Unable to process request",
       code: "OPERATION_FAILED"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },

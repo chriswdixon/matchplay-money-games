@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.190.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,28 @@ const corsHeaders = {
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CHARGE-BUYIN] ${step}${detailsStr}`);
+};
+
+// Rate limiting
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 60 * 60 * 1000; // 1 hour
+
+const isRateLimited = (userId: string): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitCache.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitCache.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  userLimit.count++;
+  return false;
 };
 
 serve(async (req) => {
@@ -35,16 +58,29 @@ serve(async (req) => {
     
     logStep("User authenticated", { userId: user.id });
 
+    // Check rate limit
+    if (isRateLimited(user.id)) {
+      logStep("Rate limit exceeded", { userId: user.id });
+      return new Response(JSON.stringify({ 
+        error: "Too many payment attempts. Please try again later.",
+        code: "RATE_LIMIT_EXCEEDED"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 429,
+      });
+    }
+
+    // Validate input with Zod
     const MAX_BUY_IN_CENTS = 50000; // $500 in cents
-    const { matchId, buyInAmount } = await req.json();
-    
-    if (!matchId || !buyInAmount) {
-      throw new Error("Missing matchId or buyInAmount");
-    }
-    
-    if (buyInAmount < 0 || buyInAmount > MAX_BUY_IN_CENTS) {
-      throw new Error(`Buy-in amount must be between $0 and $${MAX_BUY_IN_CENTS / 100}`);
-    }
+    const requestSchema = z.object({
+      matchId: z.string().uuid({ message: 'Invalid match ID format' }),
+      buyInAmount: z.number().int().min(0).max(MAX_BUY_IN_CENTS, { 
+        message: `Buy-in amount must be between $0 and $${MAX_BUY_IN_CENTS / 100}` 
+      })
+    });
+
+    const requestBody = await req.json();
+    const { matchId, buyInAmount } = requestSchema.parse(requestBody);
     
     logStep("Processing buy-in", { matchId, buyInAmount });
 
@@ -242,19 +278,21 @@ serve(async (req) => {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
     
-    // Sanitize error messages for security
-    let safeMessage = "Unable to process payment";
-    if (errorMessage.includes('Insufficient')) {
-      safeMessage = "Insufficient funds";
-    } else if (errorMessage.includes('not found') || errorMessage.includes('not authenticated')) {
-      safeMessage = "Resource not available";
-    } else if (errorMessage.includes('Payment')) {
-      safeMessage = "Payment processing failed";
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify({ 
+        error: "Invalid request data",
+        code: "VALIDATION_ERROR"
+      }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
     }
     
+    // Sanitize all error messages - never expose internal details
     return new Response(JSON.stringify({ 
-      error: safeMessage,
-      code: "PAYMENT_FAILED"
+      error: "Unable to process payment",
+      code: "OPERATION_FAILED"
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,

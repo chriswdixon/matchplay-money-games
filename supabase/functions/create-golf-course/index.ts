@@ -1,9 +1,32 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.57.0';
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+};
+
+// Rate limiting
+const rateLimitCache = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_MAX = 30;
+const RATE_LIMIT_WINDOW_MS = 60 * 1000; // 1 minute
+
+const isRateLimited = (userId: string): boolean => {
+  const now = Date.now();
+  const userLimit = rateLimitCache.get(userId);
+  
+  if (!userLimit || now > userLimit.resetTime) {
+    rateLimitCache.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+  
+  if (userLimit.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+  
+  userLimit.count++;
+  return false;
 };
 
 serve(async (req) => {
@@ -29,36 +52,52 @@ serve(async (req) => {
       throw new Error('Invalid authentication');
     }
 
-    const { name, address, city, state, zip, latitude, longitude, phone, website } = await req.json();
-
-    // Validate required fields
-    if (!name || !address) {
-      throw new Error('Course name and address are required');
+    // Check rate limit
+    if (isRateLimited(user.id)) {
+      console.log('[CREATE-GOLF-COURSE] Rate limit exceeded', { userId: user.id });
+      return new Response(
+        JSON.stringify({ 
+          error: "Too many requests. Please try again later.",
+          code: "RATE_LIMIT_EXCEEDED"
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 429 
+        }
+      );
     }
 
-    // Validate input lengths
-    if (name.length > 200) {
-      throw new Error('Course name must be less than 200 characters');
-    }
-    if (address.length > 500) {
-      throw new Error('Address must be less than 500 characters');
-    }
+    // Validate input with Zod
+    const courseSchema = z.object({
+      name: z.string().trim().min(1, 'Course name is required').max(200, 'Course name too long'),
+      address: z.string().trim().min(1, 'Address is required').max(500, 'Address too long'),
+      city: z.string().trim().max(100).optional(),
+      state: z.string().trim().max(50).optional(),
+      zip: z.string().trim().max(20).optional(),
+      latitude: z.number().min(-90).max(90).optional(),
+      longitude: z.number().min(-180).max(180).optional(),
+      phone: z.string().trim().max(50).optional(),
+      website: z.string().trim().url().max(500).optional().or(z.literal(''))
+    });
 
-    console.log('[CREATE-GOLF-COURSE] Creating course:', name);
+    const requestBody = await req.json();
+    const validatedData = courseSchema.parse(requestBody);
+
+    console.log('[CREATE-GOLF-COURSE] Creating course:', validatedData.name);
 
     // Insert the new course
     const { data: course, error: insertError } = await supabase
       .from('golf_courses')
       .insert({
-        name: name.trim(),
-        address: address.trim(),
-        city: city?.trim() || null,
-        state: state?.trim() || null,
-        zip: zip?.trim() || null,
-        latitude: latitude || null,
-        longitude: longitude || null,
-        phone: phone?.trim() || null,
-        website: website?.trim() || null,
+        name: validatedData.name,
+        address: validatedData.address,
+        city: validatedData.city || null,
+        state: validatedData.state || null,
+        zip: validatedData.zip || null,
+        latitude: validatedData.latitude || null,
+        longitude: validatedData.longitude || null,
+        phone: validatedData.phone || null,
+        website: validatedData.website || null,
       })
       .select()
       .single();
@@ -80,8 +119,27 @@ serve(async (req) => {
 
   } catch (error) {
     console.error('[CREATE-GOLF-COURSE] Error:', error);
+    
+    // Handle Zod validation errors
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ 
+          error: "Invalid course data provided",
+          code: "VALIDATION_ERROR"
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 400 
+        }
+      );
+    }
+    
+    // Sanitize all other errors
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ 
+        error: "Unable to create golf course",
+        code: "OPERATION_FAILED"
+      }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 500 
