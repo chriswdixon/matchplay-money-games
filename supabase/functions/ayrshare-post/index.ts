@@ -31,6 +31,8 @@ const postSchema = z.object({
   platforms: z.array(z.string()).min(1),
   mediaUrls: z.array(z.string().url()).optional(),
   scheduleDate: z.string().optional(),
+  tags: z.array(z.string()).optional(),
+  tempMediaPaths: z.array(z.string()).optional(), // Paths to temp uploaded files
 })
 
 const getProfilesSchema = z.object({
@@ -123,12 +125,39 @@ Deno.serve(async (req) => {
       // Create a post
       const validatedData = postSchema.parse(requestData)
 
+      let postText = validatedData.post
+
+      // Add tags/hashtags if provided
+      if (validatedData.tags && validatedData.tags.length > 0) {
+        const hashtags = validatedData.tags.map(tag => tag.startsWith('#') ? tag : `#${tag}`).join(' ')
+        postText = `${postText}\n\n${hashtags}`
+      }
+
       const ayrsharePayload: any = {
-        post: validatedData.post,
+        post: postText,
         platforms: validatedData.platforms,
       }
 
-      if (validatedData.mediaUrls && validatedData.mediaUrls.length > 0) {
+      // Handle temporary uploaded media
+      if (validatedData.tempMediaPaths && validatedData.tempMediaPaths.length > 0) {
+        const mediaUrls: string[] = []
+        
+        for (const path of validatedData.tempMediaPaths) {
+          // Get public URL for temporary file
+          const { data: urlData } = await supabaseClient
+            .storage
+            .from('temp-social-media')
+            .getPublicUrl(path)
+          
+          if (urlData?.publicUrl) {
+            mediaUrls.push(urlData.publicUrl)
+          }
+        }
+        
+        if (mediaUrls.length > 0) {
+          ayrsharePayload.mediaUrls = mediaUrls
+        }
+      } else if (validatedData.mediaUrls && validatedData.mediaUrls.length > 0) {
         ayrsharePayload.mediaUrls = validatedData.mediaUrls
       }
 
@@ -136,7 +165,12 @@ Deno.serve(async (req) => {
         ayrsharePayload.scheduleDate = validatedData.scheduleDate
       }
 
-      console.log('Posting to Ayrshare:', { platforms: validatedData.platforms, postLength: validatedData.post.length })
+      console.log('Posting to Ayrshare:', { 
+        platforms: validatedData.platforms, 
+        postLength: postText.length,
+        hasMedia: !!ayrsharePayload.mediaUrls,
+        tags: validatedData.tags
+      })
 
       const ayrshareResponse = await fetch('https://app.ayrshare.com/api/post', {
         method: 'POST',
@@ -157,6 +191,22 @@ Deno.serve(async (req) => {
       }
 
       const ayrshareData = await ayrshareResponse.json()
+
+      // Clean up temporary media files after successful post
+      if (validatedData.tempMediaPaths && validatedData.tempMediaPaths.length > 0) {
+        for (const path of validatedData.tempMediaPaths) {
+          try {
+            await supabaseClient
+              .storage
+              .from('temp-social-media')
+              .remove([path])
+            console.log('Cleaned up temp media:', path)
+          } catch (cleanupError) {
+            console.error('Error cleaning up temp media:', cleanupError)
+            // Don't fail the request if cleanup fails
+          }
+        }
+      }
 
       console.log('Ayrshare post successful:', { status: ayrshareData.status })
 

@@ -923,6 +923,10 @@ export type Database = {
         Args: Record<PropertyKey, never>
         Returns: number
       }
+      cleanup_old_temp_media: {
+        Args: Record<PropertyKey, never>
+        Returns: number
+      }
       create_match_join_token: {
         Args: {
           p_expires_in_seconds?: number

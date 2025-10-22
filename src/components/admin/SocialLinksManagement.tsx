@@ -10,8 +10,9 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { useAyrshareProfiles } from "@/hooks/useAyrshareProfiles";
+import { useTempMediaCleanup } from "@/hooks/useTempMediaCleanup";
 import { SocialPlatformUrls } from "./SocialPlatformUrls";
-import { Facebook, X, Instagram, Linkedin, Youtube, Music, Loader2, Send, CheckCircle2, AlertCircle, ExternalLink } from "lucide-react";
+import { Facebook, X, Instagram, Linkedin, Youtube, Music, Loader2, Send, CheckCircle2, AlertCircle, ExternalLink, Upload, XCircle, Hash, Plus } from "lucide-react";
 
 const platformIcons = {
   facebook: Facebook,
@@ -28,8 +29,95 @@ export const SocialLinksManagement = () => {
   const [postContent, setPostContent] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [mediaUrl, setMediaUrl] = useState("");
+  const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+  const [uploadedFilePaths, setUploadedFilePaths] = useState<string[]>([]);
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+  const [uploading, setUploading] = useState(false);
   const [posting, setPosting] = useState(false);
   const { toast } = useToast();
+  
+  // Automatically clean up old temp media files
+  useTempMediaCleanup();
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const files = event.target.files;
+    if (!files || files.length === 0) return;
+
+    const file = files[0];
+    const maxSize = 50 * 1024 * 1024; // 50MB
+
+    if (file.size > maxSize) {
+      toast({
+        title: "Error",
+        description: "File size must be less than 50MB",
+        variant: "destructive",
+      });
+      return;
+    }
+
+    try {
+      setUploading(true);
+      
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("Not authenticated");
+
+      const fileExt = file.name.split('.').pop();
+      const fileName = `${user.id}/${Date.now()}.${fileExt}`;
+
+      const { error: uploadError } = await supabase.storage
+        .from('temp-social-media')
+        .upload(fileName, file);
+
+      if (uploadError) throw uploadError;
+
+      setUploadedFiles([...uploadedFiles, file]);
+      setUploadedFilePaths([...uploadedFilePaths, fileName]);
+
+      toast({
+        title: "Success",
+        description: "Media uploaded successfully",
+      });
+    } catch (error: any) {
+      console.error("Error uploading file:", error);
+      toast({
+        title: "Error",
+        description: "Failed to upload media",
+        variant: "destructive",
+      });
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const removeUploadedFile = async (index: number) => {
+    const pathToRemove = uploadedFilePaths[index];
+    
+    try {
+      await supabase.storage
+        .from('temp-social-media')
+        .remove([pathToRemove]);
+
+      setUploadedFiles(uploadedFiles.filter((_, i) => i !== index));
+      setUploadedFilePaths(uploadedFilePaths.filter((_, i) => i !== index));
+    } catch (error: any) {
+      console.error("Error removing file:", error);
+    }
+  };
+
+  const addTag = () => {
+    if (!tagInput.trim()) return;
+    
+    const tag = tagInput.trim().startsWith('#') ? tagInput.trim() : `#${tagInput.trim()}`;
+    if (!tags.includes(tag)) {
+      setTags([...tags, tag]);
+    }
+    setTagInput("");
+  };
+
+  const removeTag = (tagToRemove: string) => {
+    setTags(tags.filter(tag => tag !== tagToRemove));
+  };
 
   const handlePost = async () => {
     if (!postContent.trim()) {
@@ -57,8 +145,14 @@ export const SocialLinksManagement = () => {
         platforms: selectedPlatforms,
       };
 
-      if (mediaUrl.trim()) {
+      if (uploadedFilePaths.length > 0) {
+        payload.tempMediaPaths = uploadedFilePaths;
+      } else if (mediaUrl.trim()) {
         payload.mediaUrls = [mediaUrl];
+      }
+
+      if (tags.length > 0) {
+        payload.tags = tags;
       }
 
       const { data, error } = await supabase.functions.invoke("ayrshare-post", {
@@ -75,6 +169,9 @@ export const SocialLinksManagement = () => {
       // Clear form and refresh profiles
       setPostContent("");
       setMediaUrl("");
+      setUploadedFiles([]);
+      setUploadedFilePaths([]);
+      setTags([]);
       setSelectedPlatforms([]);
       refetchProfiles();
     } catch (error: any) {
@@ -210,24 +307,154 @@ export const SocialLinksManagement = () => {
                   rows={4}
                   className="resize-none"
                 />
-                <p className="text-xs text-muted-foreground">
-                  {postContent.length} / 5000 characters
-                </p>
+              <p className="text-xs text-muted-foreground">
+                {postContent.length} / 5000 characters
+              </p>
+            </div>
+
+            {/* Media Upload Section */}
+            <div className="space-y-3">
+              <Label>Media (Image/Video)</Label>
+              
+              {/* Upload Button */}
+              {uploadedFiles.length === 0 && (
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    disabled={uploading}
+                    onClick={() => document.getElementById('media-upload')?.click()}
+                  >
+                    {uploading ? (
+                      <>
+                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                        Uploading...
+                      </>
+                    ) : (
+                      <>
+                        <Upload className="mr-2 h-4 w-4" />
+                        Upload Media
+                      </>
+                    )}
+                  </Button>
+                  <input
+                    id="media-upload"
+                    type="file"
+                    accept="image/*,video/*"
+                    className="hidden"
+                    onChange={handleFileUpload}
+                  />
+                </div>
+              )}
+
+              {/* Uploaded Files Preview */}
+              {uploadedFiles.length > 0 && (
+                <div className="space-y-2">
+                  {uploadedFiles.map((file, index) => (
+                    <div key={index} className="flex items-center gap-2 p-3 bg-accent rounded-lg">
+                      <Upload className="h-4 w-4 text-muted-foreground" />
+                      <span className="text-sm flex-1 truncate">{file.name}</span>
+                      <span className="text-xs text-muted-foreground">
+                        {(file.size / 1024 / 1024).toFixed(2)} MB
+                      </span>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => removeUploadedFile(index)}
+                      >
+                        <XCircle className="h-4 w-4" />
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {/* OR Divider */}
+              {uploadedFiles.length === 0 && (
+                <>
+                  <div className="relative">
+                    <div className="absolute inset-0 flex items-center">
+                      <span className="w-full border-t" />
+                    </div>
+                    <div className="relative flex justify-center text-xs uppercase">
+                      <span className="bg-background px-2 text-muted-foreground">Or use URL</span>
+                    </div>
+                  </div>
+
+                  <Input
+                    id="media-url"
+                    type="url"
+                    placeholder="https://example.com/image.jpg"
+                    value={mediaUrl}
+                    onChange={(e) => setMediaUrl(e.target.value)}
+                  />
+                </>
+              )}
+
+              <p className="text-xs text-muted-foreground">
+                {uploadedFiles.length > 0 
+                  ? "Media will be automatically deleted after posting"
+                  : "Upload a file or paste a URL to an image or video (max 50MB)"
+                }
+              </p>
+            </div>
+
+            {/* Tags Section */}
+            <div className="space-y-3">
+              <Label>Tags / Hashtags</Label>
+              
+              <div className="flex gap-2">
+                <div className="relative flex-1">
+                  <Hash className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Add a tag (without #)"
+                    value={tagInput}
+                    onChange={(e) => setTagInput(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                        addTag();
+                      }
+                    }}
+                    className="pl-10"
+                  />
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={addTag}
+                  disabled={!tagInput.trim()}
+                >
+                  <Plus className="h-4 w-4" />
+                </Button>
               </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="media-url">Media URL (Optional)</Label>
-                <Input
-                  id="media-url"
-                  type="url"
-                  placeholder="https://example.com/image.jpg"
-                  value={mediaUrl}
-                  onChange={(e) => setMediaUrl(e.target.value)}
-                />
-                <p className="text-xs text-muted-foreground">
-                  Add an image or video URL to include in your post
-                </p>
-              </div>
+              {tags.length > 0 && (
+                <div className="flex flex-wrap gap-2">
+                  {tags.map((tag, index) => (
+                    <div
+                      key={index}
+                      className="flex items-center gap-1 px-3 py-1 bg-primary/10 text-primary rounded-full text-sm"
+                    >
+                      <span>{tag}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="hover:bg-primary/20 rounded-full p-0.5"
+                      >
+                        <XCircle className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <p className="text-xs text-muted-foreground">
+                Press Enter or click + to add tags. They'll be automatically formatted with #
+              </p>
+            </div>
 
               <div className="space-y-3">
                 <Label>Select Platforms</Label>
@@ -262,24 +489,29 @@ export const SocialLinksManagement = () => {
                 )}
               </div>
 
-              <Button
-                onClick={handlePost}
-                disabled={posting || !postContent.trim() || selectedPlatforms.length === 0}
-                className="w-full"
-                size="lg"
-              >
-                {posting ? (
-                  <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Publishing...
-                  </>
-                ) : (
-                  <>
-                    <Send className="mr-2 h-4 w-4" />
-                    Publish to {selectedPlatforms.length} Platform{selectedPlatforms.length !== 1 ? 's' : ''}
-                  </>
-                )}
-              </Button>
+            <Button
+              onClick={handlePost}
+              disabled={
+                posting || 
+                !postContent.trim() || 
+                selectedPlatforms.length === 0 ||
+                uploading
+              }
+              className="w-full"
+              size="lg"
+            >
+              {posting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  Publishing...
+                </>
+              ) : (
+                <>
+                  <Send className="mr-2 h-4 w-4" />
+                  Publish to {selectedPlatforms.length} Platform{selectedPlatforms.length !== 1 ? 's' : ''}
+                </>
+              )}
+            </Button>
             </div>
           </CardContent>
         </Card>
