@@ -1,55 +1,35 @@
-import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Mail, Facebook, X, Instagram, Linkedin, Youtube, Music } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
 import { useAyrshareProfiles } from "@/hooks/useAyrshareProfiles";
-
-interface SocialLink {
-  platform: string;
-  url: string;
-  is_active: boolean;
-}
 
 const platformIcons = {
   facebook: Facebook,
   x: X,
+  twitter: X,
   instagram: Instagram,
   linkedin: Linkedin,
   youtube: Youtube,
   tiktok: Music,
 };
 
+const defaultUrls: Record<string, string> = {
+  facebook: "https://facebook.com/matchplay",
+  x: "https://x.com/matchplay",
+  twitter: "https://twitter.com/matchplay",
+  instagram: "https://instagram.com/matchplay",
+  linkedin: "https://linkedin.com/company/matchplay",
+  youtube: "https://youtube.com/@matchplay",
+  tiktok: "https://tiktok.com/@matchplay",
+};
+
 const AppFooter = () => {
   const currentYear = new Date().getFullYear();
-  const [socialLinks, setSocialLinks] = useState<SocialLink[]>([]);
-  const { connectedPlatforms, loading: loadingAyrshare } = useAyrshareProfiles();
-  const [filteredLinks, setFilteredLinks] = useState<SocialLink[]>([]);
-
-  useEffect(() => {
-    fetchSocialLinks();
-  }, []);
-
-  useEffect(() => {
-    // Filter social links to only show platforms connected in Ayrshare
-    if (!loadingAyrshare && socialLinks.length > 0) {
-      const filtered = socialLinks.filter((link) =>
-        connectedPlatforms.includes(link.platform.toLowerCase())
-      );
-      setFilteredLinks(filtered);
-    }
-  }, [socialLinks, connectedPlatforms, loadingAyrshare]);
-
-  const fetchSocialLinks = async () => {
-    const { data } = await supabase
-      .from('social_links')
-      .select('platform, url, is_active')
-      .eq('is_active', true)
-      .order('display_order');
-    
-    if (data) {
-      setSocialLinks(data);
-    }
-  };
+  const { connectedPlatforms, loading } = useAyrshareProfiles();
+  
+  // Load platform URLs from localStorage, fallback to defaults
+  const platformUrls: Record<string, string> = JSON.parse(
+    localStorage.getItem("platformUrls") || JSON.stringify(defaultUrls)
+  );
 
   return (
     <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-8">
@@ -70,19 +50,22 @@ const AppFooter = () => {
             </Button>
           </div>
 
-          {/* Social Links */}
+          {/* Social Links - Connected via Ayrshare */}
           <div className="flex items-center gap-2">
-            {filteredLinks.map((link) => {
-              const Icon = platformIcons[link.platform as keyof typeof platformIcons];
-              if (!Icon) return null;
+            {!loading && connectedPlatforms.map((platform) => {
+              const platformLower = platform.toLowerCase();
+              const Icon = platformIcons[platformLower as keyof typeof platformIcons];
+              const url = platformUrls[platformLower];
+              
+              if (!Icon || !url) return null;
               
               return (
-                <Button key={link.platform} variant="ghost" size="icon" asChild>
+                <Button key={platform} variant="ghost" size="icon" asChild>
                   <a 
-                    href={link.url} 
+                    href={url} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    aria-label={link.platform}
+                    aria-label={platform}
                   >
                     <Icon className="w-4 h-4" />
                   </a>
