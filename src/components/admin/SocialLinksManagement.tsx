@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { useAyrshareProfiles } from "@/hooks/useAyrshareProfiles";
 import { Facebook, X, Instagram, Linkedin, Youtube, Music, Loader2, Send, CheckCircle2 } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 
@@ -41,8 +42,7 @@ export const SocialLinksManagement = () => {
   const [links, setLinks] = useState<SocialLink[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [connectedPlatforms, setConnectedPlatforms] = useState<string[]>([]);
-  const [loadingProfiles, setLoadingProfiles] = useState(false);
+  const { connectedPlatforms, loading: loadingProfiles, refetch: refetchProfiles } = useAyrshareProfiles();
   const [postContent, setPostContent] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
   const [mediaUrl, setMediaUrl] = useState("");
@@ -51,7 +51,6 @@ export const SocialLinksManagement = () => {
 
   useEffect(() => {
     fetchSocialLinks();
-    fetchConnectedProfiles();
   }, []);
 
   const fetchSocialLinks = async () => {
@@ -72,25 +71,6 @@ export const SocialLinksManagement = () => {
       });
     } finally {
       setLoading(false);
-    }
-  };
-
-  const fetchConnectedProfiles = async () => {
-    try {
-      setLoadingProfiles(true);
-      const { data, error } = await supabase.functions.invoke("ayrshare-post", {
-        body: { action: "get_profiles" },
-      });
-
-      if (error) throw error;
-
-      if (data?.data?.activeSocialAccounts) {
-        setConnectedPlatforms(data.data.activeSocialAccounts);
-      }
-    } catch (error: any) {
-      console.error("Error fetching Ayrshare profiles:", error);
-    } finally {
-      setLoadingProfiles(false);
     }
   };
 
@@ -167,10 +147,11 @@ export const SocialLinksManagement = () => {
         description: "Post published successfully to selected platforms!",
       });
 
-      // Clear form
+      // Clear form and refresh profiles
       setPostContent("");
       setMediaUrl("");
       setSelectedPlatforms([]);
+      refetchProfiles();
     } catch (error: any) {
       console.error("Error posting to Ayrshare:", error);
       toast({
@@ -294,14 +275,15 @@ export const SocialLinksManagement = () => {
                 </div>
               ) : connectedPlatforms.length > 0 ? (
                 connectedPlatforms.map((platform) => {
-                  const Icon = platformIcons[platform.toLowerCase() as keyof typeof platformIcons] || Send;
+                  const platformLower = platform.toLowerCase();
+                  const Icon = platformIcons[platformLower as keyof typeof platformIcons] || Send;
                   return (
                     <div
                       key={platform}
                       className="flex items-center gap-1.5 px-3 py-1.5 bg-primary/10 text-primary rounded-full text-sm"
                     >
                       <Icon className="h-3.5 w-3.5" />
-                      <span>{platform}</span>
+                      <span className="capitalize">{platform}</span>
                       <CheckCircle2 className="h-3.5 w-3.5" />
                     </div>
                   );
@@ -351,14 +333,15 @@ export const SocialLinksManagement = () => {
               <Label>Select Platforms</Label>
               <div className="flex flex-wrap gap-2">
                 {connectedPlatforms.map((platform) => {
-                  const Icon = platformIcons[platform.toLowerCase() as keyof typeof platformIcons] || Send;
-                  const isSelected = selectedPlatforms.includes(platform.toLowerCase());
+                  const platformLower = platform.toLowerCase();
+                  const Icon = platformIcons[platformLower as keyof typeof platformIcons] || Send;
+                  const isSelected = selectedPlatforms.includes(platformLower);
                   
                   return (
                     <button
                       key={platform}
                       type="button"
-                      onClick={() => togglePlatform(platform.toLowerCase())}
+                      onClick={() => togglePlatform(platformLower)}
                       className={`flex items-center gap-2 px-4 py-2 rounded-lg border transition-colors ${
                         isSelected
                           ? "bg-primary text-primary-foreground border-primary"
@@ -367,7 +350,7 @@ export const SocialLinksManagement = () => {
                     >
                       <Checkbox checked={isSelected} className="pointer-events-none" />
                       <Icon className="h-4 w-4" />
-                      <span className="text-sm font-medium">{platform}</span>
+                      <span className="text-sm font-medium capitalize">{platform}</span>
                     </button>
                   );
                 })}
