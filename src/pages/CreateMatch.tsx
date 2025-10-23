@@ -16,12 +16,16 @@ import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFreeTier } from '@/hooks/useFreeTier';
+import { useAIGolfCourses } from '@/hooks/useAIGolfCourses';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { CreateCourseDialog } from '@/components/CreateCourseDialog';
+import { SmartCourseSearch } from '@/components/SmartCourseSearch';
+import { CourseRecommendations } from '@/components/CourseRecommendations';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { Badge } from '@/components/ui/badge';
 
 const CreateMatch = () => {
   const navigate = useNavigate();
@@ -33,6 +37,7 @@ const CreateMatch = () => {
   const { geocodeAddress } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
+  const { loading: aiLoading, smartSearch } = useAIGolfCourses();
 
   const isPaidSubscription = subscribed && tierName !== 'free';
 
@@ -297,6 +302,18 @@ const CreateMatch = () => {
   const renderCourseStep = () => (
     <div className="space-y-3">
       <Label>Golf Course *</Label>
+      
+      {/* AI Smart Search */}
+      {isPaidSubscription && (
+        <SmartCourseSearch 
+          onResults={(results) => {
+            // Smart search already updates the courses list via the hook
+            if (results.length > 0) {
+              setCourseOpen(true);
+            }
+          }}
+        />
+      )}
           
       {isPaidSubscription && (
         <div className="space-y-2">
@@ -453,6 +470,27 @@ const CreateMatch = () => {
                           {course.address}
                           {course.distance && ` • ${formatDistance(course.distance)}`}
                         </div>
+                        {/* AI-Enhanced Course Info */}
+                        {(course.difficulty_level || course.course_style || course.ai_rating) && (
+                          <div className="flex flex-wrap gap-1 mt-1">
+                            {course.ai_rating && (
+                              <Badge variant="secondary" className="text-xs">
+                                <Star className="h-2 w-2 mr-1 fill-current" />
+                                {course.ai_rating.toFixed(1)}
+                              </Badge>
+                            )}
+                            {course.difficulty_level && (
+                              <Badge variant="outline" className="text-xs">
+                                {course.difficulty_level}
+                              </Badge>
+                            )}
+                            {course.course_style && (
+                              <Badge variant="outline" className="text-xs">
+                                {course.course_style}
+                              </Badge>
+                            )}
+                          </div>
+                        )}
                       </div>
                       {user && (
                         <Star
@@ -473,6 +511,13 @@ const CreateMatch = () => {
           </Command>
         </PopoverContent>
       </Popover>
+
+      {/* AI Course Recommendations */}
+      {isPaidSubscription && user && (
+        <div className="pt-2">
+          <CourseRecommendations />
+        </div>
+      )}
 
       {isPaidSubscription && formData.booking_url && (
         <div className="space-y-2">

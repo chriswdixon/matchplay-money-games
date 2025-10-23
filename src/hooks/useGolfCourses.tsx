@@ -9,6 +9,15 @@ export interface GolfCourse {
   longitude: number;
   distance?: number;
   website?: string;
+  // AI-enhanced fields
+  description?: string;
+  amenities?: string[];
+  difficulty_level?: string;
+  course_style?: string;
+  ai_rating?: number;
+  features?: string[];
+  ai_enriched?: boolean;
+  search_keywords?: string;
 }
 
 export const useGolfCourses = () => {
