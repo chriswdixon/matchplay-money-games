@@ -919,14 +919,8 @@ export type Database = {
         Args: { player_user_id: string }
         Returns: number
       }
-      cleanup_expired_join_tokens: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
-      cleanup_old_temp_media: {
-        Args: Record<PropertyKey, never>
-        Returns: number
-      }
+      cleanup_expired_join_tokens: { Args: never; Returns: number }
+      cleanup_old_temp_media: { Args: never; Returns: number }
       create_match_join_token: {
         Args: {
           p_expires_in_seconds?: number
@@ -935,10 +929,7 @@ export type Database = {
         }
         Returns: string
       }
-      finalize_match_results: {
-        Args: { p_match_id: string }
-        Returns: boolean
-      }
+      finalize_match_results: { Args: { p_match_id: string }; Returns: boolean }
       get_match_creator_info: {
         Args: { match_id: string }
         Returns: {
@@ -1016,10 +1007,7 @@ export type Database = {
           transaction_count: number
         }[]
       }
-      get_user_email: {
-        Args: { _user_id: string }
-        Returns: string
-      }
+      get_user_email: { Args: { _user_id: string }; Returns: string }
       get_user_private_data: {
         Args: { _user_id: string }
         Returns: {
@@ -1039,22 +1027,13 @@ export type Database = {
         }
         Returns: boolean
       }
-      is_match_creator: {
-        Args: { match_id: string }
-        Returns: boolean
-      }
+      is_match_creator: { Args: { match_id: string }; Returns: boolean }
       is_match_participant: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
       }
-      is_match_play_email: {
-        Args: { email: string }
-        Returns: boolean
-      }
-      is_profile_owner: {
-        Args: { profile_user_id: string }
-        Returns: boolean
-      }
+      is_match_play_email: { Args: { email: string }; Returns: boolean }
+      is_profile_owner: { Args: { profile_user_id: string }; Returns: boolean }
       is_user_match_creator: {
         Args: { p_match_id: string; p_user_id: string }
         Returns: boolean
@@ -1075,14 +1054,8 @@ export type Database = {
         Args: { player_user_id: string }
         Returns: undefined
       }
-      sanitize_text_input: {
-        Args: { input_text: string }
-        Returns: string
-      }
-      start_match: {
-        Args: { match_id: string }
-        Returns: boolean
-      }
+      sanitize_text_input: { Args: { input_text: string }; Returns: string }
+      start_match: { Args: { match_id: string }; Returns: boolean }
       user_joined_match: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
