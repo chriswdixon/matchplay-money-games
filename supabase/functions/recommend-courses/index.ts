@@ -12,27 +12,41 @@ serve(async (req) => {
   }
 
   try {
+    // Authentication check
     const authHeader = req.headers.get('Authorization');
-    const token = authHeader?.replace('Bearer ', '');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
     
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
       Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader! } } }
+      { global: { headers: { Authorization: authHeader } } }
     );
 
-    // Get user data
-    const { data: { user } } = await supabaseClient.auth.getUser(token);
-    if (!user) throw new Error('Not authenticated');
+    // Verify user authentication
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
 
     const { userLat, userLon, limit = 5 } = await req.json();
 
     // Get user's profile and match history
     const { data: profile } = await supabaseClient
       .from('profiles')
-      .select('handicap')
+      .select('handicap, display_name')
       .eq('user_id', user.id)
       .single();
+
+    // Sanitize profile data
+    const sanitize = (str: string | null | undefined) => str ? String(str).substring(0, 100).replace(/[^\w\s,.-]/g, '') : 'Unknown';
 
     const { data: matchHistory } = await supabaseClient
       .from('match_participants')
@@ -50,9 +64,10 @@ serve(async (req) => {
     const prompt = `Generate personalized golf course recommendations for this user:
 
 User Profile:
+- Name: ${sanitize(profile?.display_name)}
 - Handicap: ${profile?.handicap || 'Not set'}
-- Recent courses played: ${matchHistory?.map(m => m.matches.course_name).join(', ') || 'None'}
-- Favorite courses: ${favoriteCourses?.map(c => c.course_name).join(', ') || 'None'}
+- Recent courses played: ${matchHistory?.map(m => sanitize(m.matches.course_name)).join(', ') || 'None'}
+- Favorite courses: ${favoriteCourses?.map(c => sanitize(c.course_name)).join(', ') || 'None'}
 - Match formats played: ${matchHistory?.map(m => m.matches.format).filter((v, i, a) => a.indexOf(v) === i).join(', ') || 'None'}
 
 Based on this profile, suggest:
@@ -155,9 +170,21 @@ Respond with JSON only.`;
     );
   } catch (error) {
     console.error('Error generating recommendations:', error);
+    
+    // Return generic error messages
+    const errorMap: Record<string, string> = {
+      'Rate limit exceeded': 'Too many requests. Please try again later.',
+      'AI credits depleted': 'Service temporarily unavailable.',
+      'Authentication required': 'Authentication required.',
+      'Unauthorized': 'Unauthorized access.'
+    };
+    
+    const userMessage = errorMap[error.message] || 'Unable to get recommendations';
+    const statusCode = error.message === 'Authentication required' || error.message === 'Unauthorized' ? 401 : 500;
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: userMessage }),
+      { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

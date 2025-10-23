@@ -12,17 +12,54 @@ serve(async (req) => {
   }
 
   try {
-    const { query, userLat, userLon } = await req.json();
-    
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
     );
+
+    // Verify user authentication
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { query, userLat, userLon } = await req.json();
+    
+    // Validate query input
+    if (!query || typeof query !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid query' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    if (query.length < 3 || query.length > 500) {
+      return new Response(
+        JSON.stringify({ error: 'Query must be between 3 and 500 characters' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
+    // Sanitize query to prevent prompt injection
+    const sanitizedQuery = query.substring(0, 500).replace(/[^\w\s,.-]/g, '');
 
     // Use AI to parse natural language query
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const prompt = `Parse this golf course search query and extract structured search criteria:
-"${query}"
+"${sanitizedQuery}"
 
 ${userLat && userLon ? `User location: ${userLat}, ${userLon}` : ''}
 
@@ -92,10 +129,18 @@ Examples:
       dbQuery = dbQuery.gte('ai_rating', searchCriteria.min_rating);
     }
 
-    // Text search on keywords
+    // Apply keywords filter with sanitization
     if (searchCriteria.keywords && searchCriteria.keywords.length > 0) {
-      const keywordSearch = searchCriteria.keywords.join(' | ');
-      dbQuery = dbQuery.or(`name.ilike.%${keywordSearch}%,search_keywords.ilike.%${keywordSearch}%`);
+      // Sanitize AI-generated keywords to prevent SQL injection
+      const sanitizedKeywords = searchCriteria.keywords
+        .filter((k: string) => typeof k === 'string' && /^[a-zA-Z0-9\s-]+$/.test(k))
+        .map((k: string) => k.substring(0, 50))
+        .slice(0, 5);
+      
+      if (sanitizedKeywords.length > 0) {
+        const keywordSearch = sanitizedKeywords.join(' | ');
+        dbQuery = dbQuery.or(`name.ilike.%${keywordSearch}%,search_keywords.ilike.%${keywordSearch}%,city.ilike.%${keywordSearch}%,state.ilike.%${keywordSearch}%`);
+      }
     }
 
     const { data: courses, error } = await dbQuery.limit(20);
@@ -132,9 +177,25 @@ Examples:
     );
   } catch (error) {
     console.error('Error in smart search:', error);
+    
+    // Return generic error messages
+    const errorMap: Record<string, string> = {
+      'Rate limit exceeded': 'Too many requests. Please try again later.',
+      'AI credits depleted': 'Service temporarily unavailable.',
+      'Invalid query': 'Invalid search query provided.',
+      'Query must be between 3 and 500 characters': 'Query must be between 3 and 500 characters.',
+      'Authentication required': 'Authentication required.',
+      'Unauthorized': 'Unauthorized access.'
+    };
+    
+    const userMessage = errorMap[error.message] || 'Unable to search courses';
+    const statusCode = error.message === 'Authentication required' || error.message === 'Unauthorized' ? 401 
+                      : error.message?.includes('Query must be') || error.message === 'Invalid query' ? 400
+                      : 500;
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: userMessage }),
+      { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });

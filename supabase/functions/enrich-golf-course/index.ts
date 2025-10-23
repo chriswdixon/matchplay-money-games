@@ -12,13 +12,53 @@ serve(async (req) => {
   }
 
   try {
-    const { courseId } = await req.json();
-    
+    // Authentication check
+    const authHeader = req.headers.get('Authorization');
+    if (!authHeader) {
+      return new Response(
+        JSON.stringify({ error: 'Authentication required' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
     const supabaseClient = createClient(
       Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+      { global: { headers: { Authorization: authHeader } } }
     );
 
+    // Verify user authentication
+    const { data: { user }, error: authError } = await supabaseClient.auth.getUser();
+    if (authError || !user) {
+      return new Response(
+        JSON.stringify({ error: 'Unauthorized' }),
+        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    // Check admin role
+    const { data: isAdmin } = await supabaseClient.rpc('has_role', {
+      _user_id: user.id,
+      _role: 'admin'
+    });
+
+    if (!isAdmin) {
+      return new Response(
+        JSON.stringify({ error: 'Admin access required' }),
+        { status: 403, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+
+    const { courseId } = await req.json();
+    
+    // Validate courseId
+    if (!courseId || typeof courseId !== 'string') {
+      return new Response(
+        JSON.stringify({ error: 'Invalid course ID' }),
+        { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      );
+    }
+    
     // Get course data
     const { data: course, error: courseError } = await supabaseClient
       .from('golf_courses')
@@ -28,13 +68,15 @@ serve(async (req) => {
 
     if (courseError) throw courseError;
 
-    // Use AI to enrich the course data
+    // Sanitize course data before embedding in prompt
+    const sanitize = (str: string | null) => str ? String(str).substring(0, 200).replace(/[^\w\s,.-]/g, '') : 'N/A';
+    
     const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
     const prompt = `Analyze this golf course and provide enriched data:
-Name: ${course.name}
-Address: ${course.address}, ${course.city}, ${course.state} ${course.zip}
-${course.phone ? `Phone: ${course.phone}` : ''}
-${course.website ? `Website: ${course.website}` : ''}
+Name: ${sanitize(course.name)}
+Address: ${sanitize(course.address)}, ${sanitize(course.city)}, ${sanitize(course.state)} ${sanitize(course.zip)}
+${course.phone ? `Phone: ${sanitize(course.phone)}` : ''}
+${course.website ? `Website: ${sanitize(course.website)}` : ''}
 
 Provide a JSON response with:
 1. description (2-3 sentences about the course)
@@ -105,9 +147,26 @@ Base your analysis on the course name, location, and any context clues. Be reali
     );
   } catch (error) {
     console.error('Error enriching course:', error);
+    
+    // Return generic error messages
+    const errorMap: Record<string, string> = {
+      'Rate limit exceeded': 'Too many requests. Please try again later.',
+      'AI credits depleted': 'Service temporarily unavailable.',
+      'Invalid course ID': 'Invalid course ID provided.',
+      'Authentication required': 'Authentication required.',
+      'Unauthorized': 'Unauthorized access.',
+      'Admin access required': 'Admin access required.'
+    };
+    
+    const userMessage = errorMap[error.message] || 'Unable to enrich course data';
+    const statusCode = error.message === 'Authentication required' || error.message === 'Unauthorized' ? 401 
+                      : error.message === 'Admin access required' ? 403
+                      : error.message === 'Invalid course ID' ? 400
+                      : 500;
+    
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
+      JSON.stringify({ error: userMessage }),
+      { status: statusCode, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
   }
 });
