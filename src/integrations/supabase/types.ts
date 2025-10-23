@@ -178,15 +178,23 @@ export type Database = {
       golf_courses: {
         Row: {
           address: string | null
+          ai_enriched: boolean | null
+          ai_rating: number | null
+          amenities: Json | null
           city: string | null
           country: string | null
+          course_style: string | null
           created_at: string | null
+          description: string | null
+          difficulty_level: string | null
           external_id: string | null
+          features: Json | null
           id: string
           latitude: number | null
           longitude: number | null
           name: string
           phone: string | null
+          search_keywords: string | null
           state: string | null
           updated_at: string | null
           website: string | null
@@ -194,15 +202,23 @@ export type Database = {
         }
         Insert: {
           address?: string | null
+          ai_enriched?: boolean | null
+          ai_rating?: number | null
+          amenities?: Json | null
           city?: string | null
           country?: string | null
+          course_style?: string | null
           created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
           external_id?: string | null
+          features?: Json | null
           id?: string
           latitude?: number | null
           longitude?: number | null
           name: string
           phone?: string | null
+          search_keywords?: string | null
           state?: string | null
           updated_at?: string | null
           website?: string | null
@@ -210,15 +226,23 @@ export type Database = {
         }
         Update: {
           address?: string | null
+          ai_enriched?: boolean | null
+          ai_rating?: number | null
+          amenities?: Json | null
           city?: string | null
           country?: string | null
+          course_style?: string | null
           created_at?: string | null
+          description?: string | null
+          difficulty_level?: string | null
           external_id?: string | null
+          features?: Json | null
           id?: string
           latitude?: number | null
           longitude?: number | null
           name?: string
           phone?: string | null
+          search_keywords?: string | null
           state?: string | null
           updated_at?: string | null
           website?: string | null

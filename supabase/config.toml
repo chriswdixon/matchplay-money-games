@@ -23,3 +23,7 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.ayrshare-post]
 [functions.request-invite]
 verify_jwt = false
+[functions.enrich-golf-course]
+[functions.smart-course-search]
+[functions.recommend-courses]
+[functions.cleanup-course-data]

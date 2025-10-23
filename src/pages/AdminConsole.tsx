@@ -13,6 +13,7 @@ import { InviteManagement } from "@/components/admin/InviteManagement";
 import { GolfDataImport } from "@/components/admin/GolfDataImport";
 import { GolfCourseManagement } from "@/components/admin/GolfCourseManagement";
 import { SocialLinksManagement } from "@/components/admin/SocialLinksManagement";
+import { AIGolfCourseTools } from "@/components/admin/AIGolfCourseTools";
 
 /**
  * SECURITY NOTE: Admin UI Access Control
@@ -122,6 +123,7 @@ const AdminConsole = () => {
             <TabsContent value="golf-data">
               <div className="space-y-6">
                 <GolfDataImport />
+                <AIGolfCourseTools />
                 <GolfCourseManagement />
               </div>
             </TabsContent>
