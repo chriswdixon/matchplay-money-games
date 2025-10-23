@@ -6,6 +6,8 @@ import { useState } from "react";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
+import logoLight from "@/assets/logo-light.png";
+import logoDark from "@/assets/logo-dark.png";
 
 interface AppHeaderProps {
   showNavMenu?: boolean;
@@ -21,6 +23,9 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
   const { hasActiveMatch, activeMatchName } = useActiveMatch();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  
+  // Get the actual applied theme (handles system theme)
+  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
 
   const handleReturnToMatch = () => {
     if (onReturnToMatch) {
@@ -36,10 +41,12 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
       <div className="flex h-16 items-center gap-2 px-4 md:container md:justify-between">
         {/* Left: Logo */}
         <div className="flex items-center shrink-0">
-          <Link to="/">
-            <h1 className="text-xl md:text-2xl font-bold bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent cursor-pointer hover:opacity-80 transition-opacity">
-              MatchPlay
-            </h1>
+          <Link to="/" className="flex items-center">
+            <img 
+              src={isDark ? logoDark : logoLight} 
+              alt="MatchPlay" 
+              className="h-10 w-auto hover:opacity-80 transition-opacity"
+            />
           </Link>
         </div>
         
