@@ -9,6 +9,7 @@ import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
 import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
 import { CancellationReviews } from "@/components/admin/CancellationReviews";
+import { IncompleteMatchReviews } from "@/components/admin/IncompleteMatchReviews";
 import { InviteManagement } from "@/components/admin/InviteManagement";
 import { GolfDataImport } from "@/components/admin/GolfDataImport";
 import { GolfCourseManagement } from "@/components/admin/GolfCourseManagement";
@@ -112,7 +113,8 @@ const AdminConsole = () => {
               <CouponManagement />
             </TabsContent>
             
-            <TabsContent value="reviews">
+            <TabsContent value="reviews" className="space-y-6">
+              <IncompleteMatchReviews />
               <CancellationReviews />
             </TabsContent>
             

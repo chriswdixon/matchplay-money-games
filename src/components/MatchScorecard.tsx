@@ -478,7 +478,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           // Only show if match is >6 hours old
           if (hoursElapsed < 6) return null;
           
-          // Determine urgency level
+          // Determine urgency level based on 24-hour deadline
           const urgency = hoursElapsed < 24 ? 'warning' : hoursElapsed < 48 ? 'alert' : 'critical';
           const bgColor = urgency === 'warning' ? 'bg-yellow-500/10 border-yellow-500/30' : 
                          urgency === 'alert' ? 'bg-orange-500/10 border-orange-500/30' :
@@ -497,9 +497,9 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                   <AlertTriangle className={cn("w-5 h-5 shrink-0 mt-0.5", iconColor, urgency === 'critical' && 'animate-pulse')} />
                   <div className="flex-1">
                     <div className={cn("font-semibold mb-1", textColor)}>
-                      {urgency === 'critical' ? '⚠️ Critical: Match Needs Immediate Attention' :
-                       urgency === 'alert' ? '⚠️ Alert: Match Pending Finalization' :
-                       '⚠️ Reminder: Please Finalize Soon'}
+                      {urgency === 'critical' ? '⚠️ Critical: 24-Hour Deadline Exceeded - Admin Review Pending' :
+                       urgency === 'alert' ? '⚠️ Alert: Match Approaching 24-Hour Deadline' :
+                       '⚠️ Reminder: Complete Within 24 Hours'}
                     </div>
                     <div className="text-sm text-muted-foreground">
                       This match was scheduled for{' '}
@@ -513,7 +513,16 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                         }).format(new Date(matchData.scheduled_time))}
                       </span>
                       {' '}({daysElapsed > 0 ? `${daysElapsed} day${daysElapsed > 1 ? 's' : ''}` : `${hoursElapsed} hours`} ago).
-                      {urgency === 'critical' && ' Please finalize the match results as soon as possible.'}
+                      {hoursElapsed >= 24 ? (
+                        <span className={cn("block mt-1 font-medium", textColor)}>
+                          This match has exceeded the 24-hour completion deadline and will be sent to admins for review. 
+                          Players who haven't completed their round may forfeit payouts.
+                        </span>
+                      ) : (
+                        <span className="block mt-1 font-medium">
+                          You have {24 - hoursElapsed} hours remaining to complete and finalize this match.
+                        </span>
+                      )}
                     </div>
                   </div>
                 </div>

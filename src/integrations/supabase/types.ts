@@ -250,6 +250,62 @@ export type Database = {
         }
         Relationships: []
       }
+      incomplete_match_reviews: {
+        Row: {
+          admin_decision: string | null
+          admin_notes: string | null
+          completed_players: Json
+          created_at: string
+          flagged_at: string
+          id: string
+          incomplete_players: Json
+          match_id: string
+          match_started_at: string
+          reviewed_at: string | null
+          reviewed_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          admin_decision?: string | null
+          admin_notes?: string | null
+          completed_players?: Json
+          created_at?: string
+          flagged_at?: string
+          id?: string
+          incomplete_players?: Json
+          match_id: string
+          match_started_at: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          admin_decision?: string | null
+          admin_notes?: string | null
+          completed_players?: Json
+          created_at?: string
+          flagged_at?: string
+          id?: string
+          incomplete_players?: Json
+          match_id?: string
+          match_started_at?: string
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "incomplete_match_reviews_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invites: {
         Row: {
           code: string
@@ -935,6 +991,14 @@ export type Database = {
         }
         Returns: Json
       }
+      admin_resolve_incomplete_match: {
+        Args: {
+          p_admin_notes?: string
+          p_decision: string
+          p_review_id: string
+        }
+        Returns: Json
+      }
       calculate_distance: {
         Args: { lat1: number; lat2: number; lon1: number; lon2: number }
         Returns: number
@@ -954,6 +1018,7 @@ export type Database = {
         Returns: string
       }
       finalize_match_results: { Args: { p_match_id: string }; Returns: boolean }
+      flag_incomplete_matches: { Args: never; Returns: number }
       get_match_creator_info: {
         Args: { match_id: string }
         Returns: {
