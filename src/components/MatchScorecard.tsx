@@ -468,6 +468,60 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           )}
         </div>
 
+        {/* Match Age Warning Banner */}
+        {matchData?.status === 'started' && matchData?.scheduled_time && (() => {
+          const hoursElapsed = Math.floor(
+            (new Date().getTime() - new Date(matchData.scheduled_time).getTime()) / (1000 * 60 * 60)
+          );
+          const daysElapsed = Math.floor(hoursElapsed / 24);
+          
+          // Only show if match is >6 hours old
+          if (hoursElapsed < 6) return null;
+          
+          // Determine urgency level
+          const urgency = hoursElapsed < 24 ? 'warning' : hoursElapsed < 48 ? 'alert' : 'critical';
+          const bgColor = urgency === 'warning' ? 'bg-yellow-500/10 border-yellow-500/30' : 
+                         urgency === 'alert' ? 'bg-orange-500/10 border-orange-500/30' :
+                         'bg-destructive/10 border-destructive/30';
+          const textColor = urgency === 'warning' ? 'text-yellow-600 dark:text-yellow-400' :
+                           urgency === 'alert' ? 'text-orange-600 dark:text-orange-400' :
+                           'text-destructive';
+          const iconColor = urgency === 'warning' ? 'text-yellow-500' :
+                           urgency === 'alert' ? 'text-orange-500' :
+                           'text-destructive';
+          
+          return (
+            <Card className={cn("mt-4 border-2", bgColor)}>
+              <CardContent className="p-4">
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className={cn("w-5 h-5 shrink-0 mt-0.5", iconColor, urgency === 'critical' && 'animate-pulse')} />
+                  <div className="flex-1">
+                    <div className={cn("font-semibold mb-1", textColor)}>
+                      {urgency === 'critical' ? '⚠️ Critical: Match Needs Immediate Attention' :
+                       urgency === 'alert' ? '⚠️ Alert: Match Pending Finalization' :
+                       '⚠️ Reminder: Please Finalize Soon'}
+                    </div>
+                    <div className="text-sm text-muted-foreground">
+                      This match was scheduled for{' '}
+                      <span className="font-medium">
+                        {new Intl.DateTimeFormat('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric',
+                          hour: 'numeric',
+                          minute: '2-digit'
+                        }).format(new Date(matchData.scheduled_time))}
+                      </span>
+                      {' '}({daysElapsed > 0 ? `${daysElapsed} day${daysElapsed > 1 ? 's' : ''}` : `${hoursElapsed} hours`} ago).
+                      {urgency === 'critical' && ' Please finalize the match results as soon as possible.'}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          );
+        })()}
+
         {/* Match Settings Collapsible Content */}
         <Collapsible 
           open={settingsOpen} 

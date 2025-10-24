@@ -3,7 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
@@ -67,6 +67,20 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     return () => clearTimeout(timer);
   }, [location, searchRadius]); // Removed refetch from dependencies to prevent loops
 
+  // Separate incomplete matches (started matches >4 hours old that user joined)
+  const incompleteMatches = useMemo(() => {
+    if (showPastMatches || !user) return [];
+    
+    const now = new Date();
+    const fourHoursAgo = new Date(now.getTime() - 4 * 60 * 60 * 1000);
+    
+    return matches.filter(match => 
+      match.status === 'started' && 
+      match.user_joined &&
+      new Date(match.scheduled_time) < fourHoursAgo
+    );
+  }, [matches, showPastMatches, user]);
+
   // Filter matches based on current filters and view type
   const filteredMatches = useMemo(() => {
     let filtered = [...matches];
@@ -87,7 +101,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         // Exclude cancelled matches
         if (match.status === 'cancelled') return false;
         
-        // Exclude started matches (active matches)
+        // Exclude started matches (will show separately in incomplete section if needed)
         if (match.status === 'started') return false;
         
         // Exclude open matches that are scheduled in the past
@@ -345,6 +359,70 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             showFilters={showFilters}
             onToggleFilters={() => setShowFilters(!showFilters)}
           />
+        )}
+
+        {/* Incomplete Matches Section */}
+        {!showPastMatches && incompleteMatches.length > 0 && (
+          <div className="mb-8 animate-pulse-subtle">
+            <Card className="border-2 border-destructive/50 bg-destructive/5">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <AlertTriangle className="w-6 h-6 text-destructive animate-pulse" />
+                    <div>
+                      <CardTitle className="text-destructive">Action Required</CardTitle>
+                      <CardDescription>
+                        {incompleteMatches.length} incomplete {incompleteMatches.length === 1 ? 'match needs' : 'matches need'} to be finalized
+                      </CardDescription>
+                    </div>
+                  </div>
+                  <Badge variant="destructive" className="text-lg px-4 py-2">
+                    {incompleteMatches.length}
+                  </Badge>
+                </div>
+              </CardHeader>
+              <CardContent className="pt-0">
+                <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+                  {incompleteMatches.map((match) => {
+                    const hoursElapsed = Math.floor(
+                      (new Date().getTime() - new Date(match.scheduled_time).getTime()) / (1000 * 60 * 60)
+                    );
+                    const daysElapsed = Math.floor(hoursElapsed / 24);
+                    
+                    return (
+                      <Card key={match.id} className="border-2 border-destructive/30 bg-card relative overflow-hidden">
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive via-orange-500 to-destructive animate-pulse" />
+                        <CardHeader className="pb-3">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="flex-1 min-w-0">
+                              <CardTitle className="text-base truncate">{match.course_name}</CardTitle>
+                              <CardDescription className="text-sm truncate">{match.location}</CardDescription>
+                            </div>
+                            <Badge variant="destructive" className="shrink-0">
+                              {daysElapsed > 0 ? `${daysElapsed}d ago` : `${hoursElapsed}h ago`}
+                            </Badge>
+                          </div>
+                        </CardHeader>
+                        <CardContent className="space-y-3">
+                          <div className="text-sm text-muted-foreground">
+                            Scheduled: {format(new Date(match.scheduled_time), 'MMM d, h:mm a')}
+                          </div>
+                          <Button 
+                            onClick={() => handleViewScorecard(match)}
+                            className="w-full bg-destructive hover:bg-destructive/90"
+                            size="lg"
+                          >
+                            <AlertTriangle className="w-4 h-4 mr-2" />
+                            Finalize Match Now
+                          </Button>
+                        </CardContent>
+                      </Card>
+                    );
+                  })}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
         )}
 
             {/* Live Matches */}
