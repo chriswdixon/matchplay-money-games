@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle } from "lucide-react";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
@@ -739,12 +740,16 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
 
         {/* Scorecard Component */}
         {scorecardMatch && (
-          <MatchScorecard
-            matchId={scorecardMatch.id}
-            matchName={scorecardMatch.course_name}
-            onClose={() => setScorecardMatch(null)}
-            readOnly={scorecardMatch.status === 'completed' || scorecardMatch.status === 'cancelled'}
-          />
+          <Dialog open={!!scorecardMatch} onOpenChange={(open) => !open && setScorecardMatch(null)}>
+            <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto p-0">
+              <MatchScorecard
+                matchId={scorecardMatch.id}
+                matchName={scorecardMatch.course_name}
+                onClose={() => setScorecardMatch(null)}
+                readOnly={scorecardMatch.status === 'completed' || scorecardMatch.status === 'cancelled'}
+              />
+            </DialogContent>
+          </Dialog>
         )}
 
         {/* Results Component */}
