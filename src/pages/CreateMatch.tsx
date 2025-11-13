@@ -202,6 +202,12 @@ const CreateMatch = () => {
     navigate('/');
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+    }
+  };
+
   const canGoNext = () => {
     if (currentStep === 0) return formData.course_name;
     if (currentStep === 1) return formData.scheduled_date && formData.scheduled_time;
@@ -783,6 +789,7 @@ const CreateMatch = () => {
             min="0"
             max="500"
             value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
+            onKeyDown={handleKeyDown}
             onChange={(e) => {
               const value = e.target.value;
               const numValue = parseInt(value) || 0;
@@ -854,6 +861,7 @@ const CreateMatch = () => {
                 min="-10"
                 max="54"
                 value={formData.handicap_min}
+                onKeyDown={handleKeyDown}
                 onChange={(e) => {
                   const value = e.target.value;
                   const numValue = value !== '' ? parseInt(value) : null;
@@ -910,6 +918,7 @@ const CreateMatch = () => {
                 min="-10"
                 max="54"
                 value={formData.handicap_max}
+                onKeyDown={handleKeyDown}
                 onChange={(e) => {
                   const value = e.target.value;
                   const numValue = value !== '' ? parseInt(value) : null;
@@ -1026,6 +1035,7 @@ const CreateMatch = () => {
           pattern="\d{4}"
           maxLength={4}
           value={formData.pin}
+          onKeyDown={handleKeyDown}
           onChange={(e) => setFormData({ ...formData, pin: e.target.value.replace(/\D/g, '') })}
           placeholder="4-digit PIN"
           className="text-center tracking-widest font-mono"
