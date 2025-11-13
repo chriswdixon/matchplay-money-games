@@ -27,6 +27,12 @@ export const useGolfCourses = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const lastToastMessage = useRef<string>('');
   const toastTimestamp = useRef<number>(0);
+  
+  // Circuit breaker for API failures
+  const apiFailureCount = useRef<number>(0);
+  const apiBlockedUntil = useRef<number>(0);
+  const MAX_API_FAILURES = 3;
+  const API_BLOCK_DURATION = 60000; // 1 minute
 
   const showToastOnce = (message: string, type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
     const now = Date.now();
@@ -82,59 +88,105 @@ export const useGolfCourses = () => {
         return coursesWithDistance;
       }
 
-      // Otherwise, supplement with API results
-      console.log('🌐 Querying API for additional courses');
+      // Check circuit breaker before making API call
+      const now = Date.now();
+      const isApiBlocked = now < apiBlockedUntil.current;
       
-      const { data, error } = await supabase.functions.invoke('search-golf-courses', {
-        body: { 
-          type: 'nearby',
-          lat: latitude,
-          lon: longitude,
-          radius: radius
-        }
-      });
+      if (!isApiBlocked) {
+        // Otherwise, supplement with API results
+        console.log('🌐 Querying API for additional courses');
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('search-golf-courses', {
+            body: { 
+              type: 'nearby',
+              lat: latitude,
+              lon: longitude,
+              radius: radius
+            }
+          });
 
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw error;
+          if (error) {
+            console.error('❌ Edge function error:', error);
+            apiFailureCount.current++;
+            
+            if (apiFailureCount.current >= MAX_API_FAILURES) {
+              apiBlockedUntil.current = now + API_BLOCK_DURATION;
+              console.warn('🚫 API circuit breaker activated. Blocking API calls for 1 minute.');
+              showToastOnce('Golf course search temporarily unavailable. Using database results.', 'warning');
+            }
+            
+            throw error;
+          }
+          
+          // Reset failure count on success
+          apiFailureCount.current = 0;
+
+          const apiCourses: GolfCourse[] = data.courses || [];
+          
+          // Merge database and API results
+          const allCourses: GolfCourse[] = [...coursesWithDistance];
+          apiCourses.forEach((apiCourse: GolfCourse) => {
+            if (!allCourses.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
+              // Calculate distance for API courses
+              const courseWithDistance: GolfCourse = {
+                ...apiCourse,
+                distance: apiCourse.distance || calculateDistance(latitude, longitude, apiCourse.latitude, apiCourse.longitude)
+              };
+              allCourses.push(courseWithDistance);
+            }
+          });
+
+          // Add popular courses as final fallback
+          const popularCourses = getPopularCourses(latitude, longitude);
+          popularCourses.forEach(popular => {
+            if (!allCourses.some(c => c.name.toLowerCase() === popular.name.toLowerCase())) {
+              allCourses.push(popular);
+            }
+          });
+
+          allCourses.sort((a, b) => (a.distance || 999) - (b.distance || 999));
+          
+          console.log('📋 Total courses:', allCourses.length);
+          setCourses(allCourses);
+          setAllCourses(allCourses);
+          
+          if (allCourses.length > 0) {
+            showToastOnce(`Found ${allCourses.length} golf courses nearby`, 'success');
+          } else {
+            showToastOnce('No golf courses found nearby. Try entering a course name manually.', 'warning');
+          }
+          
+          return allCourses;
+        } catch (apiError) {
+          console.error('❌ API call failed, using fallback:', apiError);
+          // Fall through to use database + popular courses only
+        }
+      } else {
+        console.log('⚠️ API circuit breaker active. Using database and popular courses only.');
       }
-
-      const apiCourses: GolfCourse[] = data.courses || [];
       
-      // Merge database and API results
-      const allCourses: GolfCourse[] = [...coursesWithDistance];
-      apiCourses.forEach((apiCourse: GolfCourse) => {
-        if (!allCourses.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
-          // Calculate distance for API courses
-          const courseWithDistance: GolfCourse = {
-            ...apiCourse,
-            distance: apiCourse.distance || calculateDistance(latitude, longitude, apiCourse.latitude, apiCourse.longitude)
-          };
-          allCourses.push(courseWithDistance);
-        }
-      });
-
-      // Add popular courses as final fallback
+      // If API is blocked or failed, use database + popular courses
+      const fallbackCourses: GolfCourse[] = [...coursesWithDistance];
       const popularCourses = getPopularCourses(latitude, longitude);
       popularCourses.forEach(popular => {
-        if (!allCourses.some(c => c.name.toLowerCase() === popular.name.toLowerCase())) {
-          allCourses.push(popular);
+        if (!fallbackCourses.some(c => c.name.toLowerCase() === popular.name.toLowerCase())) {
+          fallbackCourses.push(popular);
         }
       });
-
-      allCourses.sort((a, b) => (a.distance || 999) - (b.distance || 999));
       
-      console.log('📋 Total courses:', allCourses.length);
-      setCourses(allCourses);
-      setAllCourses(allCourses);
+      fallbackCourses.sort((a, b) => (a.distance || 999) - (b.distance || 999));
       
-      if (allCourses.length > 0) {
-        showToastOnce(`Found ${allCourses.length} golf courses nearby`, 'success');
+      setCourses(fallbackCourses);
+      setAllCourses(fallbackCourses);
+      
+      if (fallbackCourses.length > 0) {
+        showToastOnce(`Found ${fallbackCourses.length} golf courses`, 'success');
       } else {
         showToastOnce('No golf courses found nearby. Try entering a course name manually.', 'warning');
       }
       
-      return allCourses;
+      return fallbackCourses;
     } catch (error: any) {
       console.error('❌ Error fetching golf courses:', error);
       
@@ -271,31 +323,47 @@ export const useGolfCourses = () => {
         return dbResults;
       }
 
-      // Step 3: Query external API
-      console.log('🌐 Querying external API for additional courses');
+      // Check circuit breaker before making API call
+      const now = Date.now();
+      const isApiBlocked = now < apiBlockedUntil.current;
       
-      const { data, error } = await supabase.functions.invoke('search-golf-courses', {
-        body: { 
-          type: 'name',
-          name: searchTermInput,
-          limit: 20
-        }
-      });
+      if (!isApiBlocked) {
+        // Step 3: Query external API
+        console.log('🌐 Querying external API for additional courses');
+        
+        try {
+          const { data, error } = await supabase.functions.invoke('search-golf-courses', {
+            body: { 
+              type: 'name',
+              name: searchTermInput,
+              limit: 20
+            }
+          });
 
-      if (error) {
-        console.error('❌ Edge function error:', error);
-        throw error;
-      }
+          if (error) {
+            console.error('❌ Edge function error:', error);
+            apiFailureCount.current++;
+            
+            if (apiFailureCount.current >= MAX_API_FAILURES) {
+              apiBlockedUntil.current = now + API_BLOCK_DURATION;
+              console.warn('🚫 API circuit breaker activated. Blocking API calls for 1 minute.');
+            }
+            
+            throw error;
+          }
+          
+          // Reset failure count on success
+          apiFailureCount.current = 0;
 
-      const apiCourses: GolfCourse[] = data.courses || [];
-      
-      // Merge database and API results
-      const allResults: GolfCourse[] = [...dbResults];
-      apiCourses.forEach((apiCourse: GolfCourse) => {
-        if (!allResults.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
-          allResults.push(apiCourse);
-        }
-      });
+          const apiCourses: GolfCourse[] = data.courses || [];
+          
+          // Merge database and API results
+          const allResults: GolfCourse[] = [...dbResults];
+          apiCourses.forEach((apiCourse: GolfCourse) => {
+            if (!allResults.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
+              allResults.push(apiCourse);
+            }
+          });
 
       // Also search local and popular courses for supplementary results
       const lowerSearchTerm = searchTermInput.toLowerCase();
