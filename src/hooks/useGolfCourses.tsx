@@ -327,6 +327,8 @@ export const useGolfCourses = () => {
       const now = Date.now();
       const isApiBlocked = now < apiBlockedUntil.current;
       
+      let finalResults: GolfCourse[] = [...dbResults];
+      
       if (!isApiBlocked) {
         // Step 3: Query external API
         console.log('🌐 Querying external API for additional courses');
@@ -358,13 +360,19 @@ export const useGolfCourses = () => {
           const apiCourses: GolfCourse[] = data.courses || [];
           
           // Merge database and API results
-          const allResults: GolfCourse[] = [...dbResults];
           apiCourses.forEach((apiCourse: GolfCourse) => {
-            if (!allResults.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
-              allResults.push(apiCourse);
+            if (!finalResults.some(c => c.name.toLowerCase() === apiCourse.name.toLowerCase())) {
+              finalResults.push(apiCourse);
             }
           });
-
+        } catch (apiError) {
+          console.error('❌ API call failed for name search:', apiError);
+          // Fall through to use database + local + popular courses only
+        }
+      } else {
+        console.log('⚠️ API circuit breaker active. Using database and local courses only.');
+      }
+      
       // Also search local and popular courses for supplementary results
       const lowerSearchTerm = searchTermInput.toLowerCase();
       
@@ -383,20 +391,20 @@ export const useGolfCourses = () => {
 
       // Add local matches that aren't duplicates
       localMatches.forEach(local => {
-        if (!allResults.some(course => course.name.toLowerCase() === local.name.toLowerCase())) {
-          allResults.push(local);
+        if (!finalResults.some(course => course.name.toLowerCase() === local.name.toLowerCase())) {
+          finalResults.push(local);
         }
       });
 
       // Add popular matches that aren't duplicates
       popularMatches.forEach(popular => {
-        if (!allResults.some(course => course.name.toLowerCase() === popular.name.toLowerCase())) {
-          allResults.push(popular);
+        if (!finalResults.some(course => course.name.toLowerCase() === popular.name.toLowerCase())) {
+          finalResults.push(popular);
         }
       });
 
       // Sort by relevance
-      const sortedResults = allResults.sort((a, b) => {
+      const sortedResults = finalResults.sort((a, b) => {
         const aExactMatch = a.name.toLowerCase().startsWith(lowerSearchTerm);
         const bExactMatch = b.name.toLowerCase().startsWith(lowerSearchTerm);
         
