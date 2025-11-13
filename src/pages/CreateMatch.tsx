@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock, Plus, Info } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock, Plus, Info, AlertCircle } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
@@ -68,6 +68,40 @@ const CreateMatch = () => {
   const [submitting, setSubmitting] = useState(false);
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [customSearchTerm, setCustomSearchTerm] = useState('');
+  
+  // Validation state
+  const [validationErrors, setValidationErrors] = useState({
+    buy_in_amount: '',
+    handicap_min: '',
+    handicap_max: '',
+    handicap_range: ''
+  });
+
+  // Load saved form data from localStorage on mount
+  useEffect(() => {
+    const savedData = localStorage.getItem('matchFormData');
+    if (savedData) {
+      try {
+        const parsed = JSON.parse(savedData);
+        // Convert saved date string back to Date object
+        if (parsed.scheduled_date) {
+          parsed.scheduled_date = new Date(parsed.scheduled_date);
+        }
+        setFormData(parsed);
+        toast.info('Restored your previous match form');
+      } catch (error) {
+        console.error('Failed to load saved form data:', error);
+      }
+    }
+  }, []);
+
+  // Save form data to localStorage whenever it changes
+  useEffect(() => {
+    // Only save if there's meaningful data
+    if (formData.course_name || formData.format) {
+      localStorage.setItem('matchFormData', JSON.stringify(formData));
+    }
+  }, [formData]);
 
   const handleZipcodeSearch = async () => {
     if (!zipcode || zipcode.length < 5) {
@@ -163,6 +197,8 @@ const CreateMatch = () => {
   };
 
   const handleCancel = () => {
+    // Clear saved form data
+    localStorage.removeItem('matchFormData');
     navigate('/');
   };
 
@@ -305,6 +341,8 @@ const CreateMatch = () => {
       const { error } = await createMatch(matchData, locationCoords || undefined);
       
       if (!error) {
+        // Clear saved form data on successful submission
+        localStorage.removeItem('matchFormData');
         navigate('/');
       }
     } finally {
@@ -722,56 +760,210 @@ const CreateMatch = () => {
   const renderDetailsStep = () => (
     <div className="space-y-4">
       <div className="space-y-2">
-        <Label htmlFor="buy_in" className="flex items-center gap-2">
-          Buy-In Amount ($)
-          {!hasAccess('buy_in') && <Lock className="w-4 h-4 text-muted-foreground" />}
-        </Label>
-        <Input
-          id="buy_in"
-          type="number"
-          min="0"
-          max="500"
-          value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
-          onChange={(e) => {
-            const value = e.target.value;
-            setFormData({ ...formData, buy_in_amount: value === '' ? '0' : value });
-          }}
-          disabled={!hasAccess('buy_in')}
-          className={!hasAccess('buy_in') ? 'bg-muted cursor-not-allowed' : ''}
-        />
-        {hasAccess('buy_in') ? (
+        <div className="flex items-center gap-2">
+          <Label htmlFor="buy_in" className="flex items-center gap-2">
+            Buy-In Amount ($)
+            {!hasAccess('buy_in') && <Lock className="w-4 h-4 text-muted-foreground" />}
+          </Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Enter the buy-in amount between $0 and $500. This is the entry fee each player pays to join the match.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
+        <div className="relative">
+          <Input
+            id="buy_in"
+            type="number"
+            min="0"
+            max="500"
+            value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
+            onChange={(e) => {
+              const value = e.target.value;
+              const numValue = parseInt(value) || 0;
+              
+              // Real-time validation
+              let error = '';
+              if (value !== '' && (numValue < 0 || numValue > 500)) {
+                error = 'Buy-in must be between $0 and $500';
+              }
+              
+              setValidationErrors({ ...validationErrors, buy_in_amount: error });
+              setFormData({ ...formData, buy_in_amount: value === '' ? '0' : value });
+            }}
+            disabled={!hasAccess('buy_in')}
+            className={cn(
+              !hasAccess('buy_in') && 'bg-muted cursor-not-allowed',
+              validationErrors.buy_in_amount && 'border-destructive'
+            )}
+          />
+          {validationErrors.buy_in_amount && (
+            <div className="absolute right-3 top-1/2 -translate-y-1/2">
+              <TooltipProvider>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <AlertCircle className="w-4 h-4 text-destructive" />
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>{validationErrors.buy_in_amount}</p>
+                  </TooltipContent>
+                </Tooltip>
+              </TooltipProvider>
+            </div>
+          )}
+        </div>
+        {validationErrors.buy_in_amount && (
+          <p className="text-xs text-destructive flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />
+            {validationErrors.buy_in_amount}
+          </p>
+        )}
+        {hasAccess('buy_in') && !validationErrors.buy_in_amount && (
           <p className="text-xs text-muted-foreground">Default: $50 • Max: $500</p>
-        ) : (
+        )}
+        {!hasAccess('buy_in') && (
           <p className="text-xs text-warning">Upgrade to Local Player or Tournament Pro to enable buy-ins</p>
         )}
       </div>
 
       <div className="space-y-2">
-        <Label>Handicap Range (Optional)</Label>
-        <div className="grid grid-cols-2 gap-4">
-          <Input
-            type="number"
-            placeholder="Min"
-            min="-10"
-            max="54"
-            value={formData.handicap_min}
-            onChange={(e) => {
-              const value = e.target.value;
-              setFormData({ ...formData, handicap_min: value });
-            }}
-          />
-          <Input
-            type="number"
-            placeholder="Max"
-            min="-10"
-            max="54"
-            value={formData.handicap_max}
-            onChange={(e) => {
-              const value = e.target.value;
-              setFormData({ ...formData, handicap_max: value });
-            }}
-          />
+        <div className="flex items-center gap-2">
+          <Label>Handicap Range (Optional)</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Set a handicap range to limit who can join. Valid range is -10 to 54. Leave empty to allow all handicaps.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
+        <div className="grid grid-cols-2 gap-4">
+          <div className="space-y-1">
+            <div className="relative">
+              <Input
+                type="number"
+                placeholder="Min"
+                min="-10"
+                max="54"
+                value={formData.handicap_min}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numValue = value !== '' ? parseInt(value) : null;
+                  
+                  // Real-time validation
+                  let error = '';
+                  if (numValue !== null && (numValue < -10 || numValue > 54)) {
+                    error = 'Min: -10 to 54';
+                  }
+                  
+                  // Check range validity
+                  let rangeError = '';
+                  const maxValue = formData.handicap_max !== '' ? parseInt(formData.handicap_max) : null;
+                  if (numValue !== null && maxValue !== null && numValue > maxValue) {
+                    rangeError = 'Min must be ≤ Max';
+                  }
+                  
+                  setValidationErrors({ 
+                    ...validationErrors, 
+                    handicap_min: error,
+                    handicap_range: rangeError
+                  });
+                  setFormData({ ...formData, handicap_min: value });
+                }}
+                className={cn(
+                  (validationErrors.handicap_min || validationErrors.handicap_range) && 'border-destructive'
+                )}
+              />
+              {validationErrors.handicap_min && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <AlertCircle className="w-4 h-4 text-destructive" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{validationErrors.handicap_min}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              )}
+            </div>
+            {validationErrors.handicap_min && (
+              <p className="text-xs text-destructive">{validationErrors.handicap_min}</p>
+            )}
+          </div>
+          
+          <div className="space-y-1">
+            <div className="relative">
+              <Input
+                type="number"
+                placeholder="Max"
+                min="-10"
+                max="54"
+                value={formData.handicap_max}
+                onChange={(e) => {
+                  const value = e.target.value;
+                  const numValue = value !== '' ? parseInt(value) : null;
+                  
+                  // Real-time validation
+                  let error = '';
+                  if (numValue !== null && (numValue < -10 || numValue > 54)) {
+                    error = 'Max: -10 to 54';
+                  }
+                  
+                  // Check range validity
+                  let rangeError = '';
+                  const minValue = formData.handicap_min !== '' ? parseInt(formData.handicap_min) : null;
+                  if (numValue !== null && minValue !== null && minValue > numValue) {
+                    rangeError = 'Min must be ≤ Max';
+                  }
+                  
+                  setValidationErrors({ 
+                    ...validationErrors, 
+                    handicap_max: error,
+                    handicap_range: rangeError
+                  });
+                  setFormData({ ...formData, handicap_max: value });
+                }}
+                className={cn(
+                  (validationErrors.handicap_max || validationErrors.handicap_range) && 'border-destructive'
+                )}
+              />
+              {validationErrors.handicap_max && (
+                <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <AlertCircle className="w-4 h-4 text-destructive" />
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{validationErrors.handicap_max}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+                </div>
+              )}
+            </div>
+            {validationErrors.handicap_max && (
+              <p className="text-xs text-destructive">{validationErrors.handicap_max}</p>
+            )}
+          </div>
+        </div>
+        {validationErrors.handicap_range && (
+          <p className="text-xs text-destructive flex items-center gap-1">
+            <AlertCircle className="w-3 h-3" />
+            {validationErrors.handicap_range}
+          </p>
+        )}
       </div>
 
       <div className="space-y-2">
