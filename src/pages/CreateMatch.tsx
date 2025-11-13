@@ -267,6 +267,21 @@ const CreateMatch = () => {
 
       const isTeamFormat = maxParticipants !== 1 && (formData.format === 'Best Ball' || formData.format === 'Scramble');
 
+      // Parse numeric values safely
+      const parsedBuyIn = !hasAccess('buy_in') ? 0 : Math.max(0, parseInt(formData.buy_in_amount) || 0);
+      const parsedHandicapMin = formData.handicap_min && formData.handicap_min.trim() !== '' 
+        ? parseInt(formData.handicap_min) 
+        : undefined;
+      const parsedHandicapMax = formData.handicap_max && formData.handicap_max.trim() !== '' 
+        ? parseInt(formData.handicap_max) 
+        : undefined;
+
+      // Validate handicap range
+      if (parsedHandicapMin !== undefined && parsedHandicapMax !== undefined && parsedHandicapMin > parsedHandicapMax) {
+        toast.error('Minimum handicap must be less than or equal to maximum handicap');
+        return;
+      }
+
       const matchData = {
         course_name: formData.course_name,
         location: selectedCourse?.address?.split(',').slice(-2).join(',').trim() || formData.course_name,
@@ -277,9 +292,9 @@ const CreateMatch = () => {
         format: formData.format,
         pin: formData.pin || undefined,
         holes: parseInt(formData.holes),
-        buy_in_amount: !hasAccess('buy_in') ? 0 : (parseInt(formData.buy_in_amount) || 0) * 100,
-        handicap_min: formData.handicap_min ? parseInt(formData.handicap_min) : undefined,
-        handicap_max: formData.handicap_max ? parseInt(formData.handicap_max) : undefined,
+        buy_in_amount: parsedBuyIn * 100,
+        handicap_min: parsedHandicapMin,
+        handicap_max: parsedHandicapMax,
         max_participants: maxParticipants,
         booking_url: formData.booking_url || undefined,
         tee_selection_mode: (formData.default_tees === 'pick-own' ? 'individual' : 'fixed') as 'fixed' | 'individual',
@@ -717,7 +732,10 @@ const CreateMatch = () => {
           min="0"
           max="500"
           value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
-          onChange={(e) => setFormData({ ...formData, buy_in_amount: e.target.value })}
+          onChange={(e) => {
+            const value = e.target.value;
+            setFormData({ ...formData, buy_in_amount: value === '' ? '0' : value });
+          }}
           disabled={!hasAccess('buy_in')}
           className={!hasAccess('buy_in') ? 'bg-muted cursor-not-allowed' : ''}
         />
@@ -737,7 +755,10 @@ const CreateMatch = () => {
             min="-10"
             max="54"
             value={formData.handicap_min}
-            onChange={(e) => setFormData({ ...formData, handicap_min: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              setFormData({ ...formData, handicap_min: value });
+            }}
           />
           <Input
             type="number"
@@ -745,7 +766,10 @@ const CreateMatch = () => {
             min="-10"
             max="54"
             value={formData.handicap_max}
-            onChange={(e) => setFormData({ ...formData, handicap_max: e.target.value })}
+            onChange={(e) => {
+              const value = e.target.value;
+              setFormData({ ...formData, handicap_max: value });
+            }}
           />
         </div>
       </div>
