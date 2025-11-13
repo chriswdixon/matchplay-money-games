@@ -95,12 +95,16 @@ const CreateMatch = () => {
     }
   }, []);
 
-  // Save form data to localStorage whenever it changes
+  // Save form data to localStorage with debouncing to prevent crashes from excessive saves
   useEffect(() => {
-    // Only save if there's meaningful data
-    if (formData.course_name || formData.format) {
-      localStorage.setItem('matchFormData', JSON.stringify(formData));
-    }
+    const timeoutId = setTimeout(() => {
+      // Only save if there's meaningful data
+      if (formData.course_name || formData.format) {
+        localStorage.setItem('matchFormData', JSON.stringify(formData));
+      }
+    }, 500); // Wait 500ms after user stops typing
+
+    return () => clearTimeout(timeoutId);
   }, [formData]);
 
   const handleZipcodeSearch = async () => {
