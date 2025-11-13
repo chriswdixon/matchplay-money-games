@@ -251,6 +251,11 @@ const CreateMatch = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Prevent form submission if not on the final step (mobile keyboard triggers)
+    if (currentStep !== 3) {
+      return;
+    }
+    
     if (!user) {
       toast.error('Please sign in to create a match');
       navigate('/auth');
