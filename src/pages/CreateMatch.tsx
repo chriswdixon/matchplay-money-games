@@ -304,8 +304,8 @@ const CreateMatch = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Prevent form submission if not on the final step (mobile keyboard triggers)
-    if (isMobile && currentStep !== 3) {
+    // Prevent form submission if not on the final step
+    if (currentStep !== 3) {
       return;
     }
     
