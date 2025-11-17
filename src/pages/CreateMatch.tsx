@@ -716,71 +716,52 @@ const CreateMatch = () => {
     return (
       <div className="space-y-4">
         <div className="space-y-2">
-          <Label htmlFor="format">Match Format *</Label>
-          <Select value={formData.format} onValueChange={(value) => setFormData({ ...formData, format: value })}>
+          <div className="flex items-center gap-2">
+            <Label htmlFor="format">Match Format *</Label>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                </TooltipTrigger>
+                <TooltipContent className="max-w-xs">
+                  <div className="space-y-2 text-sm">
+                    <div>
+                      <strong>Stroke Play:</strong> Traditional scoring. Lowest total score wins. 2-8 players.
+                    </div>
+                    <div>
+                      <strong>Match Play:</strong> Head-to-head, hole-by-hole competition. 2 players only.
+                    </div>
+                    <div>
+                      <strong>Best Ball:</strong> Teams of 2. Best score per hole counts. 4-8 players (2v2, 3v3, 4v4).
+                    </div>
+                    <div>
+                      <strong>Scramble:</strong> Teams of 2. All hit, best shot selected. 4-8 players (2v2, 3v3, 4v4).
+                    </div>
+                  </div>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          </div>
+          <Select value={formData.format} onValueChange={(value) => {
+            // Auto-set max_participants based on format
+            let newMaxParticipants = formData.max_participants;
+            if (formData.max_participants !== '1') {
+              if (value === 'Match Play') {
+                newMaxParticipants = '2';
+              } else if (value === 'Best Ball' || value === 'Scramble') {
+                newMaxParticipants = '4'; // Default to 2v2
+              }
+            }
+            setFormData({ ...formData, format: value, max_participants: newMaxParticipants });
+          }}>
             <SelectTrigger id="format">
               <SelectValue placeholder="Select format" />
             </SelectTrigger>
             <SelectContent>
-              <TooltipProvider>
-                <div className="space-y-1">
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="relative">
-                        <SelectItem value="Stroke Play" className="pr-8">
-                          Stroke Play
-                        </SelectItem>
-                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs">
-                      <p className="text-sm">Traditional golf scoring. Each player counts all strokes. Lowest total score wins.</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="relative">
-                        <SelectItem value="Match Play" className="pr-8">
-                          Match Play (1v1)
-                        </SelectItem>
-                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs">
-                      <p className="text-sm">Head-to-head competition where each player compares their score on each hole. Lowest score wins the hole.</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="relative">
-                        <SelectItem value="Best Ball" className="pr-8">
-                          Best Ball (2v2)
-                        </SelectItem>
-                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs">
-                      <p className="text-sm">Each player plays their own ball. The best score from each team on each hole is used for the team score.</p>
-                    </TooltipContent>
-                  </Tooltip>
-
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <div className="relative">
-                        <SelectItem value="Scramble" className="pr-8">
-                          Scramble (2v2)
-                        </SelectItem>
-                        <Info className="w-3 h-3 absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      </div>
-                    </TooltipTrigger>
-                    <TooltipContent side="right" className="max-w-xs">
-                      <p className="text-sm">All teammates hit from each spot. After each shot, the team selects the best ball position and all players hit from there.</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </div>
-              </TooltipProvider>
+              <SelectItem value="Stroke Play">Stroke Play</SelectItem>
+              <SelectItem value="Match Play">Match Play (1v1)</SelectItem>
+              <SelectItem value="Best Ball">Best Ball (2v2)</SelectItem>
+              <SelectItem value="Scramble">Scramble (2v2)</SelectItem>
             </SelectContent>
           </Select>
         </div>
@@ -1037,7 +1018,19 @@ const CreateMatch = () => {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="max_players">Max Players</Label>
+        <div className="flex items-center gap-2">
+          <Label htmlFor="max_players">Max Players</Label>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-xs">
+                <p>Maximum number of players for this match. Format determines available options.</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
+        </div>
         <Select 
           value={formData.max_participants} 
           onValueChange={(value) => setFormData({ ...formData, max_participants: value })}
@@ -1082,8 +1075,14 @@ const CreateMatch = () => {
         {formData.max_participants === '1' && (
           <p className="text-xs text-amber-600 dark:text-amber-400">Testing mode: All format restrictions disabled, no payouts</p>
         )}
+        {formData.max_participants !== '1' && formData.format === 'Match Play' && (
+          <p className="text-xs text-muted-foreground">Match Play requires exactly 2 players</p>
+        )}
         {formData.max_participants !== '1' && (formData.format === 'Best Ball' || formData.format === 'Scramble') && (
           <p className="text-xs text-muted-foreground">Teams of 2 will select teammates after joining</p>
+        )}
+        {formData.max_participants !== '1' && formData.format === 'Stroke Play' && (
+          <p className="text-xs text-muted-foreground">Select any number of players (2-8)</p>
         )}
       </div>
 
