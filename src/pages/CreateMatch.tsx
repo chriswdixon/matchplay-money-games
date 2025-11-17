@@ -301,9 +301,7 @@ const CreateMatch = () => {
     toast.success('Course created and selected!');
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+  const handleSubmit = async () => {
     // Prevent form submission if not on the final step
     if (currentStep !== 3) {
       return;
@@ -1130,7 +1128,7 @@ const CreateMatch = () => {
       </header>
 
       {/* Form */}
-      <form onSubmit={handleSubmit} className="container mx-auto px-4 py-6 max-w-2xl">
+      <form onSubmit={(e) => e.preventDefault()} className="container mx-auto px-4 py-6 max-w-2xl">
         {isMobile ? (
           <div className="space-y-6">
             <div className="min-h-[60vh]">
@@ -1170,7 +1168,8 @@ const CreateMatch = () => {
                 </Button>
               ) : (
                 <Button
-                  type="submit"
+                  type="button"
+                  onClick={handleSubmit}
                   disabled={!isFormValid || submitting}
                   className="flex-1"
                 >
@@ -1203,7 +1202,8 @@ const CreateMatch = () => {
                 Cancel
               </Button>
               <Button
-                type="submit"
+                type="button"
+                onClick={handleSubmit}
                 disabled={!isFormValid || submitting}
                 className="flex-1"
               >
