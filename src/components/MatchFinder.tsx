@@ -694,7 +694,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               className={cn(
                                 "w-full hover:shadow-premium transition-all duration-300",
                                 match.user_joined && !isFull
-                                  ? "bg-warning text-warning-foreground hover:bg-warning/90"
+                                  ? "bg-gradient-accent text-accent-foreground"
                                   : "bg-gradient-primary text-primary-foreground"
                               )}
                               disabled={isFull || !user}
