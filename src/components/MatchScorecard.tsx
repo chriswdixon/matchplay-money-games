@@ -678,8 +678,8 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             size="sm"
                             className="w-full"
                           >
-                            <AlertTriangle className="w-3 h-3 mr-1 text-destructive" />
-                            <span className="text-destructive">Leave Match</span>
+                            <AlertTriangle className="w-3 h-3 mr-1 text-destructive dark:text-green-700" />
+                            <span className="text-destructive dark:text-green-700">Leave Match</span>
                           </Button>
                         </div>
                       )}
@@ -1621,8 +1621,8 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             size="sm"
             className="hover:bg-destructive/10"
           >
-            <AlertTriangle className="w-3 h-3 mr-1 text-destructive" />
-            <span className="text-destructive">Leave Match</span>
+            <AlertTriangle className="w-3 h-3 mr-1 text-destructive dark:text-green-700" />
+            <span className="text-destructive dark:text-green-700">Leave Match</span>
           </Button>
         </div>
       )}

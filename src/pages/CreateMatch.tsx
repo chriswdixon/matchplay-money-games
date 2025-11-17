@@ -368,7 +368,7 @@ const CreateMatch = () => {
   const isFormValid = formData.course_name && formData.scheduled_date && formData.format && formData.default_tees;
 
   const renderCourseStep = () => (
-    <div className="space-y-3">
+    <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
       <Label>Golf Course *</Label>
       
       {/* AI Smart Search */}

@@ -427,7 +427,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         )}
 
             {/* Live Matches */}
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 py-3">
+            <div className="grid gap-6 grid-cols-1 py-3">
               {loading ? (
                 // Loading skeletons
                 Array.from({ length: 6 }, (_, index) => (
