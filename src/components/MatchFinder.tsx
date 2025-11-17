@@ -325,7 +325,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   return (
-    <section className="py-4 md:py-20 px-0 md:px-6 bg-background">
+    <section className="py-4 md:py-20 px-3 md:px-6 bg-background">
       <div className="w-full md:max-w-[1400px] md:mx-auto">
         <div className="text-center mb-16 animate-fade-in px-0 md:px-0">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
