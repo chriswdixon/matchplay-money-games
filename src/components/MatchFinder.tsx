@@ -325,8 +325,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   return (
-    <section className="py-4 md:py-20 px-1 md:px-6 bg-background">
-      <div className="max-w-[1400px] mx-auto w-full px-0 md:px-0">
+    <section className="py-4 md:py-20 px-0 md:px-6 bg-background">
+      <div className="w-full md:max-w-[1400px] md:mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
             {showPastMatches ? '📜 Match History' : '🎯 Live Match Finder'}
@@ -427,7 +427,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         )}
 
             {/* Live Matches */}
-            <div className="grid gap-6 grid-cols-1 py-3">
+            <div className="grid gap-0 md:gap-6 grid-cols-1 py-3">
               {loading ? (
                 // Loading skeletons
                 Array.from({ length: 6 }, (_, index) => (
