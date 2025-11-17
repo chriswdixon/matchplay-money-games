@@ -721,7 +721,9 @@ const CreateMatch = () => {
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                  <button type="button" className="inline-flex">
+                    <Info className="w-4 h-4 text-muted-foreground cursor-help" />
+                  </button>
                 </TooltipTrigger>
                 <TooltipContent className="max-w-xs">
                   <div className="space-y-2 text-sm">
