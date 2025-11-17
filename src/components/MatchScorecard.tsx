@@ -674,11 +674,10 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                         <div className="mt-3 md:hidden">
                           <Button
                             onClick={() => setCancelDialogOpen(true)}
-                            size="sm"
                             className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
                           >
-                            <AlertTriangle className="w-3 h-3 mr-1" />
-                            <span>Leave Match</span>
+                            <AlertTriangle className="w-4 h-4 mr-2" />
+                            Leave Match
                           </Button>
                         </div>
                       )}
@@ -1616,11 +1615,10 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
         <div className="hidden md:flex justify-end px-4 md:px-6 pb-4">
           <Button
             onClick={() => setCancelDialogOpen(true)}
-            size="sm"
             className="bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
           >
-            <AlertTriangle className="w-3 h-3 mr-1" />
-            <span>Leave Match</span>
+            <AlertTriangle className="w-4 h-4 mr-2" />
+            Leave Match
           </Button>
         </div>
       )}
