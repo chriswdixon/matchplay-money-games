@@ -67,27 +67,40 @@ export const MatchManagement = () => {
         (matchesData || []).map(async (match) => {
           const { data: participants, error: participantsError } = await supabase
             .from('match_participants')
-            .select(`
-              user_id,
-              profiles:user_id (
-                display_name
-              )
-            `)
+            .select('user_id')
             .eq('match_id', match.id)
             .eq('status', 'active');
 
-          if (participantsError) throw participantsError;
+          if (participantsError) {
+            console.error('Error fetching participants:', participantsError);
+            throw participantsError;
+          }
+
+          // Fetch profile data separately to avoid RLS issues
+          const participantsWithProfiles = await Promise.all(
+            (participants || []).map(async (p) => {
+              const { data: profile } = await supabase
+                .from('profiles')
+                .select('display_name')
+                .eq('user_id', p.user_id)
+                .single();
+              
+              return {
+                user_id: p.user_id,
+                display_name: profile?.display_name || 'Unknown'
+              };
+            })
+          );
 
           return {
             ...match,
             participant_count: participants?.length || 0,
-            participants: participants?.map(p => ({
-              user_id: p.user_id,
-              display_name: (p.profiles as any)?.display_name || 'Unknown'
-            })) || []
+            participants: participantsWithProfiles
           };
         })
       );
+      
+      console.log('Matches with participants:', matchesWithParticipants.length);
 
       return matchesWithParticipants as MatchWithParticipants[];
     }
