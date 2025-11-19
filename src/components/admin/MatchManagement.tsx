@@ -41,6 +41,8 @@ interface MatchWithParticipants extends Match {
 
 export const MatchManagement = () => {
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
+  const [selectedMatches, setSelectedMatches] = useState<string[]>([]);
+  const [showBulkDeleteDialog, setShowBulkDeleteDialog] = useState(false);
   const queryClient = useQueryClient();
 
   const { data: matches, isLoading, error } = useQuery({
@@ -228,6 +230,45 @@ export const MatchManagement = () => {
     }
   });
 
+  const bulkDeleteMutation = useMutation({
+    mutationFn: async (matchIds: string[]) => {
+      const results = await Promise.allSettled(
+        matchIds.map(matchId => deleteMatchMutation.mutateAsync(matchId))
+      );
+      
+      const failed = results.filter(r => r.status === 'rejected').length;
+      if (failed > 0) {
+        throw new Error(`Failed to delete ${failed} of ${matchIds.length} matches`);
+      }
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-matches'] });
+      toast.success(`${selectedMatches.length} matches deleted`);
+      setSelectedMatches([]);
+      setShowBulkDeleteDialog(false);
+    },
+    onError: (error) => {
+      console.error('Error in bulk delete:', error);
+      toast.error(error instanceof Error ? error.message : 'Failed to delete matches');
+    }
+  });
+
+  const toggleMatchSelection = (matchId: string) => {
+    setSelectedMatches(prev => 
+      prev.includes(matchId) 
+        ? prev.filter(id => id !== matchId)
+        : [...prev, matchId]
+    );
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedMatches.length === matches?.length) {
+      setSelectedMatches([]);
+    } else {
+      setSelectedMatches(matches?.map(m => m.id) || []);
+    }
+  };
+
   const getStatusBadge = (status: string) => {
     const variants: Record<string, { variant: "default" | "secondary" | "destructive" | "outline", label: string }> = {
       open: { variant: "default", label: "Open" },
@@ -262,10 +303,28 @@ export const MatchManagement = () => {
     <>
       <Card>
         <CardHeader>
-          <CardTitle>Active & Incomplete Matches</CardTitle>
-          <CardDescription>
-            Manage all open and started matches ({matches?.length || 0} found). Deleting a match will cancel it and refund players minus $2 cancellation fee.
-          </CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>Active & Incomplete Matches</CardTitle>
+              <CardDescription>
+                Manage all open and started matches ({matches?.length || 0} found). Deleting a match will cancel it and refund players minus $2 cancellation fee.
+              </CardDescription>
+            </div>
+            {matches && matches.length > 0 && (
+              <div className="flex items-center gap-2">
+                {selectedMatches.length > 0 && (
+                  <Button
+                    variant="destructive"
+                    onClick={() => setShowBulkDeleteDialog(true)}
+                    disabled={bulkDeleteMutation.isPending}
+                  >
+                    <Trash2 className="w-4 h-4 mr-2" />
+                    Delete {selectedMatches.length} Selected
+                  </Button>
+                )}
+              </div>
+            )}
+          </div>
         </CardHeader>
         <CardContent>
           {!matches || matches.length === 0 ? (
@@ -275,10 +334,25 @@ export const MatchManagement = () => {
             </div>
           ) : (
             <div className="space-y-4">
+              <div className="flex items-center gap-2 pb-2 border-b">
+                <input
+                  type="checkbox"
+                  checked={selectedMatches.length === matches.length}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 rounded border-border"
+                />
+                <span className="text-sm text-muted-foreground">Select All</span>
+              </div>
               {matches.map((match) => (
                 <Card key={match.id} className="border-l-4 border-l-primary/20">
                   <CardContent className="p-4">
-                    <div className="flex items-start justify-between gap-4">
+                    <div className="flex items-start gap-4">
+                      <input
+                        type="checkbox"
+                        checked={selectedMatches.includes(match.id)}
+                        onChange={() => toggleMatchSelection(match.id)}
+                        className="mt-1 w-4 h-4 rounded border-border"
+                      />
                       <div className="flex-1 space-y-2">
                         <div className="flex items-center gap-2 flex-wrap">
                           <h3 className="font-semibold text-lg">{match.course_name}</h3>
@@ -353,6 +427,27 @@ export const MatchManagement = () => {
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
               Delete Match
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={showBulkDeleteDialog} onOpenChange={setShowBulkDeleteDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete {selectedMatches.length} Matches?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will cancel {selectedMatches.length} matches and refund all players (minus $2 cancellation fee per player).
+              This action cannot be undone.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => bulkDeleteMutation.mutate(selectedMatches)}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Delete All Selected
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
