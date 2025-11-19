@@ -108,24 +108,44 @@ export const MatchManagement = () => {
 
   const deleteMatchMutation = useMutation({
     mutationFn: async (matchId: string) => {
+      console.log('Starting match deletion for:', matchId);
       const match = matches?.find(m => m.id === matchId);
       if (!match) throw new Error('Match not found');
 
+      console.log('Match details:', { 
+        id: matchId, 
+        course: match.course_name, 
+        status: match.status,
+        created_by: match.created_by 
+      });
+
       // Cancel the match
-      const { error: matchError } = await supabase
+      const { data: matchUpdate, error: matchError } = await supabase
         .from('matches')
         .update({ status: 'cancelled' })
-        .eq('id', matchId);
+        .eq('id', matchId)
+        .select();
 
-      if (matchError) throw matchError;
+      console.log('Match update result:', { data: matchUpdate, error: matchError });
+
+      if (matchError) {
+        console.error('Failed to update match:', matchError);
+        throw new Error(`Failed to cancel match: ${matchError.message}`);
+      }
 
       // Mark all participants as left
-      const { error: participantsError } = await supabase
+      const { data: participantsUpdate, error: participantsError } = await supabase
         .from('match_participants')
         .update({ status: 'left' })
-        .eq('match_id', matchId);
+        .eq('match_id', matchId)
+        .select();
 
-      if (participantsError) throw participantsError;
+      console.log('Participants update result:', { data: participantsUpdate, error: participantsError });
+
+      if (participantsError) {
+        console.error('Failed to update participants:', participantsError);
+        throw new Error(`Failed to update participants: ${participantsError.message}`);
+      }
 
       // Process refunds if there's a buy-in
       if (match.buy_in_amount > 0) {
