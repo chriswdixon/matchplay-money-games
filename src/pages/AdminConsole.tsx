@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2 } from "lucide-react";
+import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp } from "lucide-react";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
@@ -15,6 +15,7 @@ import { GolfDataImport } from "@/components/admin/GolfDataImport";
 import { GolfCourseManagement } from "@/components/admin/GolfCourseManagement";
 import { SocialLinksManagement } from "@/components/admin/SocialLinksManagement";
 import { AIGolfCourseTools } from "@/components/admin/AIGolfCourseTools";
+import { MatchManagement } from "@/components/admin/MatchManagement";
 
 /**
  * SECURITY NOTE: Admin UI Access Control
@@ -62,10 +63,14 @@ const AdminConsole = () => {
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-8 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-9 lg:w-auto">
             <TabsTrigger value="reports" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               Reports
+            </TabsTrigger>
+            <TabsTrigger value="matches" className="gap-2">
+              <TrendingUp className="h-4 w-4" />
+              Matches
             </TabsTrigger>
             <TabsTrigger value="users" className="gap-2">
               <Users className="h-4 w-4" />
@@ -96,6 +101,10 @@ const AdminConsole = () => {
               Social
             </TabsTrigger>
           </TabsList>
+
+          <TabsContent value="matches">
+            <MatchManagement />
+          </TabsContent>
 
           <TabsContent value="users">
             <UserManagement />
