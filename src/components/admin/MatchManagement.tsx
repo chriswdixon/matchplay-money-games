@@ -43,9 +43,11 @@ export const MatchManagement = () => {
   const [deleteMatchId, setDeleteMatchId] = useState<string | null>(null);
   const queryClient = useQueryClient();
 
-  const { data: matches, isLoading } = useQuery({
+  const { data: matches, isLoading, error } = useQuery({
     queryKey: ['admin-matches'],
     queryFn: async () => {
+      console.log('Fetching admin matches...');
+      
       // Fetch matches that are open or started (not completed or cancelled)
       const { data: matchesData, error: matchesError } = await supabase
         .from('matches')
@@ -53,7 +55,12 @@ export const MatchManagement = () => {
         .in('status', ['open', 'started'])
         .order('scheduled_time', { ascending: true });
 
-      if (matchesError) throw matchesError;
+      if (matchesError) {
+        console.error('Error fetching matches:', matchesError);
+        throw matchesError;
+      }
+      
+      console.log('Matches fetched:', matchesData?.length || 0);
 
       // Fetch participant counts and details for each match
       const matchesWithParticipants = await Promise.all(
@@ -205,13 +212,26 @@ export const MatchManagement = () => {
     );
   }
 
+  if (error) {
+    return (
+      <Card>
+        <CardHeader>
+          <CardTitle>Active & Incomplete Matches</CardTitle>
+          <CardDescription className="text-destructive">
+            Error loading matches: {error instanceof Error ? error.message : 'Unknown error'}
+          </CardDescription>
+        </CardHeader>
+      </Card>
+    );
+  }
+
   return (
     <>
       <Card>
         <CardHeader>
           <CardTitle>Active & Incomplete Matches</CardTitle>
           <CardDescription>
-            Manage all open and started matches. Deleting a match will cancel it and refund players minus $2 cancellation fee.
+            Manage all open and started matches ({matches?.length || 0} found). Deleting a match will cancel it and refund players minus $2 cancellation fee.
           </CardDescription>
         </CardHeader>
         <CardContent>
