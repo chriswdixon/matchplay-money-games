@@ -295,7 +295,7 @@ const MatchPlayLanding = () => {
           </div>
           
           <div className="text-center text-sm text-white/70">
-            <p className="mb-2">🏌️ Currently piloting in licensed gambling states</p>
+            <p className="mb-2">🏌️ Currently piloting in select states</p>
             <p>Be among the first 1,000 members to shape the future of competitive golf</p>
           </div>
         </div>
