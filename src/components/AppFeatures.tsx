@@ -20,14 +20,14 @@ const AppFeatures = () => {
     {
       icon: <Smartphone className="w-8 h-8" />,
       title: "Booking Service",
-      description: "Seamlessly book tee times and reserve spots for money matches at courses in your area",
+      description: "Seamlessly book tee times and reserve spots for competitive matches at courses in your area",
       benefits: ["Real-time availability", "Instant confirmation", "Course integration"]
     },
     {
       icon: <Calculator className="w-8 h-8" />,
       title: "True Handicap System",
-      description: "More accurate than USGA because every stroke counts in money games - no cheating possible",
-      benefits: ["Real-money accuracy", "Live tracking", "Trend analysis"]
+      description: "More accurate than USGA because every stroke counts in competitive play - no cheating possible",
+      benefits: ["Competition accuracy", "Live tracking", "Trend analysis"]
     },
     {
       icon: <Handshake className="w-8 h-8" />,
@@ -37,8 +37,8 @@ const AppFeatures = () => {
     },
     {
       icon: <CreditCard className="w-8 h-8" />,
-      title: "Secure Deposits & Payouts",
-      description: "Bank-level security for all transactions with instant payouts to winners",
+      title: "Secure Entry Fees & Prizes",
+      description: "Bank-level security for all transactions with instant prize distribution to winners",
       benefits: ["Instant settlements", "Secure escrow", "Transaction history"]
     },
     {
@@ -138,7 +138,7 @@ const AppFeatures = () => {
           <div className="bg-gradient-hero text-white rounded-2xl p-8 md:p-12">
             <h3 className="text-3xl font-bold mb-4">The Competitive Edge</h3>
             <p className="text-xl mb-6 text-white/90 max-w-2xl mx-auto">
-              "Because these are money games, the scoring is way more accurate. 
+              "Because these are competitive matches with real stakes, the scoring is way more accurate. 
               You can't cheat your score - creating the truest handicap system ever built."
             </p>
             <div className="grid sm:grid-cols-3 gap-6 mt-8">
@@ -152,7 +152,7 @@ const AppFeatures = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-accent mb-2">Instant</div>
-                <div className="text-sm text-white/80">Payouts</div>
+                <div className="text-sm text-white/80">Prize Distribution</div>
               </div>
             </div>
           </div>

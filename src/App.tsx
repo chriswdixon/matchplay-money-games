@@ -15,6 +15,7 @@ import AdminConsole from "./pages/AdminConsole";
 import CreateMatch from "./pages/CreateMatch";
 import VerifyEmail from "./pages/VerifyEmail";
 import Install from "./pages/Install";
+import Terms from "./pages/Terms";
 
 const App = () => (
   <ActiveMatchProvider>
@@ -33,6 +34,7 @@ const App = () => (
         <Route path="/admin" element={<AdminConsole />} />
         <Route path="/create-match" element={<CreateMatch />} />
         <Route path="/install" element={<Install />} />
+        <Route path="/terms" element={<Terms />} />
         {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
         <Route path="*" element={<NotFound />} />
       </Routes>
