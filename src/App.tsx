@@ -6,6 +6,7 @@ import { Routes, Route } from "react-router-dom";
 import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBanner";
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
+import { CookieConsent } from "@/components/CookieConsent";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -26,6 +27,7 @@ const App = () => (
       <EmailConfirmationBanner />
       <OfflineIndicator />
       <PWAUpdatePrompt />
+      <CookieConsent />
       <Routes>
         <Route path="/" element={<Index />} />
         <Route path="/auth" element={<Auth />} />
