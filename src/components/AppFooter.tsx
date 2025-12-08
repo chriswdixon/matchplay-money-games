@@ -42,9 +42,12 @@ const AppFooter = () => {
           </div>
 
           {/* Legal Links */}
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 md:gap-4">
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/terms">Terms of Service</Link>
+              <Link to="/terms">Terms</Link>
+            </Button>
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/privacy">Privacy</Link>
             </Button>
             <Button variant="ghost" size="sm" asChild>
               <a href="mailto:support@match-play.co" className="flex items-center gap-2">
