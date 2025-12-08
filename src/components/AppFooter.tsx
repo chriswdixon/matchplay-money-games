@@ -1,6 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Mail, Facebook, X, Instagram, Linkedin, Youtube, Music } from "lucide-react";
 import { useAyrshareProfiles } from "@/hooks/useAyrshareProfiles";
+import { Link } from "react-router-dom";
 
 const platformIcons = {
   facebook: Facebook,
@@ -40,8 +41,11 @@ const AppFooter = () => {
             © {currentYear} MatchPlay. All rights reserved.
           </div>
 
-          {/* Support */}
-          <div className="flex items-center gap-2">
+          {/* Legal Links */}
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/terms">Terms of Service</Link>
+            </Button>
             <Button variant="ghost" size="sm" asChild>
               <a href="mailto:support@match-play.co" className="flex items-center gap-2">
                 <Mail className="w-4 h-4" />

@@ -49,8 +49,8 @@ const MatchPlayHero = () => {
         </h1>
         
         <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-200 max-w-3xl mx-auto leading-relaxed">
-          The ultimate platform for competitive golfers. Book money matches, track real handicaps, 
-          and get paid instantly. No more waiting, no more disputes.
+          The ultimate platform for competitive golfers. Join skill-based competitions, track real handicaps, 
+          and receive instant prize distribution. No more waiting, no more disputes.
         </p>
         
         {/* Feature Icons */}
@@ -65,7 +65,7 @@ const MatchPlayHero = () => {
           </div>
           <div className="flex items-center gap-2 text-accent text-sm sm:text-base">
             <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
-            <span className="font-medium">Instant Payout</span>
+            <span className="font-medium">Instant Prizes</span>
           </div>
           <div className="flex items-center gap-2 text-accent text-sm sm:text-base">
             <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
