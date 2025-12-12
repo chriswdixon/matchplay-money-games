@@ -52,6 +52,33 @@ serve(async (req) => {
       throw new Error('Invalid authentication');
     }
 
+    // Verify user has admin role
+    const { data: roleData, error: roleError } = await supabase
+      .from('user_roles')
+      .select('role')
+      .eq('user_id', user.id)
+      .eq('role', 'admin')
+      .maybeSingle();
+
+    if (roleError) {
+      console.error('[CREATE-GOLF-COURSE] Role check error:', roleError);
+      throw new Error('Authorization check failed');
+    }
+
+    if (!roleData) {
+      console.log('[CREATE-GOLF-COURSE] Unauthorized access attempt', { userId: user.id });
+      return new Response(
+        JSON.stringify({ 
+          error: "Unauthorized: Admin access required",
+          code: "UNAUTHORIZED"
+        }),
+        { 
+          headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+          status: 403 
+        }
+      );
+    }
+
     // Check rate limit
     if (isRateLimited(user.id)) {
       console.log('[CREATE-GOLF-COURSE] Rate limit exceeded', { userId: user.id });
