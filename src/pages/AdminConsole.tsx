@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { useAdminRole } from "@/hooks/useAdminRole";
 import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2 } from "lucide-react";
+import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe } from "lucide-react";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
@@ -17,6 +17,7 @@ import { SocialLinksManagement } from "@/components/admin/SocialLinksManagement"
 import { AIGolfCourseTools } from "@/components/admin/AIGolfCourseTools";
 import { MatchManagement } from "@/components/admin/MatchManagement";
 import { DeletionRequestReviews } from "@/components/admin/DeletionRequestReviews";
+import { GeoBlockingManagement } from "@/components/admin/GeoBlockingManagement";
 
 /**
  * SECURITY NOTE: Admin UI Access Control
@@ -64,7 +65,7 @@ const AdminConsole = () => {
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-10 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-11 lg:w-auto">
             <TabsTrigger value="reports" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               Reports
@@ -96,6 +97,10 @@ const AdminConsole = () => {
             <TabsTrigger value="deletions" className="gap-2">
               <Trash2 className="h-4 w-4" />
               Deletions
+            </TabsTrigger>
+            <TabsTrigger value="geo" className="gap-2">
+              <Globe className="h-4 w-4" />
+              Geo
             </TabsTrigger>
             <TabsTrigger value="golf-data" className="gap-2">
               <Database className="h-4 w-4" />
@@ -134,6 +139,10 @@ const AdminConsole = () => {
 
             <TabsContent value="deletions">
               <DeletionRequestReviews />
+            </TabsContent>
+
+            <TabsContent value="geo">
+              <GeoBlockingManagement />
             </TabsContent>
             
             <TabsContent value="reports">
