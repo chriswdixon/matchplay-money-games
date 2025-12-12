@@ -8,13 +8,14 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ArrowLeft, User, Settings, CreditCard, Target, Shield, DollarSign } from 'lucide-react';
+import { ArrowLeft, User, Settings, CreditCard, Target, Shield, DollarSign, FileText } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
 import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PaymentMethods } from '@/components/profile/PaymentMethods';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
+import { GDPRSettings } from '@/components/profile/GDPRSettings';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -112,7 +113,7 @@ export default function Profile() {
       {/* Content */}
       <div className="max-w-4xl mx-auto px-6 py-8">
         <Tabs value={activeTab} onValueChange={handleTabChange} className="space-y-6">
-          <TabsList className={isMobile ? "inline-flex w-full overflow-x-auto" : showAccountTab ? "grid w-full grid-cols-5" : "grid w-full grid-cols-4"}>
+          <TabsList className={isMobile ? "inline-flex w-full overflow-x-auto" : showAccountTab ? "grid w-full grid-cols-6" : "grid w-full grid-cols-5"}>
             <TabsTrigger value="profile" className="gap-2 whitespace-nowrap">
               <User className="w-4 h-4" />
               {!isMobile && "Profile"}
@@ -134,6 +135,10 @@ export default function Profile() {
             <TabsTrigger value="subscription" className="gap-2 whitespace-nowrap">
               <CreditCard className="w-4 h-4" />
               {!isMobile && "Subscription"}
+            </TabsTrigger>
+            <TabsTrigger value="privacy" className="gap-2 whitespace-nowrap">
+              <FileText className="w-4 h-4" />
+              {!isMobile && "Privacy"}
             </TabsTrigger>
           </TabsList>
 
@@ -159,6 +164,10 @@ export default function Profile() {
 
           <TabsContent value="subscription">
             <SubscriptionManagement isVerified={isVerified} onRequestVerification={() => setShowPasswordDialog(true)} />
+          </TabsContent>
+
+          <TabsContent value="privacy">
+            <GDPRSettings />
           </TabsContent>
         </Tabs>
       </div>

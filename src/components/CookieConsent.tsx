@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Cookie, X } from "lucide-react";
 import { Link } from "react-router-dom";
+import { supabase } from "@/integrations/supabase/client";
 
 const COOKIE_CONSENT_KEY = "matchplay-cookie-consent";
 
@@ -17,14 +18,33 @@ export const CookieConsent = () => {
     }
   }, []);
 
-  const handleAccept = () => {
-    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
-    setIsVisible(false);
+  const recordConsent = async (consented: boolean) => {
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user) {
+        await supabase.from('consent_records').insert({
+          user_id: user.id,
+          consent_type: 'cookie',
+          consented,
+          user_agent: navigator.userAgent,
+          version: '1.0',
+        });
+      }
+    } catch (error) {
+      console.error("Failed to record consent:", error);
+    }
   };
 
-  const handleDecline = () => {
+  const handleAccept = async () => {
+    localStorage.setItem(COOKIE_CONSENT_KEY, "accepted");
+    setIsVisible(false);
+    await recordConsent(true);
+  };
+
+  const handleDecline = async () => {
     localStorage.setItem(COOKIE_CONSENT_KEY, "declined");
     setIsVisible(false);
+    await recordConsent(false);
   };
 
   if (!isVisible) return null;
