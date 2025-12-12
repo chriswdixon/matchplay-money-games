@@ -1,41 +1,11 @@
 import { useState, useEffect, createContext, useContext, ReactNode } from 'react';
+import { supabase } from '@/integrations/supabase/client';
 
-// States with unclear or restrictive skill-gaming regulations
-// This list should be reviewed and updated by legal counsel
-const BLOCKED_STATES = [
-  'AZ', // Arizona - strict gambling laws
-  'AR', // Arkansas - restrictive
-  'CT', // Connecticut - unclear regulations
-  'DE', // Delaware - state-controlled gaming
-  'HI', // Hawaii - no legal gambling
-  'ID', // Idaho - restrictive
-  'IA', // Iowa - strict regulations
-  'LA', // Louisiana - complex gaming laws
-  'MT', // Montana - restrictive
-  'NV', // Nevada - requires licensing
-  'SD', // South Dakota - limited gaming
-  'TN', // Tennessee - restrictive
-  'UT', // Utah - no gambling allowed
-  'WA', // Washington - strict regulations
-];
-
-// Display names for states
-const STATE_NAMES: Record<string, string> = {
-  'AZ': 'Arizona',
-  'AR': 'Arkansas',
-  'CT': 'Connecticut',
-  'DE': 'Delaware',
-  'HI': 'Hawaii',
-  'ID': 'Idaho',
-  'IA': 'Iowa',
-  'LA': 'Louisiana',
-  'MT': 'Montana',
-  'NV': 'Nevada',
-  'SD': 'South Dakota',
-  'TN': 'Tennessee',
-  'UT': 'Utah',
-  'WA': 'Washington',
-};
+interface BlockedState {
+  state_code: string;
+  state_name: string;
+  reason: string | null;
+}
 
 interface GeoLocation {
   state: string | null;
@@ -47,13 +17,15 @@ interface GeoLocation {
 }
 
 interface GeoBlockingContextType extends GeoLocation {
-  blockedStates: string[];
+  blockedStates: BlockedState[];
   getStateName: (code: string) => string;
+  refetchBlockedStates: () => Promise<void>;
 }
 
 const GeoBlockingContext = createContext<GeoBlockingContextType | null>(null);
 
 export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
+  const [blockedStates, setBlockedStates] = useState<BlockedState[]>([]);
   const [location, setLocation] = useState<GeoLocation>({
     state: null,
     stateCode: null,
@@ -63,9 +35,29 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
     error: null,
   });
 
+  const fetchBlockedStates = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('blocked_states')
+        .select('state_code, state_name, reason')
+        .eq('is_active', true);
+
+      if (error) throw error;
+      setBlockedStates(data || []);
+      return data || [];
+    } catch (error) {
+      console.error('Failed to fetch blocked states:', error);
+      return [];
+    }
+  };
+
   useEffect(() => {
     const detectLocation = async () => {
       try {
+        // Fetch blocked states from database first
+        const states = await fetchBlockedStates();
+        const blockedCodes = states.map(s => s.state_code);
+
         // Use a free IP geolocation API
         const response = await fetch('https://ipapi.co/json/', {
           headers: { 'Accept': 'application/json' }
@@ -78,7 +70,7 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
         const data = await response.json();
         
         const stateCode = data.region_code || null;
-        const isBlocked = data.country_code === 'US' && BLOCKED_STATES.includes(stateCode);
+        const isBlocked = data.country_code === 'US' && blockedCodes.includes(stateCode);
         
         setLocation({
           state: data.region || null,
@@ -101,17 +93,20 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
         const cachedState = sessionStorage.getItem('geo_state_code');
         const cachedCountry = sessionStorage.getItem('geo_country');
         
-        if (cachedState) {
+        if (cachedState && blockedStates.length > 0) {
+          const blockedCodes = blockedStates.map(s => s.state_code);
+          const stateName = blockedStates.find(s => s.state_code === cachedState)?.state_name || cachedState;
+          
           setLocation({
-            state: STATE_NAMES[cachedState] || cachedState,
+            state: stateName,
             stateCode: cachedState,
             country: cachedCountry,
-            isBlocked: cachedCountry === 'US' && BLOCKED_STATES.includes(cachedState),
+            isBlocked: cachedCountry === 'US' && blockedCodes.includes(cachedState),
             isLoading: false,
             error: null,
           });
         } else {
-          // Allow access if we can't determine location
+          // Allow access if we can't determine location (fail-open for usability)
           setLocation({
             state: null,
             stateCode: null,
@@ -127,13 +122,21 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
     detectLocation();
   }, []);
 
-  const getStateName = (code: string) => STATE_NAMES[code] || code;
+  const getStateName = (code: string) => {
+    const state = blockedStates.find(s => s.state_code === code);
+    return state?.state_name || code;
+  };
+
+  const refetchBlockedStates = async () => {
+    await fetchBlockedStates();
+  };
 
   return (
     <GeoBlockingContext.Provider value={{ 
       ...location, 
-      blockedStates: BLOCKED_STATES,
-      getStateName 
+      blockedStates,
+      getStateName,
+      refetchBlockedStates
     }}>
       {children}
     </GeoBlockingContext.Provider>

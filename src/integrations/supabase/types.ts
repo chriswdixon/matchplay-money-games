@@ -128,6 +128,42 @@ export type Database = {
         }
         Relationships: []
       }
+      blocked_states: {
+        Row: {
+          blocked_at: string
+          blocked_by: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          reason: string | null
+          state_code: string
+          state_name: string
+          updated_at: string
+        }
+        Insert: {
+          blocked_at?: string
+          blocked_by?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          state_code: string
+          state_name: string
+          updated_at?: string
+        }
+        Update: {
+          blocked_at?: string
+          blocked_by?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          reason?: string | null
+          state_code?: string
+          state_name?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       consent_records: {
         Row: {
           consent_type: string

@@ -56,16 +56,16 @@ export const GeoBlockingOverlay = () => {
           <div className="bg-muted/50 rounded-lg p-4 space-y-3">
             <h3 className="font-semibold">Currently Restricted States</h3>
             <div className="flex flex-wrap gap-2">
-              {blockedStates.map((code) => (
+              {blockedStates.map((blockedState) => (
                 <span 
-                  key={code} 
+                  key={blockedState.state_code} 
                   className={`text-xs px-2 py-1 rounded-full ${
-                    code === stateCode 
+                    blockedState.state_code === stateCode 
                       ? 'bg-destructive/20 text-destructive font-medium' 
                       : 'bg-muted text-muted-foreground'
                   }`}
                 >
-                  {getStateName(code)}
+                  {blockedState.state_name}
                 </span>
               ))}
             </div>

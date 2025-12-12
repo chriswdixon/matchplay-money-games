@@ -633,7 +633,7 @@ export function AuthForm() {
                         <p className="text-sm text-destructive">{validationErrors.dateOfBirth}</p>
                       )}
                       <p className="text-xs text-muted-foreground">
-                        Paid subscriptions require you to be 21 or older
+                        You must be 18+ to participate in skill-based competitions
                       </p>
                     </div>
                     {!email.endsWith('@match-play.co') && (

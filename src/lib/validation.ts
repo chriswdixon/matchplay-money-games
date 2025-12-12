@@ -42,7 +42,7 @@ export const displayNameSchema = z
   .regex(/^[a-zA-Z0-9\s_-]+$/, "Display name can only contain letters, numbers, spaces, underscores, and hyphens")
   .refine((name) => name.length > 0, "Display name cannot be empty");
 
-// Date of birth validation schema
+// Date of birth validation schema - requires 18+ for skill-based competitions
 export const dateOfBirthSchema = z
   .string()
   .refine((date) => {
@@ -53,11 +53,13 @@ export const dateOfBirthSchema = z
   .refine((date) => {
     const birthDate = new Date(date);
     const today = new Date();
-    const age = today.getFullYear() - birthDate.getFullYear();
+    let age = today.getFullYear() - birthDate.getFullYear();
     const monthDiff = today.getMonth() - birthDate.getMonth();
-    const isOldEnough = age > 13 || (age === 13 && monthDiff >= 0);
-    return isOldEnough;
-  }, "You must be at least 13 years old to sign up");
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+      age--;
+    }
+    return age >= 18;
+  }, "You must be at least 18 years old to participate in skill-based competitions with entry fees");
 
 // Invite code validation schema
 export const inviteCodeSchema = z
