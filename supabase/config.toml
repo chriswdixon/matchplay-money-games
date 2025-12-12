@@ -28,3 +28,7 @@ verify_jwt = false
 [functions.recommend-courses]
 [functions.cleanup-course-data]
 [functions.flag-incomplete-matches]
+[functions.export-user-data]
+[functions.send-age-verification]
+[functions.verify-age-token]
+verify_jwt = false
