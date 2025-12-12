@@ -128,6 +128,39 @@ export type Database = {
         }
         Relationships: []
       }
+      age_verification_tokens: {
+        Row: {
+          created_at: string
+          email: string
+          expires_at: string
+          id: string
+          token: string
+          user_id: string
+          verified: boolean
+          verified_at: string | null
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          expires_at: string
+          id?: string
+          token: string
+          user_id: string
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          expires_at?: string
+          id?: string
+          token?: string
+          user_id?: string
+          verified?: boolean
+          verified_at?: string | null
+        }
+        Relationships: []
+      }
       blocked_states: {
         Row: {
           blocked_at: string
@@ -989,6 +1022,8 @@ export type Database = {
       }
       profiles: {
         Row: {
+          age_verified: boolean
+          age_verified_at: string | null
           average_rating: number | null
           created_at: string
           display_name: string | null
@@ -1001,6 +1036,8 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          age_verified?: boolean
+          age_verified_at?: string | null
           average_rating?: number | null
           created_at?: string
           display_name?: string | null
@@ -1013,6 +1050,8 @@ export type Database = {
           user_id: string
         }
         Update: {
+          age_verified?: boolean
+          age_verified_at?: string | null
           average_rating?: number | null
           created_at?: string
           display_name?: string | null

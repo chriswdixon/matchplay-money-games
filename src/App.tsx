@@ -17,6 +17,7 @@ import ResetPassword from "./pages/ResetPassword";
 import AdminConsole from "./pages/AdminConsole";
 import CreateMatch from "./pages/CreateMatch";
 import VerifyEmail from "./pages/VerifyEmail";
+import VerifyAge from "./pages/VerifyAge";
 import Install from "./pages/Install";
 import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
@@ -37,6 +38,7 @@ const App = () => (
           <Route path="/auth" element={<Auth />} />
           <Route path="/auth/reset-password" element={<ResetPassword />} />
           <Route path="/verify" element={<VerifyEmail />} />
+          <Route path="/verify-age" element={<VerifyAge />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/admin" element={<AdminConsole />} />
           <Route path="/create-match" element={<CreateMatch />} />

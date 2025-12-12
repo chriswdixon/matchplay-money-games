@@ -175,6 +175,24 @@ export function AuthForm() {
         if (inviteCode) {
           await linkInviteToUser(inviteCode, user.id);
         }
+
+        // Send age verification email
+        try {
+          await supabase.functions.invoke('send-age-verification', {
+            body: {
+              userId: user.id,
+              email: email,
+              firstName: firstName,
+              dateOfBirth: dateOfBirth,
+            }
+          });
+          toast({
+            title: "Verification Email Sent",
+            description: "Please check your email to confirm you are 18+",
+          });
+        } catch (emailError) {
+          console.error('Failed to send age verification email:', emailError);
+        }
       }
 
       // Require MFA enrollment for new users
