@@ -7,6 +7,8 @@ import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBann
 import { OfflineIndicator } from "@/components/OfflineIndicator";
 import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
 import { CookieConsent } from "@/components/CookieConsent";
+import { GeoBlockingProvider } from "@/hooks/useGeoBlocking";
+import { GeoBlockingOverlay } from "@/components/GeoBlockingOverlay";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import Profile from "./pages/Profile";
@@ -20,30 +22,33 @@ import Terms from "./pages/Terms";
 import Privacy from "./pages/Privacy";
 
 const App = () => (
-  <ActiveMatchProvider>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <EmailConfirmationBanner />
-      <OfflineIndicator />
-      <PWAUpdatePrompt />
-      <CookieConsent />
-      <Routes>
-        <Route path="/" element={<Index />} />
-        <Route path="/auth" element={<Auth />} />
-        <Route path="/auth/reset-password" element={<ResetPassword />} />
-        <Route path="/verify" element={<VerifyEmail />} />
-        <Route path="/profile" element={<Profile />} />
-        <Route path="/admin" element={<AdminConsole />} />
-        <Route path="/create-match" element={<CreateMatch />} />
-        <Route path="/install" element={<Install />} />
-        <Route path="/terms" element={<Terms />} />
-        <Route path="/privacy" element={<Privacy />} />
-        {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-        <Route path="*" element={<NotFound />} />
-      </Routes>
-    </TooltipProvider>
-  </ActiveMatchProvider>
+  <GeoBlockingProvider>
+    <ActiveMatchProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <GeoBlockingOverlay />
+        <EmailConfirmationBanner />
+        <OfflineIndicator />
+        <PWAUpdatePrompt />
+        <CookieConsent />
+        <Routes>
+          <Route path="/" element={<Index />} />
+          <Route path="/auth" element={<Auth />} />
+          <Route path="/auth/reset-password" element={<ResetPassword />} />
+          <Route path="/verify" element={<VerifyEmail />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/admin" element={<AdminConsole />} />
+          <Route path="/create-match" element={<CreateMatch />} />
+          <Route path="/install" element={<Install />} />
+          <Route path="/terms" element={<Terms />} />
+          <Route path="/privacy" element={<Privacy />} />
+          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+      </TooltipProvider>
+    </ActiveMatchProvider>
+  </GeoBlockingProvider>
 );
 
 export default App;

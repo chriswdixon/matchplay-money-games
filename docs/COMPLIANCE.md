@@ -140,24 +140,50 @@ Golf competition with entry fees may be regulated differently across US states. 
 4. **Licensing**: Some states may require gaming licenses
 5. **Registration**: Some states require operator registration
 
-### Jurisdictions Requiring Special Attention
+### Geo-Blocking Implementation
 
-States with stricter gaming regulations:
-- Arizona
-- Arkansas
-- Connecticut
-- Delaware
-- Iowa
-- Louisiana
-- Montana
-- Tennessee
+The platform implements IP-based geo-blocking to restrict access from states with unclear regulations:
 
-**Recommendation**: Obtain state-by-state legal opinion before launch.
+**Component**: `src/hooks/useGeoBlocking.tsx`
+**UI**: `src/components/GeoBlockingOverlay.tsx`
+
+#### Currently Blocked States
+
+Based on legal review requirements, the following states are restricted:
+
+| State | Code | Reason |
+|-------|------|--------|
+| Arizona | AZ | Strict gambling laws |
+| Arkansas | AR | Restrictive regulations |
+| Connecticut | CT | Unclear skill-gaming regulations |
+| Delaware | DE | State-controlled gaming |
+| Hawaii | HI | No legal gambling |
+| Idaho | ID | Restrictive regulations |
+| Iowa | IA | Strict regulations |
+| Louisiana | LA | Complex gaming laws |
+| Montana | MT | Restrictive regulations |
+| Nevada | NV | Requires licensing |
+| South Dakota | SD | Limited gaming |
+| Tennessee | TN | Restrictive regulations |
+| Utah | UT | No gambling allowed |
+| Washington | WA | Strict regulations |
+
+#### How It Works
+
+1. User visits the platform
+2. IP geolocation API determines user's state
+3. If in blocked state, overlay blocks access
+4. Session cached to avoid repeated lookups
+5. Error fallback allows access (fail-open for usability)
+
+#### Admin Configuration
+
+The blocked states list is maintained in `src/hooks/useGeoBlocking.tsx`. Legal counsel should review and update this list as regulations change.
 
 ### Compliance Features
 
 1. **Age Verification**: Date of birth collected at registration
-2. **Jurisdiction Checks**: Consider geo-blocking restricted states
+2. **Geo-Blocking**: IP-based restriction for unclear jurisdictions
 3. **Transparent Fees**: Platform fee clearly disclosed
 4. **Skill Emphasis**: Marketing emphasizes skill-based nature
 5. **Handicap System**: Creates fair competition, reinforcing skill element
@@ -182,6 +208,7 @@ States with stricter gaming regulations:
 - [x] Consent records database
 - [x] Profile data access (users can view their data)
 - [x] Profile data rectification (users can edit their profile)
+- [x] Admin deletion request review panel
 - [ ] Data breach notification process (operational procedure needed)
 - [ ] DPO appointment (if processing significant EU data)
 
@@ -195,8 +222,9 @@ States with stricter gaming regulations:
 
 ### US Compliance
 
+- [x] Geo-blocking for restricted states
+- [x] Blocked state list with clear messaging
 - [ ] State-by-state legal review
-- [ ] Age verification process
-- [ ] Geo-blocking for restricted states (if needed)
+- [ ] Age verification process enhancement
 - [ ] Consumer protection disclosures
 - [ ] Anti-money laundering considerations
