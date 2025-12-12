@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -11,7 +11,9 @@ import {
   Loader2, 
   CheckCircle, 
   AlertTriangle,
-  FileJson
+  FileJson,
+  Mail,
+  BadgeCheck
 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
@@ -34,6 +36,47 @@ export const GDPRSettings = () => {
   const [deleteLoading, setDeleteLoading] = useState(false);
   const [deleteReason, setDeleteReason] = useState("");
   const [deletionRequested, setDeletionRequested] = useState(false);
+  const [ageVerified, setAgeVerified] = useState<boolean | null>(null);
+  const [resendLoading, setResendLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchAgeVerificationStatus = async () => {
+      if (!user) return;
+      
+      const { data } = await supabase
+        .from('profiles')
+        .select('age_verified')
+        .eq('user_id', user.id)
+        .maybeSingle();
+      
+      setAgeVerified(data?.age_verified ?? false);
+    };
+
+    fetchAgeVerificationStatus();
+  }, [user]);
+
+  const handleResendVerification = async () => {
+    if (!user?.email) {
+      toast.error("No email address found");
+      return;
+    }
+
+    setResendLoading(true);
+    try {
+      const { error } = await supabase.functions.invoke('send-age-verification', {
+        body: { email: user.email, userId: user.id }
+      });
+
+      if (error) throw error;
+
+      toast.success("Verification email sent! Check your inbox.");
+    } catch (error) {
+      console.error("Resend verification error:", error);
+      toast.error("Failed to send verification email. Please try again.");
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const handleExportData = async () => {
     if (!user) {
@@ -181,7 +224,60 @@ export const GDPRSettings = () => {
         </CardContent>
       </Card>
 
-      {/* Export Data */}
+      {/* Age Verification Status */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <BadgeCheck className="h-5 w-5 text-primary" />
+            Age Verification
+          </CardTitle>
+          <CardDescription>
+            You must be 18+ to use MatchPlay for skill-based competitions.
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
+          {ageVerified === null ? (
+            <div className="flex items-center gap-2 text-muted-foreground">
+              <Loader2 className="h-4 w-4 animate-spin" />
+              Checking verification status...
+            </div>
+          ) : ageVerified ? (
+            <Alert className="bg-primary/10 border-primary">
+              <CheckCircle className="h-4 w-4 text-primary" />
+              <AlertDescription>
+                Your age has been verified. You have full access to all MatchPlay features.
+              </AlertDescription>
+            </Alert>
+          ) : (
+            <>
+              <Alert variant="destructive" className="mb-4">
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  Your age has not been verified yet. Please check your email for the verification link, 
+                  or click below to resend it.
+                </AlertDescription>
+              </Alert>
+              <Button
+                onClick={handleResendVerification}
+                disabled={resendLoading}
+                variant="outline"
+              >
+                {resendLoading ? (
+                  <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Sending...
+                  </>
+                ) : (
+                  <>
+                    <Mail className="mr-2 h-4 w-4" />
+                    Resend Verification Email
+                  </>
+                )}
+              </Button>
+            </>
+          )}
+        </CardContent>
+      </Card>
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
