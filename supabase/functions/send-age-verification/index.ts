@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 import { Resend } from "npm:resend@2.0.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
 
@@ -9,12 +10,13 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
-interface AgeVerificationRequest {
-  userId: string;
-  email: string;
-  firstName: string;
-  dateOfBirth: string;
-}
+// Input validation schema
+const ageVerificationSchema = z.object({
+  userId: z.string().uuid("Invalid user ID format"),
+  email: z.string().email("Invalid email format").max(255, "Email too long"),
+  firstName: z.string().trim().min(1, "First name required").max(50, "First name too long").optional(),
+  dateOfBirth: z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "Date must be in YYYY-MM-DD format"),
+});
 
 serve(async (req) => {
   if (req.method === "OPTIONS") {
@@ -27,11 +29,22 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { userId, email, firstName, dateOfBirth }: AgeVerificationRequest = await req.json();
-
-    if (!userId || !email || !dateOfBirth) {
-      throw new Error("Missing required fields");
+    // Parse and validate input
+    const rawBody = await req.json();
+    const validationResult = ageVerificationSchema.safeParse(rawBody);
+    
+    if (!validationResult.success) {
+      console.error("Validation error:", validationResult.error.errors);
+      return new Response(
+        JSON.stringify({ error: "Invalid input: " + validationResult.error.errors[0]?.message }),
+        { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
     }
+
+    const { userId, email, firstName, dateOfBirth } = validationResult.data;
+    
+    // Sanitize firstName for use in email template
+    const sanitizedFirstName = firstName ? firstName.replace(/[<>"'&]/g, '') : 'there';
 
     // Calculate age
     const birthDate = new Date(dateOfBirth);
@@ -92,7 +105,7 @@ serve(async (req) => {
               <h2 style="color: #1a1a1a; margin: 0 0 20px 0;">Confirm Your Age</h2>
               
               <p style="color: #4a4a4a; line-height: 1.6; margin: 0 0 20px 0;">
-                Hi ${firstName || 'there'},
+                Hi ${sanitizedFirstName},
               </p>
               
               <p style="color: #4a4a4a; line-height: 1.6; margin: 0 0 20px 0;">
