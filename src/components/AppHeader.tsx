@@ -37,8 +37,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-[env(safe-area-inset-top)]">
-      <div className="flex h-16 items-center gap-2 px-4 md:container md:justify-between">
+    <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-[env(safe-area-inset-top)]" role="banner">
+      <nav className="flex h-16 items-center gap-2 px-4 md:container md:justify-between" aria-label="Main navigation">
         {/* Left: Logo */}
         <div className="flex items-center shrink-0">
           <Link to="/" className="flex items-center">
@@ -68,8 +68,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
           {showNavMenu && navItems && (
             <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
               <SheetTrigger asChild>
-                <Button variant="ghost" size="icon" className="text-accent hover:text-accent hover:bg-accent/10">
-                  <Menu className="h-5 w-5" />
+                <Button variant="ghost" size="icon" className="text-accent hover:text-accent hover:bg-accent/10" aria-label="Open navigation menu">
+                  <Menu className="h-5 w-5" aria-hidden="true" />
                 </Button>
               </SheetTrigger>
               <SheetContent side="right" className="w-[250px]">
@@ -107,7 +107,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
           
           <UserMenu />
         </div>
-      </div>
+      </nav>
     </header>
   );
 };

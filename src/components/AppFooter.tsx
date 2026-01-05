@@ -33,7 +33,7 @@ const AppFooter = () => {
   );
 
   return (
-    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-8">
+    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-8" role="contentinfo">
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Copyright */}
@@ -42,23 +42,23 @@ const AppFooter = () => {
           </div>
 
           {/* Legal Links */}
-          <div className="flex items-center gap-2 md:gap-4">
+          <nav className="flex items-center gap-2 md:gap-4" aria-label="Legal navigation">
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/terms">Terms</Link>
+              <Link to="/terms">Terms of Service</Link>
             </Button>
             <Button variant="ghost" size="sm" asChild>
-              <Link to="/privacy">Privacy</Link>
+              <Link to="/privacy">Privacy Policy</Link>
             </Button>
             <Button variant="ghost" size="sm" asChild>
               <a href="mailto:support@match-play.co" className="flex items-center gap-2">
-                <Mail className="w-4 h-4" />
-                Support
+                <Mail className="w-4 h-4" aria-hidden="true" />
+                <span>Support</span>
               </a>
             </Button>
-          </div>
+          </nav>
 
           {/* Social Links - Connected via Ayrshare */}
-          <div className="flex items-center gap-2">
+          <nav className="flex items-center gap-2" aria-label="Social media links">
             {!loading && connectedPlatforms.map((platform) => {
               const platformLower = platform.toLowerCase();
               const Icon = platformIcons[platformLower as keyof typeof platformIcons];
@@ -72,14 +72,14 @@ const AppFooter = () => {
                     href={url} 
                     target="_blank" 
                     rel="noopener noreferrer" 
-                    aria-label={platform}
+                    aria-label={`Follow us on ${platform}`}
                   >
-                    <Icon className="w-4 h-4" />
+                    <Icon className="w-4 h-4" aria-hidden="true" />
                   </a>
                 </Button>
               );
             })}
-          </div>
+          </nav>
         </div>
       </div>
     </footer>

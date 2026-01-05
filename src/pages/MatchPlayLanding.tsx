@@ -140,6 +140,10 @@ const MatchPlayLanding = () => {
   if (user) {
     return (
       <div className="min-h-screen bg-background flex flex-col">
+        {/* WCAG 2.1 AA - Skip to main content link */}
+        <a href="#main-content" className="skip-link">
+          Skip to main content
+        </a>
         <AppHeader 
           showNavMenu 
           onNavSelect={setCurrentTab}
@@ -148,7 +152,7 @@ const MatchPlayLanding = () => {
           onReturnToMatch={handleReturnToMatch}
           hideReturnButton={currentTab === "active-match"}
         />
-        <main className="container flex-1 py-8 relative">
+        <main id="main-content" className="container flex-1 py-8 relative" role="main">
           {/* Background for logged-in users in light mode */}
           {isLightMode && (
             <div className="fixed inset-0 z-0 pointer-events-none">
@@ -232,6 +236,10 @@ const MatchPlayLanding = () => {
   // Landing page for non-logged-in users
   return (
     <div className="min-h-screen bg-background">
+      {/* WCAG 2.1 AA - Skip to main content link */}
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       {/* Dark Mode Toggle for Landing Page */}
       <div className="fixed top-4 right-4 z-50">
         <Button 
@@ -251,9 +259,11 @@ const MatchPlayLanding = () => {
       <MatchPlayHero />
       
       {/* Match Finder Section */}
-      <div id="matches-section">
-        <MatchFinder />
-      </div>
+      <main id="main-content" role="main">
+        <div id="matches-section">
+          <MatchFinder />
+        </div>
+      </main>
       
       {/* App Features Section */}
       <AppFeatures />
@@ -265,12 +275,12 @@ const MatchPlayLanding = () => {
       <MembershipTiers />
       
       {/* Footer CTA */}
-      <section className="py-20 px-6 bg-gradient-hero text-white">
+      <section className="py-20 px-6 bg-gradient-hero text-white" aria-labelledby="cta-heading">
         <div className="max-w-4xl mx-auto text-center">
           <Badge className="mb-6 bg-accent text-accent-foreground">
             Ready to Transform Your Golf Game?
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6">
+          <h2 id="cta-heading" className="text-4xl md:text-5xl font-bold mb-6">
             Join the Future of Competitive Golf
           </h2>
           <p className="text-xl mb-8 text-white/90 max-w-2xl mx-auto">
@@ -295,7 +305,7 @@ const MatchPlayLanding = () => {
           </div>
           
           <div className="text-center text-sm text-white/70">
-            <p className="mb-2">🏌️ Currently piloting in select states</p>
+            <p className="mb-2"><span aria-hidden="true">🏌️</span> Currently piloting in select states</p>
             <p>Be among the first 1,000 members to shape the future of competitive golf</p>
           </div>
         </div>
@@ -307,8 +317,9 @@ const MatchPlayLanding = () => {
           onClick={scrollToTop}
           className="fixed bottom-6 right-6 w-12 h-12 rounded-full bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 z-50"
           size="icon"
+          aria-label="Scroll to top of page"
         >
-          <ArrowUp className="w-5 h-5" />
+          <ArrowUp className="w-5 h-5" aria-hidden="true" />
         </Button>
       )}
     </div>

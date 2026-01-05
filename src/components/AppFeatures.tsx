@@ -61,13 +61,13 @@ const AppFeatures = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-muted/30">
+    <section className="py-20 px-6 bg-muted/30" aria-labelledby="features-heading">
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            🚀 Platform Features
+            <span aria-hidden="true">🚀</span> Platform Features
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 id="features-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Five Services, One Platform
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
@@ -85,7 +85,7 @@ const AppFeatures = () => {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <CardHeader className="pb-4">
-                <div className="w-16 h-16 bg-gradient-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-4">
+                <div className="w-16 h-16 bg-gradient-primary text-primary-foreground rounded-2xl flex items-center justify-center mb-4" aria-hidden="true">
                   {feature.icon}
                 </div>
                 <CardTitle className="text-xl font-bold text-foreground">
@@ -96,10 +96,10 @@ const AppFeatures = () => {
                 </CardDescription>
               </CardHeader>
               <CardContent>
-                <ul className="space-y-2">
+                <ul className="space-y-2" aria-label={`${feature.title} benefits`}>
                   {feature.benefits.map((benefit, benefitIndex) => (
                     <li key={benefitIndex} className="flex items-center gap-2 text-sm">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0"></div>
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full flex-shrink-0" aria-hidden="true"></div>
                       <span className="text-foreground">{benefit}</span>
                     </li>
                   ))}
@@ -116,12 +116,12 @@ const AppFeatures = () => {
           </h3>
           <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
             {additionalFeatures.map((feature, index) => (
-              <div 
-                key={feature.title}
-                className="flex items-start gap-3 animate-fade-in"
-                style={{ animationDelay: `${index * 0.05}s` }}
-              >
-                <div className="w-10 h-10 bg-gradient-primary text-primary-foreground rounded-xl flex items-center justify-center flex-shrink-0">
+                <div 
+                  key={feature.title}
+                  className="flex items-start gap-3 animate-fade-in"
+                  style={{ animationDelay: `${index * 0.05}s` }}
+                >
+                  <div className="w-10 h-10 bg-gradient-primary text-primary-foreground rounded-xl flex items-center justify-center flex-shrink-0" aria-hidden="true">
                   {feature.icon}
                 </div>
                 <div>
@@ -134,29 +134,32 @@ const AppFeatures = () => {
         </div>
 
         {/* Competitive Advantage */}
-        <div className="mt-16 text-center">
+        <aside className="mt-16 text-center" aria-labelledby="advantage-heading">
           <div className="bg-gradient-hero text-white rounded-2xl p-8 md:p-12">
-            <h3 className="text-3xl font-bold mb-4">The Competitive Edge</h3>
-            <p className="text-xl mb-6 text-white/90 max-w-2xl mx-auto">
+            <h3 id="advantage-heading" className="text-3xl font-bold mb-4">The Competitive Edge</h3>
+            <blockquote className="text-xl mb-6 text-white/90 max-w-2xl mx-auto">
               "Because these are competitive matches with real stakes, the scoring is way more accurate. 
               You can't cheat your score - creating the truest handicap system ever built."
-            </p>
-            <div className="grid sm:grid-cols-3 gap-6 mt-8">
+            </blockquote>
+            <dl className="grid sm:grid-cols-3 gap-6 mt-8">
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">100%</div>
-                <div className="text-sm text-white/80">Accurate Scoring</div>
+                <dt className="sr-only">Scoring Accuracy</dt>
+                <dd className="text-2xl font-bold text-accent mb-2">100%</dd>
+                <dt className="text-sm text-white/80">Accurate Scoring</dt>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">0</div>
-                <div className="text-sm text-white/80">Payment Disputes</div>
+                <dt className="sr-only">Number of Payment Disputes</dt>
+                <dd className="text-2xl font-bold text-accent mb-2">0</dd>
+                <dt className="text-sm text-white/80">Payment Disputes</dt>
               </div>
               <div className="text-center">
-                <div className="text-2xl font-bold text-accent mb-2">Instant</div>
-                <div className="text-sm text-white/80">Prize Distribution</div>
+                <dt className="sr-only">Prize Distribution Speed</dt>
+                <dd className="text-2xl font-bold text-accent mb-2">Instant</dd>
+                <dt className="text-sm text-white/80">Prize Distribution</dt>
               </div>
-            </div>
+            </dl>
           </div>
-        </div>
+        </aside>
       </div>
     </section>
   );

@@ -86,13 +86,13 @@ const MembershipTiers = () => {
   ];
 
   return (
-    <section className="py-20 px-6 bg-gradient-card">
+    <section className="py-20 px-6 bg-gradient-card" aria-labelledby="pricing-heading">
       <div className="max-w-6xl mx-auto">
         <div className="text-center mb-16 animate-fade-in">
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
-            💳 Membership Plans
+            <span aria-hidden="true">💳</span> Membership Plans
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 id="pricing-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             Choose Your Game Level
           </h2>
           <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
@@ -125,10 +125,10 @@ const MembershipTiers = () => {
                   tier.colorScheme === 'primary' ? 'bg-primary text-primary-foreground' :
                   tier.colorScheme === 'warning' ? 'bg-warning text-warning-foreground' :
                   'bg-secondary text-secondary-foreground'
-                }`}>
+                }`} aria-hidden="true">
                   {tier.icon}
                 </div>
-                <CardTitle className="text-2xl font-bold text-foreground">{tier.name}</CardTitle>
+                <CardTitle className="text-2xl font-bold text-foreground" id={`tier-${tier.tierKey}`}>{tier.name}</CardTitle>
                 <CardDescription className="text-muted-foreground">{tier.description}</CardDescription>
                 
                 {tier.showTabs && (
@@ -168,14 +168,14 @@ const MembershipTiers = () => {
               </CardHeader>
               
               <CardContent className="pb-6">
-                <ul className="space-y-3">
+                <ul className="space-y-3" aria-labelledby={`tier-${tier.tierKey}`}>
                   {tier.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-3">
                       <Check className={`w-5 h-5 mt-0.5 flex-shrink-0 ${
                         tier.colorScheme === 'primary' ? 'text-primary' :
                         tier.colorScheme === 'warning' ? 'text-warning' :
                         'text-muted-foreground'
-                      }`} />
+                      }`} aria-hidden="true" />
                       <span className="text-foreground">{feature}</span>
                     </li>
                   ))}

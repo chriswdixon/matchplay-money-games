@@ -17,12 +17,15 @@ const MatchPlayHero = () => {
   };
   
   return (
-    <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <section 
+      className="relative min-h-screen flex items-center justify-center overflow-hidden"
+      aria-labelledby="hero-heading"
+    >
       {/* Navigation */}
       {user && (
-        <div className="absolute top-6 right-6 z-20">
+        <nav className="absolute top-6 right-6 z-20" aria-label="User navigation">
           <UserMenu />
-        </div>
+        </nav>
       )}
       
       {/* Hero Background */}
@@ -41,7 +44,7 @@ const MatchPlayHero = () => {
           🏌️ Revolutionary Golf Experience
         </Badge>
         
-        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
+        <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
           Welcome to{" "}
           <span className="bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent">
             MatchPlay
@@ -54,24 +57,24 @@ const MatchPlayHero = () => {
         </p>
         
         {/* Feature Icons */}
-        <div className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10">
-          <div className="flex items-center gap-2 text-accent text-sm sm:text-base">
-            <MapPin className="w-5 h-5 sm:w-6 sm:h-6" />
+        <ul className="flex flex-wrap justify-center gap-4 sm:gap-6 md:gap-8 mb-8 sm:mb-10 list-none" aria-label="Key features">
+          <li className="flex items-center gap-2 text-accent text-sm sm:text-base">
+            <MapPin className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
             <span className="font-medium">GPS Matching</span>
-          </div>
-          <div className="flex items-center gap-2 text-accent text-sm sm:text-base">
-            <Users className="w-5 h-5 sm:w-6 sm:h-6" />
+          </li>
+          <li className="flex items-center gap-2 text-accent text-sm sm:text-base">
+            <Users className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
             <span className="font-medium">Live Scoring</span>
-          </div>
-          <div className="flex items-center gap-2 text-accent text-sm sm:text-base">
-            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" />
+          </li>
+          <li className="flex items-center gap-2 text-accent text-sm sm:text-base">
+            <DollarSign className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
             <span className="font-medium">Instant Prizes</span>
-          </div>
-          <div className="flex items-center gap-2 text-accent text-sm sm:text-base">
-            <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
+          </li>
+          <li className="flex items-center gap-2 text-accent text-sm sm:text-base">
+            <Trophy className="w-5 h-5 sm:w-6 sm:h-6" aria-hidden="true" />
             <span className="font-medium">Tournaments</span>
-          </div>
-        </div>
+          </li>
+        </ul>
         
         {/* CTA Buttons */}
         <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center items-center">
@@ -115,23 +118,26 @@ const MatchPlayHero = () => {
         </div>
         
         {/* Trust Indicators */}
-        <div className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/20">
+        <aside className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/20" aria-label="Platform statistics">
           <p className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4">Trusted by competitive golfers nationwide</p>
-          <div className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 text-accent/80">
+          <dl className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 text-accent/80">
             <div className="text-center">
-              <div className="text-xl sm:text-2xl font-bold">1,000+</div>
-              <div className="text-xs">Active Members</div>
+              <dt className="sr-only">Active Members</dt>
+              <dd className="text-xl sm:text-2xl font-bold">1,000+</dd>
+              <dt className="text-xs">Active Members</dt>
             </div>
             <div className="text-center">
-              <div className="text-xl sm:text-2xl font-bold">$500K+</div>
-              <div className="text-xs">Matches Played</div>
+              <dt className="sr-only">Matches Played Value</dt>
+              <dd className="text-xl sm:text-2xl font-bold">$500K+</dd>
+              <dt className="text-xs">Matches Played</dt>
             </div>
             <div className="text-center">
-              <div className="text-xl sm:text-2xl font-bold">5,000+</div>
-              <div className="text-xs">Rounds Scored</div>
+              <dt className="sr-only">Rounds Scored</dt>
+              <dd className="text-xl sm:text-2xl font-bold">5,000+</dd>
+              <dt className="text-xs">Rounds Scored</dt>
             </div>
-          </div>
-        </div>
+          </dl>
+        </aside>
       </div>
 
       {/* Scroll Down Arrow */}
