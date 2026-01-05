@@ -50,16 +50,22 @@ export const CookieConsent = () => {
   if (!isVisible) return null;
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg animate-in slide-in-from-bottom-5 duration-300">
+    <div 
+      role="dialog" 
+      aria-labelledby="cookie-consent-title"
+      aria-describedby="cookie-consent-description"
+      className="fixed bottom-0 left-0 right-0 z-50 p-4 bg-background/95 backdrop-blur-sm border-t border-border shadow-lg animate-in slide-in-from-bottom-5 duration-300"
+    >
+      <h2 id="cookie-consent-title" className="sr-only">Cookie Consent</h2>
       <div className="container mx-auto max-w-4xl">
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
           <div className="flex items-start gap-3 flex-1">
-            <Cookie className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" />
-            <div className="text-sm text-muted-foreground">
+            <Cookie className="h-5 w-5 text-primary mt-0.5 flex-shrink-0" aria-hidden="true" />
+            <div id="cookie-consent-description" className="text-sm text-muted-foreground">
               <p>
                 We use cookies to enhance your experience, analyze site traffic, and for marketing purposes. 
                 By clicking "Accept", you consent to our use of cookies. Read our{" "}
-                <Link to="/privacy" className="text-primary hover:underline">
+                <Link to="/privacy" className="text-primary hover:underline focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
                   Privacy Policy
                 </Link>{" "}
                 for more information.

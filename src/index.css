@@ -131,6 +131,33 @@
   body {
     @apply bg-background text-foreground font-sans;
   }
+
+  /* WCAG 2.1 AA - Skip link for keyboard navigation */
+  .skip-link {
+    @apply absolute left-0 bg-primary text-primary-foreground px-4 py-2 z-[100] font-medium;
+    top: -100%;
+    transition: top 0.2s ease;
+  }
+  
+  .skip-link:focus {
+    top: 0;
+  }
+
+  /* WCAG 2.1 AA - Enhanced focus indicators */
+  *:focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Ensure reduced motion preference is respected */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
 }
 
 @layer utilities {

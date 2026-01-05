@@ -325,13 +325,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   return (
-    <section className="py-4 md:py-20 px-3 md:px-6 bg-background">
+    <section className="py-4 md:py-20 px-3 md:px-6 bg-background" aria-labelledby="match-finder-heading">
       <div className="w-full md:max-w-[1400px] md:mx-auto">
         <div className="text-center mb-16 animate-fade-in px-0 md:px-0">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
-            {showPastMatches ? '📜 Match History' : '🎯 Live Match Finder'}
+            <span aria-hidden="true">{showPastMatches ? '📜' : '🎯'}</span> {showPastMatches ? 'Match History' : 'Live Match Finder'}
           </Badge>
-          <h2 className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 id="match-finder-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
             {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
           </h2>
           {showPastMatches && (
@@ -344,7 +344,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               <CreateMatchButton onMatchCreated={refetch} />
               {location && (
                 <p className="text-sm text-muted-foreground">
-                  📍 Location enabled • Showing matches within {searchRadius}mi
+                  <span aria-hidden="true">📍</span> Location enabled • Showing matches within {searchRadius}mi
                 </p>
               )}
             </div>
