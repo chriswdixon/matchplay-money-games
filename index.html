@@ -5,6 +5,8 @@
     <!-- Preconnect hints FIRST for critical origins to reduce network dependency chain -->
     <link rel="preconnect" href="https://rgdegvpfnilzkqpexgij.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://rgdegvpfnilzkqpexgij.supabase.co" />
+    <!-- Preload hint for LCP hero image - improves Largest Contentful Paint -->
+    <link rel="preload" as="image" href="/src/assets/hero-golf-course.jpg" fetchpriority="high" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />

@@ -34,6 +34,9 @@ const MatchPlayHero = () => {
           src={heroImage} 
           alt="Premium golf course at sunset"
           className="w-full h-full object-cover"
+          fetchPriority="high"
+          loading="eager"
+          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
       </div>
