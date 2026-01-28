@@ -12,22 +12,24 @@ interface ActiveMatchContextType {
 
 const ActiveMatchContext = createContext<ActiveMatchContextType | undefined>(undefined);
 
-export function ActiveMatchProvider({ children }: { children: ReactNode }) {
-  const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
-  const [activeMatchName, setActiveMatchName] = useState<string | null>(null);
+function ActiveMatchAutoDetector({
+  userId,
+  activeMatchId,
+  setActiveMatchId,
+  setActiveMatchName,
+}: {
+  userId: string;
+  activeMatchId: string | null;
+  setActiveMatchId: (id: string | null) => void;
+  setActiveMatchName: (name: string | null) => void;
+}) {
+  // Only mounted when a user exists, so we avoid fetching matches for logged-out visitors.
   const { matches } = useMatches();
-  const { user } = useAuth();
 
   // Auto-detect active match from matches
   useEffect(() => {
-    if (!user) {
-      setActiveMatchId(null);
-      setActiveMatchName(null);
-      return;
-    }
-
-    const startedMatch = matches.find(match => 
-      match.status === 'started' && match.user_joined
+    const startedMatch = matches.find(
+      (match) => match.status === 'started' && match.user_joined
     );
 
     if (startedMatch && !activeMatchId) {
@@ -39,7 +41,22 @@ export function ActiveMatchProvider({ children }: { children: ReactNode }) {
       setActiveMatchId(null);
       setActiveMatchName(null);
     }
-  }, [matches, user]);
+  }, [matches, activeMatchId, setActiveMatchId, setActiveMatchName]);
+
+  return null;
+}
+
+export function ActiveMatchProvider({ children }: { children: ReactNode }) {
+  const [activeMatchId, setActiveMatchId] = useState<string | null>(null);
+  const [activeMatchName, setActiveMatchName] = useState<string | null>(null);
+  const { user } = useAuth();
+
+  useEffect(() => {
+    if (!user) {
+      setActiveMatchId(null);
+      setActiveMatchName(null);
+    }
+  }, [user]);
 
   const setActiveMatch = (matchId: string | null, matchName: string | null) => {
     setActiveMatchId(matchId);
@@ -61,6 +78,14 @@ export function ActiveMatchProvider({ children }: { children: ReactNode }) {
         clearActiveMatch,
       }}
     >
+      {user ? (
+        <ActiveMatchAutoDetector
+          userId={user.id}
+          activeMatchId={activeMatchId}
+          setActiveMatchId={setActiveMatchId}
+          setActiveMatchName={setActiveMatchName}
+        />
+      ) : null}
       {children}
     </ActiveMatchContext.Provider>
   );

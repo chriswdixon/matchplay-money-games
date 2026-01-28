@@ -15,7 +15,6 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
 import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
-import { useMatches } from "@/hooks/useMatches";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useSearchParams } from "react-router-dom";
 import { cn } from "@/lib/utils";
@@ -26,7 +25,6 @@ import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
-  const { matches } = useMatches();
   const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [currentTab, setCurrentTab] = useState("matches");
@@ -109,14 +107,6 @@ const MatchPlayLanding = () => {
   }, [hasActiveMatch]);
 
   const isLightMode = theme === "light";
-
-  // Check if user has an active match
-  const activeMatch = useMemo(() => {
-    if (!user) return null;
-    return matches.find(match => 
-      match.status === 'started' && match.user_joined
-    );
-  }, [matches, user]);
 
   useEffect(() => {
     const handleScroll = () => {
