@@ -16,6 +16,7 @@ export default defineConfig(({ mode }) => ({
     componentTagger(),
     VitePWA({
       registerType: 'autoUpdate',
+      injectRegister: 'script-defer',
       includeAssets: ['favicon.ico'],
       manifest: {
         name: 'MatchPlay - Money Golf Matches',
