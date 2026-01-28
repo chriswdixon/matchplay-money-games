@@ -486,7 +486,7 @@ export function AuthForm() {
                     className={validationErrors.email ? "border-destructive" : ""}
                   />
                   {validationErrors.email && (
-                    <p className="text-sm text-destructive">{validationErrors.email}</p>
+                    <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.email}</p>
                   )}
                 </div>
                 <Button type="submit" className="w-full" disabled={resetLoading}>
@@ -516,7 +516,7 @@ export function AuthForm() {
                         className={validationErrors.email ? "border-destructive" : ""}
                       />
                       {validationErrors.email && (
-                        <p className="text-sm text-destructive">{validationErrors.email}</p>
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.email}</p>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -531,7 +531,7 @@ export function AuthForm() {
                         className={validationErrors.password ? "border-destructive" : ""}
                       />
                       {validationErrors.password && (
-                        <p className="text-sm text-destructive">{validationErrors.password}</p>
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.password}</p>
                       )}
                     </div>
                     <div className="flex justify-end">
@@ -586,7 +586,7 @@ export function AuthForm() {
                           className={validationErrors.firstName ? "border-destructive" : ""}
                         />
                         {validationErrors.firstName && (
-                          <p className="text-sm text-destructive">{validationErrors.firstName}</p>
+                          <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.firstName}</p>
                         )}
                       </div>
                       <div className="space-y-2">
@@ -601,7 +601,7 @@ export function AuthForm() {
                           className={validationErrors.lastName ? "border-destructive" : ""}
                         />
                         {validationErrors.lastName && (
-                          <p className="text-sm text-destructive">{validationErrors.lastName}</p>
+                          <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.lastName}</p>
                         )}
                       </div>
                     </div>
@@ -616,7 +616,7 @@ export function AuthForm() {
                         className={validationErrors.displayName ? "border-destructive" : ""}
                       />
                       {validationErrors.displayName && (
-                        <p className="text-sm text-destructive">{validationErrors.displayName}</p>
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.displayName}</p>
                       )}
                       <p className="text-xs text-muted-foreground">
                         This is how other players will see you
@@ -634,7 +634,7 @@ export function AuthForm() {
                         className={validationErrors.email ? "border-destructive" : ""}
                       />
                       {validationErrors.email && (
-                        <p className="text-sm text-destructive">{validationErrors.email}</p>
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.email}</p>
                       )}
                     </div>
                     <div className="space-y-2">
@@ -648,7 +648,7 @@ export function AuthForm() {
                         className={validationErrors.dateOfBirth ? "border-destructive" : ""}
                       />
                       {validationErrors.dateOfBirth && (
-                        <p className="text-sm text-destructive">{validationErrors.dateOfBirth}</p>
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.dateOfBirth}</p>
                       )}
                       <p className="text-xs text-muted-foreground">
                         You must be 18+ to participate in skill-based competitions
@@ -667,7 +667,7 @@ export function AuthForm() {
                           className={validationErrors.inviteCode ? "border-destructive" : ""}
                         />
                         {validationErrors.inviteCode && (
-                          <p className="text-sm text-destructive">{validationErrors.inviteCode}</p>
+                          <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.inviteCode}</p>
                         )}
                         <div className="flex items-center justify-between">
                           <p className="text-xs text-muted-foreground">
@@ -699,7 +699,7 @@ export function AuthForm() {
                         className={validationErrors.password ? "border-destructive" : ""}
                       />
                       {validationErrors.password && (
-                        <p className="text-sm text-destructive">{validationErrors.password}</p>
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.password}</p>
                       )}
                       {passwordWarnings.length > 0 && (
                         <Alert className="mt-2">

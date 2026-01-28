@@ -231,19 +231,19 @@ const MatchPlayLanding = () => {
         Skip to main content
       </a>
       {/* Dark Mode Toggle for Landing Page */}
-      <div className="fixed top-4 right-4 z-50">
+      <header className="fixed top-0 left-0 right-0 z-50 p-4 flex justify-end" role="banner">
         <Button 
           variant="ghost" 
           size="icon" 
           className="bg-background/80 backdrop-blur-sm border border-border min-w-[44px] min-h-[44px] touch-manipulation relative"
           style={{ WebkitTapHighlightColor: 'transparent' }}
           onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
+          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
         >
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-          <span className="sr-only">Toggle theme</span>
+          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" aria-hidden="true" />
+          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" aria-hidden="true" />
         </Button>
-      </div>
+      </header>
       
       {/* Hero Section */}
       <MatchPlayHero />
@@ -312,6 +312,9 @@ const MatchPlayLanding = () => {
           <ArrowUp className="w-5 h-5" aria-hidden="true" />
         </Button>
       )}
+      
+      {/* Footer */}
+      <AppFooter />
     </div>
   );
 };

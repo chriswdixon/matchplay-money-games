@@ -78,10 +78,11 @@ export const CookieConsent = () => {
               size="sm"
               onClick={handleDecline}
               className="text-muted-foreground hover:text-foreground"
+              aria-describedby="cookie-consent-description"
             >
               Decline
             </Button>
-            <Button size="sm" onClick={handleAccept}>
+            <Button size="sm" onClick={handleAccept} aria-describedby="cookie-consent-description">
               Accept
             </Button>
           </div>
