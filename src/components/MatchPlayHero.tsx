@@ -4,7 +4,7 @@ import { MapPin, Users, DollarSign, Trophy, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import { UserMenu } from "@/components/auth/UserMenu";
-import heroImage from "@/assets/hero-golf-course.jpg";
+import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 
 const MatchPlayHero = () => {
   const { user } = useAuth();
