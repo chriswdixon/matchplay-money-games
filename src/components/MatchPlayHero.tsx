@@ -54,7 +54,7 @@ const MatchPlayHero = () => {
           </span>
         </h1>
         
-        <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-200 max-w-3xl mx-auto leading-relaxed">
+        <p className="text-lg sm:text-xl md:text-2xl mb-6 sm:mb-8 text-gray-100 max-w-3xl mx-auto leading-relaxed">
           The ultimate platform for competitive golfers. Join skill-based competitions, track real handicaps, 
           and receive instant prize distribution. No more waiting, no more disputes.
         </p>
@@ -122,7 +122,7 @@ const MatchPlayHero = () => {
         
         {/* Trust Indicators */}
         <aside className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/20" aria-label="Platform statistics">
-          <p className="text-xs sm:text-sm text-gray-300 mb-3 sm:mb-4">Trusted by competitive golfers nationwide</p>
+          <p className="text-xs sm:text-sm text-gray-200 mb-3 sm:mb-4">Trusted by competitive golfers nationwide</p>
           <dl className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 text-accent/80">
             <div className="text-center">
               <dt className="sr-only">Active Members</dt>

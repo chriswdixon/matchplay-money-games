@@ -27,9 +27,9 @@
     --secondary: 210 15% 92%;
     --secondary-foreground: 140 25% 15%;
     
-    /* Muted Tones */
+    /* Muted Tones - WCAG AA compliant (4.5:1 contrast ratio) */
     --muted: 210 15% 95%;
-    --muted-foreground: 140 10% 45%;
+    --muted-foreground: 140 15% 35%;
     
     /* Accent - Premium Gold */
     --accent: 45 85% 60%;
@@ -101,8 +101,9 @@
     --secondary: 140 15% 15%;
     --secondary-foreground: 0 0% 90%;
     
+    /* Muted Tones - WCAG AA compliant (4.5:1 contrast ratio) */
     --muted: 140 15% 12%;
-    --muted-foreground: 0 0% 60%;
+    --muted-foreground: 0 0% 70%;
     
     --accent: 45 85% 65%;
     --accent-foreground: 140 25% 8%;
