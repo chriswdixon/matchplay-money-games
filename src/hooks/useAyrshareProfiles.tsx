@@ -13,12 +13,24 @@ export const useAyrshareProfiles = () => {
   const fetchConnectedProfiles = async () => {
     try {
       setLoading(true);
+      
+      // Check if user is authenticated before making the call
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        // Silently skip for unauthenticated users - no error logging
+        setConnectedPlatforms([]);
+        return;
+      }
+      
       const { data, error: functionError } = await supabase.functions.invoke("ayrshare-post", {
         body: { action: "get_profiles" },
       });
 
       if (functionError) {
-        console.error("Error fetching Ayrshare profiles:", functionError);
+        // Only log if it's not an auth error (expected for non-admin users)
+        if (!functionError.message?.includes('401') && !functionError.message?.includes('Unauthorized')) {
+          console.error("Error fetching Ayrshare profiles:", functionError);
+        }
         setError("Failed to fetch connected platforms");
         return;
       }
@@ -29,7 +41,7 @@ export const useAyrshareProfiles = () => {
         setConnectedPlatforms(platforms);
       }
     } catch (err: any) {
-      console.error("Error fetching Ayrshare profiles:", err);
+      // Silently handle errors - this is a non-critical feature
       setError("Failed to fetch connected platforms");
     } finally {
       setLoading(false);
