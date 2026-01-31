@@ -146,9 +146,8 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
           sessionStorage.setItem('geo_country', data.country_code || '');
           sessionStorage.setItem('geo_is_vpn', String(isVPN));
         }
-      } catch (error) {
-        // Silently handle geo detection failures - this is expected when CSP blocks or network issues occur
-        
+      } catch {
+        // Silently handle geo detection failures - expected when CSP blocks or network issues occur
         // Try to use cached data
         const cachedState = sessionStorage.getItem('geo_state_code');
         const cachedCountry = sessionStorage.getItem('geo_country');
