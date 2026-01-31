@@ -11,6 +11,9 @@ export default defineConfig(({ mode }) => ({
     host: "::",
     port: 8080,
   },
+  build: {
+    sourcemap: true,
+  },
   plugins: [
     imagetools(),
     react(),
