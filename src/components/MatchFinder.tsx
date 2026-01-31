@@ -11,17 +11,19 @@ import { useLocation } from "@/hooks/useLocation";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import CreateMatchButton from "./CreateMatchButton";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
-import PlayerRatingDialog from "./PlayerRatingDialog";
-import { MatchScorecard } from "./MatchScorecard";
-import { MatchResults } from "./MatchResults";
-import { PinEntryDialog } from "./PinEntryDialog";
-import { TeamJoinDialog } from "./TeamJoinDialog";
-import { MatchPinManagement } from "./MatchPinManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import EditMatchDialog from "./EditMatchDialog";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+
+// Lazy load heavy dialog components - only loaded when user interacts
+const PlayerRatingDialog = lazy(() => import("./PlayerRatingDialog"));
+const MatchScorecard = lazy(() => import("./MatchScorecard").then(m => ({ default: m.MatchScorecard })));
+const MatchResults = lazy(() => import("./MatchResults").then(m => ({ default: m.MatchResults })));
+const PinEntryDialog = lazy(() => import("./PinEntryDialog").then(m => ({ default: m.PinEntryDialog })));
+const TeamJoinDialog = lazy(() => import("./TeamJoinDialog").then(m => ({ default: m.TeamJoinDialog })));
+const MatchPinManagement = lazy(() => import("./MatchPinManagement").then(m => ({ default: m.MatchPinManagement })));
 
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
@@ -598,38 +600,40 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 onMatchUpdated={() => refetch()} 
                               />
                               {(match.pin || match.is_team_format) && (
-                                <MatchPinManagement
-                                  matchId={match.id}
-                                  isCreator={true}
-                                  teamPins={[
-                                    { 
-                                      teamNumber: 1, 
-                                      pin: match.pin || null, 
-                                      pinCreator: match.team1_pin_creator || null,
-                                      canReset: match.team1_pin_creator === user?.id
-                                    },
-                                    ...(match.is_team_format && match.max_participants >= 4 ? [{
-                                      teamNumber: 2,
-                                      pin: match.team2_pin || null,
-                                      pinCreator: match.team2_pin_creator || null,
-                                      canReset: match.team2_pin_creator === user?.id
-                                    }] : []),
-                                    ...(match.is_team_format && match.max_participants >= 6 ? [{
-                                      teamNumber: 3,
-                                      pin: match.team3_pin || null,
-                                      pinCreator: match.team3_pin_creator || null,
-                                      canReset: match.team3_pin_creator === user?.id
-                                    }] : []),
-                                    ...(match.is_team_format && match.max_participants === 8 ? [{
-                                      teamNumber: 4,
-                                      pin: match.team4_pin || null,
-                                      pinCreator: match.team4_pin_creator || null,
-                                      canReset: match.team4_pin_creator === user?.id
-                                    }] : [])
-                                  ]}
-                                  maxParticipants={match.max_participants}
-                                  onPinUpdated={() => refetch()}
-                                />
+                                <Suspense fallback={null}>
+                                  <MatchPinManagement
+                                    matchId={match.id}
+                                    isCreator={true}
+                                    teamPins={[
+                                      { 
+                                        teamNumber: 1, 
+                                        pin: match.pin || null, 
+                                        pinCreator: match.team1_pin_creator || null,
+                                        canReset: match.team1_pin_creator === user?.id
+                                      },
+                                      ...(match.is_team_format && match.max_participants >= 4 ? [{
+                                        teamNumber: 2,
+                                        pin: match.team2_pin || null,
+                                        pinCreator: match.team2_pin_creator || null,
+                                        canReset: match.team2_pin_creator === user?.id
+                                      }] : []),
+                                      ...(match.is_team_format && match.max_participants >= 6 ? [{
+                                        teamNumber: 3,
+                                        pin: match.team3_pin || null,
+                                        pinCreator: match.team3_pin_creator || null,
+                                        canReset: match.team3_pin_creator === user?.id
+                                      }] : []),
+                                      ...(match.is_team_format && match.max_participants === 8 ? [{
+                                        teamNumber: 4,
+                                        pin: match.team4_pin || null,
+                                        pinCreator: match.team4_pin_creator || null,
+                                        canReset: match.team4_pin_creator === user?.id
+                                      }] : [])
+                                    ]}
+                                    maxParticipants={match.max_participants}
+                                    onPinUpdated={() => refetch()}
+                                  />
+                                </Suspense>
                               )}
                             </div>
                           )}
@@ -717,11 +721,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       {/* Inline Scorecard for Past Matches */}
                       {showPastMatches && expandedMatchId === match.id && (
                         <div className="border-t overflow-x-auto w-full">
-                          <MatchScorecard
-                            matchId={match.id}
-                            matchName={match.course_name}
-                            readOnly={true}
-                          />
+                          <Suspense fallback={<div className="p-4 text-center text-muted-foreground">Loading scorecard...</div>}>
+                            <MatchScorecard
+                              matchId={match.id}
+                              matchName={match.course_name}
+                              readOnly={true}
+                            />
+                          </Suspense>
                         </div>
                       )}
                     </Card>
@@ -731,54 +737,64 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             </div>
 
         {/* Rating Dialog */}
-        <PlayerRatingDialog
-          open={ratingDialogOpen}
-          onOpenChange={setRatingDialogOpen}
-          matchId={selectedMatchForRating?.id || ''}
-          matchName={selectedMatchForRating?.course_name || ''}
-        />
+        <Suspense fallback={null}>
+          <PlayerRatingDialog
+            open={ratingDialogOpen}
+            onOpenChange={setRatingDialogOpen}
+            matchId={selectedMatchForRating?.id || ''}
+            matchName={selectedMatchForRating?.course_name || ''}
+          />
+        </Suspense>
 
         {/* Scorecard Component */}
         {scorecardMatch && (
           <Dialog open={!!scorecardMatch} onOpenChange={(open) => !open && setScorecardMatch(null)}>
             <DialogContent className="max-w-[95vw] max-h-[95vh] overflow-y-auto p-0">
-              <MatchScorecard
-                matchId={scorecardMatch.id}
-                matchName={scorecardMatch.course_name}
-                onClose={() => setScorecardMatch(null)}
-                readOnly={scorecardMatch.status === 'completed' || scorecardMatch.status === 'cancelled'}
-              />
+              <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading scorecard...</div>}>
+                <MatchScorecard
+                  matchId={scorecardMatch.id}
+                  matchName={scorecardMatch.course_name}
+                  onClose={() => setScorecardMatch(null)}
+                  readOnly={scorecardMatch.status === 'completed' || scorecardMatch.status === 'cancelled'}
+                />
+              </Suspense>
             </DialogContent>
           </Dialog>
         )}
 
         {/* Results Component */}
         {resultsMatch && (
-          <MatchResults
-            matchId={resultsMatch.id}
-            matchName={resultsMatch.course_name}
-            onClose={() => setResultsMatch(null)}
-          />
+          <Suspense fallback={<div className="p-8 text-center text-muted-foreground">Loading results...</div>}>
+            <MatchResults
+              matchId={resultsMatch.id}
+              matchName={resultsMatch.course_name}
+              onClose={() => setResultsMatch(null)}
+            />
+          </Suspense>
         )}
 
         {/* PIN Entry Dialog */}
-        <PinEntryDialog
-          open={pinDialogOpen}
-          onOpenChange={setPinDialogOpen}
-          onSubmit={handlePinSubmit}
-          title="Enter Match PIN"
-          description={`This match requires a PIN to join. Contact the match creator for access.`}
-        />
+        <Suspense fallback={null}>
+          <PinEntryDialog
+            open={pinDialogOpen}
+            onOpenChange={setPinDialogOpen}
+            onSubmit={handlePinSubmit}
+            title="Enter Match PIN"
+            description={`This match requires a PIN to join. Contact the match creator for access.`}
+          />
+        </Suspense>
 
         {/* Team Join Dialog */}
         {selectedMatchForPin && (
-          <TeamJoinDialog
-            open={teamJoinDialogOpen}
-            onOpenChange={setTeamJoinDialogOpen}
-            onSubmit={handleTeamJoin}
-            maxParticipants={selectedMatchForPin.max_participants}
-            occupiedTeams={[1]} // Team 1 is always occupied by creator
-          />
+          <Suspense fallback={null}>
+            <TeamJoinDialog
+              open={teamJoinDialogOpen}
+              onOpenChange={setTeamJoinDialogOpen}
+              onSubmit={handleTeamJoin}
+              maxParticipants={selectedMatchForPin.max_participants}
+              occupiedTeams={[1]} // Team 1 is always occupied by creator
+            />
+          </Suspense>
         )}
         
         {/* How It Works - Only show when not hidden */}
