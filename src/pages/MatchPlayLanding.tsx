@@ -18,7 +18,7 @@ import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
-import heroImage from "@/assets/hero-golf-course.jpg";
+import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 
 // Lazy load authenticated-only components for better initial load performance
 const SubscriptionManagement = lazy(() => import("@/components/SubscriptionManagement"));
