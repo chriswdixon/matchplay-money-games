@@ -3,7 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Check, Star, Crown, AlertCircle } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
@@ -198,12 +198,28 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
               <CardDescription>{tier.description}</CardDescription>
               
               <div className="mt-4">
-                <Tabs value={billingPeriod} onValueChange={(value) => setBillingPeriod(value as "annual" | "monthly")} className="w-full">
-                  <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="annual">Annual</TabsTrigger>
-                    <TabsTrigger value="monthly">Monthly</TabsTrigger>
-                  </TabsList>
-                </Tabs>
+                <ToggleGroup 
+                  type="single" 
+                  value={billingPeriod} 
+                  onValueChange={(value) => value && setBillingPeriod(value as "annual" | "monthly")} 
+                  className="inline-flex h-10 items-center justify-center rounded-md bg-muted p-1 text-muted-foreground w-full"
+                  aria-label="Billing period"
+                >
+                  <ToggleGroupItem 
+                    value="annual" 
+                    className="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm"
+                    aria-label="Annual billing"
+                  >
+                    Annual
+                  </ToggleGroupItem>
+                  <ToggleGroupItem 
+                    value="monthly" 
+                    className="flex-1 inline-flex items-center justify-center whitespace-nowrap rounded-sm px-3 py-1.5 text-sm font-medium ring-offset-background transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 data-[state=on]:bg-background data-[state=on]:text-foreground data-[state=on]:shadow-sm"
+                    aria-label="Monthly billing"
+                  >
+                    Monthly
+                  </ToggleGroupItem>
+                </ToggleGroup>
               </div>
               
               <div className="flex flex-col items-center mt-4">
