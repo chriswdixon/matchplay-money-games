@@ -147,7 +147,7 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
           sessionStorage.setItem('geo_is_vpn', String(isVPN));
         }
       } catch (error) {
-        console.error('Geo detection error:', error);
+        // Silently handle geo detection failures - this is expected when CSP blocks or network issues occur
         
         // Try to use cached data
         const cachedState = sessionStorage.getItem('geo_state_code');
