@@ -1,3 +1,4 @@
+import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import MatchPlayHero from "@/components/MatchPlayHero";
 import MatchFinder from "@/components/MatchFinder";
 import AppFeatures from "@/components/AppFeatures";
@@ -5,15 +6,11 @@ import MembershipTiers from "@/components/MembershipTiers";
 import { HandicapCalculators } from "@/components/HandicapCalculators";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
-import SubscriptionManagement from "@/components/SubscriptionManagement";
-import { HandicapSettings } from "@/components/profile/HandicapSettings";
-import { MatchScorecard } from "@/components/MatchScorecard";
 import { InstallPrompt } from "@/components/InstallPrompt";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
-import { useEffect, useState, useMemo } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useSearchParams } from "react-router-dom";
@@ -22,6 +19,18 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
 import heroImage from "@/assets/hero-golf-course.jpg";
+
+// Lazy load authenticated-only components for better initial load performance
+const SubscriptionManagement = lazy(() => import("@/components/SubscriptionManagement"));
+const HandicapSettings = lazy(() => import("@/components/profile/HandicapSettings").then(m => ({ default: m.HandicapSettings })));
+const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m => ({ default: m.MatchScorecard })));
+
+// Minimal loading fallback for tab content
+const TabLoader = () => (
+  <div className="flex items-center justify-center py-12">
+    <div className="animate-pulse text-muted-foreground">Loading...</div>
+  </div>
+);
 
 const MatchPlayLanding = () => {
   const { user } = useAuth();
@@ -193,10 +202,12 @@ const MatchPlayLanding = () => {
               
               {hasActiveMatch && (
                 <TabsContent value="active-match">
-                  <MatchScorecard
-                    matchId={activeMatchId!}
-                    matchName={activeMatchName || 'Active Match'}
-                  />
+                  <Suspense fallback={<TabLoader />}>
+                    <MatchScorecard
+                      matchId={activeMatchId!}
+                      matchName={activeMatchName || 'Active Match'}
+                    />
+                  </Suspense>
                 </TabsContent>
               )}
               
@@ -209,11 +220,15 @@ const MatchPlayLanding = () => {
               </TabsContent>
               
               <TabsContent value="handicap">
-                <HandicapSettings />
+                <Suspense fallback={<TabLoader />}>
+                  <HandicapSettings />
+                </Suspense>
               </TabsContent>
               
               <TabsContent value="subscription">
-                <SubscriptionManagement />
+                <Suspense fallback={<TabLoader />}>
+                  <SubscriptionManagement />
+                </Suspense>
               </TabsContent>
             </Tabs>
           </div>
