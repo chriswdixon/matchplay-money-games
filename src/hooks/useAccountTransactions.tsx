@@ -10,7 +10,6 @@ export interface AccountTransaction {
   transaction_type: 'winning' | 'match_buyin' | 'match_cancellation' | 'subscription_charge' | 'coupon' | 'payout' | 'double_down';
   match_id?: string;
   description: string;
-  stripe_payment_intent_id?: string;
   metadata?: any;
   created_at: string;
 }
@@ -58,7 +57,7 @@ export function useAccountTransactions() {
       setLoading(true);
       const { data, error } = await supabase
         .from('account_transactions')
-        .select('*')
+        .select('id, user_id, account_id, amount, transaction_type, match_id, description, metadata, created_at')
         .eq('user_id', user.id)
         .order('created_at', { ascending: false })
         .limit(50);
