@@ -27,10 +27,7 @@ export const useAyrshareProfiles = () => {
       });
 
       if (functionError) {
-        // Only log if it's not an auth error (expected for non-admin users)
-        if (!functionError.message?.includes('401') && !functionError.message?.includes('Unauthorized')) {
-          console.error("Error fetching Ayrshare profiles:", functionError);
-        }
+        // Silently handle all errors - this is a non-critical admin feature
         setError("Failed to fetch connected platforms");
         return;
       }
