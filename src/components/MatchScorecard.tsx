@@ -45,7 +45,11 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
     recordDoubleDownVote,
     processDoubleDownPayments,
     isMatchComplete,
-    canFinalize
+    canFinalize,
+    isCurrentPlayerComplete,
+    hasCurrentPlayerFinished,
+    allPlayersFinished,
+    isPlayerComplete
   } = useMatchScoring(matchId);
 
   const [editingHole, setEditingHole] = useState<number | null>(null);
@@ -125,13 +129,14 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
     }
   }, [currentUserScore?.scores]);
 
-  // Auto-expand settings when match is 100% complete
+  // Auto-expand settings when match is 100% complete for current user
   useEffect(() => {
-    if (currentUserScore && Object.keys(currentUserScore.scores).length === 18) {
+    const requiredHoles = matchData?.holes || 18;
+    if (currentUserScore && Object.keys(currentUserScore.scores).length === requiredHoles) {
       setSettingsOpen(true);
       setUserClosedSettings(false);
     }
-  }, [currentUserScore]);
+  }, [currentUserScore, matchData?.holes]);
 
   // Fetch double down statuses
   useEffect(() => {
@@ -248,6 +253,10 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       setTempScore('');
       setScoreDialogOpen(false);
     }
+  };
+
+  const handleFinishMatch = async () => {
+    await confirmResults();
   };
 
   const handleFinalize = async () => {
@@ -648,7 +657,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             F9: {player.net_front9} ({player.front9}) | B9: {player.net_back9} ({player.back9})
                           </div>
                           <div className="text-xs text-muted-foreground">
-                            {Object.keys(player.scores).length}/18 holes
+                            {Object.keys(player.scores).length}/{matchData?.holes || 18} holes
                           </div>
                         </div>
                       </div>
@@ -658,13 +667,13 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                         <div className="w-full bg-muted rounded-full h-2">
                           <div 
                             className="bg-primary h-2 rounded-full transition-all duration-300" 
-                            style={{ width: `${(Object.keys(player.scores).length / 18) * 100}%` }}
+                            style={{ width: `${(Object.keys(player.scores).length / (matchData?.holes || 18)) * 100}%` }}
                           ></div>
                         </div>
                         <div className="text-xs text-muted-foreground mt-1 text-center">
-                          {Math.round((Object.keys(player.scores).length / 18) * 100)}% Complete
-                          {hasConfirmed && isMatchComplete && (
-                            <span className="ml-2 text-green-600 font-medium">✓ Confirmed</span>
+                          {Math.round((Object.keys(player.scores).length / (matchData?.holes || 18)) * 100)}% Complete
+                          {hasConfirmed && (
+                            <span className="ml-2 text-green-600 font-medium">✓ Finished</span>
                           )}
                         </div>
                       </div>
@@ -691,26 +700,56 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       </div>
       )}
 
-      {/* Top Finalize Button - Shows when match is complete */}
-      {isMatchComplete && canFinalize && !matchResult && (
+      {/* Finish Match Button - Shows when current player completed all holes but hasn't finished yet */}
+      {isCurrentPlayerComplete && !hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
         <div className="flex flex-col items-center gap-4 px-6 py-4">
           <div className="text-center">
-            <h3 className="text-lg font-semibold mb-2">Round Complete!</h3>
+            <h3 className="text-lg font-semibold mb-2">🎉 You've completed all {matchData?.holes || 18} holes!</h3>
             <p className="text-sm text-muted-foreground">
-              {confirmations.filter(c => c.confirmed).length} of {confirmations.length} players confirmed
+              {confirmations.filter(c => c.confirmed).length} of {playerScores.length} players have finished
             </p>
+            {!canFinalize && (
+              <p className="text-xs text-muted-foreground mt-1">
+                Waiting for other players to complete their round...
+              </p>
+            )}
           </div>
           <Button
-            onClick={handleFinalize}
-            disabled={saving || confirmations.find(c => c.player_id === user?.id)?.confirmed}
+            onClick={handleFinishMatch}
+            disabled={saving}
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
             <Trophy className="w-5 h-5 mr-2" />
-            {confirmations.find(c => c.player_id === user?.id)?.confirmed 
-              ? "Waiting for others..." 
-              : saving ? "Confirming..." : "Confirm Results"}
+            {saving ? "Finishing..." : "Finish the Match"}
           </Button>
+        </div>
+      )}
+
+      {/* Waiting for others - Shows when current player has finished but waiting for others */}
+      {hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
+        <div className="flex flex-col items-center gap-4 px-6 py-4">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-2">✅ You've finished!</h3>
+            <p className="text-sm text-muted-foreground">
+              Waiting for {playerScores.length - confirmations.filter(c => c.confirmed).length} more player(s) to finish...
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mt-3">
+              {playerScores.map(player => {
+                const playerConfirmed = confirmations.find(c => c.player_id === player.player_id)?.confirmed;
+                const playerComplete = isPlayerComplete(player.player_id);
+                return (
+                  <Badge 
+                    key={player.player_id}
+                    variant={playerConfirmed ? "success" : playerComplete ? "outline" : "secondary"}
+                    className="text-xs"
+                  >
+                    {player.player_name}: {playerConfirmed ? "Finished ✓" : playerComplete ? "Completing..." : `${Object.keys(player.scores).length}/${matchData?.holes || 18}`}
+                  </Badge>
+                );
+              })}
+            </div>
+          </div>
         </div>
       )}
 

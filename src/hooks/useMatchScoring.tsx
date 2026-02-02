@@ -45,7 +45,7 @@ export interface MatchData {
   participant_count?: number;
   max_participants?: number;
   status?: string;
-  holes?: number;
+  holes: number;
   double_down_enabled?: boolean;
   double_down_amount?: number;
   double_down_finalized?: boolean;
@@ -106,7 +106,7 @@ export function useMatchScoring(matchId: string) {
       // Fetch match data including hole pars and tee settings
       const { data: matchInfo, error: matchError } = await supabase
         .from('matches')
-        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants, status')
+        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants, status, holes')
         .eq('id', matchId)
         .single();
 
@@ -133,7 +133,8 @@ export function useMatchScoring(matchId: string) {
         buy_in_amount: matchInfo.buy_in_amount,
         participant_count: participantCount || 0,
         max_participants: matchInfo.max_participants,
-        status: matchInfo.status
+        status: matchInfo.status,
+        holes: matchInfo.holes || 18
       });
       
       console.log('✅ Match data loaded:', { 
@@ -692,17 +693,54 @@ export function useMatchScoring(matchId: string) {
     };
   }, [matchId, user]);
 
-  // Check if all holes are completed for current user
-  const isMatchComplete = () => {
-    if (!user) return false;
+  // Check if all holes are completed for current user (supports 9 or 18 holes)
+  const isCurrentPlayerComplete = () => {
+    if (!user || !matchData) return false;
     const userScore = playerScores.find(p => p.player_id === user.id);
     if (!userScore) return false;
-    return Object.keys(userScore.scores).length === 18;
+    const requiredHoles = matchData.holes || 18;
+    return Object.keys(userScore.scores).length >= requiredHoles;
   };
 
-  // Check if current user can finalize (all players have completed all holes)
+  // Check if a specific player has completed all their holes
+  const isPlayerComplete = (playerId: string) => {
+    if (!matchData) return false;
+    const playerScore = playerScores.find(p => p.player_id === playerId);
+    if (!playerScore) return false;
+    const requiredHoles = matchData.holes || 18;
+    return Object.keys(playerScore.scores).length >= requiredHoles;
+  };
+
+  // Check if current user has already confirmed/finished
+  const hasCurrentPlayerFinished = () => {
+    if (!user) return false;
+    const confirmation = confirmations.find(c => c.player_id === user.id);
+    return confirmation?.confirmed || false;
+  };
+
+  // Check if all players have finished (completed holes AND confirmed)
+  const allPlayersFinished = () => {
+    if (!matchData || playerScores.length === 0) return false;
+    const requiredHoles = matchData.holes || 18;
+    
+    // All players must have completed all holes AND confirmed
+    return playerScores.every(player => {
+      const hasAllScores = Object.keys(player.scores).length >= requiredHoles;
+      const hasConfirmed = confirmations.find(c => c.player_id === player.player_id)?.confirmed || false;
+      return hasAllScores && hasConfirmed;
+    });
+  };
+
+  // Legacy compatibility - check if all holes completed for current user
+  const isMatchComplete = () => {
+    return isCurrentPlayerComplete();
+  };
+
+  // Legacy compatibility - check if all players completed all holes (but not necessarily confirmed)
   const canFinalize = () => {
-    return playerScores.every(player => Object.keys(player.scores).length === 18);
+    if (!matchData) return false;
+    const requiredHoles = matchData.holes || 18;
+    return playerScores.every(player => Object.keys(player.scores).length >= requiredHoles);
   };
 
   const recordDoubleDownVote = async (optedIn: boolean) => {
@@ -771,6 +809,10 @@ export function useMatchScoring(matchId: string) {
     processDoubleDownPayments,
     isMatchComplete: isMatchComplete(),
     canFinalize: canFinalize(),
+    isCurrentPlayerComplete: isCurrentPlayerComplete(),
+    hasCurrentPlayerFinished: hasCurrentPlayerFinished(),
+    allPlayersFinished: allPlayersFinished(),
+    isPlayerComplete,
     refetch: fetchMatchData
   };
 }
