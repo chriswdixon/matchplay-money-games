@@ -1,9 +1,5 @@
 import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import MatchPlayHero from "@/components/MatchPlayHero";
-import MatchFinder from "@/components/MatchFinder";
-import AppFeatures from "@/components/AppFeatures";
-import MembershipTiers from "@/components/MembershipTiers";
-import { HandicapCalculators } from "@/components/HandicapCalculators";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import { InstallPrompt } from "@/components/InstallPrompt";
@@ -20,14 +16,24 @@ import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
 import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 
-// Lazy load authenticated-only components for better initial load performance
+// Lazy load components for better initial load performance
+const MatchFinder = lazy(() => import("@/components/MatchFinder"));
+const AppFeatures = lazy(() => import("@/components/AppFeatures"));
+const MembershipTiers = lazy(() => import("@/components/MembershipTiers"));
+const HandicapCalculators = lazy(() => import("@/components/HandicapCalculators").then(m => ({ default: m.HandicapCalculators })));
 const SubscriptionManagement = lazy(() => import("@/components/SubscriptionManagement"));
 const HandicapSettings = lazy(() => import("@/components/profile/HandicapSettings").then(m => ({ default: m.HandicapSettings })));
 const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m => ({ default: m.MatchScorecard })));
 
-// Minimal loading fallback for tab content
+// Minimal loading fallback for lazy components
 const TabLoader = () => (
   <div className="flex items-center justify-center py-12">
+    <div className="animate-pulse text-muted-foreground">Loading...</div>
+  </div>
+);
+
+const SectionLoader = () => (
+  <div className="flex items-center justify-center py-16">
     <div className="animate-pulse text-muted-foreground">Loading...</div>
   </div>
 );
@@ -212,11 +218,15 @@ const MatchPlayLanding = () => {
               )}
               
               <TabsContent value="matches">
-                <MatchFinder hideHowItWorks />
+                <Suspense fallback={<TabLoader />}>
+                  <MatchFinder hideHowItWorks />
+                </Suspense>
               </TabsContent>
               
               <TabsContent value="past">
-                <MatchFinder hideHowItWorks showPastMatches />
+                <Suspense fallback={<TabLoader />}>
+                  <MatchFinder hideHowItWorks showPastMatches />
+                </Suspense>
               </TabsContent>
               
               <TabsContent value="handicap">
@@ -266,18 +276,26 @@ const MatchPlayLanding = () => {
       {/* Match Finder Section */}
       <main id="main-content" role="main">
         <div id="matches-section">
-          <MatchFinder />
+          <Suspense fallback={<SectionLoader />}>
+            <MatchFinder />
+          </Suspense>
         </div>
       </main>
       
       {/* App Features Section */}
-      <AppFeatures />
+      <Suspense fallback={<SectionLoader />}>
+        <AppFeatures />
+      </Suspense>
       
       {/* Handicap Calculators Section */}
-      <HandicapCalculators />
+      <Suspense fallback={<SectionLoader />}>
+        <HandicapCalculators />
+      </Suspense>
       
       {/* Membership Tiers Section */}
-      <MembershipTiers />
+      <Suspense fallback={<SectionLoader />}>
+        <MembershipTiers />
+      </Suspense>
       
       {/* Footer CTA */}
       <section className="py-20 px-6 bg-gradient-hero text-white" aria-labelledby="cta-heading">
