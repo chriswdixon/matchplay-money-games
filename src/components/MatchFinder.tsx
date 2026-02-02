@@ -96,7 +96,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         match.status === 'completed' || match.status === 'cancelled'
       );
     } else {
-      // Show only current/upcoming matches
+      // Show current/upcoming matches including started matches the user joined
       filtered = filtered.filter(match => {
         // Exclude completed matches
         if (match.status === 'completed') return false;
@@ -104,8 +104,10 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         // Exclude cancelled matches
         if (match.status === 'cancelled') return false;
         
-        // Exclude started matches (will show separately in incomplete section if needed)
-        if (match.status === 'started') return false;
+        // Include started matches the user has joined
+        if (match.status === 'started') {
+          return match.user_joined === true;
+        }
         
         // Exclude open matches that are scheduled in the past
         if (match.status === 'open' && new Date(match.scheduled_time) < now) {
