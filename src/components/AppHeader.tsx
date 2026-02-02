@@ -2,13 +2,12 @@ import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Menu, Target, Moon, Sun } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { Link, useNavigate } from "react-router-dom";
 import { useTheme } from "@/components/ThemeProvider";
 import logoLight from "@/assets/logo-light.png";
 import logoDark from "@/assets/logo-dark.png";
-
 interface AppHeaderProps {
   showNavMenu?: boolean;
   onNavSelect?: (value: string) => void;
@@ -23,9 +22,22 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
   const { hasActiveMatch, activeMatchName } = useActiveMatch();
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
+  const [systemPrefersDark, setSystemPrefersDark] = useState(false);
   
-  // Get the actual applied theme (handles system theme)
-  const isDark = theme === "dark" || (theme === "system" && window.matchMedia("(prefers-color-scheme: dark)").matches);
+  // Listen for system theme changes without forcing reflow on every render
+  useEffect(() => {
+    const mql = window.matchMedia("(prefers-color-scheme: dark)");
+    setSystemPrefersDark(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setSystemPrefersDark(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, []);
+  
+  // Memoize theme calculation
+  const isDark = useMemo(() => 
+    theme === "dark" || (theme === "system" && systemPrefersDark),
+    [theme, systemPrefersDark]
+  );
 
   const handleReturnToMatch = () => {
     if (onReturnToMatch) {
