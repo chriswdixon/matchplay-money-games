@@ -1261,6 +1261,10 @@ export type Database = {
       }
       is_match_play_email: { Args: { email: string }; Returns: boolean }
       is_profile_owner: { Args: { profile_user_id: string }; Returns: boolean }
+      is_user_in_match: {
+        Args: { p_match_id: string; p_user_id: string }
+        Returns: boolean
+      }
       is_user_match_creator: {
         Args: { p_match_id: string; p_user_id: string }
         Returns: boolean
