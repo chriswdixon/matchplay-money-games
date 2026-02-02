@@ -5,14 +5,16 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActiveMatchProvider } from "@/hooks/useActiveMatch";
 import { Routes, Route } from "react-router-dom";
 import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBanner";
-import { OfflineIndicator } from "@/components/OfflineIndicator";
-import { PWAUpdatePrompt } from "@/components/PWAUpdatePrompt";
-import { CookieConsent } from "@/components/CookieConsent";
 import { GeoBlockingProvider } from "@/hooks/useGeoBlocking";
-import { GeoBlockingOverlay } from "@/components/GeoBlockingOverlay";
 
 // Eager load the landing page for fastest initial render
 import Index from "./pages/Index";
+
+// Lazy load non-critical overlays
+const OfflineIndicator = lazy(() => import("@/components/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
+const PWAUpdatePrompt = lazy(() => import("@/components/PWAUpdatePrompt").then(m => ({ default: m.PWAUpdatePrompt })));
+const CookieConsent = lazy(() => import("@/components/CookieConsent").then(m => ({ default: m.CookieConsent })));
+const GeoBlockingOverlay = lazy(() => import("@/components/GeoBlockingOverlay").then(m => ({ default: m.GeoBlockingOverlay })));
 
 // Lazy load all other pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
@@ -40,11 +42,15 @@ const App = () => (
       <TooltipProvider>
         <Toaster />
         <Sonner />
-        <GeoBlockingOverlay />
+        <Suspense fallback={null}>
+          <GeoBlockingOverlay />
+        </Suspense>
         <EmailConfirmationBanner />
-        <OfflineIndicator />
-        <PWAUpdatePrompt />
-        <CookieConsent />
+        <Suspense fallback={null}>
+          <OfflineIndicator />
+          <PWAUpdatePrompt />
+          <CookieConsent />
+        </Suspense>
         <Suspense fallback={<PageLoader />}>
           <Routes>
             <Route path="/" element={<Index />} />
