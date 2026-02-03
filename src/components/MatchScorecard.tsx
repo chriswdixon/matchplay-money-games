@@ -756,24 +756,43 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             {/* Waiting message - only during started match */}
             {hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
               <>
-                <p className="text-sm text-muted-foreground">
-                  Waiting for {playerScores.length - confirmations.filter(c => c.confirmed).length} more player(s) to finish...
-                </p>
-                <div className="flex flex-wrap justify-center gap-2 mt-3">
-                  {playerScores.map(player => {
-                    const playerConfirmed = confirmations.find(c => c.player_id === player.player_id)?.confirmed;
-                    const playerComplete = isPlayerComplete(player.player_id);
-                    return (
-                      <Badge 
-                        key={player.player_id}
-                        variant={playerConfirmed ? "success" : playerComplete ? "outline" : "secondary"}
-                        className="text-xs"
-                      >
-                        {player.player_name}: {playerConfirmed ? "Finished ✓" : playerComplete ? "Completing..." : `${Object.keys(player.scores).length}/${matchData?.holes || 18}`}
-                      </Badge>
-                    );
-                  })}
-                </div>
+                {confirmations.filter(c => c.confirmed).length < playerScores.filter(p => p.status === 'active').length ? (
+                  <>
+                    <p className="text-sm text-muted-foreground">
+                      Waiting for {playerScores.filter(p => p.status === 'active').length - confirmations.filter(c => c.confirmed).length} more player(s) to finish...
+                    </p>
+                    <div className="flex flex-wrap justify-center gap-2 mt-3">
+                      {playerScores.map(player => {
+                        const playerConfirmed = confirmations.find(c => c.player_id === player.player_id)?.confirmed;
+                        const playerComplete = isPlayerComplete(player.player_id);
+                        return (
+                          <Badge 
+                            key={player.player_id}
+                            variant={playerConfirmed ? "success" : playerComplete ? "outline" : "secondary"}
+                            className="text-xs"
+                          >
+                            {player.player_name}: {playerConfirmed ? "Finished ✓" : playerComplete ? "Completing..." : `${Object.keys(player.scores).length}/${matchData?.holes || 18}`}
+                          </Badge>
+                        );
+                      })}
+                    </div>
+                  </>
+                ) : (
+                  // All confirmed but not finalized - show finalize button
+                  <div className="space-y-3">
+                    <p className="text-sm text-muted-foreground">
+                      All players have finished! Ready to see results.
+                    </p>
+                    <Button
+                      onClick={handleFinalize}
+                      disabled={saving}
+                      className="bg-gradient-primary text-primary-foreground gap-2"
+                    >
+                      <Trophy className="w-4 h-4" />
+                      {saving ? "Finalizing..." : "Show Results"}
+                    </Button>
+                  </div>
+                )}
               </>
             )}
 

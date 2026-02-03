@@ -60,10 +60,10 @@ export function usePlayerAccount() {
       if (error) throw error;
 
       if (!data) {
-        // Create account if it doesn't exist
+        // Create account if it doesn't exist with $500 (50000 cents) play money
         const { data: newAccount, error: createError } = await supabase
           .from('player_accounts')
-          .insert({ user_id: user.id, balance: 0 })
+          .insert({ user_id: user.id, balance: 50000 })
           .select()
           .single();
 
