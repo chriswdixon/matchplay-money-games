@@ -927,6 +927,7 @@ export type Database = {
           created_at: string
           id: string
           match_id: string
+          note: string | null
           rated_player_id: string
           rater_id: string
           rating: number
@@ -936,6 +937,7 @@ export type Database = {
           created_at?: string
           id?: string
           match_id: string
+          note?: string | null
           rated_player_id: string
           rater_id: string
           rating: number
@@ -945,6 +947,7 @@ export type Database = {
           created_at?: string
           id?: string
           match_id?: string
+          note?: string | null
           rated_player_id?: string
           rater_id?: string
           rating?: number

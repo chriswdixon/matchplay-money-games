@@ -1,12 +1,12 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { Star, Trophy } from 'lucide-react';
+import { Star, Trophy, Send } from 'lucide-react';
 import { usePlayerRatings, RateablePlayer } from '@/hooks/usePlayerRatings';
 import StarRating from './StarRating';
-import { toast } from 'sonner';
+import { Textarea } from '@/components/ui/textarea';
 
 interface PlayerRatingDialogProps {
   open: boolean;
@@ -19,6 +19,7 @@ const PlayerRatingDialog = ({ open, onOpenChange, matchId, matchName }: PlayerRa
   const { loading, getRateablePlayersForMatch, ratePlayer, getPlayerRating } = usePlayerRatings();
   const [players, setPlayers] = useState<RateablePlayer[]>([]);
   const [playerRatings, setPlayerRatings] = useState<Record<string, number>>({});
+  const [playerNotes, setPlayerNotes] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState<string | null>(null);
 
   useEffect(() => {
@@ -42,12 +43,23 @@ const PlayerRatingDialog = ({ open, onOpenChange, matchId, matchName }: PlayerRa
     setPlayerRatings(ratings);
   };
 
-  const handleRatePlayer = async (playerId: string, rating: number) => {
+  const handleRatingChange = (playerId: string, rating: number) => {
+    setPlayerRatings(prev => ({ ...prev, [playerId]: rating }));
+  };
+
+  const handleNoteChange = (playerId: string, note: string) => {
+    setPlayerNotes(prev => ({ ...prev, [playerId]: note }));
+  };
+
+  const handleSubmitRating = async (playerId: string) => {
+    const rating = playerRatings[playerId];
+    if (!rating || rating < 1) return;
+    
     setSubmitting(playerId);
     try {
-      const success = await ratePlayer(matchId, playerId, rating);
+      const note = playerNotes[playerId]?.trim() || undefined;
+      const success = await ratePlayer(matchId, playerId, rating, note);
       if (success) {
-        setPlayerRatings(prev => ({ ...prev, [playerId]: rating }));
         // Update the player's already_rated status
         setPlayers(prev => prev.map(p => 
           p.user_id === playerId ? { ...p, already_rated: true } : p
@@ -129,21 +141,49 @@ const PlayerRatingDialog = ({ open, onOpenChange, matchId, matchName }: PlayerRa
                       </div>
                     </div>
                     
-                    <div className="space-y-3">
+                    <div className="space-y-4">
                       <div>
                         <p className="text-sm font-medium mb-2">Rate this player (1-5 stars):</p>
                         <StarRating
                           rating={currentRating}
                           interactive={!isSubmittingThis}
                           size="lg"
-                          onRatingChange={(rating) => handleRatePlayer(player.user_id, rating)}
+                          onRatingChange={(rating) => handleRatingChange(player.user_id, rating)}
                           className="justify-start"
                         />
                       </div>
                       
-                      {isSubmittingThis && (
-                        <p className="text-xs text-muted-foreground">Saving rating...</p>
-                      )}
+                      <div>
+                        <p className="text-sm font-medium mb-2">Add a note (optional, only seen by admins):</p>
+                        <Textarea
+                          placeholder="Any comments about this player..."
+                          value={playerNotes[player.user_id] || ''}
+                          onChange={(e) => handleNoteChange(player.user_id, e.target.value)}
+                          disabled={isSubmittingThis}
+                          className="resize-none"
+                          rows={2}
+                          maxLength={500}
+                        />
+                        <p className="text-xs text-muted-foreground mt-1">
+                          {(playerNotes[player.user_id] || '').length}/500 characters
+                        </p>
+                      </div>
+                      
+                      <Button
+                        onClick={() => handleSubmitRating(player.user_id)}
+                        disabled={!currentRating || currentRating < 1 || isSubmittingThis}
+                        className="w-full gap-2"
+                        size="sm"
+                      >
+                        {isSubmittingThis ? (
+                          'Saving...'
+                        ) : (
+                          <>
+                            <Send className="w-4 h-4" />
+                            {player.already_rated ? 'Update Rating' : 'Submit Rating'}
+                          </>
+                        )}
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
