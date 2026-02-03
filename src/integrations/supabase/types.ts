@@ -1148,7 +1148,9 @@ export type Database = {
         Args: { player_user_id: string }
         Returns: number
       }
+      cleanup_consent_records_pii: { Args: never; Returns: number }
       cleanup_expired_join_tokens: { Args: never; Returns: number }
+      cleanup_old_pin_attempts: { Args: never; Returns: number }
       cleanup_old_temp_media: { Args: never; Returns: number }
       create_match_join_token: {
         Args: {
