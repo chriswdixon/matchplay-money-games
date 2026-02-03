@@ -22,11 +22,12 @@ export const CookieConsent = () => {
     try {
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
+        // Note: We intentionally do NOT collect IP addresses or user agent strings
+        // to minimize privacy risks and comply with data minimization principles
         await supabase.from('consent_records').insert({
           user_id: user.id,
           consent_type: 'cookie',
           consented,
-          user_agent: navigator.userAgent,
           version: '1.0',
         });
       }
