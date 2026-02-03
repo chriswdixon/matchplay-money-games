@@ -15,10 +15,11 @@ import { useMatches } from '@/hooks/useMatches';
 import { useActiveMatch } from '@/hooks/useActiveMatch';
 import { useCancellationConfirmations } from '@/hooks/useCancellationConfirmations';
 import { supabase } from '@/integrations/supabase/client';
-import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle } from 'lucide-react';
+import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 import { CancellationConfirmationDialog } from './CancellationConfirmationDialog';
+import PlayerRatingDialog from './PlayerRatingDialog';
 import { toast } from '@/hooks/use-toast';
 
 interface MatchScorecardProps {
@@ -66,6 +67,8 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   const [doubleDownStatuses, setDoubleDownStatuses] = useState<any[]>([]);
   const [isProcessingDoubleDown, setIsProcessingDoubleDown] = useState(false);
   const [activeTab, setActiveTab] = useState('front9');
+  const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
+  const [hasPromptedForRating, setHasPromptedForRating] = useState(false);
 
   // Debug: Log match status changes
   useEffect(() => {
@@ -137,6 +140,23 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       setUserClosedSettings(false);
     }
   }, [currentUserScore, matchData?.holes]);
+
+  // Prompt for player ratings when match completes
+  useEffect(() => {
+    if (
+      matchResult && 
+      matchData?.status === 'completed' && 
+      !hasPromptedForRating && 
+      playerScores.length > 1
+    ) {
+      // Small delay to let results display first
+      const timer = setTimeout(() => {
+        setRatingDialogOpen(true);
+        setHasPromptedForRating(true);
+      }, 1500);
+      return () => clearTimeout(timer);
+    }
+  }, [matchResult, matchData?.status, hasPromptedForRating, playerScores.length]);
 
   // Fetch double down statuses
   useEffect(() => {
@@ -442,7 +462,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           
           {/* Back/Toggle Button for Cancelled/Completed Matches or Hamburger Menu */}
           {matchData?.status === 'cancelled' || matchData?.status === 'completed' ? (
-            <div className="flex gap-2">
+            <div className="flex gap-2 flex-wrap justify-end">
+              {matchData?.status === 'completed' && matchResult && playerScores.length > 1 && (
+                <Button
+                  variant="outline"
+                  onClick={() => setRatingDialogOpen(true)}
+                  className="gap-1"
+                >
+                  <Star className="w-4 h-4" />
+                  Rate Players
+                </Button>
+              )}
               {matchData?.status === 'completed' && matchResult && (
                 <Button
                   variant="outline"
@@ -1768,7 +1798,13 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
         </AlertDialogContent>
       </AlertDialog>
 
-      {/* Editing Instructions - Remove this since we're using a dialog now */}
+      {/* Player Rating Dialog */}
+      <PlayerRatingDialog
+        open={ratingDialogOpen}
+        onOpenChange={setRatingDialogOpen}
+        matchId={matchId}
+        matchName={matchData?.course_name || matchName}
+      />
     </div>
   );
 }
