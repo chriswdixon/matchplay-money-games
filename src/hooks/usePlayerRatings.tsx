@@ -49,7 +49,8 @@ export const usePlayerRatings = () => {
   const ratePlayer = useCallback(async (
     matchId: string, 
     ratedPlayerId: string, 
-    rating: number
+    rating: number,
+    note?: string
   ): Promise<boolean> => {
     if (!user) {
       toast.error('You must be logged in to rate players');
@@ -77,7 +78,7 @@ export const usePlayerRatings = () => {
         // Update existing rating
         const { error } = await supabase
           .from('player_ratings')
-          .update({ rating })
+          .update({ rating, note: note || null })
           .eq('id', existingRating.id);
 
         if (error) throw error;
@@ -90,13 +91,13 @@ export const usePlayerRatings = () => {
             rater_id: user.id,
             rated_player_id: ratedPlayerId,
             match_id: matchId,
-            rating
+            rating,
+            note: note || null
           });
 
         if (error) throw error;
         toast.success('Player rated successfully');
       }
-
       return true;
     } catch (error: any) {
       if (error.message?.includes('no_self_rating')) {
