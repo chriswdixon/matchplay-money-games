@@ -463,16 +463,6 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           {/* Back/Toggle Button for Cancelled/Completed Matches or Hamburger Menu */}
           {matchData?.status === 'cancelled' || matchData?.status === 'completed' ? (
             <div className="flex gap-2 flex-wrap justify-end">
-              {matchData?.status === 'completed' && matchResult && playerScores.length > 1 && (
-                <Button
-                  variant="outline"
-                  onClick={() => setRatingDialogOpen(true)}
-                  className="gap-1"
-                >
-                  <Star className="w-4 h-4" />
-                  Rate Players
-                </Button>
-              )}
               {matchData?.status === 'completed' && matchResult && (
                 <Button
                   variant="outline"
@@ -779,6 +769,25 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 );
               })}
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Rate Players - Shows after match is completed */}
+      {matchData?.status === 'completed' && matchResult && playerScores.length > 1 && (
+        <div className="flex flex-col items-center gap-4 px-6 py-4 border-t border-border">
+          <div className="text-center">
+            <h3 className="text-lg font-semibold mb-2">✅ You've Finished!</h3>
+            <p className="text-sm text-muted-foreground mb-4">
+              How was your experience playing with others?
+            </p>
+            <Button
+              onClick={() => setRatingDialogOpen(true)}
+              className="gap-2"
+            >
+              <Star className="w-4 h-4" />
+              Rate Players
+            </Button>
           </div>
         </div>
       )}
