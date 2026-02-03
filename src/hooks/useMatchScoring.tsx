@@ -569,16 +569,38 @@ export function useMatchScoring(matchId: string) {
       const { count: participantCount } = await supabase
         .from('match_participants')
         .select('*', { count: 'exact', head: true })
-        .eq('match_id', matchId);
+        .eq('match_id', matchId)
+        .eq('status', 'active');
+
+      console.log('Confirmation check:', { 
+        confirmed: allConfirmations?.length, 
+        total: participantCount,
+        shouldFinalize: allConfirmations && participantCount && allConfirmations.length >= participantCount
+      });
 
       // If all players have confirmed, finalize the match
-      if (allConfirmations && participantCount && allConfirmations.length === participantCount) {
-        toast({
-          title: "All players confirmed!",
-          description: "Finalizing match results...",
-        });
-        
-        await finalizeResults();
+      if (allConfirmations && participantCount && allConfirmations.length >= participantCount) {
+        // Check if already finalized
+        const { data: existingResult } = await supabase
+          .from('match_results')
+          .select('id')
+          .eq('match_id', matchId)
+          .maybeSingle();
+
+        if (!existingResult) {
+          toast({
+            title: "All players confirmed!",
+            description: "Finalizing match results...",
+          });
+          
+          const finalized = await finalizeResults();
+          if (!finalized) {
+            console.error('Finalization failed');
+          }
+        } else {
+          console.log('Match already finalized');
+          await fetchMatchData(); // Refresh to show results
+        }
       }
 
       return true;
@@ -650,6 +672,8 @@ export function useMatchScoring(matchId: string) {
           filter: `match_id=eq.${matchId}`
         },
         async (payload) => {
+          console.log('📝 Confirmation change detected:', payload);
+          
           // Refetch to update confirmation status
           await fetchMatchData();
           
@@ -663,10 +687,17 @@ export function useMatchScoring(matchId: string) {
           const { count: participantCount } = await supabase
             .from('match_participants')
             .select('*', { count: 'exact', head: true })
-            .eq('match_id', matchId);
+            .eq('match_id', matchId)
+            .eq('status', 'active');
+
+          console.log('🔄 Auto-finalize check:', { 
+            confirmed: allConfirmations?.length, 
+            total: participantCount,
+            shouldFinalize: allConfirmations && participantCount && allConfirmations.length >= participantCount
+          });
 
           // If all players have confirmed, finalize the match
-          if (allConfirmations && participantCount && allConfirmations.length === participantCount) {
+          if (allConfirmations && participantCount && allConfirmations.length >= participantCount) {
             const { data: existingResult } = await supabase
               .from('match_results')
               .select('id')
@@ -675,11 +706,15 @@ export function useMatchScoring(matchId: string) {
             
             // Only finalize if not already finalized
             if (!existingResult) {
+              console.log('🏆 All confirmed, finalizing match...');
               toast({
                 title: "All players confirmed!",
                 description: "Finalizing match results...",
               });
-              await finalizeResults();
+              const finalized = await finalizeResults();
+              console.log('🏆 Finalization result:', finalized);
+            } else {
+              console.log('✓ Match already finalized');
             }
           }
         }
