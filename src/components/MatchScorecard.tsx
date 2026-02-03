@@ -747,47 +747,58 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       )}
 
       {/* Waiting for others - Shows when current player has finished but waiting for others */}
-      {hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
+      {/* You've Finished Section - Shows when current player has finished */}
+      {((hasCurrentPlayerFinished && matchData?.status === 'started') || (matchData?.status === 'completed' && matchResult)) && (
         <div className="flex flex-col items-center gap-4 px-6 py-4">
           <div className="text-center">
-            <h3 className="text-lg font-semibold mb-2">✅ You've finished!</h3>
-            <p className="text-sm text-muted-foreground">
-              Waiting for {playerScores.length - confirmations.filter(c => c.confirmed).length} more player(s) to finish...
-            </p>
-            <div className="flex flex-wrap justify-center gap-2 mt-3">
-              {playerScores.map(player => {
-                const playerConfirmed = confirmations.find(c => c.player_id === player.player_id)?.confirmed;
-                const playerComplete = isPlayerComplete(player.player_id);
-                return (
-                  <Badge 
-                    key={player.player_id}
-                    variant={playerConfirmed ? "success" : playerComplete ? "outline" : "secondary"}
-                    className="text-xs"
-                  >
-                    {player.player_name}: {playerConfirmed ? "Finished ✓" : playerComplete ? "Completing..." : `${Object.keys(player.scores).length}/${matchData?.holes || 18}`}
-                  </Badge>
-                );
-              })}
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Rate Players - Shows after match is completed */}
-      {matchData?.status === 'completed' && matchResult && playerScores.length > 1 && (
-        <div className="flex flex-col items-center gap-4 px-6 py-4 border-t border-border">
-          <div className="text-center">
             <h3 className="text-lg font-semibold mb-2">✅ You've Finished!</h3>
-            <p className="text-sm text-muted-foreground mb-4">
-              How was your experience playing with others?
-            </p>
-            <Button
-              onClick={() => setRatingDialogOpen(true)}
-              className="gap-2"
-            >
-              <Star className="w-4 h-4" />
-              Rate Players
-            </Button>
+            
+            {/* Waiting message - only during started match */}
+            {hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
+              <>
+                <p className="text-sm text-muted-foreground">
+                  Waiting for {playerScores.length - confirmations.filter(c => c.confirmed).length} more player(s) to finish...
+                </p>
+                <div className="flex flex-wrap justify-center gap-2 mt-3">
+                  {playerScores.map(player => {
+                    const playerConfirmed = confirmations.find(c => c.player_id === player.player_id)?.confirmed;
+                    const playerComplete = isPlayerComplete(player.player_id);
+                    return (
+                      <Badge 
+                        key={player.player_id}
+                        variant={playerConfirmed ? "success" : playerComplete ? "outline" : "secondary"}
+                        className="text-xs"
+                      >
+                        {player.player_name}: {playerConfirmed ? "Finished ✓" : playerComplete ? "Completing..." : `${Object.keys(player.scores).length}/${matchData?.holes || 18}`}
+                      </Badge>
+                    );
+                  })}
+                </div>
+              </>
+            )}
+
+            {/* Completed message */}
+            {matchData?.status === 'completed' && matchResult && (
+              <p className="text-sm text-muted-foreground">
+                Match completed! See the results above.
+              </p>
+            )}
+
+            {/* Rate Players - Always show when 2+ players */}
+            {playerScores.length > 1 && (
+              <div className="mt-4">
+                <p className="text-sm text-muted-foreground mb-3">
+                  How was your experience playing with others?
+                </p>
+                <Button
+                  onClick={() => setRatingDialogOpen(true)}
+                  className="gap-2"
+                >
+                  <Star className="w-4 h-4" />
+                  Rate Players
+                </Button>
+              </div>
+            )}
           </div>
         </div>
       )}
