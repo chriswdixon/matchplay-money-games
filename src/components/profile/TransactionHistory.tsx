@@ -1,7 +1,7 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAccountTransactions } from '@/hooks/useAccountTransactions';
-import { History, TrendingUp, TrendingDown, CreditCard, Trophy, XCircle, Ticket, Loader2 } from 'lucide-react';
+import { History, TrendingUp, TrendingDown, CreditCard, Trophy, XCircle, Ticket, Loader2, LogOut, Zap } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function TransactionHistory() {
@@ -16,46 +16,46 @@ export function TransactionHistory() {
       case 'payout':
         return <TrendingDown className="w-4 h-4" />;
       case 'match_cancellation':
-        return <XCircle className="w-4 h-4" />;
+        return <LogOut className="w-4 h-4" />;
       case 'coupon':
         return <Ticket className="w-4 h-4" />;
+      case 'double_down':
+        return <Zap className="w-4 h-4" />;
+      case 'subscription_charge':
+        return <CreditCard className="w-4 h-4" />;
       default:
         return <History className="w-4 h-4" />;
     }
   };
 
-  const getTransactionColor = (type: string) => {
-    switch (type) {
-      case 'winning':
-      case 'coupon':
-        return 'text-green-600 dark:text-green-400';
-      case 'match_buyin':
-      case 'payout':
-      case 'subscription_charge':
-        return 'text-red-600 dark:text-red-400';
-      case 'match_cancellation':
-        return 'text-yellow-600 dark:text-yellow-400';
-      default:
-        return 'text-muted-foreground';
+  const getTransactionColor = (type: string, amount: number) => {
+    // Color based on whether money was gained or lost
+    if (amount > 0) {
+      return 'text-green-600 dark:text-green-400';
+    } else if (amount < 0) {
+      return 'text-red-600 dark:text-red-400';
     }
+    return 'text-muted-foreground';
   };
 
   const getTransactionLabel = (type: string) => {
     switch (type) {
       case 'winning':
-        return 'Match Winning';
+        return 'Match Winnings';
       case 'match_buyin':
         return 'Match Buy-in';
       case 'payout':
         return 'Payout';
       case 'match_cancellation':
-        return 'Cancellation Fee';
+        return 'Left Match / Cancellation';
       case 'subscription_charge':
-        return 'Subscription';
+        return 'Subscription Fee';
       case 'coupon':
         return 'Coupon Credit';
+      case 'double_down':
+        return 'Double Down';
       default:
-        return type;
+        return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
   };
 
@@ -118,8 +118,8 @@ export function TransactionHistory() {
                     </div>
                   </div>
                   <div className="text-right">
-                    <p className={`font-semibold ${getTransactionColor(transaction.transaction_type)}`}>
-                      {isPositive ? '+' : ''}${Math.abs(amountInDollars).toFixed(2)}
+                    <p className={`font-semibold ${getTransactionColor(transaction.transaction_type, amountInCents)}`}>
+                      {isPositive ? '+' : '-'}${Math.abs(amountInDollars).toFixed(2)}
                     </p>
                   </div>
                 </div>
