@@ -1,94 +1,15 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Crown, CheckCircle, ExternalLink, CreditCard, RefreshCw, Star, Zap, Lock } from "lucide-react";
-import { useSubscription, SUBSCRIPTION_TIERS } from "@/hooks/useSubscription";
-import { supabase } from "@/integrations/supabase/client";
-import { useToast } from "@/hooks/use-toast";
-import { useState } from "react";
+import { Crown, CheckCircle, Star, Zap, Wallet } from "lucide-react";
+import { useSubscription } from "@/hooks/useSubscription";
 
 interface SubscriptionManagementProps {
   isVerified?: boolean;
   onRequestVerification?: () => void;
 }
 
-const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: SubscriptionManagementProps) => {
-  const { subscribed, tierName, subscriptionEnd, loading, refreshSubscription } = useSubscription();
-  const { toast } = useToast();
-  const [portalLoading, setPortalLoading] = useState(false);
-  const [upgradeLoading, setUpgradeLoading] = useState(false);
-
-  const handleManageBilling = async () => {
-    setPortalLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('customer-portal', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Opening billing portal",
-          description: "Manage your subscription in the new tab",
-        });
-      }
-    } catch (error) {
-      console.error('Error opening portal:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to open billing portal",
-        variant: "destructive",
-      });
-    } finally {
-      setPortalLoading(false);
-    }
-  };
-
-  const handleUpgrade = async (priceId: string) => {
-    if (!isVerified && onRequestVerification) {
-      onRequestVerification();
-      return;
-    }
-    
-    setUpgradeLoading(true);
-    try {
-      const { data: { session } } = await supabase.auth.getSession();
-      if (!session) throw new Error('Not authenticated');
-
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { priceId },
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) throw error;
-
-      if (data?.url) {
-        window.open(data.url, '_blank');
-        toast({
-          title: "Redirecting to checkout",
-          description: "Complete your upgrade in the new tab",
-        });
-      }
-    } catch (error) {
-      console.error('Error creating checkout:', error);
-      toast({
-        title: "Error",
-        description: error instanceof Error ? error.message : "Failed to create checkout",
-        variant: "destructive",
-      });
-    } finally {
-      setUpgradeLoading(false);
-    }
-  };
+const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementProps) => {
+  const { tierName, loading } = useSubscription();
 
   if (loading) {
     return (
@@ -104,10 +25,11 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
   const tierFeatures = {
     'Free': [
       "Basic match booking",
-      "Local player matching",
+      "Local player matching", 
       "Simple handicap tracking",
       "Live scoring",
-      "Match history"
+      "Match history",
+      "$500 starting play money"
     ],
     'Local Player': [
       "Everything in Free",
@@ -132,7 +54,6 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
   const isFreeTier = tierName === 'Free';
   const isLocalTier = tierName === 'Local Player';
   const isTournamentTier = tierName === 'Tournament Pro';
-  const canUpgrade = !isTournamentTier;
 
   return (
     <div className="max-w-[1400px] mx-auto space-y-6">
@@ -147,7 +68,7 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
                 {isLocalTier && <Star className="w-5 h-5 text-primary" />}
                 {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
               </CardTitle>
-              <CardDescription>Manage your membership and billing</CardDescription>
+              <CardDescription>Your membership details</CardDescription>
             </div>
             <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
               {tierName}
@@ -155,121 +76,42 @@ const SubscriptionManagement = ({ isVerified = false, onRequestVerification }: S
           </div>
         </CardHeader>
         <CardContent className="space-y-4">
-          <>
-            <div className="space-y-2">
-              <h4 className="font-medium">Your Features</h4>
-              <ul className="space-y-2">
-                {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                    <CheckCircle className="w-4 h-4 text-accent" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-            </div>
-
-            {subscriptionEnd && !isFreeTier && (
-              <div className="pt-4 border-t">
-                <p className="text-sm text-muted-foreground">
-                  Next billing date: {new Date(subscriptionEnd).toLocaleDateString()}
-                </p>
-              </div>
-            )}
-          </>
+          <div className="space-y-2">
+            <h4 className="font-medium">Your Features</h4>
+            <ul className="space-y-2">
+              {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
+                <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <CheckCircle className="w-4 h-4 text-accent" />
+                  {feature}
+                </li>
+              ))}
+            </ul>
+          </div>
         </CardContent>
       </Card>
 
-      {/* Billing & Card Management */}
-      {!isFreeTier && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Billing & Payment</CardTitle>
-            <CardDescription>Manage your payment method and view billing history</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            <Button variant="outline" className="w-full" onClick={handleManageBilling} disabled={portalLoading}>
-              <CreditCard className="w-4 h-4 mr-2" />
-              {portalLoading ? "Loading..." : "Manage Payment Method"}
-            </Button>
-            <p className="text-sm text-muted-foreground text-center">
-              Update your credit card, view invoices, and manage your subscription
+      {/* Play Money Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Wallet className="w-5 h-5 text-primary" />
+            Play Money System
+          </CardTitle>
+          <CardDescription>How the play money system works</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+            <p className="text-sm text-muted-foreground">
+              All matches use <strong>play money</strong> instead of real currency. New accounts start with $500 in play money.
             </p>
-          </CardContent>
-        </Card>
-      )}
-
-      {/* Available Upgrades */}
-      {canUpgrade && (
-        <Card>
-          <CardHeader>
-            <CardTitle>Available Upgrades</CardTitle>
-            <CardDescription>Unlock more features for your golf game</CardDescription>
-          </CardHeader>
-          <CardContent className="space-y-4">
-            {isFreeTier && (
-              <div className="p-4 border rounded-lg space-y-3">
-                <div className="flex items-center justify-between">
-                  <h4 className="font-semibold flex items-center gap-2">
-                    <Star className="w-5 h-5 text-primary" />
-                    Local Player
-                  </h4>
-                  <div className="text-right">
-                    <Badge variant="secondary">$49/year</Badge>
-                    <p className="text-xs text-muted-foreground mt-1">or $59/mo</p>
-                  </div>
-                </div>
-                <ul className="space-y-1 text-sm text-muted-foreground">
-                  {tierFeatures['Local Player'].slice(1).map((feature, idx) => (
-                    <li key={idx} className="flex items-center gap-2">
-                      <CheckCircle className="w-3 h-3 text-accent" />
-                      {feature}
-                    </li>
-                  ))}
-                </ul>
-                <Button 
-                  onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.local_annual.price_id!)} 
-                  size="sm" 
-                  className="w-full"
-                  disabled={upgradeLoading}
-                >
-                  {!isVerified && <Lock className="w-4 h-4 mr-2" />}
-                  {upgradeLoading ? "Processing..." : (isVerified ? "Upgrade to Local Player" : "Verify to Upgrade")}
-                </Button>
-              </div>
-            )}
-            
-            <div className="p-4 border rounded-lg space-y-3">
-              <div className="flex items-center justify-between">
-                <h4 className="font-semibold flex items-center gap-2">
-                  <Crown className="w-5 h-5 text-accent" />
-                  Tournament Pro
-                </h4>
-                <div className="text-right">
-                  <Badge variant="secondary">$99/year</Badge>
-                  <p className="text-xs text-muted-foreground mt-1">or $109/mo</p>
-                </div>
-              </div>
-              <ul className="space-y-1 text-sm text-muted-foreground">
-                {tierFeatures['Tournament Pro'].slice(1).map((feature, idx) => (
-                  <li key={idx} className="flex items-center gap-2">
-                    <CheckCircle className="w-3 h-3 text-accent" />
-                    {feature}
-                  </li>
-                ))}
-              </ul>
-              <Button 
-                onClick={() => handleUpgrade(SUBSCRIPTION_TIERS.tournament_annual.price_id!)} 
-                size="sm" 
-                className="w-full bg-yellow-500 hover:bg-yellow-600 text-white"
-                disabled={upgradeLoading}
-              >
-                {!isVerified && <Lock className="w-4 h-4 mr-2" />}
-                {upgradeLoading ? "Processing..." : (isVerified ? "Upgrade to Tournament Pro" : "Verify to Upgrade")}
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+              <li>Match buy-ins are deducted from your balance</li>
+              <li>Win matches to earn more play money</li>
+              <li>Climb the leaderboard by accumulating winnings</li>
+            </ul>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 };

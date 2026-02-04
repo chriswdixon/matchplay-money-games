@@ -1,40 +1,9 @@
-import { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { usePlayerAccount } from '@/hooks/usePlayerAccount';
-import { DollarSign, TrendingUp, ArrowUpRight, Loader2 } from 'lucide-react';
-import { toast } from 'sonner';
+import { DollarSign, TrendingUp, Info } from 'lucide-react';
 
 export function AccountBalance() {
-  const { account, loading, requestPayout } = usePlayerAccount();
-  const [payoutAmount, setPayoutAmount] = useState('');
-  const [isProcessing, setIsProcessing] = useState(false);
-  const [dialogOpen, setDialogOpen] = useState(false);
-
-  const handlePayout = async () => {
-    const amount = parseFloat(payoutAmount);
-    if (isNaN(amount) || amount <= 0) {
-      toast.error('Please enter a valid amount');
-      return;
-    }
-
-    if (amount > balance) {
-      toast.error('Amount exceeds available balance');
-      return;
-    }
-
-    setIsProcessing(true);
-    const { error } = await requestPayout(amount);
-    setIsProcessing(false);
-
-    if (!error) {
-      setPayoutAmount('');
-      setDialogOpen(false);
-    }
-  };
+  const { account, loading } = usePlayerAccount();
 
   if (loading) {
     return (
@@ -58,10 +27,10 @@ export function AccountBalance() {
           <div className="p-2 bg-gradient-primary rounded-lg">
             <DollarSign className="w-5 h-5 text-primary-foreground" />
           </div>
-          Account Balance
+          Play Money Balance
         </CardTitle>
         <CardDescription>
-          Your winnings and available funds
+          Your play money for matches
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
@@ -80,69 +49,15 @@ export function AccountBalance() {
           </div>
         </div>
 
-        {/* Payout Button */}
-        {balance > 0 && (
-          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-            <DialogTrigger asChild>
-              <Button className="w-full bg-gradient-primary text-primary-foreground hover:opacity-90 gap-2">
-                <ArrowUpRight className="w-4 h-4" />
-                Request Payout
-              </Button>
-            </DialogTrigger>
-            <DialogContent>
-              <DialogHeader>
-                <DialogTitle>Request Payout</DialogTitle>
-                <DialogDescription>
-                  Transfer funds from your account to your payment method
-                </DialogDescription>
-              </DialogHeader>
-              <div className="space-y-4 py-4">
-                <div className="space-y-2">
-                  <Label htmlFor="amount">Payout Amount</Label>
-                  <div className="relative">
-                    <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
-                    <Input
-                      id="amount"
-                      type="number"
-                      step="0.01"
-                      min="0"
-                      max={balance}
-                      value={payoutAmount}
-                      onChange={(e) => setPayoutAmount(e.target.value)}
-                      className="pl-7"
-                      placeholder="0.00"
-                    />
-                  </div>
-                  <p className="text-xs text-muted-foreground">
-                    Maximum: ${balance.toFixed(2)}
-                  </p>
-                </div>
-                <Button
-                  onClick={handlePayout}
-                  disabled={isProcessing || !payoutAmount}
-                  className="w-full bg-gradient-primary"
-                >
-                  {isProcessing ? (
-                    <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                      Processing...
-                    </>
-                  ) : (
-                    'Confirm Payout'
-                  )}
-                </Button>
-              </div>
-            </DialogContent>
-          </Dialog>
-        )}
-
-        {balance === 0 && (
-          <div className="text-center py-4 text-muted-foreground">
-            <p className="text-sm">
-              Win matches to build your balance and earn payouts!
+        {/* Info */}
+        <div className="flex items-start gap-3 p-4 bg-muted/50 rounded-lg">
+          <Info className="w-5 h-5 text-primary mt-0.5 shrink-0" />
+          <div className="space-y-1">
+            <p className="text-sm text-muted-foreground">
+              This is <strong>play money</strong> for participating in matches. Win matches to earn more!
             </p>
           </div>
-        )}
+        </div>
       </CardContent>
     </Card>
   );
