@@ -94,8 +94,10 @@ export function TransactionHistory() {
         ) : (
           <div className="space-y-3">
             {transactions.map((transaction) => {
-              const amount = parseFloat(transaction.amount.toString());
-              const isPositive = amount > 0;
+              // Amount is stored in cents, convert to dollars for display
+              const amountInCents = parseFloat(transaction.amount.toString());
+              const amountInDollars = amountInCents / 100;
+              const isPositive = amountInCents > 0;
 
               return (
                 <div
@@ -117,7 +119,7 @@ export function TransactionHistory() {
                   </div>
                   <div className="text-right">
                     <p className={`font-semibold ${getTransactionColor(transaction.transaction_type)}`}>
-                      {isPositive ? '+' : ''}${Math.abs(amount).toFixed(2)}
+                      {isPositive ? '+' : ''}${Math.abs(amountInDollars).toFixed(2)}
                     </p>
                   </div>
                 </div>
