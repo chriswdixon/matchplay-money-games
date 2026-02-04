@@ -12,7 +12,9 @@ export function useFreeTier() {
       if (loading) return false;
       if (!isFree) return true;
       
-      // Free tier restrictions
+      // Free tier restrictions - account_tab is always accessible for play money
+      if (feature === 'account_tab') return true;
+      
       return false;
     }
   };
