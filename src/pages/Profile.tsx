@@ -13,7 +13,7 @@ import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
 import { TransactionHistory } from '@/components/profile/TransactionHistory';
-import { PaymentMethods } from '@/components/profile/PaymentMethods';
+
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
 
@@ -150,7 +150,6 @@ export default function Profile() {
             <TabsContent value="account" className="space-y-6">
               <AccountBalance />
               <TransactionHistory />
-              <PaymentMethods />
             </TabsContent>
           )}
 
