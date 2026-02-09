@@ -684,7 +684,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               onClick={() => handleViewScorecard(match)}
                             >
                               <Target className="w-4 h-4 mr-2" />
-                              View Scorecard
+                              Open Scorecard to Complete Match
                             </Button>
                           ) : match.status === 'open' && match.user_joined && isFull ? (
                             <Button
