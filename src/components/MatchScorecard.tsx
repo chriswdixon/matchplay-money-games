@@ -280,7 +280,12 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
   };
 
   const handleFinalize = async () => {
-    await confirmResults();
+    // Try to finalize directly first, fall back to confirmResults
+    const finalized = await finalizeResults();
+    if (!finalized) {
+      // If direct finalization fails, try confirm flow
+      await confirmResults();
+    }
   };
 
   const handleConfirm = async () => {
