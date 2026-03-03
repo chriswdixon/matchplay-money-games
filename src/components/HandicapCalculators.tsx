@@ -11,7 +11,7 @@ export function HandicapCalculators() {
   // Course Handicap Calculator state
   const [handicapIndex, setHandicapIndex] = useState('');
   const [courseRating, setCourseRating] = useState('');
-  const [slopeRating, setSlopeRating] = useState('');
+  
   const [par, setPar] = useState('');
   const [courseHandicap, setCourseHandicap] = useState<number | null>(null);
 
@@ -23,11 +23,11 @@ export function HandicapCalculators() {
   const calculateCourseHandicap = () => {
     const hi = parseFloat(handicapIndex);
     const cr = parseFloat(courseRating);
-    const sr = parseFloat(slopeRating);
+    const sr = 113; // Standard slope rating
     const p = parseFloat(par);
 
     // Validation
-    if (!handicapIndex || !courseRating || !slopeRating || !par) {
+    if (!handicapIndex || !courseRating || !par) {
       toast.error('Please fill in all fields');
       return;
     }
@@ -37,10 +37,6 @@ export function HandicapCalculators() {
       return;
     }
 
-    if (sr < 55 || sr > 155) {
-      toast.error('Slope Rating must be between 55 and 155');
-      return;
-    }
 
     if (p < 20 || p > 90) {
       toast.error('Par must be between 20 and 90');
@@ -72,7 +68,7 @@ export function HandicapCalculators() {
   const resetCourseCalculator = () => {
     setHandicapIndex('');
     setCourseRating('');
-    setSlopeRating('');
+    
     setPar('');
     setCourseHandicap(null);
   };
@@ -145,21 +141,6 @@ export function HandicapCalculators() {
                   </p>
                 </div>
 
-                <div className="space-y-2">
-                  <Label htmlFor="slopeRating">Slope Rating™</Label>
-                  <Input
-                    id="slopeRating"
-                    type="number"
-                    min="55"
-                    max="155"
-                    placeholder="e.g., 130"
-                    value={slopeRating}
-                    onChange={(e) => setSlopeRating(e.target.value)}
-                  />
-                  <p className="text-xs text-muted-foreground">
-                    Range: 55 to 155
-                  </p>
-                </div>
 
                 <div className="space-y-2">
                   <Label htmlFor="par">Par</Label>
