@@ -1065,16 +1065,22 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-semibold text-accent-foreground">Total</h3>
+                          <h3 className="font-semibold text-accent-foreground">Front 9</h3>
                           <div className="text-sm text-muted-foreground">
                             {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) <= 9).length}/9 holes
                           </div>
+                          {matchData?.tee_data?.holes && (
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {Array.from({ length: 9 }, (_, i) => i + 1)
+                                .reduce((sum, hole) => sum + (matchData.tee_data?.holes?.[String(hole)]?.yardage || 0), 0)
+                                .toLocaleString()} yds
+                            </div>
+                          )}
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.front9 || 0}</div>
                           <div className="text-sm font-semibold text-accent-foreground">
                             {(() => {
-                              // Only calculate for completed holes
                               const completedHoles = Array.from({ length: 9 }, (_, i) => i + 1)
                                 .filter(hole => currentUserScore?.scores[hole]);
                               
@@ -1389,16 +1395,22 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
-                          <h3 className="font-semibold text-accent-foreground">Total</h3>
+                          <h3 className="font-semibold text-accent-foreground">Back 9</h3>
                           <div className="text-sm text-muted-foreground">
                             {Object.keys(currentUserScore?.scores || {}).filter(h => parseInt(h) >= 10).length}/9 holes
                           </div>
+                          {matchData?.tee_data?.holes && (
+                            <div className="text-xs text-muted-foreground mt-0.5">
+                              {Array.from({ length: 9 }, (_, i) => i + 10)
+                                .reduce((sum, hole) => sum + (matchData.tee_data?.holes?.[String(hole)]?.yardage || 0), 0)
+                                .toLocaleString()} yds
+                            </div>
+                          )}
                         </div>
                         <div className="text-right">
                           <div className="text-2xl font-bold text-accent-foreground">{currentUserScore?.back9 || 0}</div>
                           <div className="text-sm font-semibold text-accent-foreground">
                             {(() => {
-                              // Only calculate for completed holes
                               const completedHoles = Array.from({ length: 9 }, (_, i) => i + 10)
                                 .filter(hole => currentUserScore?.scores[hole]);
                               
