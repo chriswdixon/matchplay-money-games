@@ -16,14 +16,14 @@ import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { useFreeTier } from '@/hooks/useFreeTier';
-import { useAIGolfCourses } from '@/hooks/useAIGolfCourses';
+
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
 import { CreateCourseDialog } from '@/components/CreateCourseDialog';
-import { SmartCourseSearch } from '@/components/SmartCourseSearch';
-import { CourseRecommendations } from '@/components/CourseRecommendations';
+
+
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Badge } from '@/components/ui/badge';
 import { supabase } from '@/integrations/supabase/client';
@@ -38,7 +38,7 @@ const CreateMatch = () => {
   const { geocodeAddress } = useLocation();
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
-  const { loading: aiLoading, smartSearch } = useAIGolfCourses();
+  
 
   const isPaidSubscription = subscribed && tierName !== 'free';
 
@@ -423,17 +423,8 @@ const CreateMatch = () => {
     <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
       <Label>Golf Course *</Label>
       
-      {/* AI Smart Search */}
-      {isPaidSubscription && (
-        <SmartCourseSearch 
-          onResults={(results) => {
-            // Smart search already updates the courses list via the hook
-            if (results.length > 0) {
-              setCourseOpen(true);
-            }
-          }}
-        />
-      )}
+
+
           
       {isPaidSubscription && (
         <div className="space-y-2">
@@ -632,12 +623,8 @@ const CreateMatch = () => {
         </PopoverContent>
       </Popover>
 
-      {/* AI Course Recommendations */}
-      {isPaidSubscription && user && (
-        <div className="pt-2">
-          <CourseRecommendations />
-        </div>
-      )}
+
+
 
       {isPaidSubscription && formData.booking_url && (
         <div className="space-y-2">
