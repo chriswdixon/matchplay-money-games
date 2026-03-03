@@ -204,10 +204,14 @@ export function useMatchScoring(matchId: string) {
 
       // Process player scores with handicap calculations
       const playerScoresMap: { [playerId: string]: PlayerScore } = {};
-      const slopeRating = 113; // Standard slope rating
+      // Use actual slope rating from tee_data if available, otherwise standard 113
+      const teeData = matchInfo.tee_data as MatchData['tee_data'];
+      const slopeRating = teeData?.slope_rating || 113;
+      const courseRating = teeData?.course_rating;
       
       participants.forEach((participant: any) => {
         const handicapIndex = participant.handicap || 0;
+        // Course Handicap = Handicap Index × (Slope Rating / 113)
         const courseHandicap = Math.round((handicapIndex * slopeRating) / 113);
         
         playerScoresMap[participant.user_id] = {
