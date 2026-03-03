@@ -14,7 +14,7 @@ import { InviteManagement } from "@/components/admin/InviteManagement";
 import { GolfDataImport } from "@/components/admin/GolfDataImport";
 import { GolfCourseManagement } from "@/components/admin/GolfCourseManagement";
 import { SocialLinksManagement } from "@/components/admin/SocialLinksManagement";
-import { AIGolfCourseTools } from "@/components/admin/AIGolfCourseTools";
+
 import { MatchManagement } from "@/components/admin/MatchManagement";
 import { DeletionRequestReviews } from "@/components/admin/DeletionRequestReviews";
 import { GeoBlockingManagement } from "@/components/admin/GeoBlockingManagement";
@@ -152,7 +152,6 @@ const AdminConsole = () => {
             <TabsContent value="golf-data">
               <div className="space-y-6">
                 <GolfDataImport />
-                <AIGolfCourseTools />
                 <GolfCourseManagement />
               </div>
             </TabsContent>
