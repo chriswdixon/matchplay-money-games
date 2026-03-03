@@ -297,6 +297,7 @@ export const useMatches = () => {
     tee_selection_mode: 'fixed' | 'individual';
     default_tees?: string;
     hole_pars?: Record<string, number>;
+    tee_data?: any;
   }, userLocation?: { latitude: number; longitude: number }) => {
     if (!user) {
       toast.error('You must be logged in to create a match');
@@ -351,7 +352,8 @@ export const useMatches = () => {
           hole_pars: holeParsValidation.data,
           pin: (matchData as any).pin || null,
           team1_pin_creator: (matchData as any).pin ? user.id : null,
-          created_by: user.id
+          created_by: user.id,
+          tee_data: matchData.tee_data || null
         })
         .select()
         .maybeSingle();

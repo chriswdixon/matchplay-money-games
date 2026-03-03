@@ -37,6 +37,15 @@ export interface MatchData {
   course_name: string;
   location: string;
   hole_pars: { [hole: string]: number };
+  tee_data?: {
+    tee_name: string;
+    slope_rating: number;
+    course_rating: number;
+    total_yards: number;
+    par_total: number;
+    gender: string;
+    holes: { [hole: string]: { par: number; yardage: number; handicap?: number } };
+  };
   tee_selection_mode?: 'fixed' | 'individual';
   default_tees?: string;
   scheduled_time?: string;
@@ -106,7 +115,7 @@ export function useMatchScoring(matchId: string) {
       // Fetch match data including hole pars and tee settings
       const { data: matchInfo, error: matchError } = await supabase
         .from('matches')
-        .select('id, course_name, location, hole_pars, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants, status, holes')
+        .select('id, course_name, location, hole_pars, tee_data, tee_selection_mode, default_tees, scheduled_time, format, buy_in_amount, max_participants, status, holes')
         .eq('id', matchId)
         .single();
 
@@ -126,6 +135,7 @@ export function useMatchScoring(matchId: string) {
         course_name: matchInfo.course_name,
         location: matchInfo.location,
         hole_pars: matchInfo.hole_pars as { [hole: string]: number },
+        tee_data: matchInfo.tee_data as MatchData['tee_data'],
         tee_selection_mode: matchInfo.tee_selection_mode as 'fixed' | 'individual' | undefined,
         default_tees: matchInfo.default_tees || undefined,
         scheduled_time: matchInfo.scheduled_time,
