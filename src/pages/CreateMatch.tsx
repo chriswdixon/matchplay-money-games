@@ -36,7 +36,7 @@ const CreateMatch = () => {
   const { isFree, hasAccess } = useFreeTier();
   const { createMatch } = useMatches();
   const { geocodeAddress } = useLocation();
-  const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, formatDistance } = useGolfCourses();
+  const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
   
 
@@ -71,6 +71,8 @@ const CreateMatch = () => {
   const [submitting, setSubmitting] = useState(false);
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [customSearchTerm, setCustomSearchTerm] = useState('');
+  const [loadingCourseDetail, setLoadingCourseDetail] = useState(false);
+  const [courseTees, setCourseTees] = useState<any[]>([]);
   
   // Validation state
   const [validationErrors, setValidationErrors] = useState({
@@ -210,7 +212,7 @@ const CreateMatch = () => {
     }
   };
 
-  const handleCourseSelect = (course: any) => {
+  const handleCourseSelect = async (course: any) => {
     setSelectedCourse(course);
     setFormData({ 
       ...formData, 
@@ -222,6 +224,25 @@ const CreateMatch = () => {
       longitude: course.longitude
     });
     setCourseOpen(false);
+
+    // Fetch course detail if we have an externalId
+    if (course.externalId) {
+      setLoadingCourseDetail(true);
+      try {
+        const detail = await fetchCourseDetail(course.externalId);
+        if (detail?.tees && detail.tees.length > 0) {
+          setCourseTees(detail.tees);
+          setSelectedCourse((prev: any) => ({ ...prev, tees: detail.tees }));
+          toast.success(`Loaded ${detail.tees.length} tee set(s) for ${course.name}`);
+        }
+      } catch (err) {
+        console.error('Failed to fetch course detail:', err);
+      } finally {
+        setLoadingCourseDetail(false);
+      }
+    } else {
+      setCourseTees([]);
+    }
   };
 
   const handleToggleFavorite = async (e: React.MouseEvent, course: any) => {
@@ -385,6 +406,34 @@ const CreateMatch = () => {
         return;
       }
 
+      // Build tee_data and hole_pars from selected tee if available
+      let teeData: any = undefined;
+      let holePars: Record<string, number> | undefined = undefined;
+      
+      if (courseTees.length > 0 && formData.default_tees !== 'pick-own') {
+        const selectedTee = courseTees.find((t: any) => t.tee_name === formData.default_tees);
+        if (selectedTee && selectedTee.holes?.length > 0) {
+          teeData = {
+            tee_name: selectedTee.tee_name,
+            slope_rating: selectedTee.slope_rating,
+            course_rating: selectedTee.course_rating,
+            total_yards: selectedTee.total_yards,
+            par_total: selectedTee.par_total,
+            gender: selectedTee.gender,
+            holes: Object.fromEntries(
+              selectedTee.holes.map((h: any, i: number) => [
+                String(i + 1),
+                { par: h.par, yardage: h.yardage, handicap: h.handicap }
+              ])
+            ),
+          };
+          // Auto-populate hole pars from tee data
+          holePars = Object.fromEntries(
+            selectedTee.holes.map((h: any, i: number) => [String(i + 1), h.par])
+          );
+        }
+      }
+
       const matchData = {
         course_name: formData.course_name,
         location: selectedCourse?.address?.split(',').slice(-2).join(',').trim() || formData.course_name,
@@ -402,7 +451,9 @@ const CreateMatch = () => {
         booking_url: formData.booking_url || undefined,
         tee_selection_mode: (formData.default_tees === 'pick-own' ? 'individual' : 'fixed') as 'fixed' | 'individual',
         default_tees: formData.default_tees === 'pick-own' ? undefined : formData.default_tees,
-        is_team_format: isTeamFormat
+        is_team_format: isTeamFormat,
+        tee_data: teeData,
+        hole_pars: holePars,
       };
 
       const { error } = await createMatch(matchData, locationCoords || undefined);
@@ -776,19 +827,57 @@ const CreateMatch = () => {
 
         <div className="space-y-2">
           <Label htmlFor="tees">Tee Selection *</Label>
+          {loadingCourseDetail && (
+            <div className="flex items-center gap-2 text-sm text-muted-foreground py-2">
+              <Loader2 className="w-4 h-4 animate-spin" />
+              Loading course tees...
+            </div>
+          )}
           <Select value={formData.default_tees} onValueChange={(value) => setFormData({ ...formData, default_tees: value })}>
             <SelectTrigger id="tees">
               <SelectValue placeholder="Select tees" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="black">Black (Championship)</SelectItem>
-              <SelectItem value="blue">Blue (Back)</SelectItem>
-              <SelectItem value="white">White (Middle)</SelectItem>
-              <SelectItem value="gold">Gold (Senior)</SelectItem>
-              <SelectItem value="red">Red (Forward)</SelectItem>
-              <SelectItem value="pick-own">Pick Your Own</SelectItem>
+              {courseTees.length > 0 ? (
+                <>
+                  {courseTees.map((tee, idx) => (
+                    <SelectItem key={`${tee.tee_name}-${tee.gender}-${idx}`} value={tee.tee_name}>
+                      <div className="flex items-center gap-2">
+                        <span>{tee.tee_name}</span>
+                        <span className="text-xs text-muted-foreground">
+                          ({tee.gender === 'male' ? 'M' : 'F'}) • {tee.total_yards}yd • Slope {tee.slope_rating} • CR {tee.course_rating}
+                        </span>
+                      </div>
+                    </SelectItem>
+                  ))}
+                  <SelectItem value="pick-own">Pick Your Own</SelectItem>
+                </>
+              ) : (
+                <>
+                  <SelectItem value="black">Black (Championship)</SelectItem>
+                  <SelectItem value="blue">Blue (Back)</SelectItem>
+                  <SelectItem value="white">White (Middle)</SelectItem>
+                  <SelectItem value="gold">Gold (Senior)</SelectItem>
+                  <SelectItem value="red">Red (Forward)</SelectItem>
+                  <SelectItem value="pick-own">Pick Your Own</SelectItem>
+                </>
+              )}
             </SelectContent>
           </Select>
+          {formData.default_tees && courseTees.length > 0 && (() => {
+            const selectedTee = courseTees.find((t: any) => t.tee_name === formData.default_tees);
+            if (!selectedTee) return null;
+            return (
+              <div className="bg-muted/50 rounded-lg p-3 space-y-1">
+                <div className="text-sm font-medium">{selectedTee.tee_name} Tees</div>
+                <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
+                  <div>Slope: <span className="font-semibold text-foreground">{selectedTee.slope_rating}</span></div>
+                  <div>Rating: <span className="font-semibold text-foreground">{selectedTee.course_rating}</span></div>
+                  <div>Yards: <span className="font-semibold text-foreground">{selectedTee.total_yards?.toLocaleString()}</span></div>
+                </div>
+              </div>
+            );
+          })()}
         </div>
       </div>
     );

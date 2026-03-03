@@ -2,6 +2,22 @@ import { useState, useRef } from 'react';
 import { toast } from 'sonner';
 import { supabase } from '@/integrations/supabase/client';
 
+export interface GolfCourseHoleData {
+  par: number;
+  yardage: number;
+  handicap?: number;
+}
+
+export interface GolfCourseTeeData {
+  tee_name: string;
+  slope_rating: number;
+  course_rating: number;
+  total_yards: number;
+  par_total: number;
+  gender: 'male' | 'female';
+  holes: GolfCourseHoleData[];
+}
+
 export interface GolfCourse {
   name: string;
   address: string;
@@ -9,6 +25,9 @@ export interface GolfCourse {
   longitude: number;
   distance?: number;
   website?: string;
+  externalId?: number;
+  clubName?: string;
+  tees?: GolfCourseTeeData[];
   // AI-enhanced fields
   description?: string;
   amenities?: string[];
@@ -453,11 +472,62 @@ export const useGolfCourses = () => {
     }
   };
 
+  const fetchCourseDetail = async (courseId: number): Promise<GolfCourse | null> => {
+    try {
+      console.log('🔍 Fetching course detail for ID:', courseId);
+      const { data, error } = await supabase.functions.invoke('search-golf-courses', {
+        body: { type: 'detail', courseId }
+      });
+
+      if (error) {
+        console.error('❌ Error fetching course detail:', error);
+        return null;
+      }
+
+      const course = data?.course;
+      if (!course) return null;
+
+      // Parse tees into our structured format
+      const parsedTees: GolfCourseTeeData[] = [];
+      if (course.tees) {
+        for (const gender of ['male', 'female'] as const) {
+          const genderTees = course.tees[gender];
+          if (Array.isArray(genderTees)) {
+            for (const tee of genderTees) {
+              parsedTees.push({
+                tee_name: tee.tee_name || 'Unknown',
+                slope_rating: tee.slope_rating || 113,
+                course_rating: tee.course_rating || 72,
+                total_yards: tee.total_yards || 0,
+                par_total: tee.par_total || 72,
+                gender,
+                holes: (tee.holes || []).map((h: any) => ({
+                  par: h.par || 4,
+                  yardage: h.yardage || 0,
+                  handicap: h.handicap,
+                })),
+              });
+            }
+          }
+        }
+      }
+
+      return {
+        ...course,
+        tees: parsedTees.length > 0 ? parsedTees : undefined,
+      };
+    } catch (error) {
+      console.error('❌ Error fetching course detail:', error);
+      return null;
+    }
+  };
+
   return {
     courses,
     loading,
     searchNearbyCourses,
     searchCoursesByName,
+    fetchCourseDetail,
     formatDistance
   };
 };

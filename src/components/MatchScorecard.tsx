@@ -623,22 +623,40 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             {matchData && (
               <Card className="bg-muted/50 border-primary/20">
                 <CardContent className="p-4">
-                  <div className="flex items-center gap-2 text-sm">
-                    <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
-                      Playing Tees
-                    </Badge>
-                    {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
-                      <span className="font-medium">
-                        All players: <span className="text-primary font-bold">{matchData.default_tees}</span> tees
-                      </span>
-                    ) : matchData.tee_selection_mode === 'individual' ? (
-                      <span className="font-medium text-muted-foreground">
-                        Individual tee selection
-                      </span>
-                    ) : (
-                      <span className="font-medium text-muted-foreground">
-                        Tees not specified
-                      </span>
+                  <div className="flex flex-col gap-2">
+                    <div className="flex items-center gap-2 text-sm">
+                      <Badge variant="outline" className="bg-primary/10 text-primary border-primary/30">
+                        Playing Tees
+                      </Badge>
+                      {matchData.tee_selection_mode === 'fixed' && matchData.default_tees ? (
+                        <span className="font-medium">
+                          All players: <span className="text-primary font-bold">{matchData.default_tees}</span> tees
+                        </span>
+                      ) : matchData.tee_selection_mode === 'individual' ? (
+                        <span className="font-medium text-muted-foreground">
+                          Individual tee selection
+                        </span>
+                      ) : (
+                        <span className="font-medium text-muted-foreground">
+                          Tees not specified
+                        </span>
+                      )}
+                    </div>
+                    {matchData.tee_data && (
+                      <div className="grid grid-cols-3 gap-3 text-xs mt-1">
+                        <div className="bg-background rounded px-2 py-1.5">
+                          <div className="text-muted-foreground">Slope</div>
+                          <div className="font-bold text-foreground text-sm">{matchData.tee_data.slope_rating}</div>
+                        </div>
+                        <div className="bg-background rounded px-2 py-1.5">
+                          <div className="text-muted-foreground">Rating</div>
+                          <div className="font-bold text-foreground text-sm">{matchData.tee_data.course_rating}</div>
+                        </div>
+                        <div className="bg-background rounded px-2 py-1.5">
+                          <div className="text-muted-foreground">Yards</div>
+                          <div className="font-bold text-foreground text-sm">{matchData.tee_data.total_yards?.toLocaleString()}</div>
+                        </div>
+                      </div>
                     )}
                   </div>
                 </CardContent>
@@ -872,6 +890,20 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                       ))}
                       <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
                     </tr>
+                    {/* Yardage Row - only if tee_data available */}
+                    {matchData?.tee_data?.holes && (
+                      <tr className="border-b bg-muted/10">
+                        <th className="text-left p-1 lg:p-2 text-[10px] lg:text-xs font-medium text-muted-foreground">YDS</th>
+                        {front9Holes.map(hole => (
+                          <th key={hole} className="text-center p-1 lg:p-2 text-[10px] lg:text-xs font-normal w-7 lg:w-10 text-muted-foreground">
+                            {matchData.tee_data?.holes?.[String(hole)]?.yardage || '—'}
+                          </th>
+                        ))}
+                        <th className="text-center p-1 lg:p-2 text-[10px] lg:text-xs font-normal text-muted-foreground">
+                          {front9Holes.reduce((sum, h) => sum + (matchData.tee_data?.holes?.[String(h)]?.yardage || 0), 0)}
+                        </th>
+                      </tr>
+                    )}
                     {/* Hole Numbers Row */}
                     <tr className="border-b">
                       <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium">
@@ -1097,7 +1129,15 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             </div>
                             <div>
                               <div className="font-semibold">Hole {hole}</div>
-                              <div className="text-sm text-muted-foreground">Par {par}</div>
+                              <div className="text-sm text-muted-foreground">
+                                Par {par}
+                                {matchData?.tee_data?.holes?.[String(hole)] && (
+                                  <span className="ml-2">• {matchData.tee_data.holes[String(hole)].yardage} yds</span>
+                                )}
+                              </div>
+                              {matchData?.tee_data?.holes?.[String(hole)]?.handicap !== undefined && (
+                                <div className="text-xs text-muted-foreground">HCP {matchData.tee_data.holes[String(hole)].handicap}</div>
+                              )}
                             </div>
                           </div>
                           <Button
@@ -1175,6 +1215,20 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                       ))}
                       <th className="text-center p-1 lg:p-2 text-xs lg:text-sm font-medium bg-accent/20 text-muted-foreground">Total</th>
                     </tr>
+                    {/* Yardage Row - only if tee_data available */}
+                    {matchData?.tee_data?.holes && (
+                      <tr className="border-b bg-muted/10">
+                        <th className="text-left p-1 lg:p-2 text-[10px] lg:text-xs font-medium text-muted-foreground">YDS</th>
+                        {back9Holes.map(hole => (
+                          <th key={hole} className="text-center p-1 lg:p-2 text-[10px] lg:text-xs font-normal w-7 lg:w-10 text-muted-foreground">
+                            {matchData.tee_data?.holes?.[String(hole)]?.yardage || '—'}
+                          </th>
+                        ))}
+                        <th className="text-center p-1 lg:p-2 text-[10px] lg:text-xs font-normal text-muted-foreground">
+                          {back9Holes.reduce((sum, h) => sum + (matchData.tee_data?.holes?.[String(h)]?.yardage || 0), 0)}
+                        </th>
+                      </tr>
+                    )}
                     {/* Hole Numbers Row */}
                     <tr className="border-b">
                       <th className="text-left p-1 lg:p-2 text-xs lg:text-sm font-medium">
@@ -1399,7 +1453,15 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             </div>
                             <div>
                               <div className="font-semibold">Hole {hole}</div>
-                              <div className="text-sm text-muted-foreground">Par {par}</div>
+                              <div className="text-sm text-muted-foreground">
+                                Par {par}
+                                {matchData?.tee_data?.holes?.[String(hole)] && (
+                                  <span className="ml-2">• {matchData.tee_data.holes[String(hole)].yardage} yds</span>
+                                )}
+                              </div>
+                              {matchData?.tee_data?.holes?.[String(hole)]?.handicap !== undefined && (
+                                <div className="text-xs text-muted-foreground">HCP {matchData.tee_data.holes[String(hole)].handicap}</div>
+                              )}
                             </div>
                           </div>
                           <Button

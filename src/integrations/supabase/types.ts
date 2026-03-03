@@ -785,6 +785,7 @@ export type Database = {
           team3_pin_creator: string | null
           team4_pin: string | null
           team4_pin_creator: string | null
+          tee_data: Json | null
           tee_selection_mode: string
           updated_at: string
         }
@@ -820,6 +821,7 @@ export type Database = {
           team3_pin_creator?: string | null
           team4_pin?: string | null
           team4_pin_creator?: string | null
+          tee_data?: Json | null
           tee_selection_mode?: string
           updated_at?: string
         }
@@ -855,6 +857,7 @@ export type Database = {
           team3_pin_creator?: string | null
           team4_pin?: string | null
           team4_pin_creator?: string | null
+          tee_data?: Json | null
           tee_selection_mode?: string
           updated_at?: string
         }
