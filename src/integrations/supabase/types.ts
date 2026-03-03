@@ -1124,7 +1124,50 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      double_down_participants_public: {
+        Row: {
+          additional_buyin: number | null
+          created_at: string | null
+          id: string | null
+          match_id: string | null
+          opted_in: boolean | null
+          payment_processed: boolean | null
+          responded: boolean | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          additional_buyin?: number | null
+          created_at?: string | null
+          id?: string | null
+          match_id?: string | null
+          opted_in?: boolean | null
+          payment_processed?: boolean | null
+          responded?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          additional_buyin?: number | null
+          created_at?: string | null
+          id?: string | null
+          match_id?: string | null
+          opted_in?: boolean | null
+          payment_processed?: boolean | null
+          responded?: boolean | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "double_down_participants_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       admin_resolve_cancellation_review: {

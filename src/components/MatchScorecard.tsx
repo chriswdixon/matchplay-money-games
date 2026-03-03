@@ -164,11 +164,8 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
     const fetchDoubleDownStatuses = async () => {
       const { data } = await supabase
-        .from('double_down_participants')
-        .select(`
-          *,
-          profiles!inner(display_name)
-        `)
+        .from('double_down_participants_public' as any)
+        .select('*')
         .eq('match_id', matchId);
 
       if (data) {
