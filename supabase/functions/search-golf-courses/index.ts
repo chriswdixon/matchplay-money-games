@@ -79,7 +79,7 @@ serve(async (req) => {
       console.log('[SEARCH-GOLF-COURSES] Fetching course detail for ID:', courseId);
 
       const response = await fetch(`${API_BASE}/v1/courses/${courseId}`, {
-        headers: { 'Authorization': `Bearer ${apiKey}` },
+        headers: { 'Authorization': `Key ${apiKey}` },
       });
 
       if (!response.ok) {
@@ -88,8 +88,9 @@ serve(async (req) => {
         throw new Error(`Golf Course API error: ${response.status}`);
       }
 
-      const courseData = await response.json();
-      console.log('[SEARCH-GOLF-COURSES] Course detail retrieved:', courseData.course_name);
+      const responseData = await response.json();
+      const courseData = responseData.course || responseData;
+      console.log('[SEARCH-GOLF-COURSES] Course detail retrieved:', courseData.course_name || courseData.club_name);
 
       const course: GolfCourse = {
         name: courseData.course_name || courseData.club_name || 'Unknown',
@@ -125,7 +126,7 @@ serve(async (req) => {
       const apiUrl = `${API_BASE}/v1/search?search_query=${encodeURIComponent(name)}`;
 
       const response = await fetch(apiUrl, {
-        headers: { 'Authorization': `Bearer ${apiKey}` },
+        headers: { 'Authorization': `Key ${apiKey}` },
       });
 
       if (!response.ok) {
