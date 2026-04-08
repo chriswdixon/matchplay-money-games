@@ -35,6 +35,29 @@ const isRateLimited = (userId: string): boolean => {
   return false;
 };
 
+const safeMessages = new Set([
+  "No authorization header",
+  "Unauthorized",
+  "User email not available",
+  "Too many requests. Please try again later.",
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  return safeMessages.has(message) ? message : "Unable to save payment method.";
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "Too many requests. Please try again later.") {
+    return 429;
+  }
+  if (message === "No authorization header" || message === "Unauthorized" || message === "User email not available") {
+    return 401;
+  }
+  return 500;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -55,6 +78,7 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) throw new Error("Unauthorized");
+    if (!user.email) throw new Error("User email not available");
     
     logStep("User authenticated", { userId: user.id });
 
@@ -127,6 +151,14 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
+
+    if (error instanceof z.ZodError) {
+      return new Response(JSON.stringify({ error: "Invalid request data" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
     return new Response(JSON.stringify({ error: errorMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
