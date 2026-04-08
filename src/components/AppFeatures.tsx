@@ -62,7 +62,7 @@ const AppFeatures = () => {
             <span aria-hidden="true">🚀</span> Platform Features
           </Badge>
           <h2 id="features-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Five Services, One Platform
+            Four Services, One Platform
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             LinkUp combines the best of GolfNow, 18Birdies, Venmo, and GHIN 
@@ -71,7 +71,7 @@ const AppFeatures = () => {
         </div>
 
         {/* Core Features Grid */}
-        <div className="grid lg:grid-cols-3 gap-8 mb-16">
+        <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
           {coreFeatures.map((feature, index) => (
             <Card 
               key={feature.title}
