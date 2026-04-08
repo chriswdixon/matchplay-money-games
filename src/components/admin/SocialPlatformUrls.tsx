@@ -28,13 +28,13 @@ const platformNames: Record<string, string> = {
 };
 
 const defaultUrls: Record<string, string> = {
-  facebook: "https://facebook.com/matchplay",
-  x: "https://x.com/matchplay",
-  twitter: "https://twitter.com/matchplay",
-  instagram: "https://instagram.com/matchplay",
-  linkedin: "https://linkedin.com/company/matchplay",
-  youtube: "https://youtube.com/@matchplay",
-  tiktok: "https://tiktok.com/@matchplay",
+  facebook: "https://facebook.com/linkupgolf",
+  x: "https://x.com/linkupgolf",
+  twitter: "https://twitter.com/linkupgolf",
+  instagram: "https://instagram.com/linkupgolf",
+  linkedin: "https://linkedin.com/company/linkupgolf",
+  youtube: "https://youtube.com/@linkupgolf",
+  tiktok: "https://tiktok.com/@linkupgolf",
 };
 
 export const SocialPlatformUrls = () => {

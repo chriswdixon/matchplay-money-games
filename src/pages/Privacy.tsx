@@ -12,7 +12,7 @@ const Privacy = () => {
           <Button variant="ghost" size="sm" asChild>
             <Link to="/" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              Back to MatchPlay
+              Back to LinkUp
             </Link>
           </Button>
         </div>
@@ -77,10 +77,10 @@ const Privacy = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">1. Introduction</h2>
             <p className="text-muted-foreground mt-4">
-              MatchPlay ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our competitive golf platform.
+              LinkUp ("we," "us," or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our competitive golf platform.
             </p>
             <p className="text-muted-foreground">
-              By using MatchPlay, you agree to the collection and use of information in accordance with this policy. We comply with applicable data protection laws including the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA).
+              By using LinkUp, you agree to the collection and use of information in accordance with this policy. We comply with applicable data protection laws including the General Data Protection Regulation (GDPR) and the California Consumer Privacy Act (CCPA).
             </p>
           </section>
 
@@ -236,7 +236,7 @@ const Privacy = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">11. Children's Privacy</h2>
             <p className="text-muted-foreground mt-4">
-              MatchPlay is not intended for users under 18 years of age. We do not knowingly collect personal information from children. If we learn we have collected data from a minor, we will delete it promptly.
+              LinkUp is not intended for users under 18 years of age. We do not knowingly collect personal information from children. If we learn we have collected data from a minor, we will delete it promptly.
             </p>
           </section>
 
@@ -281,7 +281,7 @@ const Privacy = () => {
         {/* Back to Home */}
         <div className="mt-12 text-center">
           <Button asChild>
-            <Link to="/">Return to MatchPlay</Link>
+            <Link to="/">Return to LinkUp</Link>
           </Button>
         </div>
       </main>

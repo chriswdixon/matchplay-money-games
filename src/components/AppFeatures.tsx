@@ -71,7 +71,7 @@ const AppFeatures = () => {
             Five Services, One Platform
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            MatchPlay combines the best of GolfNow, 18Birdies, Venmo, and GHIN 
+            LinkUp combines the best of GolfNow, 18Birdies, Venmo, and GHIN 
             into one seamless competitive golf experience.
           </p>
         </div>

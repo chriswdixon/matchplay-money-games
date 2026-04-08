@@ -277,7 +277,7 @@ async function queryOpenStreetMap(
   }
 
   const response = await fetch(osmUrl, {
-    headers: { 'User-Agent': 'MatchPlay-Golf-App/1.0' }
+    headers: { 'User-Agent': 'LinkUp-Golf-App/1.0' }
   });
 
   if (!response.ok) {

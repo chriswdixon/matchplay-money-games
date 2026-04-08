@@ -81,7 +81,7 @@ serve(async (req) => {
     return new Response(
       JSON.stringify({ 
         success: true, 
-        message: "Age successfully verified! You can now access all MatchPlay features." 
+        message: "Age successfully verified! You can now access all LinkUp features." 
       }),
       { status: 200, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
