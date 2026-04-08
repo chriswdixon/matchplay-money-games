@@ -41,12 +41,6 @@ const AppFeatures = () => {
       description: "Bank-level security for all transactions with instant prize distribution to winners",
       benefits: ["Instant settlements", "Secure escrow", "Transaction history"]
     },
-    {
-      icon: <MapPin className="w-8 h-8" />,
-      title: "GPS Course Integration",
-      description: "Real-time location services and course mapping for accurate play tracking",
-      benefits: ["Live scoring zones", "Course navigation", "Distance tracking"]
-    }
   ];
 
   const additionalFeatures = [
