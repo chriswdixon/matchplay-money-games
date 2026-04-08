@@ -128,7 +128,7 @@ serve(async (req) => {
                 </p>
                 <ul style="color: #4a4a4a; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
                   <li>You are at least 18 years old</li>
-                  <li>The date of birth you provided (${new Date(dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}) is accurate</li>
+                  <li>The date of birth you provided (${escapeHtml(new Date(dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }))}) is accurate</li>
                   <li>You understand this is a skill-based competition platform</li>
                 </ul>
               </div>
