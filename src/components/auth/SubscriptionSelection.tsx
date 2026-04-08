@@ -233,11 +233,6 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
                   </span>
                   <span className="text-muted-foreground ml-1">/mo</span>
                 </div>
-                {billingPeriod === "annual" && (
-                  <p className="text-sm text-muted-foreground mt-1">
-                    billed annually at {tier.annualTotal}
-                  </p>
-                )}
               </div>
               <p className="text-sm text-muted-foreground mt-2">
                 7-day free trial included

@@ -172,11 +172,6 @@ const MembershipTiers = () => {
                     </span>
                     <span className="text-muted-foreground ml-1">/mo</span>
                   </div>
-                  {tier.showTabs && billingPeriod === "annual" && (
-                    <p className="text-sm text-muted-foreground mt-2">
-                      billed annually at {tier.annualTotal}
-                    </p>
-                  )}
                   {!tier.showTabs && 'period' in tier && (
                     <span className="text-sm text-muted-foreground mt-2">Forever free</span>
                   )}
