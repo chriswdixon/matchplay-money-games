@@ -157,7 +157,11 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const safeMessages = ["No authorization header", "Unauthorized"];
+    const safeMessage = safeMessages.includes(errorMessage)
+      ? errorMessage
+      : "An error occurred while exporting your data. Please try again.";
+    return new Response(JSON.stringify({ error: safeMessage }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

@@ -43,8 +43,14 @@ serve(async (req) => {
 
     const { userId, email, firstName, dateOfBirth } = validationResult.data;
     
-    // Sanitize firstName for use in email template
-    const sanitizedFirstName = firstName ? firstName.replace(/[<>"'&]/g, '') : 'there';
+    // HTML-encode firstName for safe use in email template
+    const escapeHtml = (str: string) => str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+    const sanitizedFirstName = firstName ? escapeHtml(firstName) : 'there';
 
     // Calculate age
     const birthDate = new Date(dateOfBirth);
