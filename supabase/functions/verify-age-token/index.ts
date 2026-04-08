@@ -87,8 +87,18 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Error verifying age token:", error);
+    // Only return safe, expected error messages
+    const safeMessages = [
+      "Token is required",
+      "Invalid or expired verification token",
+      "Verification token has expired. Please request a new one.",
+      "Must be 18 or older to participate",
+    ];
+    const message = safeMessages.includes(error.message)
+      ? error.message
+      : "An error occurred during verification. Please try again.";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 400, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }

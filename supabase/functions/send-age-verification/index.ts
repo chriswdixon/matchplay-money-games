@@ -43,8 +43,14 @@ serve(async (req) => {
 
     const { userId, email, firstName, dateOfBirth } = validationResult.data;
     
-    // Sanitize firstName for use in email template
-    const sanitizedFirstName = firstName ? firstName.replace(/[<>"'&]/g, '') : 'there';
+    // HTML-encode firstName for safe use in email template
+    const escapeHtml = (str: string) => str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#x27;');
+    const sanitizedFirstName = firstName ? escapeHtml(firstName) : 'there';
 
     // Calculate age
     const birthDate = new Date(dateOfBirth);
@@ -122,7 +128,7 @@ serve(async (req) => {
                 </p>
                 <ul style="color: #4a4a4a; margin: 0; padding-left: 20px; font-size: 14px; line-height: 1.8;">
                   <li>You are at least 18 years old</li>
-                  <li>The date of birth you provided (${new Date(dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}) is accurate</li>
+                  <li>The date of birth you provided (${escapeHtml(new Date(dateOfBirth).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' }))}) is accurate</li>
                   <li>You understand this is a skill-based competition platform</li>
                 </ul>
               </div>
@@ -157,8 +163,12 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Error sending age verification email:", error);
+    const safeMessages = ["Must be 18 or older to participate", "Failed to create verification token"];
+    const message = safeMessages.includes(error.message)
+      ? error.message
+      : "An error occurred. Please try again.";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
