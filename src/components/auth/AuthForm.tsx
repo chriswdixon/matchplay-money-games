@@ -356,7 +356,7 @@ export function AuthForm() {
             setShowInstallPrompt(true);
             toast({
               title: "Setup Complete",
-              description: "Welcome to MatchPlay! You're all set to join matches.",
+              description: "Welcome to LinkUp! You're all set to join matches.",
             });
           }}
           onSkip={() => {
@@ -385,7 +385,7 @@ export function AuthForm() {
             <CardContent className="pt-6 text-center space-y-4">
               <h3 className="text-lg font-semibold">You're All Set! 🎉</h3>
               <p className="text-sm text-muted-foreground">
-                Install MatchPlay on your device for the best experience on the course.
+                Install LinkUp on your device for the best experience on the course.
               </p>
               <Button 
                 onClick={() => setShowInstallPrompt(false)}
@@ -415,7 +415,7 @@ export function AuthForm() {
               });
             } else {
               toast({
-                title: "Welcome to MatchPlay",
+                title: "Welcome to LinkUp",
                 description: "Your account is now secured with two-factor authentication",
               });
             }
@@ -452,7 +452,7 @@ export function AuthForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            {showResetForm ? 'Reset Password' : 'Welcome to MatchPlay'}
+            {showResetForm ? 'Reset Password' : 'Welcome to LinkUp'}
           </CardTitle>
           <CardDescription>
             {showResetForm 
