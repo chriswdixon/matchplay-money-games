@@ -124,7 +124,7 @@ export const useLocation = () => {
       
       const response = await fetch(nominatimUrl, {
         headers: {
-          'User-Agent': 'MatchPlayGolfApp/1.0 (contact@example.com)'
+          'User-Agent': 'LinkUpGolfApp/1.0 (contact@example.com)'
         }
       });
       

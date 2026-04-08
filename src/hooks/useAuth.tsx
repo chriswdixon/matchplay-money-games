@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           // Log successful authentication securely (no sensitive data)
           console.log('User authenticated successfully');
           toast({
-            title: "Welcome to MatchPlay!",
+            title: "Welcome to LinkUp!",
             description: "You've successfully signed in.",
           });
         } else if (event === 'SIGNED_OUT') {
