@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState, useMemo } from "react";
-import MatchPlayHero from "@/components/MatchPlayHero";
+import LinkUpHero from "@/components/LinkUpHero";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 import { InstallPrompt } from "@/components/InstallPrompt";
@@ -38,7 +38,7 @@ const SectionLoader = () => (
   </div>
 );
 
-const MatchPlayLanding = () => {
+const LinkUpLanding = () => {
   const { user } = useAuth();
   const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -271,7 +271,7 @@ const MatchPlayLanding = () => {
       </header>
       
       {/* Hero Section */}
-      <MatchPlayHero />
+      <LinkUpHero />
       
       {/* Match Finder Section */}
       <main id="main-content" role="main">
@@ -352,4 +352,4 @@ const MatchPlayLanding = () => {
   );
 };
 
-export default MatchPlayLanding;
+export default LinkUpLanding;

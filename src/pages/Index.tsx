@@ -1,7 +1,7 @@
-import MatchPlayLanding from "./MatchPlayLanding";
+import LinkUpLanding from "./LinkUpLanding";
 
 const Index = () => {
-  return <MatchPlayLanding />;
+  return <LinkUpLanding />;
 };
 
 export default Index;

@@ -10,7 +10,7 @@ export interface OfflineScore {
   synced: boolean;
 }
 
-const DB_NAME = 'matchplay-offline';
+const DB_NAME = 'linkup-offline';
 const DB_VERSION = 1;
 
 let dbInstance: IDBPDatabase | null = null;

@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { UserMenu } from "@/components/auth/UserMenu";
 import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 
-const MatchPlayHero = () => {
+const LinkUpHero = () => {
   const { user } = useAuth();
 
   const handleScrollDown = () => {
@@ -50,7 +50,7 @@ const MatchPlayHero = () => {
         <h1 id="hero-heading" className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold mb-4 sm:mb-6 leading-tight">
           Welcome to{" "}
           <span className="bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent">
-            MatchPlay
+            LinkUp
           </span>
         </h1>
         
@@ -106,7 +106,7 @@ const MatchPlayHero = () => {
                 className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold border-0"
                 asChild
               >
-                <Link to="/auth">Join MatchPlay</Link>
+                <Link to="/auth">Join LinkUp</Link>
               </Button>
               <Button 
                 variant="outline" 
@@ -158,4 +158,4 @@ const MatchPlayHero = () => {
   );
 };
 
-export default MatchPlayHero;
+export default LinkUpHero;
