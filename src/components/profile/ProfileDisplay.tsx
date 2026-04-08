@@ -140,7 +140,7 @@ export function ProfileDisplay() {
         {(!profile?.display_name && !privateData?.phone && (profile?.handicap === null || profile?.handicap === undefined)) && (
           <div className="text-center py-8 text-muted-foreground">
             <User className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>Complete your profile to get the most out of MatchPlay</p>
+            <p>Complete your profile to <p>Complete your profile to get the most out of LinkUp</p></p>
           </div>
         )}
       </CardContent>

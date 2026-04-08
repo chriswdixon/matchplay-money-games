@@ -56,7 +56,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
           <Link to="/" className="flex items-center">
             <img 
               src={isDark ? logoDark : logoLight} 
-              alt="MatchPlay" 
+              alt="LinkUp" 
               className="h-10 w-auto hover:opacity-80 transition-opacity"
             />
           </Link>

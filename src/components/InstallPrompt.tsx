@@ -58,7 +58,7 @@ export const InstallPrompt = ({ forceShow = false, onDismiss }: InstallPromptPro
       <div className="flex items-start gap-3">
         <div className="flex-1">
           <h3 className="font-semibold text-sm mb-2 flex items-center gap-2">
-            📱 Install MatchPlay
+            📱 Install LinkUp
           </h3>
           {isIOS ? (
             <p className="text-xs text-muted-foreground mb-2">

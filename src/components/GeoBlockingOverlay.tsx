@@ -78,7 +78,7 @@ export const GeoBlockingOverlay = () => {
               in your area, please contact our support team.
             </p>
             <Button variant="outline" asChild>
-              <a href="mailto:support@matchplay.golf">Contact Support</a>
+              <a href="mailto:support@linkup.golf">Contact Support</a>
             </Button>
           </div>
 

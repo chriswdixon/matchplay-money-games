@@ -51,7 +51,7 @@ export default function Install() {
           <div className="inline-block p-4 bg-primary rounded-full mb-4">
             <Smartphone className="h-12 w-12 text-primary-foreground" />
           </div>
-          <h1 className="text-4xl font-bold mb-2">Install MatchPlay</h1>
+          <h1 className="text-4xl font-bold mb-2">Install LinkUp</h1>
           <p className="text-xl text-muted-foreground">
             Track your golf scores even when offline on the course
           </p>
@@ -64,7 +64,7 @@ export default function Install() {
                 <CheckCircle className="h-8 w-8" />
                 <div>
                   <p className="text-lg font-semibold">Already Installed!</p>
-                  <p className="text-sm">MatchPlay is ready to use offline</p>
+                  <p className="text-sm">LinkUp is ready to use offline</p>
                 </div>
               </div>
               <Button onClick={() => navigate('/')} className="w-full mt-6">
@@ -116,7 +116,7 @@ export default function Install() {
               <Card>
                 <CardHeader>
                   <CardTitle>Install on iPhone/iPad</CardTitle>
-                  <CardDescription>Follow these steps to add MatchPlay to your home screen</CardDescription>
+                  <CardDescription>Follow these steps to add LinkUp to your home screen</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-4">
@@ -141,14 +141,14 @@ export default function Install() {
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                       4
                     </div>
-                    <p>MatchPlay will now appear on your home screen!</p>
+                    <p>LinkUp will now appear on your home screen!</p>
                   </div>
                 </CardContent>
               </Card>
             ) : deferredPrompt ? (
               <Card>
                 <CardHeader>
-                  <CardTitle>Install MatchPlay</CardTitle>
+                  <CardTitle>Install LinkUp</CardTitle>
                   <CardDescription>Click the button below to install the app</CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -162,7 +162,7 @@ export default function Install() {
               <Card>
                 <CardHeader>
                   <CardTitle>Install on Android/Desktop</CardTitle>
-                  <CardDescription>Follow these steps to install MatchPlay</CardDescription>
+                  <CardDescription>Follow these steps to install LinkUp</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div className="flex gap-4">
@@ -187,7 +187,7 @@ export default function Install() {
                     <div className="flex-shrink-0 w-8 h-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center font-semibold">
                       4
                     </div>
-                    <p>MatchPlay will now work offline!</p>
+                    <p>LinkUp will now work offline!</p>
                   </div>
                 </CardContent>
               </Card>
