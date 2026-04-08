@@ -163,8 +163,12 @@ serve(async (req) => {
     );
   } catch (error: any) {
     console.error("Error sending age verification email:", error);
+    const safeMessages = ["Must be 18 or older to participate", "Failed to create verification token"];
+    const message = safeMessages.includes(error.message)
+      ? error.message
+      : "An error occurred. Please try again.";
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: message }),
       { status: 500, headers: { "Content-Type": "application/json", ...corsHeaders } }
     );
   }
