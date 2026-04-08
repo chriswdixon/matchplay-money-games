@@ -22,7 +22,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
-        <ThemeProvider defaultTheme="system" <ThemeProvider defaultTheme="system" storageKey="linkup-theme">>
+        <ThemeProvider defaultTheme="system" storageKey="linkup-theme">
           <AuthProvider>
             <SubscriptionProvider>
               <App />
