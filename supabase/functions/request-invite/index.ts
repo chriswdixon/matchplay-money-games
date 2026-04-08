@@ -41,6 +41,15 @@ const handler = async (req: Request): Promise<Response> => {
   }
 
   try {
+    // Rate limit by IP
+    const clientIp = req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(clientIp)) {
+      return new Response(
+        JSON.stringify({ error: "Too many requests. Please try again later." }),
+        { status: 429, headers: { "Content-Type": "application/json", ...corsHeaders } }
+      );
+    }
+
     const body = await req.json();
     
     // Validate and sanitize input
