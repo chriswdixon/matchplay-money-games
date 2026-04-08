@@ -159,9 +159,9 @@ serve(async (req) => {
       });
     }
 
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: getSafeErrorMessage(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: getStatusCode(error),
     });
   }
 });
