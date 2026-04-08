@@ -12,6 +12,25 @@ const logStep = (step: string, details?: any) => {
   console.log(`[SETUP-INTENT] ${step}${detailsStr}`);
 };
 
+const safeMessages = new Set([
+  "No authorization header",
+  "Unauthorized",
+  "User email not available",
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  return safeMessages.has(message) ? message : "Unable to prepare payment setup.";
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "No authorization header" || message === "Unauthorized" || message === "User email not available") {
+    return 401;
+  }
+  return 500;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -32,6 +51,7 @@ serve(async (req) => {
     const token = authHeader.replace("Bearer ", "");
     const { data: { user }, error: userError } = await supabaseClient.auth.getUser(token);
     if (userError || !user) throw new Error("Unauthorized");
+    if (!user.email) throw new Error("User email not available");
     
     logStep("User authenticated", { userId: user.id, email: user.email });
 
@@ -75,9 +95,9 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: getSafeErrorMessage(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: getStatusCode(error),
     });
   }
 });

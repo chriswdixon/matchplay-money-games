@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import Stripe from "https://esm.sh/stripe@18.5.0";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -10,6 +11,28 @@ const corsHeaders = {
 const logStep = (step: string, details?: any) => {
   const detailsStr = details ? ` - ${JSON.stringify(details)}` : '';
   console.log(`[CREATE-CHECKOUT] ${step}${detailsStr}`);
+};
+
+const checkoutRequestSchema = z.object({
+  priceId: z.string().trim().min(1).max(100).regex(/^price_[A-Za-z0-9]+$/, "Invalid price ID"),
+});
+
+const safeMessages = new Set([
+  "No authorization header",
+  "User not authenticated or email not available",
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  return safeMessages.has(message) ? message : "Unable to create checkout session.";
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "No authorization header" || message === "User not authenticated or email not available") {
+    return 401;
+  }
+  return 500;
 };
 
 serve(async (req) => {
@@ -25,15 +48,24 @@ serve(async (req) => {
   try {
     logStep("Function started");
 
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
     const token = authHeader.replace("Bearer ", "");
     const { data } = await supabaseClient.auth.getUser(token);
     const user = data.user;
     if (!user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
-    const { priceId } = await req.json();
-    if (!priceId) throw new Error("Price ID is required");
+    const parsedBody = checkoutRequestSchema.safeParse(await req.json());
+    if (!parsedBody.success) {
+      logStep("Invalid checkout request", { issues: parsedBody.error.issues });
+      return new Response(JSON.stringify({ error: "Invalid checkout request" }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 400,
+      });
+    }
+
+    const { priceId } = parsedBody.data;
     logStep("Price ID provided", { priceId });
 
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", { apiVersion: "2025-08-27.basil" });
@@ -72,9 +104,9 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in create-checkout", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: getSafeErrorMessage(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: getStatusCode(error),
     });
   }
 });

@@ -6,6 +6,28 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+const safeMessages = new Set([
+  'No authorization header',
+  'Authentication failed',
+  'Access denied: Admin role required',
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : '';
+  return safeMessages.has(message) ? message : 'Unable to load users.';
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : '';
+  if (message === 'No authorization header' || message === 'Authentication failed') {
+    return 401;
+  }
+  if (message === 'Access denied: Admin role required') {
+    return 403;
+  }
+  return 500;
+};
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -103,10 +125,10 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('Error in admin-list-users:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: getSafeErrorMessage(error) }),
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 400,
+        status: getStatusCode(error),
       }
     );
   }

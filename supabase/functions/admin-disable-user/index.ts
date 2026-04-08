@@ -7,6 +7,28 @@ const corsHeaders = {
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
 };
 
+const safeMessages = new Set([
+  "No authorization header",
+  "Not authenticated",
+  "Unauthorized: Admin access required",
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  return safeMessages.has(message) ? message : "Unable to disable user.";
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "No authorization header" || message === "Not authenticated") {
+    return 401;
+  }
+  if (message === "Unauthorized: Admin access required") {
+    return 403;
+  }
+  return 500;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -20,7 +42,8 @@ serve(async (req) => {
     );
 
     // Verify admin
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
     const token = authHeader.replace("Bearer ", "");
     const { data: userData } = await supabaseClient.auth.getUser(token);
     const user = userData.user;
@@ -59,9 +82,17 @@ serve(async (req) => {
     );
   } catch (error) {
     console.error("Error in admin-disable-user:", error);
+
+    if (error instanceof z.ZodError) {
+      return new Response(
+        JSON.stringify({ error: "Invalid user data" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      JSON.stringify({ error: getSafeErrorMessage(error) }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: getStatusCode(error) }
     );
   }
 });

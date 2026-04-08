@@ -12,6 +12,28 @@ const logStep = (step: string, details?: any) => {
   console.log(`[CUSTOMER-PORTAL] ${step}${detailsStr}`);
 };
 
+const safeMessages = new Set([
+  "No authorization header provided",
+  "User not authenticated or email not available",
+  "No billing portal is available for this account",
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  return safeMessages.has(message) ? message : "Unable to open billing portal.";
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "No authorization header provided" || message === "User not authenticated or email not available") {
+    return 401;
+  }
+  if (message === "No billing portal is available for this account") {
+    return 404;
+  }
+  return 500;
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -36,15 +58,15 @@ serve(async (req) => {
 
     const token = authHeader.replace("Bearer ", "");
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    if (userError) console.error("Authentication error:", userError);
     const user = userData.user;
-    if (!user?.email) throw new Error("User not authenticated or email not available");
+    if (userError || !user?.email) throw new Error("User not authenticated or email not available");
     logStep("User authenticated", { userId: user.id, email: user.email });
 
     const stripe = new Stripe(stripeKey, { apiVersion: "2025-08-27.basil" });
     const customers = await stripe.customers.list({ email: user.email, limit: 1 });
     if (customers.data.length === 0) {
-      throw new Error("No Stripe customer found for this user");
+      throw new Error("No billing portal is available for this account");
     }
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
@@ -63,9 +85,9 @@ serve(async (req) => {
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in customer-portal", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    return new Response(JSON.stringify({ error: getSafeErrorMessage(error) }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: getStatusCode(error),
     });
   }
 });

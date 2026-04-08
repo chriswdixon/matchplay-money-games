@@ -1,10 +1,38 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 import Stripe from "https://esm.sh/stripe@18.5.0";
+import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
   "Access-Control-Allow-Headers": "authorization, x-client-info, apikey, content-type",
+};
+
+const couponRequestSchema = z.object({
+  name: z.string().trim().min(1).max(50).regex(/^[A-Za-z0-9 _-]+$/, "Invalid coupon name"),
+  tier: z.enum(["local", "tournament"]),
+});
+
+const safeMessages = new Set([
+  "No authorization header",
+  "Not authenticated",
+  "Unauthorized: Admin access required",
+]);
+
+const getSafeErrorMessage = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  return safeMessages.has(message) ? message : "Unable to create coupon.";
+};
+
+const getStatusCode = (error: unknown) => {
+  const message = error instanceof Error ? error.message : "";
+  if (message === "No authorization header" || message === "Not authenticated") {
+    return 401;
+  }
+  if (message === "Unauthorized: Admin access required") {
+    return 403;
+  }
+  return 500;
 };
 
 serve(async (req) => {
@@ -20,7 +48,8 @@ serve(async (req) => {
     );
 
     // Verify admin
-    const authHeader = req.headers.get("Authorization")!;
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader) throw new Error("No authorization header");
     const token = authHeader.replace("Bearer ", "");
     const { data: userData } = await supabaseClient.auth.getUser(token);
     const user = userData.user;
@@ -38,7 +67,16 @@ serve(async (req) => {
     if (!roleData) throw new Error("Unauthorized: Admin access required");
 
     // Get coupon details from request
-    const { name, tier } = await req.json();
+    const parsedBody = couponRequestSchema.safeParse(await req.json());
+    if (!parsedBody.success) {
+      console.error("Invalid coupon request:", parsedBody.error);
+      return new Response(
+        JSON.stringify({ error: "Invalid coupon input" }),
+        { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 400 }
+      );
+    }
+
+    const { name, tier } = parsedBody.data;
 
     // Initialize Stripe
     const stripe = new Stripe(Deno.env.get("STRIPE_SECRET_KEY") || "", {
@@ -71,8 +109,8 @@ serve(async (req) => {
   } catch (error) {
     console.error("Error in admin-create-coupon:", error);
     return new Response(
-      JSON.stringify({ error: error instanceof Error ? error.message : "Unknown error" }),
-      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 500 }
+      JSON.stringify({ error: getSafeErrorMessage(error) }),
+      { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: getStatusCode(error) }
     );
   }
 });
