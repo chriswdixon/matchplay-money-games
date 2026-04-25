@@ -155,6 +155,13 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
           })
         )}
       </div>
+
+      <JoinMatchConfirmDialog
+        open={!!confirmMatch}
+        onOpenChange={(o) => !o && setConfirmMatch(null)}
+        match={confirmMatch}
+        onConfirm={handleConfirmJoin}
+      />
     </section>
   );
 };
