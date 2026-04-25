@@ -47,7 +47,8 @@ const LinkUpLanding = () => {
   const { user } = useAuth();
   const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
-  const [currentTab, setCurrentTab] = useState("matches");
+  const [currentTab, setCurrentTab] = useState("home");
+  const [searchQuery, setSearchQuery] = useState("");
   const [searchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
 
