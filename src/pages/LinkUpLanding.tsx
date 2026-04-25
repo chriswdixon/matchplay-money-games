@@ -240,6 +240,7 @@ const LinkUpLanding = () => {
           activeTab={activeBottomTab}
           onChange={(tab) => setCurrentTab(tab)}
         />
+        <HeroThemeSwitcher />
       </div>
     );
   }
@@ -344,6 +345,7 @@ const LinkUpLanding = () => {
       
       {/* Footer */}
       <AppFooter />
+      <HeroThemeSwitcher />
     </div>
   );
 };
