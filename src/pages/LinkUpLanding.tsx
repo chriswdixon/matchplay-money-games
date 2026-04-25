@@ -20,6 +20,7 @@ import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import GamesNearYou from "@/components/home/GamesNearYou";
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
+import HeroThemeSwitcher, { applyHeroTheme, getStoredHeroTheme } from "@/components/HeroThemeSwitcher";
 
 // Lazy load components for better initial load performance
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
@@ -51,6 +52,11 @@ const LinkUpLanding = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchParams] = useSearchParams();
   const { theme, setTheme } = useTheme();
+
+  // Apply stored hero theme on mount (defaults to gold)
+  useEffect(() => {
+    applyHeroTheme(getStoredHeroTheme());
+  }, []);
 
   // Handle shared PIN links and secure token links
   useEffect(() => {
