@@ -43,14 +43,24 @@ const BottomTabBar = ({ activeTab, onChange }: BottomTabBarProps) => {
                 onClick={() => handleClick(id)}
                 aria-label={label}
                 aria-current={active ? "page" : undefined}
-                className={cn(
-                  "flex items-center justify-center transition-all",
-                  active
-                    ? "bg-primary text-primary-foreground rounded-full w-12 h-12 shadow-accent"
-                    : "text-background/90 hover:text-background w-12 h-12 rounded-full",
-                )}
+                className="relative flex flex-col items-center justify-center w-12 h-12"
               >
-                <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 2} />
+                <span
+                  className={cn(
+                    "flex items-center justify-center rounded-full transition-all",
+                    active
+                      ? "bg-primary text-primary-foreground w-11 h-11 shadow-accent"
+                      : "text-background/90 hover:text-background w-11 h-11",
+                  )}
+                >
+                  <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 2} />
+                </span>
+                {active && (
+                  <span
+                    aria-hidden="true"
+                    className="absolute -bottom-1.5 h-1 w-6 rounded-full bg-primary"
+                  />
+                )}
               </button>
             );
           })}
