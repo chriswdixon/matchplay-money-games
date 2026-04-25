@@ -153,11 +153,7 @@ const LinkUpLanding = () => {
     const homeTabs: BottomTab[] = ["home", "past", "subscription"];
     const activeBottomTab: BottomTab = homeTabs.includes(currentTab as BottomTab)
       ? (currentTab as BottomTab)
-      : currentTab === "active-match"
-        ? "home"
-        : "home";
-
-    const [searchQuery, setSearchQuery] = useState("");
+      : "home";
 
     return (
       <div className="min-h-screen bg-muted/40 flex flex-col">
