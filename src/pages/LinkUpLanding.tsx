@@ -197,7 +197,11 @@ const LinkUpLanding = () => {
 
               <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
 
-              <GamesNearYou searchQuery={searchQuery} />
+              <GamesNearYou
+                searchQuery={searchQuery}
+                onClearSearch={() => setSearchQuery("")}
+                onPickSuggestion={(v) => setSearchQuery(v)}
+              />
             </div>
           )}
 

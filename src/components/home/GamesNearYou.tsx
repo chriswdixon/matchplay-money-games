@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { SlidersHorizontal } from "lucide-react";
+import { SlidersHorizontal, MapPin, X } from "lucide-react";
 import { useMatches, type Match } from "@/hooks/useMatches";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuth } from "@/hooks/useAuth";
@@ -9,33 +9,71 @@ import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import JoinMatchConfirmDialog from "@/components/JoinMatchConfirmDialog";
+import MatchDetailsSheet from "@/components/MatchDetailsSheet";
 
 interface GamesNearYouProps {
   searchQuery?: string;
   onOpenFilters?: () => void;
+  onClearSearch?: () => void;
+  onPickSuggestion?: (value: string) => void;
 }
 
-const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) => {
+const GamesNearYou = ({
+  searchQuery = "",
+  onOpenFilters,
+  onClearSearch,
+  onPickSuggestion,
+}: GamesNearYouProps) => {
   const { user } = useAuth();
   const { matches, loading, joinMatch, refetch } = useMatches();
   const { location, formatDistance } = useLocation();
   const [joiningId, setJoiningId] = useState<string | null>(null);
   const [confirmMatch, setConfirmMatch] = useState<Match | null>(null);
+  const [detailsMatch, setDetailsMatch] = useState<Match | null>(null);
 
   useEffect(() => {
     refetch(location || undefined);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [location?.latitude, location?.longitude]);
 
-  const visible = useMemo(() => {
+  // Realtime: refresh when ANY match or participant row changes (so counts update live)
+  useEffect(() => {
+    const channel = supabase
+      .channel("games-near-you-public")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "match_participants" },
+        () => {
+          refetch(location || undefined);
+        },
+      )
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "matches" },
+        () => {
+          refetch(location || undefined);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [location?.latitude, location?.longitude]);
+
+  const baseList = useMemo(() => {
     const now = new Date();
-    let list = matches.filter((m) => {
+    return matches.filter((m) => {
       if (m.status === "completed" || m.status === "cancelled") return false;
       if (m.status === "open" && new Date(m.scheduled_time) < now) return false;
-      if (m.user_joined) return false; // hide already-joined here
+      if (m.user_joined) return false;
       return true;
     });
+  }, [matches]);
 
+  const visible = useMemo(() => {
+    let list = baseList;
     if (searchQuery.trim()) {
       const q = searchQuery.toLowerCase();
       list = list.filter(
@@ -45,13 +83,25 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
           m.address?.toLowerCase().includes(q),
       );
     }
-
-    list.sort(
+    list = [...list].sort(
       (a, b) =>
         new Date(a.scheduled_time).getTime() - new Date(b.scheduled_time).getTime(),
     );
     return list.slice(0, 8);
-  }, [matches, searchQuery]);
+  }, [baseList, searchQuery]);
+
+  // Build suggestions from available matches' locations when current query has no hits
+  const suggestions = useMemo(() => {
+    const tokens = new Set<string>();
+    baseList.forEach((m) => {
+      if (m.location) tokens.add(m.location.split(",")[0].trim());
+      if (m.address) {
+        const zip = m.address.match(/\b\d{5}\b/);
+        if (zip) tokens.add(zip[0]);
+      }
+    });
+    return Array.from(tokens).slice(0, 5);
+  }, [baseList]);
 
   const handleJoin = (matchId: string) => {
     if (!user) return;
@@ -82,6 +132,8 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
 
   const formatTime = (iso: string) => format(new Date(iso), "h:mm");
 
+  const hasActiveSearch = searchQuery.trim().length > 0;
+
   return (
     <section
       className="rounded-3xl bg-foreground text-background p-4 md:p-6 shadow-card"
@@ -110,9 +162,48 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
             <Skeleton key={i} className="h-16 w-full rounded-xl bg-background/10" />
           ))
         ) : visible.length === 0 ? (
-          <p className="text-sm text-background/70 py-6 text-center">
-            No matches available right now. Try widening your search.
-          </p>
+          <div className="py-6 text-center space-y-4">
+            <div className="space-y-1">
+              <p className="text-sm font-semibold">
+                {hasActiveSearch
+                  ? `No matches for "${searchQuery}"`
+                  : "No matches available right now."}
+              </p>
+              <p className="text-xs text-background/70">
+                {hasActiveSearch
+                  ? "Try one of these areas instead:"
+                  : "Check back soon or widen your search radius."}
+              </p>
+            </div>
+
+            {hasActiveSearch && suggestions.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-2">
+                {suggestions.map((s) => (
+                  <button
+                    key={s}
+                    type="button"
+                    onClick={() => onPickSuggestion?.(s)}
+                    className="inline-flex items-center gap-1 bg-background/10 hover:bg-background/20 text-background rounded-full px-3 py-1.5 text-xs font-medium transition-colors"
+                  >
+                    <MapPin className="w-3 h-3" aria-hidden="true" />
+                    {s}
+                  </button>
+                ))}
+              </div>
+            )}
+
+            {hasActiveSearch && onClearSearch && (
+              <Button
+                variant="secondary"
+                size="sm"
+                onClick={onClearSearch}
+                className="rounded-full bg-background text-foreground hover:bg-background/90 h-9 px-5"
+              >
+                <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                Clear filters
+              </Button>
+            )}
+          </div>
         ) : (
           visible.map((m) => {
             const time = formatTime(m.scheduled_time);
@@ -122,7 +213,16 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
             return (
               <div
                 key={m.id}
-                className="flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-4 py-3"
+                role="button"
+                tabIndex={0}
+                onClick={() => setDetailsMatch(m)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ") {
+                    e.preventDefault();
+                    setDetailsMatch(m);
+                  }
+                }}
+                className="flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-4 py-3 cursor-pointer hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <div className="flex-1 min-w-0 space-y-0.5">
                   <div className="text-base md:text-lg font-bold truncate leading-tight">
@@ -145,7 +245,10 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
                 <Button
                   size="sm"
                   disabled={isFull || joiningId === m.id}
-                  onClick={() => handleJoin(m.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    handleJoin(m.id);
+                  }}
                   className="bg-primary text-primary-foreground hover:opacity-90 rounded-full h-10 px-6 font-bold tracking-wide shrink-0 shadow-accent"
                 >
                   {isFull ? "FULL" : joiningId === m.id ? "..." : "JOIN"}
@@ -161,6 +264,17 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
         onOpenChange={(o) => !o && setConfirmMatch(null)}
         match={confirmMatch}
         onConfirm={handleConfirmJoin}
+      />
+
+      <MatchDetailsSheet
+        open={!!detailsMatch}
+        onOpenChange={(o) => !o && setDetailsMatch(null)}
+        match={detailsMatch}
+        joining={joiningId === detailsMatch?.id}
+        onJoin={(m) => {
+          setDetailsMatch(null);
+          handleJoin(m.id);
+        }}
       />
     </section>
   );

@@ -4,7 +4,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
-import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
+import CourseImage from "@/components/CourseImage";
 
 interface RecentCourse {
   course_name: string;
@@ -104,11 +104,10 @@ const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) =
               idx === courses.length - 1 && "mr-4",
             )}
           >
-            <img
-              src={heroImage}
+            <CourseImage
+              src={null}
               alt={c.course_name}
-              className="absolute inset-0 w-full h-full object-cover"
-              loading="lazy"
+              containerClassName="absolute inset-0 w-full h-full"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
             <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/45 backdrop-blur-sm rounded-full px-2 py-0.5 text-white text-[10px] font-semibold">
