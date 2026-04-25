@@ -15,6 +15,11 @@ import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { useTheme } from "@/components/ThemeProvider";
 import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
+import HomeProfileCard from "@/components/home/HomeProfileCard";
+import HomeSearchBar from "@/components/home/HomeSearchBar";
+import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
+import GamesNearYou from "@/components/home/GamesNearYou";
+import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 
 // Lazy load components for better initial load performance
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
