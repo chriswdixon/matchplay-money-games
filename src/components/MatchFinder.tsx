@@ -48,6 +48,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [pinDialogOpen, setPinDialogOpen] = useState(false);
   const [teamJoinDialogOpen, setTeamJoinDialogOpen] = useState(false);
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
+  const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
   // Request location on component mount (only for current matches, not past, and only if user has access)
@@ -257,8 +258,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         setSelectedMatchForPin(match);
         setPinDialogOpen(true);
       } else {
-        await joinMatch(match.id);
+        setConfirmJoinMatch(match);
       }
+    }
+  };
+
+  const handleConfirmDirectJoin = async () => {
+    if (confirmJoinMatch) {
+      await joinMatch(confirmJoinMatch.id);
+      setConfirmJoinMatch(null);
     }
   };
 
