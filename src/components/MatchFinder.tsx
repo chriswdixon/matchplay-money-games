@@ -24,6 +24,7 @@ const MatchResults = lazy(() => import("./MatchResults").then(m => ({ default: m
 const PinEntryDialog = lazy(() => import("./PinEntryDialog").then(m => ({ default: m.PinEntryDialog })));
 const TeamJoinDialog = lazy(() => import("./TeamJoinDialog").then(m => ({ default: m.TeamJoinDialog })));
 const MatchPinManagement = lazy(() => import("./MatchPinManagement").then(m => ({ default: m.MatchPinManagement })));
+const JoinMatchConfirmDialog = lazy(() => import("./JoinMatchConfirmDialog"));
 
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
@@ -48,6 +49,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [pinDialogOpen, setPinDialogOpen] = useState(false);
   const [teamJoinDialogOpen, setTeamJoinDialogOpen] = useState(false);
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
+  const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
 
   // Request location on component mount (only for current matches, not past, and only if user has access)
@@ -257,8 +259,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         setSelectedMatchForPin(match);
         setPinDialogOpen(true);
       } else {
-        await joinMatch(match.id);
+        setConfirmJoinMatch(match);
       }
+    }
+  };
+
+  const handleConfirmDirectJoin = async () => {
+    if (confirmJoinMatch) {
+      await joinMatch(confirmJoinMatch.id);
+      setConfirmJoinMatch(null);
     }
   };
 
@@ -798,6 +807,16 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             />
           </Suspense>
         )}
+
+        {/* Join Confirmation Dialog */}
+        <Suspense fallback={null}>
+          <JoinMatchConfirmDialog
+            open={!!confirmJoinMatch}
+            onOpenChange={(o) => !o && setConfirmJoinMatch(null)}
+            match={confirmJoinMatch}
+            onConfirm={handleConfirmDirectJoin}
+          />
+        </Suspense>
         
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (

@@ -2,12 +2,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { SlidersHorizontal } from "lucide-react";
-import { useMatches } from "@/hooks/useMatches";
+import { useMatches, type Match } from "@/hooks/useMatches";
 import { useLocation } from "@/hooks/useLocation";
 import { useAuth } from "@/hooks/useAuth";
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
+import JoinMatchConfirmDialog from "@/components/JoinMatchConfirmDialog";
 
 interface GamesNearYouProps {
   searchQuery?: string;
@@ -19,6 +20,7 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
   const { matches, loading, joinMatch, refetch } = useMatches();
   const { location, formatDistance } = useLocation();
   const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [confirmMatch, setConfirmMatch] = useState<Match | null>(null);
 
   useEffect(() => {
     refetch(location || undefined);
@@ -51,7 +53,7 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
     return list.slice(0, 8);
   }, [matches, searchQuery]);
 
-  const handleJoin = async (matchId: string) => {
+  const handleJoin = (matchId: string) => {
     if (!user) return;
     const match = matches.find((m) => m.id === matchId);
     if (!match) return;
@@ -65,9 +67,14 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
       return;
     }
 
-    setJoiningId(matchId);
+    setConfirmMatch(match);
+  };
+
+  const handleConfirmJoin = async () => {
+    if (!confirmMatch) return;
+    setJoiningId(confirmMatch.id);
     try {
-      await joinMatch(matchId);
+      await joinMatch(confirmMatch.id);
     } finally {
       setJoiningId(null);
     }
@@ -148,6 +155,13 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
           })
         )}
       </div>
+
+      <JoinMatchConfirmDialog
+        open={!!confirmMatch}
+        onOpenChange={(o) => !o && setConfirmMatch(null)}
+        match={confirmMatch}
+        onConfirm={handleConfirmJoin}
+      />
     </section>
   );
 };
