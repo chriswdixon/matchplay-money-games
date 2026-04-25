@@ -148,107 +148,91 @@ const LinkUpLanding = () => {
 
   // Logged-in user experience
   if (user) {
+    // Map currentTab to the new bottom tab system
+    const homeTabs: BottomTab[] = ["home", "past", "subscription"];
+    const activeBottomTab: BottomTab = homeTabs.includes(currentTab as BottomTab)
+      ? (currentTab as BottomTab)
+      : currentTab === "active-match"
+        ? "home"
+        : "home";
+
+    const [searchQuery, setSearchQuery] = useState("");
+
     return (
-      <div className="min-h-screen bg-background flex flex-col">
+      <div className="min-h-screen bg-muted/40 flex flex-col">
         {/* WCAG 2.1 AA - Skip to main content link */}
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <AppHeader 
-          showNavMenu 
-          onNavSelect={setCurrentTab}
+        <AppHeader
+          showNavMenu
+          onNavSelect={(v) => setCurrentTab(v)}
           currentTab={currentTab}
           navItems={navItems}
           onReturnToMatch={handleReturnToMatch}
           hideReturnButton={currentTab === "active-match"}
         />
-        <main id="main-content" className="container flex-1 py-8 relative" role="main">
-          {/* Background for logged-in users in light mode */}
-          {isLightMode && (
-            <div className="fixed inset-0 z-0 pointer-events-none">
-              <img 
-                src={heroImage} 
-                alt="Golf course background"
-                className="w-full h-full object-cover opacity-45"
+
+        <main
+          id="main-content"
+          className="flex-1 pb-32 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4"
+          role="main"
+        >
+          <InstallPrompt />
+
+          {/* Active match banner takes priority */}
+          {currentTab === "active-match" && hasActiveMatch && (
+            <Suspense fallback={<TabLoader />}>
+              <MatchScorecard
+                matchId={activeMatchId!}
+                matchName={activeMatchName || "Active Match"}
               />
-              <div className="absolute inset-0 bg-gradient-to-b from-background/40 via-background/70 to-background" />
+            </Suspense>
+          )}
+
+          {currentTab === "home" && (
+            <div className="space-y-6">
+              {/* Profile + Search card */}
+              <div className="bg-card rounded-3xl p-4 shadow-card space-y-4">
+                <HomeProfileCard />
+                <HomeSearchBar value={searchQuery} onChange={setSearchQuery} />
+              </div>
+
+              <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
+
+              <GamesNearYou searchQuery={searchQuery} />
             </div>
           )}
-          
-          <div className="relative z-10">
-            <InstallPrompt />
-            <Tabs value={currentTab} onValueChange={setCurrentTab} className="w-full">
-              {/* Desktop/Tablet Tabs - Dynamically adjusts based on active match */}
-              <TabsList className={cn(
-                "hidden md:grid w-full max-w-[1400px] mx-auto mb-8",
-                hasActiveMatch ? "grid-cols-5" : "grid-cols-4"
-              )}>
-                {hasActiveMatch && (
-                  <TabsTrigger value="active-match" className="flex items-center gap-2">
-                    <Target className="w-4 h-4" />
-                    <span className="hidden lg:inline">Active Match</span>
-                    <span className="lg:hidden">Active</span>
-                  </TabsTrigger>
-                )}
-                <TabsTrigger value="matches" className="flex items-center gap-2">
-                  <Search className="w-4 h-4" />
-                  <span className="hidden lg:inline">Find Matches</span>
-                  <span className="lg:hidden">Matches</span>
-                </TabsTrigger>
-                <TabsTrigger value="past" className="flex items-center gap-2">
-                  <History className="w-4 h-4" />
-                  <span className="hidden lg:inline">Past Matches</span>
-                  <span className="lg:hidden">Past</span>
-                </TabsTrigger>
-                <TabsTrigger value="handicap" className="flex items-center gap-2">
-                  <Trophy className="w-4 h-4" />
-                  Handicap
-                </TabsTrigger>
-                <TabsTrigger value="subscription" className="flex items-center gap-2">
-                  <Crown className="w-4 h-4" />
-                  <span className="hidden lg:inline">Subscription</span>
-                  <span className="lg:hidden">Sub</span>
-                </TabsTrigger>
-              </TabsList>
-              
-              {hasActiveMatch && (
-                <TabsContent value="active-match">
-                  <Suspense fallback={<TabLoader />}>
-                    <MatchScorecard
-                      matchId={activeMatchId!}
-                      matchName={activeMatchName || 'Active Match'}
-                    />
-                  </Suspense>
-                </TabsContent>
-              )}
-              
-              <TabsContent value="matches">
-                <Suspense fallback={<TabLoader />}>
-                  <MatchFinder hideHowItWorks />
-                </Suspense>
-              </TabsContent>
-              
-              <TabsContent value="past">
-                <Suspense fallback={<TabLoader />}>
-                  <MatchFinder hideHowItWorks showPastMatches />
-                </Suspense>
-              </TabsContent>
-              
-              <TabsContent value="handicap">
-                <Suspense fallback={<TabLoader />}>
-                  <HandicapSettings />
-                </Suspense>
-              </TabsContent>
-              
-              <TabsContent value="subscription">
-                <Suspense fallback={<TabLoader />}>
-                  <SubscriptionManagement />
-                </Suspense>
-              </TabsContent>
-            </Tabs>
-          </div>
+
+          {currentTab === "matches" && (
+            <Suspense fallback={<TabLoader />}>
+              <MatchFinder hideHowItWorks />
+            </Suspense>
+          )}
+
+          {currentTab === "past" && (
+            <Suspense fallback={<TabLoader />}>
+              <MatchFinder hideHowItWorks showPastMatches />
+            </Suspense>
+          )}
+
+          {currentTab === "handicap" && (
+            <Suspense fallback={<TabLoader />}>
+              <HandicapSettings />
+            </Suspense>
+          )}
+
+          {currentTab === "subscription" && (
+            <Suspense fallback={<TabLoader />}>
+              <SubscriptionManagement />
+            </Suspense>
+          )}
         </main>
-        <AppFooter />
+
+        <BottomTabBar
+          activeTab={activeBottomTab}
+          onChange={(tab) => setCurrentTab(tab)}
+        />
       </div>
     );
   }
