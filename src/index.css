@@ -31,10 +31,10 @@
     --muted: 210 15% 95%;
     --muted-foreground: 140 15% 35%;
     
-    /* Accent - LinkUp Red-Orange */
-    --accent: 10 75% 52%;
+    /* Accent - LinkUp Vibrant Green (matches primary brand green) */
+    --accent: 145 70% 40%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 10 85% 62%;
+    --accent-glow: 145 75% 50%;
     
     /* Status Colors */
     --destructive: 0 75% 55%;
@@ -105,9 +105,9 @@
     --muted: 140 15% 12%;
     --muted-foreground: 0 0% 70%;
     
-    --accent: 10 75% 58%;
+    --accent: 145 70% 45%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 10 85% 68%;
+    --accent-glow: 145 75% 55%;
     
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 98%;

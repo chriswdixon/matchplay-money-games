@@ -105,9 +105,9 @@ const MembershipTiers = () => {
           {tiers.map((tier, index) => (
             <Card 
               key={tier.name} 
-              className={`relative transition-all duration-300 hover:shadow-premium animate-slide-up ${
+              className={`relative flex flex-col h-full transition-all duration-300 hover:shadow-premium animate-slide-up ${
                 tier.popular 
-                  ? 'border-primary shadow-premium bg-gradient-card scale-105' 
+                  ? 'border-primary shadow-premium bg-gradient-card' 
                   : tier.colorScheme === 'warning'
                   ? 'border-warning shadow-premium'
                   : 'border-border hover:border-primary/30'
@@ -178,7 +178,7 @@ const MembershipTiers = () => {
                 </div>
               </CardHeader>
               
-              <CardContent className="pb-6">
+              <CardContent className="pb-6 flex-1">
                 <ul className="space-y-3" aria-labelledby={`tier-${tier.tierKey}`}>
                   {tier.features.map((feature, featureIndex) => (
                     <li key={featureIndex} className="flex items-start gap-3">
@@ -193,7 +193,7 @@ const MembershipTiers = () => {
                 </ul>
               </CardContent>
               
-              <CardFooter>
+              <CardFooter className="mt-auto">
                 <Button 
                   onClick={() => 'isContactOnly' in tier && tier.isContactOnly ? undefined : handleSubscribe(tier.tierKey, billingPeriod)}
                   disabled={'isContactOnly' in tier && tier.isContactOnly}
