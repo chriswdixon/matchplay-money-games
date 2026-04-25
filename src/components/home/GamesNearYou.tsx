@@ -115,31 +115,31 @@ const GamesNearYou = ({ searchQuery = "", onOpenFilters }: GamesNearYouProps) =>
             return (
               <div
                 key={m.id}
-                className="flex items-center gap-3 bg-background/95 text-foreground rounded-xl p-3"
+                className="flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-4 py-3"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="text-xs text-muted-foreground flex items-center gap-1.5 flex-wrap">
-                    <span className="text-accent font-semibold">{time}</span>
+                <div className="flex-1 min-w-0 space-y-0.5">
+                  <div className="text-base md:text-lg font-bold truncate leading-tight">
+                    {m.course_name}
+                  </div>
+                  <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
+                    <span className="text-accent font-bold">{time}</span>
                     {distance && (
                       <>
-                        <span aria-hidden="true">•</span>
-                        <span>{distance} away</span>
+                        <span aria-hidden="true" className="opacity-60">•</span>
+                        <span>{distance}</span>
                       </>
                     )}
-                    <span aria-hidden="true">•</span>
-                    <span>
-                      {m.participant_count || 0}/{m.max_participants} Players
+                    <span aria-hidden="true" className="opacity-60">•</span>
+                    <span className="font-medium">
+                      {m.participant_count || 0}/{m.max_participants} players
                     </span>
-                  </div>
-                  <div className="text-base md:text-lg font-bold truncate">
-                    {m.course_name}
                   </div>
                 </div>
                 <Button
                   size="sm"
                   disabled={isFull || joiningId === m.id}
                   onClick={() => handleJoin(m.id)}
-                  className="bg-primary text-primary-foreground hover:opacity-90 rounded-full px-5 font-semibold shrink-0"
+                  className="bg-primary text-primary-foreground hover:opacity-90 rounded-full h-10 px-6 font-bold tracking-wide shrink-0 shadow-accent"
                 >
                   {isFull ? "FULL" : joiningId === m.id ? "..." : "JOIN"}
                 </Button>
