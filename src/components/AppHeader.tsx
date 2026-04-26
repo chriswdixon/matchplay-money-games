@@ -69,7 +69,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
               variant="default"
               size="sm"
               onClick={handleReturnToMatch}
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90 gap-1 md:gap-2"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 gap-1 md:gap-2"
             >
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Return to Active Match</span>
