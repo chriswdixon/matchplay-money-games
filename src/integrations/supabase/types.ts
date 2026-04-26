@@ -197,6 +197,54 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log_alerts: {
+        Row: {
+          check_run_at: string
+          created_at: string
+          details: Json
+          expected_event: string
+          id: string
+          match_id: string | null
+          resolution_note: string | null
+          resolved_at: string | null
+          resolved_by: string | null
+          severity: string
+          source_row_id: string | null
+          source_table: string
+          status: string
+        }
+        Insert: {
+          check_run_at?: string
+          created_at?: string
+          details?: Json
+          expected_event: string
+          id?: string
+          match_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_row_id?: string | null
+          source_table: string
+          status?: string
+        }
+        Update: {
+          check_run_at?: string
+          created_at?: string
+          details?: Json
+          expected_event?: string
+          id?: string
+          match_id?: string | null
+          resolution_note?: string | null
+          resolved_at?: string | null
+          resolved_by?: string | null
+          severity?: string
+          source_row_id?: string | null
+          source_table?: string
+          status?: string
+        }
+        Relationships: []
+      }
       blocked_states: {
         Row: {
           blocked_at: string
@@ -1371,6 +1419,10 @@ export type Database = {
       recalculate_player_handicap: {
         Args: { player_user_id: string }
         Returns: undefined
+      }
+      reconcile_audit_log: {
+        Args: { p_lookback_hours?: number }
+        Returns: Json
       }
       sanitize_text_input: { Args: { input_text: string }; Returns: string }
       start_match: { Args: { match_id: string }; Returns: boolean }

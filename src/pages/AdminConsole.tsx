@@ -5,6 +5,7 @@ import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
 import { AuditLog } from "@/components/admin/AuditLog";
+import { AuditAlerts } from "@/components/admin/AuditAlerts";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
@@ -165,7 +166,8 @@ const AdminConsole = () => {
               <SocialLinksManagement />
             </TabsContent>
 
-            <TabsContent value="audit">
+            <TabsContent value="audit" className="space-y-6">
+              <AuditAlerts />
               <AuditLog />
             </TabsContent>
         </Tabs>
