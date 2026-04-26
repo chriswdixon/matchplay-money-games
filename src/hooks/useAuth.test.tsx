@@ -1,13 +1,16 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { renderHook, act, waitFor } from "@testing-library/react";
 import { ReactNode } from "react";
-import { createSupabaseMock } from "@/test/utils/supabaseMock";
 
-const mock = createSupabaseMock();
-vi.mock("@/integrations/supabase/client", () => ({ supabase: mock }));
+vi.mock("@/integrations/supabase/client", async () => {
+  const { createSupabaseMock } = await import("@/test/utils/supabaseMock");
+  return { supabase: createSupabaseMock() };
+});
 vi.mock("@/hooks/use-toast", () => ({ useToast: () => ({ toast: vi.fn() }) }));
 
+import { supabase } from "@/integrations/supabase/client";
 import { AuthProvider, useAuth } from "@/hooks/useAuth";
+const mock = supabase as any;
 
 const wrapper = ({ children }: { children: ReactNode }) => <AuthProvider>{children}</AuthProvider>;
 
