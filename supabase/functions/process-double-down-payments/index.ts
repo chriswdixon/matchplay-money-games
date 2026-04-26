@@ -28,6 +28,9 @@ serve(async (req) => {
     apiVersion: '2023-10-16',
   });
 
+  let matchId: string = '';
+  const processedPayments: any[] = [];
+
   try {
     logStep('Function started');
 
