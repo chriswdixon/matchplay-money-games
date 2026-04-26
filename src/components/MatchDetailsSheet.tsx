@@ -304,7 +304,7 @@ const MatchDetailsSheet = ({
           {/* Admin-only per-match audit log */}
           {isAdmin && match?.id && (
             <div className="space-y-2">
-              <AuditLog matchId={match.id} pageSize={100} />
+              <AuditLog matchId={match.id} />
             </div>
           )}
 
