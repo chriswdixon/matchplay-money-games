@@ -168,7 +168,7 @@ Respond with JSON only.`;
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error generating recommendations:', error);
     
     // Return generic error messages

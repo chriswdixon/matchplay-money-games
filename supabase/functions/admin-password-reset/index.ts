@@ -89,7 +89,7 @@ serve(async (req) => {
       JSON.stringify({ success: true, message: "Password reset email sent" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in admin-password-reset:", error);
     
     // Handle Zod validation errors

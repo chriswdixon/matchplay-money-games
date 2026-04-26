@@ -144,7 +144,7 @@ serve(async (req) => {
       }
     );
 
-  } catch (error) {
+  } catch (error: any) {
     console.error('[CREATE-GOLF-COURSE] Error:', error);
     
     // Handle Zod validation errors

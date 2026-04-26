@@ -89,7 +89,7 @@ serve(async (req) => {
     // 
     // For proper implementation, see: https://stripe.com/docs/connect
     throw new Error("Payouts are temporarily disabled. Please contact support for manual payout processing.");
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
     return new Response(JSON.stringify({ error: errorMessage }), {

@@ -159,7 +159,7 @@ serve(async (req) => {
             courses.push(osmCourse);
           }
         });
-      } catch (osmError) {
+      } catch (osmError: any) {
         console.log('[SEARCH-GOLF-COURSES] OSM query failed:', osmError.message);
       }
 
@@ -180,7 +180,7 @@ serve(async (req) => {
       try {
         const osmCourses = await queryOpenStreetMap('nearby', lat, lon, radius);
         courses = osmCourses;
-      } catch (osmError) {
+      } catch (osmError: any) {
         console.log('[SEARCH-GOLF-COURSES] OSM nearby query failed:', osmError.message);
       }
 

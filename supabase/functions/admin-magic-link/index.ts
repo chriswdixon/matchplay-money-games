@@ -92,7 +92,7 @@ serve(async (req) => {
       JSON.stringify({ success: true, message: "Magic link sent" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in admin-magic-link:", error);
     
     // Handle Zod validation errors
