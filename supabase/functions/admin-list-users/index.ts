@@ -1,10 +1,22 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { createClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+import { createClient, type User } from "https://esm.sh/@supabase/supabase-js@2.57.2";
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
+
+// Supabase's GoTrue `User` type omits `banned_until`, but the admin API returns it.
+// See: https://supabase.com/docs/reference/javascript/auth-admin-getuserbyid
+type AdminUser = User & { banned_until?: string | null };
+
+const isUserDisabled = (user: AdminUser | null | undefined): boolean => {
+  const banned = user?.banned_until;
+  if (!banned) return false;
+  const until = new Date(banned).getTime();
+  return Number.isFinite(until) && until > Date.now();
+};
+
 
 const safeMessages = new Set([
   'No authorization header',
@@ -107,7 +119,7 @@ serve(async (req) => {
           phone: privateData?.phone || null,
           membership_tier: privateData?.membership_tier || 'Free',
           is_admin: !!userRole,
-          is_disabled: (authUser?.user as any)?.banned_until ? new Date((authUser.user as any).banned_until) > new Date() : false,
+          is_disabled: isUserDisabled(authUser?.user as AdminUser | null | undefined),
           created_at: profile.created_at
         };
       })
