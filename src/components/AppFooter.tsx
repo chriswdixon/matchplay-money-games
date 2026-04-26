@@ -43,13 +43,13 @@ const AppFooter = () => {
 
           {/* Legal Links */}
           <nav className="flex items-center gap-2 md:gap-4" aria-label="Legal navigation">
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="text-accent hover:text-accent hover:bg-accent/10">
               <Link to="/terms">Terms of Service</Link>
             </Button>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="text-accent hover:text-accent hover:bg-accent/10">
               <Link to="/privacy">Privacy Policy</Link>
             </Button>
-            <Button variant="ghost" size="sm" asChild>
+            <Button variant="ghost" size="sm" asChild className="text-accent hover:text-accent hover:bg-accent/10">
               <a href="mailto:support@match-play.co" className="flex items-center gap-2">
                 <Mail className="w-4 h-4" aria-hidden="true" />
                 <span>Support</span>
