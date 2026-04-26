@@ -6,6 +6,38 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
+// Sanitize free-form strings used in AI prompts
+export const sanitize = (str: string | null | undefined) =>
+  str ? String(str).substring(0, 100).replace(/[^\w\s,.-]/g, '') : 'Unknown';
+
+// Normalize the `matches` relation which Supabase may return as an object or array
+function getMatchRelation(row: any): any | null {
+  if (!row) return null;
+  const m = row.matches;
+  if (!m) return null;
+  if (Array.isArray(m)) return m[0] ?? null;
+  return m;
+}
+
+export function extractCourseNames(matchHistory: any[] | null | undefined): string {
+  if (!matchHistory || matchHistory.length === 0) return 'None';
+  const names = matchHistory
+    .map((m) => getMatchRelation(m)?.course_name)
+    .filter((v): v is string => typeof v === 'string' && v.length > 0)
+    .map((v) => sanitize(v));
+  return names.length > 0 ? names.join(', ') : 'None';
+}
+
+export function extractFormats(matchHistory: any[] | null | undefined): string {
+  if (!matchHistory || matchHistory.length === 0) return 'None';
+  const formats = matchHistory
+    .map((m) => getMatchRelation(m)?.format)
+    .filter((v): v is string => typeof v === 'string' && v.length > 0)
+    .filter((v, i, a) => a.indexOf(v) === i);
+  return formats.length > 0 ? formats.join(', ') : 'None';
+}
+
+
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
     return new Response(null, { headers: corsHeaders });
@@ -45,8 +77,29 @@ serve(async (req) => {
       .eq('user_id', user.id)
       .single();
 
-    // Sanitize profile data
-    const sanitize = (str: string | null | undefined) => str ? String(str).substring(0, 100).replace(/[^\w\s,.-]/g, '') : 'Unknown';
+    // Sanitize profile data (sanitize is exported at module top)
+
+    const { data: matchHistory } = await supabaseClient
+      .from('match_participants')
+      .select('match_id, matches!inner(course_name, format)')
+      .eq('user_id', user.id)
+      .limit(10);
+
+    const { data: favoriteCourses } = await supabaseClient
+      .from('favorite_courses')
+      .select('course_name')
+      .eq('user_id', user.id);
+
+    // Use AI to generate recommendations
+    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
+    const prompt = `Generate personalized golf course recommendations for this user:
+
+User Profile:
+- Name: ${sanitize(profile?.display_name)}
+- Handicap: ${profile?.handicap || 'Not set'}
+- Recent courses played: ${extractCourseNames(matchHistory as any[])}
+- Favorite courses: ${favoriteCourses?.map(c => sanitize(c.course_name)).join(', ') || 'None'}
+- Match formats played: ${extractFormats(matchHistory as any[])}
 
     const { data: matchHistory } = await supabaseClient
       .from('match_participants')
