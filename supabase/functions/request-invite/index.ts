@@ -1,8 +1,23 @@
 import { serve } from "https://deno.land/std@0.177.0/http/server.ts";
-import { Resend } from "https://esm.sh/resend@2.0.0";
 import { z } from "https://deno.land/x/zod@v3.22.4/mod.ts";
 
-const resend = new Resend(Deno.env.get("RESEND_API_KEY"));
+const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
+
+async function sendEmail(payload: { from: string; to: string[]; subject: string; html: string }) {
+  const res = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${RESEND_API_KEY}`,
+    },
+    body: JSON.stringify(payload),
+  });
+  if (!res.ok) {
+    const text = await res.text();
+    throw new Error(`Resend API error ${res.status}: ${text}`);
+  }
+  return res.json();
+}
 
 const corsHeaders = {
   "Access-Control-Allow-Origin": "*",
@@ -70,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Invite request received:", { firstName, lastName, email });
 
     // Send email to support
-    const emailResponse = await resend.emails.send({
+    const emailResponse = await sendEmail({
       from: "LinkUp Invites <onboarding@resend.dev>",
       to: ["support@match-play.co"],
       subject: "New Invite Code Request",
@@ -88,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Support notification sent:", emailResponse);
 
     // Send confirmation to user
-    await resend.emails.send({
+    await sendEmail({
       from: "LinkUp <onboarding@resend.dev>",
       to: [email],
       subject: "Invite Request Received - LinkUp",
