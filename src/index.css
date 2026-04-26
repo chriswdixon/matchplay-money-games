@@ -18,10 +18,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 140 25% 15%;
     
-    /* Primary - LinkUp Vibrant Green */
-    --primary: 145 70% 45%;
+    /* Primary - LinkUp Vibrant Green (WCAG AA: white text 5.13:1) */
+    --primary: 145 70% 29%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 145 75% 55%;
+    --primary-glow: 145 75% 38%;
     
     /* Secondary - Sophisticated Gray */
     --secondary: 210 15% 92%;
@@ -31,10 +31,10 @@
     --muted: 210 15% 95%;
     --muted-foreground: 140 15% 35%;
     
-    /* Accent - LinkUp Vibrant Green (matches primary brand green) */
-    --accent: 145 70% 40%;
+    /* Accent - LinkUp Vibrant Green (WCAG AA on white & muted) */
+    --accent: 145 70% 29%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 145 75% 50%;
+    --accent-glow: 145 75% 38%;
     
     /* Status Colors */
     --destructive: 0 75% 55%;
