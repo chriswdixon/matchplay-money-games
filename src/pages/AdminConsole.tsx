@@ -166,7 +166,8 @@ const AdminConsole = () => {
               <SocialLinksManagement />
             </TabsContent>
 
-            <TabsContent value="audit">
+            <TabsContent value="audit" className="space-y-6">
+              <AuditAlerts />
               <AuditLog />
             </TabsContent>
         </Tabs>
