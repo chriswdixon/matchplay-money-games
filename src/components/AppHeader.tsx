@@ -109,7 +109,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
             variant="ghost" 
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="relative z-50 min-w-[44px] min-h-[44px] touch-manipulation"
+            className="relative z-50 min-w-[44px] min-h-[44px] touch-manipulation text-accent hover:text-accent hover:bg-accent/10"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
