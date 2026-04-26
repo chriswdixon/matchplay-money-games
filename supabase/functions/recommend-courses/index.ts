@@ -66,9 +66,9 @@ serve(async (req) => {
 User Profile:
 - Name: ${sanitize(profile?.display_name)}
 - Handicap: ${profile?.handicap || 'Not set'}
-- Recent courses played: ${matchHistory?.map(m => sanitize((m.matches as any).course_name)).join(', ') || 'None'}
+- Recent courses played: ${(matchHistory as any[])?.map((m: any) => sanitize(m.matches?.course_name)).join(', ') || 'None'}
 - Favorite courses: ${favoriteCourses?.map(c => sanitize(c.course_name)).join(', ') || 'None'}
-- Match formats played: ${matchHistory?.map(m => (m.matches as any).format).filter((v, i, a) => a.indexOf(v) === i).join(', ') || 'None'}
+- Match formats played: ${(matchHistory as any[])?.map((m: any) => m.matches?.format).filter((v: any, i: number, a: any[]) => a.indexOf(v) === i).join(', ') || 'None'}
 
 Based on this profile, suggest:
 1. difficulty_preferences (array: "Beginner", "Intermediate", "Advanced", "Championship")
