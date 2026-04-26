@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -6,8 +6,9 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Input } from "@/components/ui/input";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Button } from "@/components/ui/button";
 import { format } from "date-fns";
-import { ShieldCheck, Activity, AlertTriangle } from "lucide-react";
+import { ShieldCheck, Activity, AlertTriangle, Loader2 } from "lucide-react";
 
 type Category = "score" | "transaction" | "payout" | "dispute" | "admin_override";
 
@@ -26,7 +27,7 @@ interface AuditEntry {
 interface AuditLogProps {
   /** When provided, scopes the log to a single match. */
   matchId?: string;
-  /** Defaults to 100 (per-match) or 200 (global). */
+  /** Number of rows per page. Defaults to 50. */
   pageSize?: number;
 }
 
@@ -38,40 +39,88 @@ const categoryColor: Record<Category, string> = {
   admin_override: "bg-red-500/15 text-red-600 border-red-500/30",
 };
 
-export function AuditLog({ matchId, pageSize }: AuditLogProps) {
+export function AuditLog({ matchId, pageSize = 50 }: AuditLogProps) {
   const [entries, setEntries] = useState<AuditEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [filter, setFilter] = useState<Category | "all">("all");
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    async function load() {
-      setLoading(true);
-      setError(null);
-      const limit = pageSize ?? (matchId ? 100 : 200);
+  // Server-side category filter is included in the query so pagination
+  // stays consistent across pages.
+  const fetchPage = useCallback(
+    async (pageIndex: number, replace: boolean) => {
+      const from = pageIndex * pageSize;
+      const to = from + pageSize - 1;
       let query = supabase
         .from("audit_log" as any)
         .select("*")
         .order("created_at", { ascending: false })
-        .limit(limit);
+        .range(from, to);
       if (matchId) query = query.eq("match_id", matchId);
+      if (filter !== "all") query = query.eq("category", filter);
+
       const { data, error } = await query;
-      if (cancelled) return;
       if (error) {
         setError(error.message);
-        setEntries([]);
-      } else {
-        setEntries((data ?? []) as unknown as AuditEntry[]);
+        if (replace) setEntries([]);
+        setHasMore(false);
+        return;
       }
-      setLoading(false);
-    }
-    load();
+      setError(null);
+      const rows = (data ?? []) as unknown as AuditEntry[];
+      setEntries((prev) => (replace ? rows : [...prev, ...rows]));
+      setHasMore(rows.length === pageSize);
+    },
+    [matchId, pageSize, filter],
+  );
+
+  // Initial / filter-change load -> reset to page 0
+  useEffect(() => {
+    let cancelled = false;
+    setLoading(true);
+    setPage(0);
+    setHasMore(true);
+    (async () => {
+      await fetchPage(0, true);
+      if (!cancelled) setLoading(false);
+    })();
     return () => {
       cancelled = true;
     };
-  }, [matchId, pageSize]);
+  }, [fetchPage]);
+
+  // Infinite scroll sentinel
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node || loading || loadingMore || !hasMore) return;
+    const observer = new IntersectionObserver(
+      async (intersections) => {
+        if (!intersections[0]?.isIntersecting) return;
+        setLoadingMore(true);
+        const next = page + 1;
+        await fetchPage(next, false);
+        setPage(next);
+        setLoadingMore(false);
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [page, hasMore, loading, loadingMore, fetchPage]);
+
+  const loadMoreManually = async () => {
+    if (loadingMore || !hasMore) return;
+    setLoadingMore(true);
+    const next = page + 1;
+    await fetchPage(next, false);
+    setPage(next);
+    setLoadingMore(false);
+  };
 
   const filtered = entries.filter((e) => {
     if (filter !== "all" && e.category !== filter) return false;
