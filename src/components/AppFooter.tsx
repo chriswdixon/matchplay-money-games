@@ -67,7 +67,7 @@ const AppFooter = () => {
               if (!Icon || !url) return null;
               
               return (
-                <Button key={platform} variant="ghost" size="icon" asChild>
+                <Button key={platform} variant="ghost" size="icon" asChild className="text-accent hover:text-accent hover:bg-accent/10">
                   <a 
                     href={url} 
                     target="_blank" 
