@@ -101,28 +101,6 @@ User Profile:
 - Favorite courses: ${favoriteCourses?.map(c => sanitize(c.course_name)).join(', ') || 'None'}
 - Match formats played: ${extractFormats(matchHistory as any[])}
 
-    const { data: matchHistory } = await supabaseClient
-      .from('match_participants')
-      .select('match_id, matches!inner(course_name, format)')
-      .eq('user_id', user.id)
-      .limit(10);
-
-    const { data: favoriteCourses } = await supabaseClient
-      .from('favorite_courses')
-      .select('course_name')
-      .eq('user_id', user.id);
-
-    // Use AI to generate recommendations
-    const LOVABLE_API_KEY = Deno.env.get('LOVABLE_API_KEY');
-    const prompt = `Generate personalized golf course recommendations for this user:
-
-User Profile:
-- Name: ${sanitize(profile?.display_name)}
-- Handicap: ${profile?.handicap || 'Not set'}
-- Recent courses played: ${(matchHistory as any[])?.map((m: any) => sanitize(m.matches?.course_name)).join(', ') || 'None'}
-- Favorite courses: ${favoriteCourses?.map(c => sanitize(c.course_name)).join(', ') || 'None'}
-- Match formats played: ${(matchHistory as any[])?.map((m: any) => m.matches?.format).filter((v: any, i: number, a: any[]) => a.indexOf(v) === i).join(', ') || 'None'}
-
 Based on this profile, suggest:
 1. difficulty_preferences (array: "Beginner", "Intermediate", "Advanced", "Championship")
 2. style_preferences (array: "Links", "Parkland", "Desert", "Mountain", "Resort", "Municipal")
