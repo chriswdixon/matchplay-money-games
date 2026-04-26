@@ -69,7 +69,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
               variant="default"
               size="sm"
               onClick={handleReturnToMatch}
-              className="bg-gradient-primary text-primary-foreground hover:opacity-90 gap-1 md:gap-2"
+              className="bg-accent text-accent-foreground hover:bg-accent/90 gap-1 md:gap-2"
             >
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Return to Active Match</span>
@@ -109,7 +109,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
             variant="ghost" 
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="relative z-50 min-w-[44px] min-h-[44px] touch-manipulation"
+            className="relative z-50 min-w-[44px] min-h-[44px] touch-manipulation text-accent hover:text-accent hover:bg-accent/10"
             style={{ WebkitTapHighlightColor: 'transparent' }}
           >
             <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
