@@ -161,6 +161,42 @@ export type Database = {
         }
         Relationships: []
       }
+      audit_log: {
+        Row: {
+          actor_id: string | null
+          category: Database["public"]["Enums"]["audit_category"]
+          created_at: string
+          event_type: string
+          id: string
+          match_id: string | null
+          payload: Json
+          summary: string
+          user_id: string | null
+        }
+        Insert: {
+          actor_id?: string | null
+          category: Database["public"]["Enums"]["audit_category"]
+          created_at?: string
+          event_type: string
+          id?: string
+          match_id?: string | null
+          payload?: Json
+          summary: string
+          user_id?: string | null
+        }
+        Update: {
+          actor_id?: string | null
+          category?: Database["public"]["Enums"]["audit_category"]
+          created_at?: string
+          event_type?: string
+          id?: string
+          match_id?: string | null
+          payload?: Json
+          summary?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
       blocked_states: {
         Row: {
           blocked_at: string
@@ -1363,9 +1399,27 @@ export type Database = {
           team_number: number
         }[]
       }
+      write_audit_log: {
+        Args: {
+          p_actor_id: string
+          p_category: Database["public"]["Enums"]["audit_category"]
+          p_event_type: string
+          p_match_id: string
+          p_payload: Json
+          p_summary: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role: "admin" | "moderator" | "user"
+      audit_category:
+        | "score"
+        | "transaction"
+        | "payout"
+        | "dispute"
+        | "admin_override"
       transaction_type:
         | "winning"
         | "match_buyin"
@@ -1502,6 +1556,13 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["admin", "moderator", "user"],
+      audit_category: [
+        "score",
+        "transaction",
+        "payout",
+        "dispute",
+        "admin_override",
+      ],
       transaction_type: [
         "winning",
         "match_buyin",

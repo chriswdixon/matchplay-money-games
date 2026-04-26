@@ -23,6 +23,8 @@ import {
 import { format } from "date-fns";
 import { supabase } from "@/integrations/supabase/client";
 import CourseImage from "@/components/CourseImage";
+import { useAdminRole } from "@/hooks/useAdminRole";
+import { AuditLog } from "@/components/admin/AuditLog";
 
 export interface MatchDetailsInfo {
   id: string;
@@ -75,6 +77,7 @@ const MatchDetailsSheet = ({
 }: MatchDetailsSheetProps) => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(false);
+  const { isAdmin } = useAdminRole();
 
   useEffect(() => {
     if (!open || !match) return;
@@ -297,6 +300,13 @@ const MatchDetailsSheet = ({
           </div>
 
           <Separator />
+
+          {/* Admin-only per-match audit log */}
+          {isAdmin && match?.id && (
+            <div className="space-y-2">
+              <AuditLog matchId={match.id} pageSize={100} />
+            </div>
+          )}
 
           {/* Footer CTA */}
           <div className="flex items-center gap-3 pb-2">
