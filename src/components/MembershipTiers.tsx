@@ -105,12 +105,13 @@ const MembershipTiers = () => {
           {tiers.map((tier, index) => (
             <Card 
               key={tier.name} 
-              className={`relative flex flex-col h-full transition-all duration-300 hover:shadow-premium animate-slide-up ${
+              tabIndex={0}
+              className={`relative flex flex-col h-full transition-all duration-300 animate-slide-up outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-background hover:-translate-y-1 hover:border-primary hover:shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_18px_40px_-12px_hsl(var(--primary)/0.45)] focus-visible:-translate-y-1 focus-visible:shadow-[0_0_0_1px_hsl(var(--primary)/0.4),0_18px_40px_-12px_hsl(var(--primary)/0.45)] ${
                 tier.popular 
-                  ? 'border-primary shadow-premium bg-gradient-card' 
+                  ? 'border-primary bg-gradient-card shadow-[0_0_0_1px_hsl(var(--primary)/0.5),0_14px_36px_-10px_hsl(var(--primary)/0.45)] ring-1 ring-primary/30' 
                   : tier.colorScheme === 'warning'
-                  ? 'border-warning shadow-premium'
-                  : 'border-border hover:border-primary/30'
+                  ? 'border-primary/40 shadow-premium'
+                  : 'border-border'
               }`}
               style={{ animationDelay: `${index * 0.1}s` }}
             >
