@@ -274,7 +274,7 @@ serve(async (req) => {
         status: 200,
       });
     }
-  } catch (error) {
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
     

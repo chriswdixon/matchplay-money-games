@@ -162,7 +162,7 @@ Provide JSON with cleaned fields:
       }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error cleaning course data:', error);
     
     // Return generic error messages

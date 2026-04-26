@@ -80,7 +80,7 @@ serve(async (req) => {
       JSON.stringify({ success: true, message: "User disabled successfully" }),
       { headers: { ...corsHeaders, "Content-Type": "application/json" }, status: 200 }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error("Error in admin-disable-user:", error);
 
     if (error instanceof z.ZodError) {
