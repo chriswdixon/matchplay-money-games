@@ -77,6 +77,7 @@ const MatchDetailsSheet = ({
 }: MatchDetailsSheetProps) => {
   const [participants, setParticipants] = useState<Participant[]>([]);
   const [loading, setLoading] = useState(false);
+  const { isAdmin } = useAdminRole();
 
   useEffect(() => {
     if (!open || !match) return;
@@ -299,6 +300,13 @@ const MatchDetailsSheet = ({
           </div>
 
           <Separator />
+
+          {/* Admin-only per-match audit log */}
+          {isAdmin && match?.id && (
+            <div className="space-y-2">
+              <AuditLog matchId={match.id} pageSize={100} />
+            </div>
+          )}
 
           {/* Footer CTA */}
           <div className="flex items-center gap-3 pb-2">
