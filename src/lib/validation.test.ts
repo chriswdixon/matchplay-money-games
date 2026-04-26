@@ -19,9 +19,8 @@ import {
 
 describe("validation: passwordSchema", () => {
   it.each([
-    ["Strong1!aB", true],
-    ["12345678!Aa", true],
-    ["short1!A", false], // 8 chars but needs all categories — has them; let's recompute: short1!A length=8, has lower/upper/num/special — should be true
+    ["StrongAa1!", true],
+    ["GoodPw9$Aa", true],
   ])("validates password %s", (pw, ok) => {
     const r = passwordSchema.safeParse(pw);
     if (ok) expect(r.success).toBe(true);

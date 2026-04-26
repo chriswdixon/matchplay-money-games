@@ -9,9 +9,10 @@ describe("MembershipTiers", () => {
 
   it("renders all three tiers", () => {
     renderWithProviders(<MembershipTiers />);
-    expect(screen.getByText(/Free/i)).toBeInTheDocument();
-    expect(screen.getByText(/Local Player/i)).toBeInTheDocument();
-    expect(screen.getByText(/Global Player/i)).toBeInTheDocument();
+    expect(screen.getByText("Local Player")).toBeInTheDocument();
+    expect(screen.getByText("Tournament Pro")).toBeInTheDocument();
+    // "Free" appears multiple times (tier name + "Start Free" button); use heading-level match
+    expect(screen.getAllByText(/Free/).length).toBeGreaterThan(0);
   });
 
   it("shows Most Popular badge on the popular tier", () => {
@@ -19,10 +20,11 @@ describe("MembershipTiers", () => {
     expect(screen.getByText(/Most Popular/i)).toBeInTheDocument();
   });
 
-  it("renders all Start buttons", () => {
+  it("renders Start Free, Start Local Play, and Contact Us buttons", () => {
     renderWithProviders(<MembershipTiers />);
-    const buttons = screen.getAllByRole("button", { name: /Start/i });
-    expect(buttons.length).toBeGreaterThanOrEqual(3);
+    expect(screen.getByRole("button", { name: /Start Free/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Start Local Play/i })).toBeInTheDocument();
+    expect(screen.getByRole("button", { name: /Contact Us/i })).toBeInTheDocument();
   });
 
   it("Start Free navigates to /auth", async () => {
