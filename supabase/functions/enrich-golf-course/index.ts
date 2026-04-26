@@ -145,7 +145,7 @@ Base your analysis on the course name, location, and any context clues. Be reali
       JSON.stringify({ success: true, data: enrichedData }),
       { headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Error enriching course:', error);
     
     // Return generic error messages

@@ -40,7 +40,7 @@ Deno.serve(async (req) => {
         status: 200,
       }
     );
-  } catch (error) {
+  } catch (error: any) {
     console.error('Fatal error in flag-incomplete-matches:', error);
     return new Response(
       JSON.stringify({

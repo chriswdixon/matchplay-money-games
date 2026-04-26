@@ -107,7 +107,7 @@ serve(async (req) => {
           phone: privateData?.phone || null,
           membership_tier: privateData?.membership_tier || 'Free',
           is_admin: !!userRole,
-          is_disabled: authUser?.user?.banned_until ? new Date(authUser.user.banned_until) > new Date() : false,
+          is_disabled: (authUser?.user as any)?.banned_until ? new Date((authUser.user as any).banned_until) > new Date() : false,
           created_at: profile.created_at
         };
       })
