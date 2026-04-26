@@ -122,8 +122,9 @@ export function AuditLog({ matchId, pageSize = 50 }: AuditLogProps) {
     setLoadingMore(false);
   };
 
+  // Category filter is applied server-side via fetchPage; only the
+  // free-text search is filtered client-side over loaded entries.
   const filtered = entries.filter((e) => {
-    if (filter !== "all" && e.category !== filter) return false;
     if (!search) return true;
     const haystack = `${e.summary} ${e.event_type} ${JSON.stringify(e.payload)}`.toLowerCase();
     return haystack.includes(search.toLowerCase());
@@ -218,6 +219,36 @@ export function AuditLog({ matchId, pageSize = 50 }: AuditLogProps) {
                 </li>
               ))}
             </ul>
+
+            {/* Infinite scroll sentinel + manual fallback */}
+            {hasMore ? (
+              <div
+                ref={sentinelRef}
+                className="flex items-center justify-center py-4"
+              >
+                {loadingMore ? (
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                    Loading more...
+                  </div>
+                ) : (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={loadMoreManually}
+                    className="text-xs"
+                  >
+                    Load more
+                  </Button>
+                )}
+              </div>
+            ) : (
+              entries.length > 0 && (
+                <div className="text-center text-xs text-muted-foreground py-4">
+                  End of audit log ({entries.length} entries)
+                </div>
+              )
+            )}
           </ScrollArea>
         )}
       </CardContent>
