@@ -85,7 +85,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Invite request received:", { firstName, lastName, email });
 
     // Send email to support
-    const emailResponse = await resend.emails.send({
+    const emailResponse = await sendEmail({
       from: "LinkUp Invites <onboarding@resend.dev>",
       to: ["support@match-play.co"],
       subject: "New Invite Code Request",
@@ -103,7 +103,7 @@ const handler = async (req: Request): Promise<Response> => {
     console.log("Support notification sent:", emailResponse);
 
     // Send confirmation to user
-    await resend.emails.send({
+    await sendEmail({
       from: "LinkUp <onboarding@resend.dev>",
       to: [email],
       subject: "Invite Request Received - LinkUp",
