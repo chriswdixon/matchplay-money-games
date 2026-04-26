@@ -1,6 +1,7 @@
 // Shared helper for edge functions to write audit log entries.
 // Uses the service-role client (bypasses RLS).
-import type { SupabaseClient } from "https://esm.sh/@supabase/supabase-js@2.57.2";
+// Accepts any Supabase client instance (avoids cross-SDK-version type conflicts).
+type AnySupabaseClient = { from: (table: string) => any };
 
 export type AuditCategory =
   | "score"
@@ -20,7 +21,7 @@ export interface AuditWrite {
 }
 
 export async function writeAudit(
-  supabase: SupabaseClient,
+  supabase: AnySupabaseClient,
   entry: AuditWrite,
 ): Promise<void> {
   try {
