@@ -66,7 +66,7 @@ const AdminConsole = () => {
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-11 lg:w-auto">
+          <TabsList className="grid w-full grid-cols-12 lg:w-auto">
             <TabsTrigger value="reports" className="gap-2">
               <BarChart3 className="h-4 w-4" />
               Reports
@@ -110,6 +110,10 @@ const AdminConsole = () => {
             <TabsTrigger value="social" className="gap-2">
               <Share2 className="h-4 w-4" />
               Social
+            </TabsTrigger>
+            <TabsTrigger value="audit" className="gap-2">
+              <ShieldCheck className="h-4 w-4" />
+              Audit
             </TabsTrigger>
           </TabsList>
 
@@ -159,6 +163,10 @@ const AdminConsole = () => {
 
             <TabsContent value="social">
               <SocialLinksManagement />
+            </TabsContent>
+
+            <TabsContent value="audit">
+              <AuditLog />
             </TabsContent>
         </Tabs>
       </main>
