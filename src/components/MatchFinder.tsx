@@ -610,7 +610,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 match={match} 
                                 onMatchUpdated={() => refetch()} 
                               />
-                              {(match.pin || match.is_team_format) && (
+                              {(match.team1_pin_creator || match.is_team_format) && (
                                 <Suspense fallback={null}>
                                   <MatchPinManagement
                                     matchId={match.id}

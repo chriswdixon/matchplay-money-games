@@ -1303,6 +1303,13 @@ export type Database = {
         Args: { match_id: string }
         Returns: number
       }
+      get_match_team_pins: {
+        Args: { p_match_id: string }
+        Returns: {
+          pin: string
+          team_number: number
+        }[]
+      }
       get_match_with_location_filter: {
         Args: { match_id: string }
         Returns: {
