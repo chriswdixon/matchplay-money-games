@@ -181,8 +181,6 @@ const LinkUpLanding = () => {
           className="flex-1 pb-32 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4"
           role="main"
         >
-          <InstallPrompt />
-
           {/* Active match banner takes priority */}
           {currentTab === "active-match" && hasActiveMatch && (
             <Suspense fallback={<TabLoader />}>
