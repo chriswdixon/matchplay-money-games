@@ -71,3 +71,67 @@ Yes, you can!
 To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
 
 Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+
+## PWA / Service Worker support — removed
+
+This app **no longer ships any Progressive Web App (PWA) or service-worker
+functionality**. The previous `vite-plugin-pwa` + Workbox setup, the
+`/install` route, the install prompt UI, the web app manifest, and all
+related icons have been intentionally removed.
+
+### Why it was removed
+
+- The service worker cached responses inside the Lovable preview iframe,
+  serving stale builds and breaking navigation.
+- The install prompt added confusion for users who only need the web app.
+- Maintaining a separate offline cache layer was no longer worth the
+  complexity now that the app is online-first.
+
+### What this means in practice
+
+- There is no `manifest.webmanifest` / `manifest.json`, no `sw.js`, no
+  `registerSW.*`, and no `dev-dist/` Workbox output in the repo.
+- `/install` (and any sub-path) redirects to the **NotFound** page via a
+  `<Navigate to="/404" replace />` route guard in `src/App.tsx`.
+- The runtime no longer attempts to register a service worker. Returning
+  visitors who installed the old SW will have it evicted naturally the
+  next time their browser revalidates the page (no SW = nothing to update).
+- `index.html` no longer ships PWA meta tags (`apple-mobile-web-app-*`,
+  `apple-touch-icon`, `mask-icon`, manifest `<link>`).
+
+### CI guard — `.github/workflows/no-pwa.yml`
+
+A dedicated GitHub Actions workflow (`No PWA Reintroduction`) runs on
+every PR and every push to `main` and **fails the build** if any of the
+following are reintroduced:
+
+**Forbidden files / paths**
+- `dev-dist/` (Workbox build output)
+- `public/pwa-192x192.png`, `public/pwa-512x512.png`
+- `public/manifest.json`, `public/manifest.webmanifest`,
+  `public/site.webmanifest`
+- `public/sw.js`, `public/service-worker.js`
+- `src/components/PWAUpdatePrompt.tsx`
+- `src/components/InstallPrompt.tsx`
+- `src/pages/Install.tsx`
+- Any `service-worker.*`, `registerSW.*`, or `*.webmanifest` file under
+  `src/` or `public/`
+
+**Forbidden source references** (scanned across `*.ts`, `*.tsx`, `*.js`,
+`*.jsx`, `*.mjs`, `*.cjs`, `*.json`, `*.html`, excluding `node_modules`,
+`dist`, lockfiles, and the workflow itself)
+- `vite-plugin-pwa`
+- `VitePWA(` invocations
+- `workbox-window`, `workbox-build`, `workbox-core`, `workbox-precaching`,
+  `workbox-routing`, `workbox-strategies`
+- `navigator.serviceWorker.register`
+- `registerSW`
+
+**Forbidden dependencies in `package.json`**
+- `vite-plugin-pwa`
+- Any `workbox-*` package
+
+If you have a legitimate reason to reintroduce a service worker (e.g.
+true offline support outside the Lovable preview), update the guard
+workflow in the same PR and document the rationale here.
+
