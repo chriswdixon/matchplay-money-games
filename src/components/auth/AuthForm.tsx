@@ -82,6 +82,60 @@ export function AuthForm() {
     checkMFAStatus();
   }, []);
 
+  // Live invite-code validation. Re-runs whenever the user edits the
+  // code or the email (since @match-play.co emails skip the check).
+  // Debounced 450ms to avoid hammering the RPC; a cancellation flag
+  // prevents stale responses from overwriting a newer status.
+  useEffect(() => {
+    const trimmed = inviteCode.trim();
+    if (!trimmed) {
+      setInviteStatus({ kind: 'idle' });
+      return;
+    }
+    if (email.trim().toLowerCase().endsWith('@match-play.co')) {
+      setInviteStatus({ kind: 'idle' });
+      return;
+    }
+
+    const parsed = inviteCodeSchema.safeParse(trimmed);
+    if (!parsed.success) {
+      setInviteStatus({
+        kind: 'format',
+        message: parsed.error.errors[0]?.message ?? 'Invalid invite code format',
+      });
+      return;
+    }
+
+    let cancelled = false;
+    setInviteStatus({ kind: 'checking' });
+    const handle = window.setTimeout(async () => {
+      try {
+        const result = await validateInvite(trimmed, email);
+        if (cancelled) return;
+        if (result.valid) {
+          setInviteStatus({ kind: 'valid' });
+        } else {
+          setInviteStatus({
+            kind: 'invalid',
+            message: result.error || 'Invalid or expired invite code',
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setInviteStatus({
+            kind: 'invalid',
+            message: "We couldn't check that code right now. Please try again.",
+          });
+        }
+      }
+    }, 450);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(handle);
+    };
+  }, [inviteCode, email, validateInvite]);
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setValidationErrors({});
