@@ -250,7 +250,6 @@ jobs:
 
             // Walk the merged Playwright JSON report and collect failures.
             // Each entry: { title, project, file, error, isHero }
-            type Failure = { title: string; project: string; file: string; error: string; isHero: boolean };
             const failures = [];
 
             try {
