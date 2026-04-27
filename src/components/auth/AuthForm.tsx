@@ -215,23 +215,36 @@ export function AuthForm() {
       return;
     }
 
-    // Validate invite code (unless @match-play.co email)
+    // Validate invite code (unless @match-play.co email).
+    // The live debounced check above already populated `inviteStatus`;
+    // we just gate submission on its terminal states. If the user hits
+    // submit before the debounced check fires, fall back to a one-shot
+    // server validation here so we never let an unchecked code through.
     if (!email.endsWith('@match-play.co')) {
-      // Validate invite code format
-      try {
-        inviteCodeSchema.parse(inviteCode);
-      } catch (error: any) {
-        setValidationErrors({ inviteCode: error.errors?.[0]?.message || 'Invalid invite code format' });
+      if (inviteStatus.kind === 'format' || inviteStatus.kind === 'invalid') {
+        setValidationErrors({ inviteCode: inviteStatus.message });
         return;
       }
-
-      const inviteResult = await validateInvite(inviteCode, email);
-      if (!inviteResult.valid) {
-        setValidationErrors({ inviteCode: inviteResult.error || 'Invalid invite code' });
-        return;
+      if (inviteStatus.kind === 'idle' || inviteStatus.kind === 'checking') {
+        const formatCheck = inviteCodeSchema.safeParse(inviteCode);
+        if (!formatCheck.success) {
+          const message =
+            formatCheck.error.errors[0]?.message ?? 'Invalid invite code format';
+          setInviteStatus({ kind: 'format', message });
+          setValidationErrors({ inviteCode: message });
+          return;
+        }
+        const inviteResult = await validateInvite(inviteCode, email);
+        if (!inviteResult.valid) {
+          const message = inviteResult.error || 'Invalid or expired invite code';
+          setInviteStatus({ kind: 'invalid', message });
+          setValidationErrors({ inviteCode: message });
+          return;
+        }
+        setInviteStatus({ kind: 'valid' });
       }
     }
-    
+
     setLoading(true);
     const { error } = await signUp(email, password, finalDisplayName, firstName, lastName);
     
