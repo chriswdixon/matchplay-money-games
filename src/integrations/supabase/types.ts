@@ -1416,6 +1416,7 @@ export type Database = {
         Args: { p_code: string; p_user_id: string }
         Returns: undefined
       }
+      realtime_topic_match_id: { Args: { topic: string }; Returns: string }
       recalculate_player_handicap: {
         Args: { player_user_id: string }
         Returns: undefined
