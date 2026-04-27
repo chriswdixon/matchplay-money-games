@@ -101,3 +101,13 @@ This requires the default `GITHUB_TOKEN` to have `contents: write` and
 `pull-requests: write` (already configured on the job). If your repo
 restricts Actions from creating PRs, enable it under
 **Settings → Actions → General → Workflow permissions**.
+
+### Nightly schedule
+
+A cron trigger (`0 7 * * *` UTC) runs the full suite against `main` every
+night. This catches gradual drift that a code-change-triggered run would
+miss — font fallback shifts, CDN image re-encoding, transitive dep updates.
+
+When a nightly run fails, the workflow opens (or comments on) a GitHub
+issue labeled `visual-regression,nightly` with a link to the artifacts so
+you can triage without having to watch the Actions tab.
