@@ -9,17 +9,6 @@ import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 
-// Unregister any previously installed service workers and clear caches
-// (PWA support has been removed from this app).
-if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
-  navigator.serviceWorker.getRegistrations?.().then((regs) => {
-    regs.forEach((r) => r.unregister());
-  }).catch(() => {});
-  if (typeof caches !== "undefined") {
-    caches.keys?.().then((keys) => keys.forEach((k) => caches.delete(k))).catch(() => {});
-  }
-}
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {

@@ -3,7 +3,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ActiveMatchProvider } from "@/hooks/useActiveMatch";
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import { EmailConfirmationBanner } from "@/components/auth/EmailConfirmationBanner";
 import { GeoBlockingProvider } from "@/hooks/useGeoBlocking";
 
@@ -63,6 +63,10 @@ const App = () => (
             
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            {/* PWA install flow has been removed — always send /install (and any sub-paths) to NotFound */}
+            <Route path="/install" element={<Navigate to="/404" replace />} />
+            <Route path="/install/*" element={<Navigate to="/404" replace />} />
+            <Route path="/404" element={<NotFound />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
