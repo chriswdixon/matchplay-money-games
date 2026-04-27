@@ -138,7 +138,7 @@ export const MatchPinManagement = ({
           </DialogHeader>
           
           <div className="space-y-4 py-4">
-            {teamPins.map((teamPin) => (
+            {mergedPins.map((teamPin) => (
               <Card key={teamPin.teamNumber}>
                 <CardHeader className="pb-3">
                   <CardTitle className="text-base flex items-center justify-between">
