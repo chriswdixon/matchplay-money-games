@@ -841,6 +841,16 @@ export function AuthForm() {
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Creating account..." : "Sign Up"}
                     </Button>
+                    {!email.endsWith('@match-play.co') && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowRequestInvite(true)}
+                        className="w-full"
+                      >
+                        Request an Invite
+                      </Button>
+                    )}
                   </form>
                 </TabsContent>
               </Tabs>
