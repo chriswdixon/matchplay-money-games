@@ -25,7 +25,7 @@ const AdminConsole = lazy(() => import("./pages/AdminConsole"));
 const CreateMatch = lazy(() => import("./pages/CreateMatch"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const VerifyAge = lazy(() => import("./pages/VerifyAge"));
-const Install = lazy(() => import("./pages/Install"));
+
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 
@@ -61,7 +61,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminConsole />} />
             <Route path="/create-match" element={<CreateMatch />} />
-            <Route path="/install" element={<Install />} />
+            
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

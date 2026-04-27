@@ -2,7 +2,7 @@ import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import LinkUpHero from "@/components/LinkUpHero";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
-import { InstallPrompt } from "@/components/InstallPrompt";
+
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -181,8 +181,6 @@ const LinkUpLanding = () => {
           className="flex-1 pb-32 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4"
           role="main"
         >
-          <InstallPrompt />
-
           {/* Active match banner takes priority */}
           {currentTab === "active-match" && hasActiveMatch && (
             <Suspense fallback={<TabLoader />}>
