@@ -28,6 +28,12 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  # Nightly run on main catches gradual drift (font fallback shifts, CDN
+  # image re-encoding, dependency updates) even when no code changed.
+  # 07:00 UTC ≈ off-peak; scheduled workflows always run against the
+  # default branch (main).
+  schedule:
+    - cron: "0 7 * * *"
   workflow_dispatch:
     inputs:
       update_baselines:
