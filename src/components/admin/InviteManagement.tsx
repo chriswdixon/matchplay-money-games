@@ -17,7 +17,7 @@ import {
 import { Label } from '@/components/ui/label';
 
 export const InviteManagement = () => {
-  const { invites, loading, generateInvite } = useInvites();
+  const { invites, loading, generateInvite } = useInvites({ autoFetch: true });
   const { toast } = useToast();
   const [expiryDays, setExpiryDays] = useState('30');
   const [generating, setGenerating] = useState(false);

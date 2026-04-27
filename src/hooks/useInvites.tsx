@@ -12,9 +12,21 @@ interface Invite {
   created_at: string;
 }
 
-export const useInvites = () => {
+export interface UseInvitesOptions {
+  /**
+   * When true, automatically fetches the full invites list on mount.
+   * Selecting from the `invites` table requires admin RLS access, so
+   * non-admin callers (e.g. the public `/auth` page, which only needs
+   * `validateInvite` / `linkInviteToUser`) MUST leave this disabled to
+   * avoid a "permission denied for table invites" toast.
+   */
+  autoFetch?: boolean;
+}
+
+export const useInvites = (options: UseInvitesOptions = {}) => {
+  const { autoFetch = false } = options;
   const [invites, setInvites] = useState<Invite[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(autoFetch);
   const { toast } = useToast();
 
   const fetchInvites = async () => {
@@ -104,8 +116,10 @@ export const useInvites = () => {
   };
 
   useEffect(() => {
-    fetchInvites();
-  }, []);
+    if (autoFetch) {
+      fetchInvites();
+    }
+  }, [autoFetch]);
 
   return {
     invites,
