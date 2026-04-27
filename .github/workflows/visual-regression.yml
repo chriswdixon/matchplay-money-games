@@ -1,0 +1,85 @@
+name: Visual Regression
+
+# Runs Playwright screenshot diffs on every PR and on pushes to main.
+# Fails the build when a snapshot drifts from the committed baseline
+# (e.g. an accidental color/gradient change to the homepage hero).
+#
+# Updating baselines after an intentional UI change:
+#   bun run test:visual:update
+#   git add tests/visual/**/__screenshots__/**
+#
+# Baselines are platform-specific. This workflow runs on
+# ubuntu-latest, so commit the Linux baselines produced here.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    name: Playwright snapshots
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        id: pw-cache
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lockb', 'package.json') }}
+
+      - name: Install Playwright Chromium
+        if: steps.pw-cache.outputs.cache-hit != 'true'
+        run: bunx playwright install --with-deps chromium webkit
+
+      - name: Install system deps for cached browsers
+        if: steps.pw-cache.outputs.cache-hit == 'true'
+        run: bunx playwright install-deps chromium webkit
+
+      - name: Run visual regression tests
+        run: bun run test:visual
+        env:
+          CI: "true"
+          # Public-route snapshots only — auth-gated specs auto-skip when
+          # these creds are unset, which is the safe default for CI.
+          # To exercise authenticated screens, add these as repo secrets:
+          # PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
+          # PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
+          # PLAYWRIGHT_ADMIN_EMAIL: ${{ secrets.PLAYWRIGHT_ADMIN_EMAIL }}
+          # PLAYWRIGHT_ADMIN_PASSWORD: ${{ secrets.PLAYWRIGHT_ADMIN_PASSWORD }}
+          # PLAYWRIGHT_MATCH_ID: ${{ secrets.PLAYWRIGHT_MATCH_ID }}
+
+      - name: Upload Playwright report (diffs + traces)
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 14
+
+      - name: Upload diff snapshots
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diffs
+          path: test-results
+          retention-days: 14

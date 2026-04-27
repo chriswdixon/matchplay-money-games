@@ -65,3 +65,23 @@ bun run test:visual:update
 ```
 
 Review the diff in the PR before merging.
+
+## CI
+
+`.github/workflows/visual-regression.yml` runs `bun run test:visual` on every
+PR and push to `main`. Snapshot drift fails the build. The HTML report and
+any diff PNGs are uploaded as workflow artifacts (`playwright-report`,
+`visual-diffs`) — download them from the failed run's summary page to see
+exactly what changed.
+
+When you intentionally change a covered screen:
+
+1. `bun run test:visual:update` locally (or pull the artifact from CI and
+   replace the baselines)
+2. Commit the updated PNGs under `tests/visual/**/__screenshots__/`
+3. Push — CI re-runs against the new baselines
+
+Auth-gated specs are skipped in CI by default. To enable them, add
+`PLAYWRIGHT_TEST_EMAIL`, `PLAYWRIGHT_TEST_PASSWORD`, `PLAYWRIGHT_ADMIN_EMAIL`,
+`PLAYWRIGHT_ADMIN_PASSWORD`, and `PLAYWRIGHT_MATCH_ID` as repo secrets and
+uncomment the matching `env:` lines in the workflow.
