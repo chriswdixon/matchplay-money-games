@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Shield, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Shield, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter, inviteCodeSchema } from '@/lib/validation';
@@ -42,6 +42,25 @@ export function AuthForm() {
   const [inviteCode, setInviteCode] = useState('');
   const [showRequestInvite, setShowRequestInvite] = useState(false);
   const [requestInviteLoading, setRequestInviteLoading] = useState(false);
+
+  // Live invite-code validation state machine.
+  //   idle      → field is empty, no feedback
+  //   format    → length/charset issue (purely client-side, instant)
+  //   checking  → debounced server check in flight
+  //   valid     → server confirmed the code is usable
+  //   invalid   → server rejected the code (expired, used, or unknown)
+  //
+  // The server intentionally returns one generic message
+  // ("Invalid or expired invite code") to prevent enumeration —
+  // we keep that exact wording but pair it with an inline
+  // "Request an Invite" CTA so users have a clear next step.
+  type InviteStatus =
+    | { kind: 'idle' }
+    | { kind: 'format'; message: string }
+    | { kind: 'checking' }
+    | { kind: 'valid' }
+    | { kind: 'invalid'; message: string };
+  const [inviteStatus, setInviteStatus] = useState<InviteStatus>({ kind: 'idle' });
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   const { validateInvite, linkInviteToUser } = useInvites();
