@@ -134,7 +134,10 @@ export function AuthForm() {
       cancelled = true;
       window.clearTimeout(handle);
     };
-  }, [inviteCode, email, validateInvite]);
+    // validateInvite is intentionally excluded — it's a fresh closure on every
+    // render of useInvites and would cause an infinite re-run loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteCode, email]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
