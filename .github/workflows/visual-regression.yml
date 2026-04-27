@@ -13,6 +13,15 @@ name: Visual Regression
 #
 # Baselines are platform-specific. This workflow runs on
 # ubuntu-latest, so commit the Linux baselines produced here.
+#
+# Performance design:
+#   - Verification runs are sharded across N parallel jobs (matrix) — each
+#     shard runs ~1/N of the specs, then a final job merges the HTML reports.
+#   - Three caches: bun install dir, Playwright browsers, Playwright OS deps.
+#   - Vite's transform cache is also persisted so the dev server boots faster
+#     on warm runs.
+#   - The baseline-refresh path runs unsharded (single job) so the resulting
+#     PR contains a coherent set of PNGs.
 
 on:
   push:
@@ -30,14 +39,24 @@ concurrency:
   group: visual-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  # Pin Playwright once so the browser-cache key matches the runtime version.
+  # Bumping the dep automatically invalidates the cache via hashFiles below.
+  PLAYWRIGHT_BROWSERS_PATH: ${{ github.workspace }}/.cache/ms-playwright
+
 jobs:
+  # ===================================================================
+  # Verification: sharded matrix, only when NOT regenerating baselines
+  # ===================================================================
   visual:
-    name: Playwright snapshots
+    name: Snapshots (shard ${{ matrix.shard }}/${{ strategy.job-total }})
+    if: ${{ github.event_name != 'workflow_dispatch' || inputs.update_baselines != true }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
-    permissions:
-      contents: write       # needed to push the baselines branch
-      pull-requests: write  # needed to open the review PR
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        shard: [1, 2, 3]
 
     steps:
       - name: Checkout
@@ -48,48 +67,214 @@ jobs:
         with:
           bun-version: latest
 
+      # ---------- Cache: bun install ----------
+      - name: Cache bun install
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
       - name: Install dependencies
         run: bun install --frozen-lockfile
 
+      # ---------- Cache: Playwright browsers ----------
+      # Keyed on the @playwright/test version pinned in the lockfile so the
+      # cache invalidates exactly when the binaries change, never sooner.
       - name: Cache Playwright browsers
-        id: pw-cache
+        id: pw-browsers
         uses: actions/cache@v4
         with:
-          path: ~/.cache/ms-playwright
-          key: playwright-${{ runner.os }}-${{ hashFiles('bun.lockb', 'package.json') }}
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: pw-browsers-${{ runner.os }}-${{ hashFiles('bun.lockb') }}
+          restore-keys: |
+            pw-browsers-${{ runner.os }}-
 
-      - name: Install Playwright Chromium
-        if: steps.pw-cache.outputs.cache-hit != 'true'
-        run: bunx playwright install --with-deps chromium webkit
+      - name: Install Playwright browsers
+        if: steps.pw-browsers.outputs.cache-hit != 'true'
+        run: bunx playwright install chromium webkit
 
-      - name: Install system deps for cached browsers
-        if: steps.pw-cache.outputs.cache-hit == 'true'
-        run: bunx playwright install-deps chromium webkit
+      # ---------- Cache: Playwright OS deps ----------
+      # `playwright install-deps` is fast but apt-fetch heavy; a marker file
+      # lets us skip it entirely on warm runners.
+      - name: Cache Playwright OS deps marker
+        id: pw-osdeps
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/playwright-osdeps.marker
+          key: pw-osdeps-${{ runner.os }}-${{ hashFiles('bun.lockb') }}
 
-      # ---------- Normal verification run ----------
-      - name: Run visual regression tests
-        if: ${{ github.event_name != 'workflow_dispatch' || inputs.update_baselines != true }}
-        run: bun run test:visual
+      - name: Install Playwright OS dependencies
+        if: steps.pw-osdeps.outputs.cache-hit != 'true'
+        run: |
+          sudo bunx playwright install-deps chromium webkit
+          mkdir -p ~/.cache && touch ~/.cache/playwright-osdeps.marker
+
+      # ---------- Cache: Vite transform cache ----------
+      # Speeds up `bun run dev` boot inside Playwright's webServer.
+      - name: Cache Vite
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.vite
+          key: vite-${{ runner.os }}-${{ hashFiles('bun.lockb', 'vite.config.ts', 'tailwind.config.ts') }}
+          restore-keys: |
+            vite-${{ runner.os }}-
+
+      # ---------- Run sharded tests ----------
+      - name: Run visual regression tests (shard ${{ matrix.shard }}/${{ strategy.job-total }})
+        run: bunx playwright test --shard=${{ matrix.shard }}/${{ strategy.job-total }}
         env:
           CI: "true"
-          # Public-route snapshots only — auth-gated specs auto-skip when
-          # these creds are unset, which is the safe default for CI.
-          # To exercise authenticated screens, add these as repo secrets:
+          # Auth-gated specs auto-skip when these creds are unset.
           # PLAYWRIGHT_TEST_EMAIL: ${{ secrets.PLAYWRIGHT_TEST_EMAIL }}
           # PLAYWRIGHT_TEST_PASSWORD: ${{ secrets.PLAYWRIGHT_TEST_PASSWORD }}
           # PLAYWRIGHT_ADMIN_EMAIL: ${{ secrets.PLAYWRIGHT_ADMIN_EMAIL }}
           # PLAYWRIGHT_ADMIN_PASSWORD: ${{ secrets.PLAYWRIGHT_ADMIN_PASSWORD }}
           # PLAYWRIGHT_MATCH_ID: ${{ secrets.PLAYWRIGHT_MATCH_ID }}
 
-      # ---------- On-demand baseline refresh ----------
+      # ---------- Per-shard artifacts (for merging) ----------
+      - name: Upload blob report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: blob-report-${{ matrix.shard }}
+          path: blob-report
+          retention-days: 1
+
+      - name: Upload diff snapshots (failures only)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-diffs-shard-${{ matrix.shard }}
+          path: test-results
+          retention-days: 14
+
+  # ===================================================================
+  # Merge sharded reports into one downloadable HTML report
+  # ===================================================================
+  merge-reports:
+    name: Merge HTML report
+    if: ${{ always() && (github.event_name != 'workflow_dispatch' || inputs.update_baselines != true) }}
+    needs: [visual]
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache bun install
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Download blob reports
+        uses: actions/download-artifact@v4
+        with:
+          path: all-blob-reports
+          pattern: blob-report-*
+          merge-multiple: true
+
+      - name: Merge into HTML report
+        run: bunx playwright merge-reports --reporter html ./all-blob-reports
+
+      - name: Upload merged HTML report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: playwright-report
+          retention-days: 14
+
+  # ===================================================================
+  # On-demand baseline refresh (single job — produces a coherent PR)
+  # ===================================================================
+  refresh-baselines:
+    name: Refresh baselines
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines == true }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    permissions:
+      contents: write
+      pull-requests: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
+
+      - name: Cache bun install
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.bun/install/cache
+            node_modules
+          key: bun-${{ runner.os }}-${{ hashFiles('bun.lockb', 'package.json') }}
+          restore-keys: |
+            bun-${{ runner.os }}-
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Cache Playwright browsers
+        id: pw-browsers
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.PLAYWRIGHT_BROWSERS_PATH }}
+          key: pw-browsers-${{ runner.os }}-${{ hashFiles('bun.lockb') }}
+          restore-keys: |
+            pw-browsers-${{ runner.os }}-
+
+      - name: Install Playwright browsers
+        if: steps.pw-browsers.outputs.cache-hit != 'true'
+        run: bunx playwright install chromium webkit
+
+      - name: Cache Playwright OS deps marker
+        id: pw-osdeps
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/playwright-osdeps.marker
+          key: pw-osdeps-${{ runner.os }}-${{ hashFiles('bun.lockb') }}
+
+      - name: Install Playwright OS dependencies
+        if: steps.pw-osdeps.outputs.cache-hit != 'true'
+        run: |
+          sudo bunx playwright install-deps chromium webkit
+          mkdir -p ~/.cache && touch ~/.cache/playwright-osdeps.marker
+
+      - name: Cache Vite
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.vite
+          key: vite-${{ runner.os }}-${{ hashFiles('bun.lockb', 'vite.config.ts', 'tailwind.config.ts') }}
+          restore-keys: |
+            vite-${{ runner.os }}-
+
       - name: Regenerate baselines
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines == true }}
         run: bun run test:visual:update
         env:
           CI: "true"
 
       - name: Open baseline-update PR
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines == true }}
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "chore(visual): refresh snapshot baselines"
@@ -110,22 +295,4 @@ jobs:
             - [ ] No unrelated screens drifted (background images, fonts, copy)
             - [ ] Light/dark and mobile/desktop variants all look correct
 
-            Merge this PR to adopt the new baselines. After merge, future
-            verification runs will diff against these images.
-
-      # ---------- Artifacts ----------
-      - name: Upload Playwright report (diffs + traces)
-        if: always()
-        uses: actions/upload-artifact@v4
-        with:
-          name: playwright-report
-          path: playwright-report
-          retention-days: 14
-
-      - name: Upload diff snapshots
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: visual-diffs
-          path: test-results
-          retention-days: 14
+            Merge this PR to adopt the new baselines.
