@@ -1,11 +1,11 @@
-import { test, expect } from "@playwright/test";
-import { dismissOverlays, setTheme, stabilize } from "./helpers";
+import { test } from "@playwright/test";
+import { dismissOverlays, setTheme, snapshotElement, stabilize } from "./helpers";
 
 /**
  * Hero-specific snapshot — tighter than the full-page route shot.
- * Catches color/gradient regressions on the "Welcome to LinkUp" headline,
- * badge, feature icons, and CTA buttons across light/dark and
- * mobile/desktop breakpoints.
+ * Uses the `strict` threshold preset so any real color / gradient
+ * regression on "Welcome to LinkUp" trips the build, while normal
+ * sub-pixel anti-aliasing stays under the bar.
  */
 test("homepage hero", async ({ page, colorScheme }) => {
   await dismissOverlays(page);
@@ -29,5 +29,5 @@ test("homepage hero", async ({ page, colorScheme }) => {
   });
 
   await stabilize(page);
-  await expect(hero).toHaveScreenshot("hero.png");
+  await snapshotElement(hero, "hero", { preset: "strict" });
 });
