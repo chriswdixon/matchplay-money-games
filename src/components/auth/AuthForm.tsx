@@ -716,18 +716,93 @@ export function AuthForm() {
                     {!email.endsWith('@match-play.co') && (
                       <div className="space-y-2">
                         <Label htmlFor="invite-code">Invite Code</Label>
-                        <Input
-                          id="invite-code"
-                          type="text"
-                          placeholder="Enter your invite code"
-                          value={inviteCode}
-                          onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                          required={!showRequestInvite}
-                          className={validationErrors.inviteCode ? "border-destructive" : ""}
-                        />
-                        {validationErrors.inviteCode && (
-                          <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.inviteCode}</p>
-                        )}
+                        <div className="relative">
+                          <Input
+                            id="invite-code"
+                            type="text"
+                            placeholder="Enter your invite code"
+                            value={inviteCode}
+                            onChange={(e) => {
+                              setInviteCode(e.target.value.toUpperCase());
+                              // Clear any submit-time error so the live status takes over
+                              if (validationErrors.inviteCode) {
+                                setValidationErrors((prev) => {
+                                  const { inviteCode: _drop, ...rest } = prev;
+                                  return rest;
+                                });
+                              }
+                            }}
+                            required={!showRequestInvite}
+                            aria-invalid={
+                              inviteStatus.kind === 'invalid' ||
+                              inviteStatus.kind === 'format' ||
+                              !!validationErrors.inviteCode
+                            }
+                            aria-describedby="invite-code-status invite-code-hint"
+                            autoComplete="off"
+                            spellCheck={false}
+                            className={`pr-10 ${
+                              inviteStatus.kind === 'invalid' ||
+                              inviteStatus.kind === 'format' ||
+                              validationErrors.inviteCode
+                                ? 'border-destructive'
+                                : inviteStatus.kind === 'valid'
+                                  ? 'border-green-500 focus-visible:ring-green-500'
+                                  : ''
+                            }`}
+                          />
+                          {/* Status icon — non-interactive, always announced via aria-describedby */}
+                          <div
+                            className="pointer-events-none absolute inset-y-0 right-3 flex items-center"
+                            aria-hidden="true"
+                          >
+                            {inviteStatus.kind === 'checking' && (
+                              <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                            )}
+                            {inviteStatus.kind === 'valid' && (
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            )}
+                            {(inviteStatus.kind === 'invalid' ||
+                              inviteStatus.kind === 'format') && (
+                              <AlertCircle className="w-4 h-4 text-destructive" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Live status region — single source of truth for screen readers */}
+                        <div
+                          id="invite-code-status"
+                          role="status"
+                          aria-live="polite"
+                          className="min-h-[1.25rem] text-sm"
+                        >
+                          {inviteStatus.kind === 'checking' && (
+                            <span className="text-muted-foreground">Checking your code…</span>
+                          )}
+                          {inviteStatus.kind === 'valid' && (
+                            <span className="text-green-600">Looks good — your invite is valid.</span>
+                          )}
+                          {inviteStatus.kind === 'format' && (
+                            <span className="text-destructive">{inviteStatus.message}</span>
+                          )}
+                          {inviteStatus.kind === 'invalid' && (
+                            <span className="text-destructive">
+                              {inviteStatus.message}.{' '}
+                              <button
+                                type="button"
+                                onClick={() => setShowRequestInvite(true)}
+                                className="underline underline-offset-2 hover:text-destructive/80"
+                              >
+                                Request a new invite
+                              </button>
+                            </span>
+                          )}
+                          {/* Submit-time error fallback (rare — covers offline / race cases) */}
+                          {inviteStatus.kind === 'idle' && validationErrors.inviteCode && (
+                            <span className="text-destructive">{validationErrors.inviteCode}</span>
+                          )}
+                        </div>
+
                         <div className="flex items-center justify-between">
                           <p className="text-xs text-muted-foreground">
                             Beta invites are required to sign up
