@@ -803,19 +803,9 @@ export function AuthForm() {
                           )}
                         </div>
 
-                        <div className="flex items-center justify-between">
-                          <p id="invite-code-hint" className="text-xs text-muted-foreground">
-                            6–32 letters or numbers. Beta invites are required to sign up.
-                          </p>
-                          <Button
-                            type="button"
-                            variant="link"
-                            onClick={() => setShowRequestInvite(true)}
-                            className="p-0 h-auto text-xs"
-                          >
-                            Request an Invite
-                          </Button>
-                        </div>
+                        <p id="invite-code-hint" className="text-xs text-muted-foreground">
+                          6–32 letters or numbers. Beta invites are required to sign up.
+                        </p>
                       </div>
                     )}
                     <div className="space-y-2">
@@ -851,6 +841,16 @@ export function AuthForm() {
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Creating account..." : "Sign Up"}
                     </Button>
+                    {!email.endsWith('@match-play.co') && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setShowRequestInvite(true)}
+                        className="w-full"
+                      >
+                        Request an Invite
+                      </Button>
+                    )}
                   </form>
                 </TabsContent>
               </Tabs>
