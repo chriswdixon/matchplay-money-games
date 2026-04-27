@@ -85,3 +85,19 @@ Auth-gated specs are skipped in CI by default. To enable them, add
 `PLAYWRIGHT_TEST_EMAIL`, `PLAYWRIGHT_TEST_PASSWORD`, `PLAYWRIGHT_ADMIN_EMAIL`,
 `PLAYWRIGHT_ADMIN_PASSWORD`, and `PLAYWRIGHT_MATCH_ID` as repo secrets and
 uncomment the matching `env:` lines in the workflow.
+
+### On-demand baseline refresh from CI
+
+Don't have a Linux box handy? Trigger the baseline regeneration from GitHub:
+
+1. **Actions → Visual Regression → Run workflow**
+2. Tick **`update_baselines`** and run on the branch you want to update
+3. The job runs `bun run test:visual:update` and opens a PR titled
+   *"chore(visual): refresh snapshot baselines"* containing only the new PNGs
+4. Review the diff in the PR (every changed snapshot is visible inline) and
+   merge to adopt
+
+This requires the default `GITHUB_TOKEN` to have `contents: write` and
+`pull-requests: write` (already configured on the job). If your repo
+restricts Actions from creating PRs, enable it under
+**Settings → Actions → General → Workflow permissions**.

@@ -4,9 +4,12 @@ name: Visual Regression
 # Fails the build when a snapshot drifts from the committed baseline
 # (e.g. an accidental color/gradient change to the homepage hero).
 #
-# Updating baselines after an intentional UI change:
-#   bun run test:visual:update
-#   git add tests/visual/**/__screenshots__/**
+# Updating baselines:
+#   - Locally:   bun run test:visual:update && commit tests/visual/**/__screenshots__
+#   - Remotely:  Actions → "Visual Regression" → "Run workflow" with
+#                update_baselines = true. The job re-runs Playwright with
+#                --update-snapshots and opens a PR containing the new PNGs
+#                for you to review and merge.
 #
 # Baselines are platform-specific. This workflow runs on
 # ubuntu-latest, so commit the Linux baselines produced here.
@@ -17,6 +20,11 @@ on:
   pull_request:
     branches: [main]
   workflow_dispatch:
+    inputs:
+      update_baselines:
+        description: "Regenerate snapshot baselines and open a PR with the changes"
+        type: boolean
+        default: false
 
 concurrency:
   group: visual-${{ github.ref }}
@@ -27,6 +35,9 @@ jobs:
     name: Playwright snapshots
     runs-on: ubuntu-latest
     timeout-minutes: 20
+    permissions:
+      contents: write       # needed to push the baselines branch
+      pull-requests: write  # needed to open the review PR
 
     steps:
       - name: Checkout
@@ -55,7 +66,9 @@ jobs:
         if: steps.pw-cache.outputs.cache-hit == 'true'
         run: bunx playwright install-deps chromium webkit
 
+      # ---------- Normal verification run ----------
       - name: Run visual regression tests
+        if: ${{ github.event_name != 'workflow_dispatch' || inputs.update_baselines != true }}
         run: bun run test:visual
         env:
           CI: "true"
@@ -68,6 +81,39 @@ jobs:
           # PLAYWRIGHT_ADMIN_PASSWORD: ${{ secrets.PLAYWRIGHT_ADMIN_PASSWORD }}
           # PLAYWRIGHT_MATCH_ID: ${{ secrets.PLAYWRIGHT_MATCH_ID }}
 
+      # ---------- On-demand baseline refresh ----------
+      - name: Regenerate baselines
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines == true }}
+        run: bun run test:visual:update
+        env:
+          CI: "true"
+
+      - name: Open baseline-update PR
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.update_baselines == true }}
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "chore(visual): refresh snapshot baselines"
+          title: "chore(visual): refresh snapshot baselines"
+          branch: chore/visual-baselines-${{ github.run_id }}
+          base: ${{ github.ref_name }}
+          delete-branch: true
+          add-paths: |
+            tests/**/__screenshots__/**
+            tests/visual/**/*.png
+          body: |
+            Automated baseline refresh triggered from
+            [run #${{ github.run_id }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})
+            by @${{ github.actor }} on `${{ github.ref_name }}`.
+
+            ### Review checklist
+            - [ ] Each updated PNG reflects an **intentional** UI change
+            - [ ] No unrelated screens drifted (background images, fonts, copy)
+            - [ ] Light/dark and mobile/desktop variants all look correct
+
+            Merge this PR to adopt the new baselines. After merge, future
+            verification runs will diff against these images.
+
+      # ---------- Artifacts ----------
       - name: Upload Playwright report (diffs + traces)
         if: always()
         uses: actions/upload-artifact@v4
