@@ -17,7 +17,11 @@ export default defineConfig({
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 2 : undefined,
-  reporter: [["html", { open: "never", outputFolder: "playwright-report" }]],
+  // CI uses the `blob` reporter so sharded runs can be merged into a single
+  // HTML report by `playwright merge-reports`. Local runs get HTML directly.
+  reporter: process.env.CI
+    ? [["blob", { outputDir: "blob-report" }], ["github"]]
+    : [["html", { open: "never", outputFolder: "playwright-report" }], ["list"]],
   timeout: 60_000,
   expect: {
     // Allow tiny anti-aliasing diffs; fail on real visual changes.
