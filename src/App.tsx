@@ -12,7 +12,7 @@ import Index from "./pages/Index";
 
 // Lazy load non-critical overlays
 const OfflineIndicator = lazy(() => import("@/components/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
-const PWAUpdatePrompt = lazy(() => import("@/components/PWAUpdatePrompt").then(m => ({ default: m.PWAUpdatePrompt })));
+
 const CookieConsent = lazy(() => import("@/components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 const GeoBlockingOverlay = lazy(() => import("@/components/GeoBlockingOverlay").then(m => ({ default: m.GeoBlockingOverlay })));
 
@@ -48,7 +48,6 @@ const App = () => (
         <EmailConfirmationBanner />
         <Suspense fallback={null}>
           <OfflineIndicator />
-          <PWAUpdatePrompt />
           <CookieConsent />
         </Suspense>
         <Suspense fallback={<PageLoader />}>

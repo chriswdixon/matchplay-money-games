@@ -51,7 +51,6 @@ export async function dismissOverlays(page: Page) {
         "linkup-cookie-consent",
         JSON.stringify({ necessary: true, analytics: false, marketing: false, ts: Date.now() })
       );
-      localStorage.setItem("linkup-install-prompt-dismissed", "1");
       localStorage.setItem("linkup-age-verified", "1");
     } catch {}
   });
