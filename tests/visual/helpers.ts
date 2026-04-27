@@ -1,8 +1,8 @@
-import { Page, expect } from "@playwright/test";
+import { Page, Locator, expect } from "@playwright/test";
+import { THRESHOLDS, type ThresholdPreset } from "./thresholds";
 
 /**
  * Make a page deterministic for visual regression:
- * - freeze time
  * - disable animations & transitions
  * - hide volatile elements (toasts, live timers, randomized avatars)
  * - wait for fonts and network idle
@@ -47,14 +47,41 @@ export async function setTheme(page: Page, theme: "light" | "dark") {
 export async function dismissOverlays(page: Page) {
   await page.addInitScript(() => {
     try {
-      localStorage.setItem("linkup-cookie-consent", JSON.stringify({ necessary: true, analytics: false, marketing: false, ts: Date.now() }));
+      localStorage.setItem(
+        "linkup-cookie-consent",
+        JSON.stringify({ necessary: true, analytics: false, marketing: false, ts: Date.now() })
+      );
       localStorage.setItem("linkup-install-prompt-dismissed", "1");
       localStorage.setItem("linkup-age-verified", "1");
     } catch {}
   });
 }
 
-export async function snapshot(page: Page, name: string) {
+/**
+ * Full-page snapshot with a named threshold preset.
+ *
+ *   await snapshot(page, "home");                    // default tolerance
+ *   await snapshot(page, "home", { preset: "strict" });
+ */
+export async function snapshot(
+  page: Page,
+  name: string,
+  opts: { preset?: ThresholdPreset } = {}
+) {
   await stabilize(page);
-  await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true });
+  const preset = THRESHOLDS[opts.preset ?? "default"];
+  await expect(page).toHaveScreenshot(`${name}.png`, { fullPage: true, ...preset });
+}
+
+/**
+ * Element-scoped snapshot with a named threshold preset. Prefer this for
+ * brand-critical regions (hero, primary CTAs) where `strict` makes sense.
+ */
+export async function snapshotElement(
+  locator: Locator,
+  name: string,
+  opts: { preset?: ThresholdPreset } = {}
+) {
+  const preset = THRESHOLDS[opts.preset ?? "default"];
+  await expect(locator).toHaveScreenshot(`${name}.png`, preset);
 }

@@ -111,3 +111,29 @@ miss — font fallback shifts, CDN image re-encoding, transitive dep updates.
 When a nightly run fails, the workflow opens (or comments on) a GitHub
 issue labeled `visual-regression,nightly` with a link to the artifacts so
 you can triage without having to watch the Actions tab.
+
+## Per-screen diff thresholds
+
+`tests/visual/thresholds.ts` defines three presets — `strict`, `default`,
+`relaxed` — controlling `maxDiffPixelRatio`, `maxDiffPixels`, and per-pixel
+`threshold`. Specs pick a preset by name; numbers live in one place.
+
+| Preset | Use for | Pixel ratio | YIQ tolerance |
+|---|---|---|---|
+| `strict` | Brand surfaces (hero, gradient headings) | 0.1% | 0.1 |
+| `default` | Most public routes | 1% | 0.2 |
+| `relaxed` | Avatars, charts, generated content | 3% | 0.25 |
+
+```ts
+// Full page, default tolerance
+await snapshot(page, "privacy");
+
+// Stricter, element-scoped
+await snapshotElement(hero, "hero", { preset: "strict" });
+
+// Looser for noisy admin tables
+await snapshot(page, "admin", { preset: "relaxed" });
+```
+
+If a screen flakes, prefer hiding the volatile node (`data-volatile`)
+before loosening the preset.
