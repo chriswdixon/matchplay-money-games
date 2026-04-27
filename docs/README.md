@@ -26,6 +26,7 @@ npm run dev
 | [Features](./FEATURES.md) | Core feature implementations and business logic |
 | [Security](./SECURITY.md) | Security practices, RLS, input validation |
 | [Testing](./TESTING.md) | Testing strategies and debugging |
+| [Tester Guide](./TESTER_GUIDE.md) | Manual QA checklist for desktop, mobile & PWA |
 | [Contributing](./CONTRIBUTING.md) | Code standards, PR process, and conventions |
 
 ## Technology Stack
