@@ -61,8 +61,13 @@ const AppFeatures = () => {
           <Badge className="mb-4 bg-primary/10 text-primary border-primary/20">
             <span aria-hidden="true">🚀</span> Platform Features
           </Badge>
-          <h2 id="features-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
-            Four Services, One Platform
+          <h2 id="features-heading" className="text-4xl md:text-5xl font-bold mb-6">
+            <span className="bg-gradient-to-r from-accent via-accent-glow to-accent bg-clip-text text-transparent">
+              Four Services,
+            </span>{" "}
+            <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+              One Platform
+            </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
             LinkUp combines the best of GolfNow, 18Birdies, Venmo, and GHIN 
