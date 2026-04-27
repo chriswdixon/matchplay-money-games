@@ -197,8 +197,11 @@ jobs:
           pattern: blob-report-*
           merge-multiple: true
 
-      - name: Merge into HTML report
-        run: bunx playwright merge-reports --reporter html ./all-blob-reports
+      - name: Merge into HTML + JSON reports
+        # JSON report drives the PR comment; HTML is the human-friendly artifact.
+        run: |
+          bunx playwright merge-reports --reporter html ./all-blob-reports
+          bunx playwright merge-reports --reporter json ./all-blob-reports > playwright-results.json
 
       - name: Upload merged HTML report
         uses: actions/upload-artifact@v4
@@ -206,6 +209,156 @@ jobs:
           name: playwright-report
           path: playwright-report
           retention-days: 14
+
+      - name: Upload merged JSON report
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-results-json
+          path: playwright-results.json
+          retention-days: 14
+
+  # ===================================================================
+  # PR comment: summarize failed visual diffs and link to artifacts.
+  # Sticky — replaces the previous comment on subsequent runs so the PR
+  # thread doesn't fill up with stale reports.
+  # ===================================================================
+  pr-comment:
+    name: Comment failures on PR
+    if: ${{ always() && github.event_name == 'pull_request' }}
+    needs: [visual, merge-reports]
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    steps:
+      - name: Download merged JSON report
+        uses: actions/download-artifact@v4
+        with:
+          name: playwright-results-json
+          path: .
+
+      - name: Build + post sticky comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const path = require('path');
+
+            const MARKER = '<!-- visual-regression-comment -->';
+            const runUrl = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const reportUrl = `${runUrl}#artifacts`;
+            const prNumber = context.payload.pull_request.number;
+
+            // Walk the merged Playwright JSON report and collect failures.
+            // Each entry: { title, project, file, error, isHero }
+            const failures = [];
+
+            try {
+              const raw = fs.readFileSync('playwright-results.json', 'utf8');
+              const report = JSON.parse(raw);
+
+              const walk = (suite, fileHint) => {
+                const file = suite.file || fileHint;
+                for (const child of suite.suites || []) walk(child, file);
+                for (const spec of suite.specs || []) {
+                  for (const t of spec.tests || []) {
+                    const last = t.results?.[t.results.length - 1];
+                    if (!last || last.status === 'passed' || last.status === 'skipped') continue;
+                    const errorMsg = (last.error?.message || last.errors?.[0]?.message || 'unknown failure')
+                      .split('\n')[0]
+                      .slice(0, 240);
+                    failures.push({
+                      title: spec.title,
+                      project: t.projectName || 'default',
+                      file: file || spec.file || 'unknown',
+                      error: errorMsg,
+                      isHero: /hero/i.test(spec.title) || /hero\.spec/i.test(file || ''),
+                    });
+                  }
+                }
+              };
+              for (const s of report.suites || []) walk(s, s.file);
+            } catch (e) {
+              core.warning(`Could not parse playwright-results.json: ${e.message}`);
+            }
+
+            // Build the comment body.
+            let body;
+            if (failures.length === 0) {
+              body = [
+                MARKER,
+                '### 🎭 Visual regression: ✅ all snapshots match',
+                '',
+                `[View run](${runUrl})`,
+              ].join('\n');
+            } else {
+              const heroFailures = failures.filter((f) => f.isHero);
+              const otherFailures = failures.filter((f) => !f.isHero);
+
+              const renderRow = (f) =>
+                `| \`${f.title}\` | \`${f.project}\` | ${f.error.replace(/\|/g, '\\|')} |`;
+
+              const sections = [];
+              if (heroFailures.length) {
+                sections.push(
+                  '#### 🚨 Homepage hero regressions',
+                  '| Test | Project | First error |',
+                  '|---|---|---|',
+                  ...heroFailures.map(renderRow),
+                  ''
+                );
+              }
+              if (otherFailures.length) {
+                sections.push(
+                  `<details><summary>Other failed snapshots (${otherFailures.length})</summary>`,
+                  '',
+                  '| Test | Project | First error |',
+                  '|---|---|---|',
+                  ...otherFailures.map(renderRow),
+                  '',
+                  '</details>'
+                );
+              }
+
+              body = [
+                MARKER,
+                `### 🎭 Visual regression: ❌ ${failures.length} snapshot${failures.length === 1 ? '' : 's'} failed`,
+                '',
+                ...sections,
+                '**Artifacts** (download from the run page):',
+                `- 📊 [\`playwright-report\`](${reportUrl}) — full HTML report with side-by-side diffs`,
+                `- 🖼️ \`visual-diffs-shard-*\` — raw expected / actual / diff PNGs`,
+                '',
+                'If the change is intentional, refresh baselines via **Actions → Visual Regression → Run workflow** with `update_baselines = true`.',
+                '',
+                `[View run](${runUrl})`,
+              ].join('\n');
+            }
+
+            // Sticky: find existing comment by marker, update or create.
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+              per_page: 100,
+            });
+            const existing = comments.find((c) => c.body && c.body.includes(MARKER));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
 
   # ===================================================================
   # Nightly failure alert: open / update a tracking issue when the

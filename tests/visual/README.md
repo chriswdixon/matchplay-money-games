@@ -137,3 +137,12 @@ await snapshot(page, "admin", { preset: "relaxed" });
 
 If a screen flakes, prefer hiding the volatile node (`data-volatile`)
 before loosening the preset.
+
+### PR comments
+
+On every PR run, the workflow posts a sticky comment summarizing failures:
+- **🚨 Homepage hero regressions** are surfaced in their own table at the top
+- Other failed snapshots are collapsed in a `<details>` block
+- The comment links to the `playwright-report` HTML artifact (side-by-side
+  diffs) and the per-shard `visual-diffs-shard-*` PNGs
+- The comment is updated in place across re-runs — no thread spam
