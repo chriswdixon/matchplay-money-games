@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Shield, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Shield, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter, inviteCodeSchema } from '@/lib/validation';
@@ -42,6 +42,25 @@ export function AuthForm() {
   const [inviteCode, setInviteCode] = useState('');
   const [showRequestInvite, setShowRequestInvite] = useState(false);
   const [requestInviteLoading, setRequestInviteLoading] = useState(false);
+
+  // Live invite-code validation state machine.
+  //   idle      → field is empty, no feedback
+  //   format    → length/charset issue (purely client-side, instant)
+  //   checking  → debounced server check in flight
+  //   valid     → server confirmed the code is usable
+  //   invalid   → server rejected the code (expired, used, or unknown)
+  //
+  // The server intentionally returns one generic message
+  // ("Invalid or expired invite code") to prevent enumeration —
+  // we keep that exact wording but pair it with an inline
+  // "Request an Invite" CTA so users have a clear next step.
+  type InviteStatus =
+    | { kind: 'idle' }
+    | { kind: 'format'; message: string }
+    | { kind: 'checking' }
+    | { kind: 'valid' }
+    | { kind: 'invalid'; message: string };
+  const [inviteStatus, setInviteStatus] = useState<InviteStatus>({ kind: 'idle' });
   const { signIn, signUp, signInWithMagicLink } = useAuth();
   const { toast } = useToast();
   const { validateInvite, linkInviteToUser } = useInvites();
@@ -62,6 +81,63 @@ export function AuthForm() {
     };
     checkMFAStatus();
   }, []);
+
+  // Live invite-code validation. Re-runs whenever the user edits the
+  // code or the email (since @match-play.co emails skip the check).
+  // Debounced 450ms to avoid hammering the RPC; a cancellation flag
+  // prevents stale responses from overwriting a newer status.
+  useEffect(() => {
+    const trimmed = inviteCode.trim();
+    if (!trimmed) {
+      setInviteStatus({ kind: 'idle' });
+      return;
+    }
+    if (email.trim().toLowerCase().endsWith('@match-play.co')) {
+      setInviteStatus({ kind: 'idle' });
+      return;
+    }
+
+    const parsed = inviteCodeSchema.safeParse(trimmed);
+    if (!parsed.success) {
+      setInviteStatus({
+        kind: 'format',
+        message: parsed.error.errors[0]?.message ?? 'Invalid invite code format',
+      });
+      return;
+    }
+
+    let cancelled = false;
+    setInviteStatus({ kind: 'checking' });
+    const handle = window.setTimeout(async () => {
+      try {
+        const result = await validateInvite(trimmed, email);
+        if (cancelled) return;
+        if (result.valid) {
+          setInviteStatus({ kind: 'valid' });
+        } else {
+          setInviteStatus({
+            kind: 'invalid',
+            message: result.error || 'Invalid or expired invite code',
+          });
+        }
+      } catch {
+        if (!cancelled) {
+          setInviteStatus({
+            kind: 'invalid',
+            message: "We couldn't check that code right now. Please try again.",
+          });
+        }
+      }
+    }, 450);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(handle);
+    };
+    // validateInvite is intentionally excluded — it's a fresh closure on every
+    // render of useInvites and would cause an infinite re-run loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [inviteCode, email]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -139,23 +215,36 @@ export function AuthForm() {
       return;
     }
 
-    // Validate invite code (unless @match-play.co email)
+    // Validate invite code (unless @match-play.co email).
+    // The live debounced check above already populated `inviteStatus`;
+    // we just gate submission on its terminal states. If the user hits
+    // submit before the debounced check fires, fall back to a one-shot
+    // server validation here so we never let an unchecked code through.
     if (!email.endsWith('@match-play.co')) {
-      // Validate invite code format
-      try {
-        inviteCodeSchema.parse(inviteCode);
-      } catch (error: any) {
-        setValidationErrors({ inviteCode: error.errors?.[0]?.message || 'Invalid invite code format' });
+      if (inviteStatus.kind === 'format' || inviteStatus.kind === 'invalid') {
+        setValidationErrors({ inviteCode: inviteStatus.message });
         return;
       }
-
-      const inviteResult = await validateInvite(inviteCode, email);
-      if (!inviteResult.valid) {
-        setValidationErrors({ inviteCode: inviteResult.error || 'Invalid invite code' });
-        return;
+      if (inviteStatus.kind === 'idle' || inviteStatus.kind === 'checking') {
+        const formatCheck = inviteCodeSchema.safeParse(inviteCode);
+        if (!formatCheck.success) {
+          const message =
+            formatCheck.error.errors[0]?.message ?? 'Invalid invite code format';
+          setInviteStatus({ kind: 'format', message });
+          setValidationErrors({ inviteCode: message });
+          return;
+        }
+        const inviteResult = await validateInvite(inviteCode, email);
+        if (!inviteResult.valid) {
+          const message = inviteResult.error || 'Invalid or expired invite code';
+          setInviteStatus({ kind: 'invalid', message });
+          setValidationErrors({ inviteCode: message });
+          return;
+        }
+        setInviteStatus({ kind: 'valid' });
       }
     }
-    
+
     setLoading(true);
     const { error } = await signUp(email, password, finalDisplayName, firstName, lastName);
     
@@ -627,21 +716,96 @@ export function AuthForm() {
                     {!email.endsWith('@match-play.co') && (
                       <div className="space-y-2">
                         <Label htmlFor="invite-code">Invite Code</Label>
-                        <Input
-                          id="invite-code"
-                          type="text"
-                          placeholder="Enter your invite code"
-                          value={inviteCode}
-                          onChange={(e) => setInviteCode(e.target.value.toUpperCase())}
-                          required={!showRequestInvite}
-                          className={validationErrors.inviteCode ? "border-destructive" : ""}
-                        />
-                        {validationErrors.inviteCode && (
-                          <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.inviteCode}</p>
-                        )}
+                        <div className="relative">
+                          <Input
+                            id="invite-code"
+                            type="text"
+                            placeholder="Enter your invite code"
+                            value={inviteCode}
+                            onChange={(e) => {
+                              setInviteCode(e.target.value.toUpperCase());
+                              // Clear any submit-time error so the live status takes over
+                              if (validationErrors.inviteCode) {
+                                setValidationErrors((prev) => {
+                                  const { inviteCode: _drop, ...rest } = prev;
+                                  return rest;
+                                });
+                              }
+                            }}
+                            required={!showRequestInvite}
+                            aria-invalid={
+                              inviteStatus.kind === 'invalid' ||
+                              inviteStatus.kind === 'format' ||
+                              !!validationErrors.inviteCode
+                            }
+                            aria-describedby="invite-code-status invite-code-hint"
+                            autoComplete="off"
+                            spellCheck={false}
+                            className={`pr-10 ${
+                              inviteStatus.kind === 'invalid' ||
+                              inviteStatus.kind === 'format' ||
+                              validationErrors.inviteCode
+                                ? 'border-destructive'
+                                : inviteStatus.kind === 'valid'
+                                  ? 'border-green-500 focus-visible:ring-green-500'
+                                  : ''
+                            }`}
+                          />
+                          {/* Status icon — non-interactive, always announced via aria-describedby */}
+                          <div
+                            className="pointer-events-none absolute inset-y-0 right-3 flex items-center"
+                            aria-hidden="true"
+                          >
+                            {inviteStatus.kind === 'checking' && (
+                              <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
+                            )}
+                            {inviteStatus.kind === 'valid' && (
+                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                            )}
+                            {(inviteStatus.kind === 'invalid' ||
+                              inviteStatus.kind === 'format') && (
+                              <AlertCircle className="w-4 h-4 text-destructive" />
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Live status region — single source of truth for screen readers */}
+                        <div
+                          id="invite-code-status"
+                          role="status"
+                          aria-live="polite"
+                          className="min-h-[1.25rem] text-sm"
+                        >
+                          {inviteStatus.kind === 'checking' && (
+                            <span className="text-muted-foreground">Checking your code…</span>
+                          )}
+                          {inviteStatus.kind === 'valid' && (
+                            <span className="text-green-600">Looks good — your invite is valid.</span>
+                          )}
+                          {inviteStatus.kind === 'format' && (
+                            <span className="text-destructive">{inviteStatus.message}</span>
+                          )}
+                          {inviteStatus.kind === 'invalid' && (
+                            <span className="text-destructive">
+                              {inviteStatus.message}.{' '}
+                              <button
+                                type="button"
+                                onClick={() => setShowRequestInvite(true)}
+                                className="underline underline-offset-2 hover:text-destructive/80"
+                              >
+                                Request a new invite
+                              </button>
+                            </span>
+                          )}
+                          {/* Submit-time error fallback (rare — covers offline / race cases) */}
+                          {inviteStatus.kind === 'idle' && validationErrors.inviteCode && (
+                            <span className="text-destructive">{validationErrors.inviteCode}</span>
+                          )}
+                        </div>
+
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-muted-foreground">
-                            Beta invites are required to sign up
+                          <p id="invite-code-hint" className="text-xs text-muted-foreground">
+                            6–32 letters or numbers. Beta invites are required to sign up.
                           </p>
                           <Button
                             type="button"
