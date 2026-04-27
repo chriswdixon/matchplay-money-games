@@ -40,6 +40,28 @@ export const MatchPinManagement = ({
   const [resetDialogOpen, setResetDialogOpen] = useState(false);
   const [selectedTeam, setSelectedTeam] = useState<number | null>(null);
   const [copiedPin, setCopiedPin] = useState<number | null>(null);
+  const [livePins, setLivePins] = useState<Record<number, string>>({});
+
+  // Fetch real PIN values securely when the dialog opens (column-level RLS hides them on the table)
+  useEffect(() => {
+    if (!open) return;
+    let cancelled = false;
+    (async () => {
+      const { data, error } = await supabase.rpc('get_match_team_pins', { p_match_id: matchId });
+      if (cancelled || error || !data) return;
+      const map: Record<number, string> = {};
+      for (const row of data as Array<{ team_number: number; pin: string }>) {
+        if (row.pin) map[row.team_number] = row.pin;
+      }
+      setLivePins(map);
+    })();
+    return () => { cancelled = true; };
+  }, [open, matchId]);
+
+  const mergedPins: TeamPin[] = teamPins.map(tp => ({
+    ...tp,
+    pin: livePins[tp.teamNumber] ?? tp.pin,
+  }));
 
   const handleResetPin = (teamNumber: number) => {
     setSelectedTeam(teamNumber);
