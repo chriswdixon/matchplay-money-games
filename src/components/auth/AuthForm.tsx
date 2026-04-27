@@ -804,8 +804,8 @@ export function AuthForm() {
                         </div>
 
                         <div className="flex items-center justify-between">
-                          <p className="text-xs text-muted-foreground">
-                            Beta invites are required to sign up
+                          <p id="invite-code-hint" className="text-xs text-muted-foreground">
+                            6–32 letters or numbers. Beta invites are required to sign up.
                           </p>
                           <Button
                             type="button"
