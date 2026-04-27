@@ -14,7 +14,10 @@
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:edge": "cd supabase && deno test -A --no-check functions/_tests/",
-    "test:rls": "cd supabase && deno test -A --no-check functions/_tests/rls/"
+    "test:rls": "cd supabase && deno test -A --no-check functions/_tests/rls/",
+    "test:visual": "playwright test",
+    "test:visual:update": "playwright test --update-snapshots",
+    "test:visual:report": "playwright show-report"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
