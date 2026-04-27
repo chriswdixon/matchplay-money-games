@@ -17,7 +17,7 @@ import { MFAVerification } from './MFAVerification';
 import { PaymentMethodSetup } from './PaymentMethodSetup';
 import { SubscriptionSelection } from './SubscriptionSelection';
 import { useInvites } from '@/hooks/useInvites';
-import { InstallPrompt } from '@/components/InstallPrompt';
+
 
 export function AuthForm() {
   const [email, setEmail] = useState('');
@@ -38,7 +38,7 @@ export function AuthForm() {
   const [needsMFASetup, setNeedsMFASetup] = useState(false);
   const [showSubscriptionSelection, setShowSubscriptionSelection] = useState(false);
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
-  const [showInstallPrompt, setShowInstallPrompt] = useState(false);
+  
   const [inviteCode, setInviteCode] = useState('');
   const [showRequestInvite, setShowRequestInvite] = useState(false);
   const [requestInviteLoading, setRequestInviteLoading] = useState(false);
