@@ -1,0 +1,93 @@
+name: No PWA Reintroduction
+
+# Guards against accidentally re-adding PWA / service-worker / Workbox
+# functionality. PWA support was intentionally removed from this app
+# (see src/main.tsx history and tests/visual/README.md), and reintroducing
+# it would break the preview iframe and cache stale assets for users.
+#
+# This job fails if any of the following appear in the repository:
+#   - vite-plugin-pwa or workbox-* dependencies in package.json / bun.lock
+#   - VitePWA(...) usage in vite config
+#   - Service worker source files (sw.js, service-worker.{js,ts}, registerSW.*)
+#   - A web app manifest (manifest.webmanifest, site.webmanifest, manifest.json
+#     in /public)
+#   - Generated dev-dist/ Workbox artifacts
+#   - PWA icon files in /public (pwa-192x192.png, pwa-512x512.png)
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  guard:
+    name: Reject PWA artifacts
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for forbidden PWA files
+        run: |
+          set -e
+          FORBIDDEN_PATHS=(
+            "dev-dist"
+            "public/pwa-192x192.png"
+            "public/pwa-512x512.png"
+            "public/manifest.json"
+            "public/manifest.webmanifest"
+            "public/site.webmanifest"
+            "public/sw.js"
+            "public/service-worker.js"
+            "src/components/PWAUpdatePrompt.tsx"
+            "src/components/InstallPrompt.tsx"
+            "src/pages/Install.tsx"
+          )
+          FAIL=0
+          for p in "${FORBIDDEN_PATHS[@]}"; do
+            if [ -e "$p" ]; then
+              echo "::error file=$p::Forbidden PWA artifact present: $p"
+              FAIL=1
+            fi
+          done
+          # Any service-worker source under src/ or public/
+          if find src public -type f \( \
+              -iname "service-worker.*" -o \
+              -iname "registerSW.*" -o \
+              -iname "*.webmanifest" \
+            \) 2>/dev/null | grep -q .; then
+            echo "::error::Service-worker / web-manifest source files detected:"
+            find src public -type f \( -iname "service-worker.*" -o -iname "registerSW.*" -o -iname "*.webmanifest" \)
+            FAIL=1
+          fi
+          exit $FAIL
+
+      - name: Check for forbidden PWA references in source
+        run: |
+          set -e
+          # Scan source, config, and HTML — but not docs, tests, lockfiles,
+          # or this guard workflow itself (which legitimately mentions them).
+          MATCHES=$(grep -RInE \
+            -e "vite-plugin-pwa" \
+            -e "VitePWA\s*\(" \
+            -e "workbox-(window|build|core|precaching|routing|strategies)" \
+            -e "navigator\.serviceWorker\.register" \
+            -e "registerSW" \
+            --include="*.ts" --include="*.tsx" --include="*.js" --include="*.jsx" \
+            --include="*.mjs" --include="*.cjs" --include="*.json" --include="*.html" \
+            --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.github \
+            --exclude="bun.lock" --exclude="package-lock.json" \
+            . || true)
+          if [ -n "$MATCHES" ]; then
+            echo "::error::Forbidden PWA references detected in source:"
+            echo "$MATCHES"
+            exit 1
+          fi
+
+      - name: Check package.json for PWA dependencies
+        run: |
+          set -e
+          if grep -E '"(vite-plugin-pwa|workbox-[a-z]+)"\s*:' package.json; then
+            echo "::error file=package.json::PWA dependency reintroduced in package.json"
+            exit 1
+          fi

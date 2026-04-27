@@ -283,13 +283,13 @@
     }
   }
 
-  /* iOS PWA Touch Optimization */
+  /* iOS touch optimization */
   .touch-manipulation {
     touch-action: manipulation;
     -webkit-tap-highlight-color: transparent;
   }
 
-  /* Ensure buttons are clickable in iOS PWA */
+  /* Ensure buttons are clickable on iOS */
   button, a, [role="button"] {
     -webkit-tap-highlight-color: transparent;
     -webkit-touch-callout: none;
