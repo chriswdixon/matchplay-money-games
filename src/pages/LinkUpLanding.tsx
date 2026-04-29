@@ -51,6 +51,7 @@ const LinkUpLanding = () => {
   const [currentTab, setCurrentTab] = useState("home");
   const [searchQuery, setSearchQuery] = useState("");
   const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
 
   // Apply stored hero theme on mount (defaults to gold)
