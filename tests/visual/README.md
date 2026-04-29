@@ -7,7 +7,7 @@ by [Playwright](https://playwright.dev/).
 
 | Spec | Routes | Auth |
 |---|---|---|
-| `public-routes.spec.ts` | `/`, `/linkup`, `/auth`, `/privacy`, `/terms` | none |
+| `public-routes.spec.ts` | `/`, `/tyche`, `/auth`, `/privacy`, `/terms` | none |
 | `authenticated.spec.ts` | `/` (dashboard), `/create-match`, `/profile`, `/admin` | yes |
 | `authenticated.spec.ts` | `/match/:id` (scorecard) | yes + match id |
 
