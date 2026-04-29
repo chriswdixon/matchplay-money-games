@@ -9,7 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
