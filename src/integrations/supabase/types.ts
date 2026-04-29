@@ -836,6 +836,42 @@ export type Database = {
         }
         Relationships: []
       }
+      match_win_posts: {
+        Row: {
+          course_name: string
+          created_at: string
+          format: string
+          holes: number
+          id: string
+          is_team_win: boolean
+          match_id: string
+          team_number: number | null
+          winner_user_id: string
+        }
+        Insert: {
+          course_name: string
+          created_at?: string
+          format: string
+          holes?: number
+          id?: string
+          is_team_win?: boolean
+          match_id: string
+          team_number?: number | null
+          winner_user_id: string
+        }
+        Update: {
+          course_name?: string
+          created_at?: string
+          format?: string
+          holes?: number
+          id?: string
+          is_team_win?: boolean
+          match_id?: string
+          team_number?: number | null
+          winner_user_id?: string
+        }
+        Relationships: []
+      }
       matches: {
         Row: {
           address: string | null

@@ -28,6 +28,7 @@ const VerifyAge = lazy(() => import("./pages/VerifyAge"));
 
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
+const WinsFeed = lazy(() => import("./pages/WinsFeed"));
 
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
@@ -63,6 +64,7 @@ const App = () => (
             
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
+            <Route path="/wins" element={<WinsFeed />} />
             {/* PWA install flow has been removed — always send /install (and any sub-paths) to NotFound */}
             <Route path="/install" element={<Navigate to="/404" replace />} />
             <Route path="/install/*" element={<Navigate to="/404" replace />} />
