@@ -1,4 +1,4 @@
-# LinkUp — Tester UX Checklist
+# Tyche — Tester UX Checklist
 
 A complete manual QA guide for verifying UX across **desktop browsers**, **mobile browsers**, and the **installed PWA** (iOS & Android). Work through each section and record pass/fail with screenshots.
 
@@ -29,15 +29,15 @@ A complete manual QA guide for verifying UX across **desktop browsers**, **mobil
 
 ### 1.1 Landing page (`/`)
 - [ ] Hero loads within 2s, no layout shift (LCP image has `fetchpriority="high"`)
-- [ ] Theme switcher (light/dark) works and persists after refresh (key: `linkup-theme`)
-- [ ] All nav links work; footer brand reads **"MatchPlay"** (intentional exception); rest of app says **"LinkUp"**
+- [ ] Theme switcher (light/dark) works and persists after refresh (key: `tyche-theme`)
+- [ ] All nav links work; footer brand reads **"MatchPlay"** (intentional exception); rest of app says **"Tyche"**
 - [ ] No gambling terminology anywhere ("entry fees", "prizes", "competitive gaming" only)
 - [ ] H1 present, meta title <60 chars, meta description <160 chars
 
 ### 1.2 Cookie consent (GDPR)
 - [ ] Banner appears on first visit
 - [ ] "Accept", "Reject", "Customize" all work
-- [ ] Choice persists in `localStorage` (`linkup-cookie-consent`)
+- [ ] Choice persists in `localStorage` (`tyche-cookie-consent`)
 - [ ] No `user_agent` is collected (verify via Network tab)
 - [ ] Banner does **not** reappear after a choice
 
@@ -187,7 +187,7 @@ Run `axe DevTools` on: `/`, `/auth`, `/profile`, `/create-match`, a match detail
 
 ### 8.1 Install — iOS Safari
 - [ ] Visit production URL → tap Share → "Add to Home Screen"
-- [ ] App icon appears with correct LinkUp branding
+- [ ] App icon appears with correct Tyche branding
 - [ ] Launch from home screen → opens standalone (no Safari chrome)
 - [ ] Status bar styling looks correct (no white gap at top)
 

@@ -1,6 +1,6 @@
 # End-to-End Test Suite
 
-Comprehensive test harness for the LinkUp / MatchPlay app. Three layers:
+Comprehensive test harness for the Tyche / MatchPlay app. Three layers:
 
 | Layer | Runner | Location | Mode |
 |---|---|---|---|
@@ -23,7 +23,7 @@ bun run test:rls
 ## Live tests — important
 
 `test:edge` and `test:rls` create real auth users in Supabase project `rgdegvpfnilzkqpexgij`.
-All test users use the prefix `e2e+` and email domain `@e2e.linkup.test`.
+All test users use the prefix `e2e+` and email domain `@e2e.tyche.test`.
 A teardown helper signs them out and best-effort deletes their data.
 
 **Email confirmation must be disabled** in Supabase Auth settings (already confirmed off).
