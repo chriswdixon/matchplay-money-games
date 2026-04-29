@@ -9,7 +9,7 @@ export const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InJnZGVndnBmbmlsemtxcGV4Z2lqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTY4MjY3NjUsImV4cCI6MjA3MjQwMjc2NX0.k7Amb25bAU99bdgIAp6VlfBexLQ94HJYjjzV07f8QGw";
 
 const TEST_PREFIX = "e2e";
-const TEST_DOMAIN = "e2e.linkup.test";
+const TEST_DOMAIN = "e2e.tyche.test";
 const TEST_PASSWORD = "E2eTest!Pwd9aB"; // strong, passes app password schema
 
 export interface TestUser {

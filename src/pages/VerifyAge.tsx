@@ -87,7 +87,7 @@ const VerifyAge = () => {
                 What's next?
               </p>
               <p className="text-sm text-green-700 dark:text-green-300">
-                You now have You now have full access to LinkUp. Find matches, compete with other golfers,. Find matches, compete with other golfers, 
+                You now have You now have full access to Tyche. Find matches, compete with other golfers,. Find matches, compete with other golfers, 
                 and earn prizes based on your skills!
               </p>
             </div>

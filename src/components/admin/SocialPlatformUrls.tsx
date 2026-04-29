@@ -28,13 +28,13 @@ const platformNames: Record<string, string> = {
 };
 
 const defaultUrls: Record<string, string> = {
-  facebook: "https://facebook.com/linkupgolf",
-  x: "https://x.com/linkupgolf",
-  twitter: "https://twitter.com/linkupgolf",
-  instagram: "https://instagram.com/linkupgolf",
-  linkedin: "https://linkedin.com/company/linkupgolf",
-  youtube: "https://youtube.com/@linkupgolf",
-  tiktok: "https://tiktok.com/@linkupgolf",
+  facebook: "https://facebook.com/tychegolf",
+  x: "https://x.com/tychegolf",
+  twitter: "https://twitter.com/tychegolf",
+  instagram: "https://instagram.com/tychegolf",
+  linkedin: "https://linkedin.com/company/tychegolf",
+  youtube: "https://youtube.com/@tychegolf",
+  tiktok: "https://tiktok.com/@tychegolf",
 };
 
 export const SocialPlatformUrls = () => {

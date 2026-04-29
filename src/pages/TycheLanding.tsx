@@ -1,5 +1,5 @@
 import { lazy, Suspense, useEffect, useState, useMemo } from "react";
-import LinkUpHero from "@/components/LinkUpHero";
+import TycheHero from "@/components/TycheHero";
 import AppHeader from "@/components/AppHeader";
 import AppFooter from "@/components/AppFooter";
 
@@ -44,7 +44,7 @@ const SectionLoader = () => (
   </div>
 );
 
-const LinkUpLanding = () => {
+const TycheLanding = () => {
   const { user } = useAuth();
   const { hasActiveMatch, activeMatchId, activeMatchName, setActiveMatch } = useActiveMatch();
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -285,7 +285,7 @@ const LinkUpLanding = () => {
       </header>
       
       {/* Hero Section */}
-      <LinkUpHero />
+      <TycheHero />
       
       {/* Match Finder Section */}
       <main id="main-content" role="main">
@@ -367,4 +367,4 @@ const LinkUpLanding = () => {
   );
 };
 
-export default LinkUpLanding;
+export default TycheLanding;

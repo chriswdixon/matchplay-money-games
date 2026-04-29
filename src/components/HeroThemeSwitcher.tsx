@@ -10,7 +10,7 @@ const THEMES: { id: HeroTheme; label: string; swatch: string }[] = [
   { id: "teal", label: "Teal", swatch: "bg-[hsl(178_75%_42%)]" },
 ];
 
-const STORAGE_KEY = "linkup-hero-theme";
+const STORAGE_KEY = "tyche-hero-theme";
 
 export const applyHeroTheme = (theme: HeroTheme) => {
   const root = document.documentElement;

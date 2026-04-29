@@ -12,7 +12,7 @@ describe("HeroThemeSwitcher", () => {
   it("applyHeroTheme sets class and persists", () => {
     applyHeroTheme("green");
     expect(document.documentElement.classList.contains("theme-green")).toBe(true);
-    expect(localStorage.getItem("linkup-hero-theme")).toBe("green");
+    expect(localStorage.getItem("tyche-hero-theme")).toBe("green");
 
     applyHeroTheme("teal");
     expect(document.documentElement.classList.contains("theme-teal")).toBe(true);
@@ -21,9 +21,9 @@ describe("HeroThemeSwitcher", () => {
 
   it("getStoredHeroTheme defaults to gold and reads valid value", () => {
     expect(getStoredHeroTheme()).toBe("gold");
-    localStorage.setItem("linkup-hero-theme", "green");
+    localStorage.setItem("tyche-hero-theme", "green");
     expect(getStoredHeroTheme()).toBe("green");
-    localStorage.setItem("linkup-hero-theme", "bogus");
+    localStorage.setItem("tyche-hero-theme", "bogus");
     expect(getStoredHeroTheme()).toBe("gold");
   });
 

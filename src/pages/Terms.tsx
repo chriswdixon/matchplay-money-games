@@ -12,7 +12,7 @@ const Terms = () => {
           <Button variant="ghost" size="sm" asChild>
             <Link to="/" className="flex items-center gap-2">
               <ArrowLeft className="w-4 h-4" />
-              Back to LinkUp
+              Back to Tyche
             </Link>
           </Button>
         </div>
@@ -38,7 +38,7 @@ const Terms = () => {
             </CardHeader>
             <CardContent>
               <p className="text-sm text-muted-foreground">
-                LinkUp facilitates skill-based golf competitions where outcomes are determined by player performance, not chance.
+                Tyche facilitates skill-based golf competitions where outcomes are determined by player performance, not chance.
               </p>
             </CardContent>
           </Card>
@@ -91,7 +91,7 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">1. Platform Overview</h2>
             <p className="text-muted-foreground mt-4">
-              LinkUp ("Platform," "we," "us," or "our") is a competitive golf platform that enables players to participate in skill-based golf competitions. The Platform facilitates match organization, real-time scoring, handicap tracking, and prize distribution for golf competitions.
+              Tyche ("Platform," "we," "us," or "our") is a competitive golf platform that enables players to participate in skill-based golf competitions. The Platform facilitates match organization, real-time scoring, handicap tracking, and prize distribution for golf competitions.
             </p>
             <p className="text-muted-foreground">
               Our services are designed for recreational golfers who wish to compete against other players in organized, skill-based competitions with entry fees and prizes.
@@ -101,7 +101,7 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">2. Nature of Competition</h2>
             <p className="text-muted-foreground mt-4">
-              <strong>Skill-Based Activity:</strong> Golf competitions facilitated through LinkUp are skill-based sporting events where the outcome is determined predominantly by the relative skill, knowledge, and physical ability of the participants, not by chance.
+              <strong>Skill-Based Activity:</strong> Golf competitions facilitated through Tyche are skill-based sporting events where the outcome is determined predominantly by the relative skill, knowledge, and physical ability of the participants, not by chance.
             </p>
             <p className="text-muted-foreground">
               <strong>Entry Fees and Prizes:</strong> Participants may pay entry fees to join competitions. These entry fees form a prize pool that is distributed to top-performing players based on their final scores. Entry fees are held in secure escrow until competition completion.
@@ -114,7 +114,7 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">3. Eligibility</h2>
             <p className="text-muted-foreground mt-4">
-              To use LinkUp, you must:
+              To use Tyche, you must:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-2">
               <li>Be at least 18 years of age (or the legal age of majority in your jurisdiction)</li>
@@ -128,7 +128,7 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">4. User Responsibilities</h2>
             <p className="text-muted-foreground mt-4">
-              As a LinkUp user, you agree to:
+              As a Tyche user, you agree to:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-2">
               <li>Record scores accurately and honestly during all rounds</li>
@@ -159,14 +159,14 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">6. Account Balances and Withdrawals</h2>
             <p className="text-muted-foreground mt-4">
-              Prize earnings are credited to your LinkUp account balance. You may withdraw available funds to your linked payment method at any time, subject to our verification procedures and minimum withdrawal amounts.
+              Prize earnings are credited to your Tyche account balance. You may withdraw available funds to your linked payment method at any time, subject to our verification procedures and minimum withdrawal amounts.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">7. Fair Play Policy</h2>
             <p className="text-muted-foreground mt-4">
-              LinkUp maintains a zero-tolerance policy for:
+              Tyche maintains a zero-tolerance policy for:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-2">
               <li>Score manipulation or falsification</li>
@@ -183,7 +183,7 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">8. Limitation of Liability</h2>
             <p className="text-muted-foreground mt-4">
-              LinkUp is a platform that facilitates competition organization and prize distribution. We are not responsible for:
+              Tyche is a platform that facilitates competition organization and prize distribution. We are not responsible for:
             </p>
             <ul className="list-disc pl-6 text-muted-foreground space-y-2">
               <li>Golf course conditions or availability</li>
@@ -197,14 +197,14 @@ const Terms = () => {
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">9. Privacy and Data</h2>
             <p className="text-muted-foreground mt-4">
-              Your privacy is important to us. We collect and process personal information in accordance with our Privacy Policy. By using LinkUp, you consent to our collection and use of your information as described therein.
+              Your privacy is important to us. We collect and process personal information in accordance with our Privacy Policy. By using Tyche, you consent to our collection and use of your information as described therein.
             </p>
           </section>
 
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">10. Changes to Terms</h2>
             <p className="text-muted-foreground mt-4">
-              We may update these Terms from time to time. We will notify you of any material changes via email or through the Platform. Continued use of LinkUp after such changes constitutes acceptance of the updated Terms.
+              We may update these Terms from time to time. We will notify you of any material changes via email or through the Platform. Continued use of Tyche after such changes constitutes acceptance of the updated Terms.
             </p>
           </section>
 
@@ -222,7 +222,7 @@ const Terms = () => {
         {/* Back to Home */}
         <div className="mt-12 text-center">
           <Button asChild>
-            <Link to="/">Return to LinkUp</Link>
+            <Link to="/">Return to Tyche</Link>
           </Button>
         </div>
       </main>

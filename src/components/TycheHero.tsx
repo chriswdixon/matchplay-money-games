@@ -6,7 +6,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { UserMenu } from "@/components/auth/UserMenu";
 import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 
-const LinkUpHero = () => {
+const TycheHero = () => {
   const { user } = useAuth();
 
   const handleScrollDown = () => {
@@ -52,7 +52,7 @@ const LinkUpHero = () => {
             Welcome to
           </span>{" "}
           <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
-            LinkUp
+            Tyche
           </span>
         </h1>
         
@@ -108,7 +108,7 @@ const LinkUpHero = () => {
                 className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold border-0"
                 asChild
               >
-                <Link to="/auth">Join LinkUp</Link>
+                <Link to="/auth">Join Tyche</Link>
               </Button>
               <Button 
                 variant="outline" 
@@ -160,4 +160,4 @@ const LinkUpHero = () => {
   );
 };
 
-export default LinkUpHero;
+export default TycheHero;
