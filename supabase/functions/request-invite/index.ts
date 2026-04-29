@@ -86,7 +86,7 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send email to support
     const emailResponse = await sendEmail({
-      from: "LinkUp Invites <onboarding@resend.dev>",
+      from: "Tyche Invites <onboarding@resend.dev>",
       to: ["support@match-play.co"],
       subject: "New Invite Code Request",
       html: `
@@ -104,15 +104,15 @@ const handler = async (req: Request): Promise<Response> => {
 
     // Send confirmation to user
     await sendEmail({
-      from: "LinkUp <onboarding@resend.dev>",
+      from: "Tyche <onboarding@resend.dev>",
       to: [email],
-      subject: "Invite Request Received - LinkUp",
+      subject: "Invite Request Received - Tyche",
       html: `
-        <h1>Thank you for your interest in LinkUp!</h1>
+        <h1>Thank you for your interest in Tyche!</h1>
         <p>Hi ${firstName},</p>
         <p>We've received your request for an invite code. Our team will review it and get back to you shortly.</p>
         <p>We're excited to have you join our golf matchmaking community!</p>
-        <p>Best regards,<br>The LinkUp Team</p>
+        <p>Best regards,<br>The Tyche Team</p>
       `,
     });
 

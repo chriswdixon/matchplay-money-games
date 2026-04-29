@@ -4,7 +4,7 @@ import { dismissOverlays, setTheme, snapshotElement, stabilize } from "./helpers
 /**
  * Hero-specific snapshot — tighter than the full-page route shot.
  * Uses the `strict` threshold preset so any real color / gradient
- * regression on "Welcome to LinkUp" trips the build, while normal
+ * regression on "Welcome to Tyche" trips the build, while normal
  * sub-pixel anti-aliasing stays under the bar.
  */
 test("homepage hero", async ({ page, colorScheme }) => {

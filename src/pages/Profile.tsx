@@ -104,7 +104,7 @@ export default function Profile() {
             
             <div className="flex-1">
               <h1 className="text-2xl font-bold">Profile Settings</h1>
-              <p className="text-muted-foreground"><p className="text-muted-foreground">Manage your LinkUp profile and preferences</p> and preferences</p>
+              <p className="text-muted-foreground"><p className="text-muted-foreground">Manage your Tyche profile and preferences</p> and preferences</p>
             </div>
           </div>
         </div>

@@ -328,7 +328,7 @@ const JoinMatchConfirmDialog = ({
                 <li>Skill-based competitive play — not gambling.</li>
                 <li>Complete every hole to be eligible for payout.</li>
                 <li>Forfeit applies if you leave or fail to start.</li>
-                <li>Disputes are reviewed by LinkUp admins.</li>
+                <li>Disputes are reviewed by Tyche admins.</li>
               </ul>
             </div>
 
@@ -412,7 +412,7 @@ const JoinMatchConfirmDialog = ({
                     6. Service availability
                   </h4>
                   <p>
-                    LinkUp is in pilot release in select regions. Features,
+                    Tyche is in pilot release in select regions. Features,
                     payouts, and limits may change. Service may be paused or
                     restricted at any time without prior notice.
                   </p>
@@ -428,7 +428,7 @@ const JoinMatchConfirmDialog = ({
               </div>
               <ul className="text-[11px] text-muted-foreground space-y-1 list-disc pl-4">
                 <li>
-                  LinkUp is a <strong>pilot</strong> in select regions. Access
+                  Tyche is a <strong>pilot</strong> in select regions. Access
                   may be limited or revoked based on jurisdiction.
                 </li>
                 <li>

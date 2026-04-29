@@ -4,7 +4,7 @@ import { Cookie, X } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 
-const COOKIE_CONSENT_KEY = "linkup-cookie-consent";
+const COOKIE_CONSENT_KEY = "tyche-cookie-consent";
 
 export const CookieConsent = () => {
   const [isVisible, setIsVisible] = useState(false);

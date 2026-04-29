@@ -1,7 +1,7 @@
-import LinkUpLanding from "./LinkUpLanding";
+import TycheLanding from "./TycheLanding";
 
 const Index = () => {
-  return <LinkUpLanding />;
+  return <TycheLanding />;
 };
 
 export default Index;

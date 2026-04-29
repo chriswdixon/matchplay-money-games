@@ -8,7 +8,7 @@ import { dismissOverlays, setTheme, snapshot } from "./helpers";
  */
 const ROUTES: Array<{ name: string; path: string }> = [
   { name: "home", path: "/" },
-  { name: "landing", path: "/linkup" },
+  { name: "landing", path: "/tyche" },
   { name: "auth", path: "/auth" },
   { name: "privacy", path: "/privacy" },
   { name: "terms", path: "/terms" },

@@ -149,7 +149,7 @@ serve(async (req) => {
       headers: { 
         ...corsHeaders, 
         "Content-Type": "application/json",
-        "Content-Disposition": `attachment; filename="linkup-data-export-${new Date().toISOString().split('T')[0]}.json"`
+        "Content-Disposition": `attachment; filename="tyche-data-export-${new Date().toISOString().split('T')[0]}.json"`
       },
       status: 200,
     });

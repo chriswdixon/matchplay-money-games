@@ -106,7 +106,7 @@ export const GDPRSettings = () => {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `linkup-data-export-${new Date().toISOString().split('T')[0]}.json`;
+      a.download = `tyche-data-export-${new Date().toISOString().split('T')[0]}.json`;
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);
@@ -232,7 +232,7 @@ export const GDPRSettings = () => {
             Age Verification
           </CardTitle>
           <CardDescription>
-            You must be 18+ to use LinkUp for skill-based competitions.
+            You must be 18+ to use Tyche for skill-based competitions.
           </CardDescription>
         </CardHeader>
         <CardContent>
@@ -245,7 +245,7 @@ export const GDPRSettings = () => {
             <Alert className="bg-primary/10 border-primary">
               <CheckCircle className="h-4 w-4 text-primary" />
               <AlertDescription>
-                Your age has been verified. You have full access to all LinkUp features.
+                Your age has been verified. You have full access to all Tyche features.
               </AlertDescription>
             </Alert>
           ) : (
@@ -385,7 +385,7 @@ export const GDPRSettings = () => {
                       <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                       <AlertDialogDescription className="space-y-2">
                         <p>
-                          This will permanently delete your LinkUp account and all associated data including:
+                          This will permanently delete your Tyche account and all associated data including:
                         </p>
                         <ul className="list-disc pl-4 space-y-1">
                           <li>Your profile and personal information</li>

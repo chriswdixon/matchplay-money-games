@@ -70,7 +70,7 @@ const AppFeatures = () => {
             </span>
           </h2>
           <p className="text-xl text-muted-foreground max-w-3xl mx-auto">
-            LinkUp combines the best of GolfNow, 18Birdies, Venmo, and GHIN 
+            Tyche combines the best of GolfNow, 18Birdies, Venmo, and GHIN 
             into one seamless competitive golf experience.
           </p>
         </div>

@@ -444,7 +444,7 @@ export function AuthForm() {
             setShowPaymentSetup(false);
             toast({
               title: "Setup Complete",
-              description: "Welcome to LinkUp! You're all set to join matches.",
+              description: "Welcome to Tyche! You're all set to join matches.",
             });
           }}
           onSkip={() => {
@@ -474,7 +474,7 @@ export function AuthForm() {
               });
             } else {
               toast({
-                title: "Welcome to LinkUp",
+                title: "Welcome to Tyche",
                 description: "Your account is now secured with two-factor authentication",
               });
             }
@@ -511,7 +511,7 @@ export function AuthForm() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
-            {showResetForm ? 'Reset Password' : 'Welcome to LinkUp'}
+            {showResetForm ? 'Reset Password' : 'Welcome to Tyche'}
           </CardTitle>
           <CardDescription>
             {showResetForm 

@@ -88,7 +88,7 @@ for (const name of ADMIN_ONLY_FUNCTIONS) {
 
 Deno.test("edge:request-invite — accepts a valid request shape", async () => {
   const { status } = await callEdgeFunction("request-invite", {
-    email: `e2e+invite-${crypto.randomUUID().slice(0, 8)}@e2e.linkup.test`,
+    email: `e2e+invite-${crypto.randomUUID().slice(0, 8)}@e2e.tyche.test`,
     name: "E2E",
     reason: "automated test",
   });

@@ -105,9 +105,9 @@ serve(async (req) => {
 
     // Send verification email
     const emailResponse = await sendEmail({
-      from: "LinkUp <noreply@match-play.co>",
+      from: "Tyche <noreply@match-play.co>",
       to: [email],
-      subject: "Confirm Your Age - LinkUp",
+      subject: "Confirm Your Age - Tyche",
       html: `
         <!DOCTYPE html>
         <html>
@@ -118,7 +118,7 @@ serve(async (req) => {
         <body style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; background-color: #f4f4f4; margin: 0; padding: 20px;">
           <div style="max-width: 600px; margin: 0 auto; background-color: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);">
             <div style="background: linear-gradient(135deg, #2d5016 0%, #4a7c23 100%); padding: 30px; text-align: center;">
-              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">⛳ LinkUp</h1>
+              <h1 style="color: #ffffff; margin: 0; font-size: 28px;">⛳ Tyche</h1>
               <p style="color: rgba(255,255,255,0.9); margin: 10px 0 0 0;">Skill-Based Golf Competition</p>
             </div>
             
@@ -130,11 +130,11 @@ serve(async (req) => {
               </p>
               
               <p style="color: #4a4a4a; line-height: 1.6; margin: 0 0 20px 0;">
-                To complete your LinkUp registration, please confirm that you are <strong>18 years of age or older</strong>.
+                To complete your Tyche registration, please confirm that you are <strong>18 years of age or older</strong>.
               </p>
               
               <p style="color: #4a4a4a; line-height: 1.6; margin: 0 0 20px 0;">
-                This verification is required because LinkUp hosts skill-based competitions with entry fees and prizes.
+                This verification is required because Tyche hosts skill-based competitions with entry fees and prizes.
               </p>
               
               <div style="background-color: #f8f9fa; border-radius: 8px; padding: 20px; margin: 30px 0; border-left: 4px solid #4a7c23;">
@@ -155,13 +155,13 @@ serve(async (req) => {
               </div>
               
               <p style="color: #888888; font-size: 12px; line-height: 1.6; margin: 30px 0 0 0;">
-                This link will expire in 24 hours. If you did not create an account on LinkUp, please ignore this email.
+                This link will expire in 24 hours. If you did not create an account on Tyche, please ignore this email.
               </p>
             </div>
             
             <div style="background-color: #f8f9fa; padding: 20px 30px; text-align: center; border-top: 1px solid #eaeaea;">
               <p style="color: #888888; font-size: 12px; margin: 0;">
-                © ${new Date().getFullYear()} LinkUp. All rights reserved.
+                © ${new Date().getFullYear()} Tyche. All rights reserved.
               </p>
             </div>
           </div>

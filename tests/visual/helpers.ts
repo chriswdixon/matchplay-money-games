@@ -35,7 +35,7 @@ export async function setTheme(page: Page, theme: "light" | "dark") {
   await page.addInitScript((t) => {
     try {
       localStorage.setItem("vite-ui-theme", t);
-      localStorage.setItem("linkup-theme", t);
+      localStorage.setItem("tyche-theme", t);
     } catch {}
   }, theme);
 }
@@ -48,10 +48,10 @@ export async function dismissOverlays(page: Page) {
   await page.addInitScript(() => {
     try {
       localStorage.setItem(
-        "linkup-cookie-consent",
+        "tyche-cookie-consent",
         JSON.stringify({ necessary: true, analytics: false, marketing: false, ts: Date.now() })
       );
-      localStorage.setItem("linkup-age-verified", "1");
+      localStorage.setItem("tyche-age-verified", "1");
     } catch {}
   });
 }
