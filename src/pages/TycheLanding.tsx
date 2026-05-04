@@ -7,7 +7,7 @@ import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
+import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useSearchParams, useNavigate } from "react-router-dom";
@@ -240,21 +240,6 @@ const TycheLanding = () => {
       <a href="#main-content" className="skip-link">
         Skip to main content
       </a>
-      {/* Dark Mode Toggle for Landing Page */}
-      <header className="fixed top-0 left-0 right-0 z-50 p-4 flex justify-end" role="banner">
-        <Button 
-          variant="ghost" 
-          size="icon" 
-          className="bg-background/80 backdrop-blur-sm border border-border min-w-[44px] min-h-[44px] touch-manipulation relative"
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-        >
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" aria-hidden="true" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" aria-hidden="true" />
-        </Button>
-      </header>
-      
       {/* Hero Section */}
       <TycheHero />
       
