@@ -12,8 +12,41 @@ export interface LocationError {
   message: string;
 }
 
+const LAST_KNOWN_KEY = 'tyche-last-known-location';
+const LAST_KNOWN_MAX_AGE_MS = 24 * 60 * 60 * 1000; // 24h
+
+interface StoredLocation extends Location {
+  timestamp: number;
+}
+
+const readLastKnown = (): StoredLocation | null => {
+  try {
+    const raw = localStorage.getItem(LAST_KNOWN_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as StoredLocation;
+    if (
+      typeof parsed?.latitude !== 'number' ||
+      typeof parsed?.longitude !== 'number' ||
+      typeof parsed?.timestamp !== 'number'
+    ) return null;
+    if (Date.now() - parsed.timestamp > LAST_KNOWN_MAX_AGE_MS) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const writeLastKnown = (loc: Location) => {
+  try {
+    const payload: StoredLocation = { ...loc, timestamp: Date.now() };
+    localStorage.setItem(LAST_KNOWN_KEY, JSON.stringify(payload));
+  } catch {
+    // ignore quota / private mode errors
+  }
+};
+
 export const useLocation = () => {
-  const [location, setLocation] = useState<Location | null>(null);
+  const [location, setLocation] = useState<Location | null>(() => readLastKnown());
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<LocationError | null>(null);
 
@@ -90,14 +123,12 @@ export const useLocation = () => {
     setLoading(true);
     setError(null);
 
-    // 1) High accuracy (GPS) — short timeout so we don't hang on iOS
-    // 2) Low accuracy (Wi-Fi / cell) — longer timeout, allows cached position
-    // 3) Cached-only — accept any recent fix
-    // 4) IP-based coarse fallback
-    const attempts: Array<{ opts: PositionOptions; timeoutMs: number }> = [
-      { opts: { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }, timeoutMs: 9000 },
-      { opts: { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }, timeoutMs: 16000 },
-      { opts: { enableHighAccuracy: false, timeout: 5000, maximumAge: Infinity }, timeoutMs: 6000 },
+    // High-accuracy attempt first (GPS via iOS Core Location / Android FLP),
+    // then graceful degradation. Each attempt has its own manual timeout guard.
+    const attempts: Array<{ opts: PositionOptions; timeoutMs: number; label: string }> = [
+      { label: 'gps',    opts: { enableHighAccuracy: true,  timeout: 8000,  maximumAge: 60000 },        timeoutMs: 9000 },
+      { label: 'coarse', opts: { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 },       timeoutMs: 16000 },
+      { label: 'cached', opts: { enableHighAccuracy: false, timeout: 5000,  maximumAge: Infinity },     timeoutMs: 6000 },
     ];
 
     let lastError: LocationError | null = null;
@@ -105,28 +136,45 @@ export const useLocation = () => {
       try {
         const loc = await tryGetPosition(attempt.opts, attempt.timeoutMs);
         setLocation(loc);
+        writeLastKnown(loc);
         setLoading(false);
         return loc;
       } catch (e) {
         const le = e as LocationError;
         lastError = le;
-        // If the user denied permission, no retry will help.
-        if (le.code === 1) break;
-        // Otherwise (timeout / position unavailable), continue to next strategy.
+        if (le.code === 1) break; // permission denied — no retry helps
       }
     }
 
-    // Final fallback: IP geolocation (only if not a permission denial)
-    if (!lastError || lastError.code !== 1) {
-      const ipLoc = await ipFallback();
-      if (ipLoc) {
-        setLocation(ipLoc);
-        setLoading(false);
-        toast.message('Using approximate location', {
-          description: 'GPS unavailable — using your network location instead.',
-        });
-        return ipLoc;
-      }
+    // Permission denied: surface the error, do not silently substitute.
+    if (lastError?.code === 1) {
+      setError(lastError);
+      setLoading(false);
+      throw lastError;
+    }
+
+    // Fallback 1: persisted last-known device location (≤24h old)
+    const lastKnown = readLastKnown();
+    if (lastKnown) {
+      setLocation(lastKnown);
+      setLoading(false);
+      const ageMin = Math.round((Date.now() - lastKnown.timestamp) / 60000);
+      toast.message('Using last known location', {
+        description: `Couldn't get a fresh GPS fix — using your location from ${ageMin} min ago.`,
+      });
+      return lastKnown;
+    }
+
+    // Fallback 2: IP-based coarse location
+    const ipLoc = await ipFallback();
+    if (ipLoc) {
+      setLocation(ipLoc);
+      writeLastKnown(ipLoc);
+      setLoading(false);
+      toast.message('Using approximate location', {
+        description: 'GPS unavailable — using your network location instead.',
+      });
+      return ipLoc;
     }
 
     const finalError: LocationError =
