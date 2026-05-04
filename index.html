@@ -2,6 +2,37 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
+    <!--
+      Preview cache guard (pre-boot). Runs before any module/script loads.
+      Cleans up legacy SW + Cache Storage from prior PWA builds and forces
+      ONE cache-busted reload if needed. No PWA worker is installed here.
+    -->
+    <script>
+      (function () {
+        try {
+          if ('caches' in window) {
+            caches.keys().then(function (names) {
+              names.forEach(function (n) { caches.delete(n); });
+            }).catch(function () {});
+          }
+          var swApi = navigator['serviceWorker'];
+          if (!swApi || typeof swApi.getRegistrations !== 'function') return;
+          var FLAG = 'tyche-preboot-cache-bust';
+          swApi.getRegistrations().then(function (regs) {
+            if (!regs || regs.length === 0) return;
+            Promise.all(regs.map(function (r) {
+              return r['unregister']().catch(function () { return false; });
+            })).then(function () {
+              if (sessionStorage.getItem(FLAG)) return;
+              sessionStorage.setItem(FLAG, '1');
+              var u = new URL(window.location.href);
+              u.searchParams.set('cb', Date.now().toString(36));
+              window.location.replace(u.toString());
+            });
+          }).catch(function () {});
+        } catch (e) {}
+      })();
+    </script>
     <!-- Preconnect hints FIRST for critical origins to reduce network dependency chain -->
     <link rel="preconnect" href="https://rgdegvpfnilzkqpexgij.supabase.co" crossorigin />
     <link rel="dns-prefetch" href="https://rgdegvpfnilzkqpexgij.supabase.co" />
