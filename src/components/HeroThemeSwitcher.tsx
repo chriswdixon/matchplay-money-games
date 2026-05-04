@@ -2,11 +2,11 @@ import { useEffect, useState } from "react";
 import { Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-type HeroTheme = "gold" | "green" | "teal";
+type HeroTheme = "green" | "pewter" | "teal";
 
 const THEMES: { id: HeroTheme; label: string; swatch: string }[] = [
-  { id: "gold", label: "Gold", swatch: "bg-[hsl(42_85%_55%)]" },
-  { id: "green", label: "Green", swatch: "bg-[hsl(145_70%_45%)]" },
+  { id: "green", label: "Green", swatch: "bg-[hsl(142_76%_36%)]" },
+  { id: "pewter", label: "Pewter", swatch: "bg-[hsl(220_8%_55%)]" },
   { id: "teal", label: "Teal", swatch: "bg-[hsl(178_75%_42%)]" },
 ];
 
@@ -14,7 +14,7 @@ const STORAGE_KEY = "tyche-hero-theme";
 
 export const applyHeroTheme = (theme: HeroTheme) => {
   const root = document.documentElement;
-  root.classList.remove("theme-gold", "theme-green", "theme-teal");
+  root.classList.remove("theme-gold", "theme-green", "theme-teal", "theme-pewter");
   root.classList.add(`theme-${theme}`);
   try {
     localStorage.setItem(STORAGE_KEY, theme);
@@ -26,7 +26,7 @@ export const applyHeroTheme = (theme: HeroTheme) => {
 export const getStoredHeroTheme = (): HeroTheme => {
   try {
     const v = localStorage.getItem(STORAGE_KEY);
-    if (v === "gold" || v === "green" || v === "teal") return v;
+    if (v === "green" || v === "pewter" || v === "teal") return v;
   } catch {
     /* ignore */
   }
