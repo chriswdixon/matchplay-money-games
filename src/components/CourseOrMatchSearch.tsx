@@ -26,6 +26,20 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
   const navigate = useNavigate();
   const { user } = useAuth();
 
+  const RADIUS_MI = 30;
+
+  const distanceMi = (lat1: number, lon1: number, lat2: number, lon2: number) => {
+    const R = 3959;
+    const dLat = ((lat2 - lat1) * Math.PI) / 180;
+    const dLon = ((lon2 - lon1) * Math.PI) / 180;
+    const a =
+      Math.sin(dLat / 2) ** 2 +
+      Math.cos((lat1 * Math.PI) / 180) *
+        Math.cos((lat2 * Math.PI) / 180) *
+        Math.sin(dLon / 2) ** 2;
+    return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (mode === "matches") {
@@ -33,18 +47,31 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
       return;
     }
     setSearched(true);
-    if (query.trim().length >= 2) {
-      const results = await searchCoursesByName(query.trim());
-      setCourseResults(results.slice(0, 12));
-    } else {
-      // No query — find nearby
-      if (!location) {
-        await requestLocation();
-        return;
-      }
-      const results = await searchNearbyCourses(location.latitude, location.longitude, 30);
-      setCourseResults(results.slice(0, 12));
+
+    // Course search requires GPS — only nearby (within 30mi)
+    if (!location) {
+      await requestLocation();
+      return;
     }
+
+    let results: GolfCourse[];
+    if (query.trim().length >= 2) {
+      const named = await searchCoursesByName(query.trim());
+      results = named
+        .map((c) => ({
+          ...c,
+          distance:
+            c.distance ??
+            (c.latitude && c.longitude
+              ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+              : undefined),
+        }))
+        .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
+        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    } else {
+      results = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
+    }
+    setCourseResults(results.slice(0, 12));
   };
 
   const handleModeChange = (value: string) => {
