@@ -174,7 +174,7 @@ export function HandicapCalculatorsInline() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </aside>
   );
 }
 
