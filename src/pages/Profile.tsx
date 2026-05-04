@@ -28,7 +28,7 @@ const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
 );
 
-type TabId = 'profile' | 'account' | 'settings' | 'security' | 'privacy';
+type TabId = 'profile' | 'account' | 'notifications' | 'settings' | 'security' | 'privacy';
 
 export default function Profile() {
   const { user, loading } = useAuth();
