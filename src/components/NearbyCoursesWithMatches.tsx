@@ -288,7 +288,7 @@ const NearbyCoursesWithMatches = () => {
           <div ref={sentinelRef} className="py-2 text-center">
             <Button
               size="sm"
-              onClick={() => setVisibleCount((c) => Math.min(c + 5, courses.length))}
+              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), courses.length))}
               className="bg-success text-success-foreground hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
             >
               Load more ({courses.length - visibleCount} remaining)
