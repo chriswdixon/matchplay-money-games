@@ -36,7 +36,7 @@ const WalletPage = lazy(() => import("./pages/Wallet"));
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="animate-pulse text-muted-foreground">Loading...</div>
+    <GolfBallLoader size={64} />
   </div>
 );
 

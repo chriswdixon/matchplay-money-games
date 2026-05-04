@@ -22,7 +22,7 @@ const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m =
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-12">
-    <div className="animate-pulse text-muted-foreground">Loading...</div>
+    <GolfBallLoader />
   </div>
 );
 
