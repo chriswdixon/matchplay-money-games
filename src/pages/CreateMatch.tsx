@@ -632,27 +632,6 @@ const CreateMatch = () => {
                           {course.address}
                           {course.distance && ` • ${formatDistance(course.distance)}`}
                         </div>
-                        {/* AI-Enhanced Course Info */}
-                        {(course.difficulty_level || course.course_style || course.ai_rating) && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {course.ai_rating && (
-                              <Badge variant="secondary" className="text-xs">
-                                <Star className="h-2 w-2 mr-1 fill-current" />
-                                {course.ai_rating.toFixed(1)}
-                              </Badge>
-                            )}
-                            {course.difficulty_level && (
-                              <Badge variant="outline" className="text-xs">
-                                {course.difficulty_level}
-                              </Badge>
-                            )}
-                            {course.course_style && (
-                              <Badge variant="outline" className="text-xs">
-                                {course.course_style}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
                       </div>
                       {user && (
                         <Star
