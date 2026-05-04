@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
@@ -164,22 +164,19 @@ export function HandicapCalculators() {
   const [openPlaying, setOpenPlaying] = useState(false);
 
   return (
-    <Card className="shadow-card border-0">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <Calculator className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
-          </div>
-          <div>
-            <CardTitle>Handicap Calculators</CardTitle>
-            <CardDescription>
-              Open a calculator to compute your Course or Playing Handicap
-            </CardDescription>
-          </div>
+    <div className="space-y-4">
+      <div className="flex items-center gap-3">
+        <div className="p-2 bg-gradient-primary rounded-lg">
+          <Calculator className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
         </div>
-      </CardHeader>
-      <CardContent>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+        <div>
+          <h2 className="text-lg font-semibold leading-none tracking-tight">Handicap Calculators</h2>
+          <p className="text-sm text-muted-foreground">
+            Open a calculator to compute your Course or Playing Handicap
+          </p>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
           <Dialog open={openCourse} onOpenChange={setOpenCourse}>
             <DialogTrigger asChild>
               <Button type="button" variant="outline" className="h-auto py-4 justify-start gap-3">
@@ -221,8 +218,7 @@ export function HandicapCalculators() {
               <PlayingHandicapForm onClose={() => setOpenPlaying(false)} />
             </DialogContent>
           </Dialog>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }
