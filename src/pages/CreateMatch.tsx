@@ -35,7 +35,7 @@ const CreateMatch = () => {
   const { subscribed, tierName } = useSubscription();
   const { isFree, hasAccess } = useFreeTier();
   const { createMatch } = useMatches();
-  const { geocodeAddress } = useLocation();
+  
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
   
@@ -64,9 +64,8 @@ const CreateMatch = () => {
   const [dateOpen, setDateOpen] = useState(false);
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
-  const [zipcode, setZipcode] = useState('');
   const [searchRadius] = useState(30);
-  const [loadingZipcode, setLoadingZipcode] = useState(false);
+  
   const [loadingGPS, setLoadingGPS] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
@@ -158,30 +157,6 @@ const CreateMatch = () => {
     return () => clearTimeout(timeoutId);
   }, [formData]);
 
-  const handleZipcodeSearch = async () => {
-    if (!zipcode || zipcode.length < 5) {
-      toast.error('Please enter a valid 5-digit zipcode');
-      return;
-    }
-
-    try {
-      setLoadingZipcode(true);
-      const coords = await geocodeAddress(zipcode);
-      
-      if (coords) {
-        setLocationCoords(coords);
-        await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
-        toast.success(`Found courses within ${searchRadius} miles`);
-      } else {
-        toast.error('Could not find location for this zipcode');
-      }
-    } catch (error) {
-      toast.error('Failed to search by zipcode');
-    } finally {
-      setLoadingZipcode(false);
-    }
-  };
-
   const handleGPSSearch = async () => {
     if (!navigator.geolocation) {
       toast.error('Geolocation is not supported by your browser');
@@ -211,6 +186,15 @@ const CreateMatch = () => {
       toast.error('Failed to access GPS');
     }
   };
+
+  // Auto-request GPS on mount so courses are populated immediately
+  useEffect(() => {
+    if (!locationCoords) {
+      handleGPSSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
 
   const handleCourseSelect = async (course: any) => {
     setSelectedCourse(course);
@@ -477,43 +461,32 @@ const CreateMatch = () => {
 
 
           
-      {isPaidSubscription && (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <Input
-              type="tel"
-              placeholder="Enter zipcode"
-              value={zipcode}
-              onChange={(e) => setZipcode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-              maxLength={5}
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleZipcodeSearch}
-              disabled={loadingZipcode || zipcode.length < 5}
-            >
-              {loadingZipcode ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGPSSearch}
-              disabled={loadingGPS || !hasAccess('gps_matching')}
-              title={!hasAccess('gps_matching') ? 'Upgrade to enable GPS matching' : 'Use GPS location'}
-            >
-              {loadingGPS ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-            </Button>
-          </div>
-          {!hasAccess('gps_matching') && (
-            <p className="text-xs text-warning">🔒 Upgrade to Local Player or Tournament Pro for GPS-based matching</p>
+      <div className="space-y-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleGPSSearch}
+          disabled={loadingGPS}
+          className="w-full"
+        >
+          {loadingGPS ? (
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+          ) : (
+            <MapPin className="w-4 h-4 mr-2" />
           )}
-          <p className="text-xs text-muted-foreground">Search courses within {searchRadius} miles</p>
-        </div>
-      )}
+          {locationCoords ? 'Refresh nearby courses' : 'Use my location to find courses'}
+        </Button>
+        {!locationCoords && (
+          <p className="text-xs text-muted-foreground">
+            Location access is required to find courses near you.
+          </p>
+        )}
+        {locationCoords && (
+          <p className="text-xs text-muted-foreground">
+            Showing courses within {searchRadius} miles
+          </p>
+        )}
+      </div>
 
       <Popover open={courseOpen} onOpenChange={setCourseOpen}>
         <PopoverTrigger asChild>
@@ -632,27 +605,6 @@ const CreateMatch = () => {
                           {course.address}
                           {course.distance && ` • ${formatDistance(course.distance)}`}
                         </div>
-                        {/* AI-Enhanced Course Info */}
-                        {(course.difficulty_level || course.course_style || course.ai_rating) && (
-                          <div className="flex flex-wrap gap-1 mt-1">
-                            {course.ai_rating && (
-                              <Badge variant="secondary" className="text-xs">
-                                <Star className="h-2 w-2 mr-1 fill-current" />
-                                {course.ai_rating.toFixed(1)}
-                              </Badge>
-                            )}
-                            {course.difficulty_level && (
-                              <Badge variant="outline" className="text-xs">
-                                {course.difficulty_level}
-                              </Badge>
-                            )}
-                            {course.course_style && (
-                              <Badge variant="outline" className="text-xs">
-                                {course.course_style}
-                              </Badge>
-                            )}
-                          </div>
-                        )}
                       </div>
                       {user && (
                         <Star
