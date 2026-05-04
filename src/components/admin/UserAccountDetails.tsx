@@ -64,42 +64,36 @@ export function UserAccountDetails({ initialUserId, hideLookup }: UserAccountDet
 
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Account Lookup</CardTitle>
-          <CardDescription>
-            View account balance and transaction summary for any user
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Label htmlFor="userId">User ID</Label>
-              <Input
-                id="userId"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="Enter user UUID"
-              />
+      {!hideLookup && (
+        <Card>
+          <CardHeader>
+            <CardTitle>User Account Lookup</CardTitle>
+            <CardDescription>
+              View account balance and transaction summary for any user
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Label htmlFor="userId">User ID</Label>
+                <Input
+                  id="userId"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  placeholder="Enter user UUID"
+                />
+              </div>
+              <Button
+                onClick={() => fetchAccountInfo()}
+                disabled={loading}
+                className="mt-auto bg-gradient-primary"
+              >
+                {loading ? 'Loading...' : 'Lookup'}
+              </Button>
             </div>
-            <Button
-              onClick={fetchAccountInfo}
-              disabled={loading}
-              className="mt-auto bg-gradient-primary"
-            >
-              {loading ? (
-                <>
-                  Loading...
-                </>
-              ) : (
-                <>
-                  Lookup
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {accountInfo && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
