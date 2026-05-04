@@ -60,6 +60,7 @@ const CreateMatch = () => {
   const [searchRadius] = useState(30);
   
   const [loadingGPS, setLoadingGPS] = useState(false);
+  const [gpsError, setGpsError] = useState<'denied' | 'unavailable' | 'timeout' | 'unsupported' | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [customSearchTerm, setCustomSearchTerm] = useState('');
