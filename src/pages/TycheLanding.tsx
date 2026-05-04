@@ -243,6 +243,7 @@ const TycheLanding = () => {
         <BottomTabBar
           activeTab={activeBottomTab}
           onChange={(tab) => setCurrentTab(tab)}
+          hasActiveMatch={hasActiveMatch}
         />
       </div>
     );
