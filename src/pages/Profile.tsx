@@ -230,6 +230,29 @@ export default function Profile() {
               </Tooltip>
             </TooltipProvider>
           )}
+          <AlertDialog open={adminConfirmOpen} onOpenChange={setAdminConfirmOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Enter Admin Console?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You're about to access the Admin Console, where you can manage users,
+                  matches, coupons, and support requests. All admin actions are logged.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setAdminConfirmOpen(false);
+                    navigate('/admin');
+                  }}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Continue to Admin
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
