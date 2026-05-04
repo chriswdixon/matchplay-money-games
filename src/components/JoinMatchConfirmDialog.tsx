@@ -127,7 +127,7 @@ const JoinMatchConfirmDialog = ({
 
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
-      <AlertDialogContent className="max-w-md p-0 overflow-hidden">
+      <AlertDialogContent className="max-w-md p-0 overflow-hidden rounded-3xl">
         <ScrollArea className="max-h-[85vh]">
           <div className="p-6 space-y-4">
             <AlertDialogHeader>
@@ -475,7 +475,7 @@ const JoinMatchConfirmDialog = ({
           <AlertDialogAction
             onClick={handleConfirm}
             disabled={!agreed || status !== "pre-join" || insufficient}
-            className="bg-primary text-primary-foreground hover:opacity-90"
+            className="rounded-full bg-primary text-primary-foreground hover:opacity-90"
           >
             {status === "joining"
               ? "Holding funds…"

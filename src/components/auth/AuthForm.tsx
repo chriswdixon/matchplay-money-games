@@ -507,10 +507,10 @@ export function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="text-center">
-          <CardTitle className="text-2xl font-bold">
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">
+      <Card className="w-full max-w-md rounded-3xl shadow-card border-border/60">
+        <CardHeader className="text-center space-y-2">
+          <CardTitle className="text-2xl font-bold tracking-tight">
             {showResetForm ? 'Reset Password' : 'Welcome to Tyche'}
           </CardTitle>
           <CardDescription>

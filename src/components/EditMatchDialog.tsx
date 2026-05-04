@@ -230,7 +230,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
           Edit Match
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
+      <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto rounded-3xl">
         <DialogHeader>
           <DialogTitle className="text-2xl font-bold text-foreground">Edit Match</DialogTitle>
           <DialogDescription className="text-muted-foreground">
@@ -512,7 +512,7 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
             </Button>
             <Button
               type="submit"
-              className="px-8 bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+              className="px-8 rounded-full bg-primary text-primary-foreground hover:opacity-90 transition-opacity"
             >
               Update Match
             </Button>
