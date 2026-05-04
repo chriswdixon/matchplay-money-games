@@ -587,9 +587,6 @@ const CreateMatch = () => {
                     disabled={loadingGPS}
                     className="mt-2"
                   >
-                    {loadingGPS ? (
-                    ) : (
-                    )}
                     Try again
                   </Button>
                 )}
