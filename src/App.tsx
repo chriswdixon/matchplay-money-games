@@ -16,6 +16,7 @@ const OfflineIndicator = lazy(() => import("@/components/OfflineIndicator").then
 
 const CookieConsent = lazy(() => import("@/components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 const GeoBlockingOverlay = lazy(() => import("@/components/GeoBlockingOverlay").then(m => ({ default: m.GeoBlockingOverlay })));
+const PWAInstallOnLogin = lazy(() => import("@/components/PWAInstallOnLogin").then(m => ({ default: m.PWAInstallOnLogin })));
 
 // Lazy load all other pages for code splitting
 const Auth = lazy(() => import("./pages/Auth"));
