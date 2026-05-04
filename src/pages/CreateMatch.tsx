@@ -359,16 +359,16 @@ const CreateMatch = () => {
   };
 
   const canGoNext = () => {
-    // Course is prefilled when arriving from a course card and is no longer
-    // a hard requirement to advance past step 0.
+    // Course is prefilled when arriving from a course card.
     if (currentStep === 0) return true;
-    if (currentStep === 1) return formData.scheduled_date && formData.scheduled_time;
-    if (currentStep === 2) return formData.format && formData.default_tees;
+    if (currentStep === 1) {
+      return formData.scheduled_date && formData.scheduled_time && formData.format && formData.default_tees;
+    }
     return true;
   };
 
   const handleNext = () => {
-    if (canGoNext() && currentStep < 3) {
+    if (canGoNext() && currentStep < 2) {
       setCurrentStep(currentStep + 1);
     }
   };
@@ -390,10 +390,10 @@ const CreateMatch = () => {
 
   const handleSubmit = async () => {
     // Prevent form submission if not on the final step
-    if (currentStep !== 3) {
+    if (currentStep !== 2) {
       return;
     }
-    
+
     if (!user) {
       toast.error('Please sign in to create a match');
       navigate('/auth');
@@ -1279,36 +1279,43 @@ const CreateMatch = () => {
   );
 
   return (
-    <div className="min-h-screen bg-muted/40 md:pb-0">
-      {/* Close button - top right on all screen sizes */}
-      <button
-        type="button"
-        onClick={handleCancel}
-        aria-label="Cancel and close"
-        className="fixed top-4 right-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
-      >
-        <X className="h-5 w-5" />
-      </button>
-
+    <div className="min-h-screen bg-muted/40 md:pb-0 relative">
       {/* Form */}
       <form
         onSubmit={(e) => e.preventDefault()}
         className={cn(
           "container mx-auto max-w-2xl",
           isMobile
-            ? "px-0 pt-4 pb-28 min-h-screen flex flex-col"
+            ? "px-0 pt-0 pb-24 min-h-screen flex flex-col"
             : "px-4 py-6"
         )}
       >
         {isMobile ? (
           <>
-            <div className="flex-1 px-3">
+            <div className="flex-1 flex flex-col px-3 pt-3">
               <div className={cn(
-                "rounded-3xl p-4 shadow-card text-base text-foreground bg-card transition-colors hover:bg-success/10 h-full",
+                "rounded-3xl shadow-card text-base text-foreground bg-card transition-colors hover:bg-success/10 flex-1 flex flex-col overflow-hidden",
               )}>
-                {currentStep === 1 && renderDateTimeStep()}
-                {currentStep === 2 && renderFormatTeesStep()}
-                {currentStep === 3 && renderDetailsStep()}
+                {/* In-card header with close button so it never overlaps other cards */}
+                <div className="flex items-center justify-end px-3 pt-3">
+                  <button
+                    type="button"
+                    onClick={handleCancel}
+                    aria-label="Cancel and close"
+                    className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-accent transition-colors"
+                  >
+                    <X className="h-5 w-5" />
+                  </button>
+                </div>
+                <div className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto">
+                  {currentStep === 1 && (
+                    <>
+                      {renderDateTimeStep()}
+                      {renderFormatTeesStep()}
+                    </>
+                  )}
+                  {currentStep === 2 && renderDetailsStep()}
+                </div>
               </div>
             </div>
 
@@ -1323,7 +1330,7 @@ const CreateMatch = () => {
                   Back
                 </Button>
               )}
-              {currentStep < 3 ? (
+              {currentStep < 2 ? (
                 <Button
                   type="button"
                   onClick={handleNext}
@@ -1346,8 +1353,20 @@ const CreateMatch = () => {
           </>
         ) : (
           <div className="space-y-6">
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDateTimeStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderFormatTeesStep()}</div>
+            <div className="flex justify-end">
+              <button
+                type="button"
+                onClick={handleCancel}
+                aria-label="Cancel and close"
+                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
+              >
+                <X className="h-5 w-5" />
+              </button>
+            </div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10 space-y-6">
+              {renderDateTimeStep()}
+              {renderFormatTeesStep()}
+            </div>
             <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDetailsStep()}</div>
 
             <div className="flex gap-3 pt-2">
