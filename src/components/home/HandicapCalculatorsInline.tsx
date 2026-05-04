@@ -62,12 +62,12 @@ export function HandicapCalculatorsInline() {
   };
 
   return (
-    <div className="bg-card rounded-3xl p-4 shadow-card space-y-4">
-      <div className="flex items-center gap-2">
-        <Trophy className="w-6 h-6 text-primary" aria-hidden="true" />
-        <h2 className="text-2xl font-bold">Handicap Calculators</h2>
-      </div>
-      <p className="text-sm text-muted-foreground">
+    <aside className="bg-gradient-hero text-white rounded-2xl p-8 md:p-12 text-center" aria-labelledby="handicap-calculators-heading">
+      <h3 id="handicap-calculators-heading" className="text-3xl font-bold mb-4 flex items-center justify-center gap-2">
+        <Trophy className="w-7 h-7 text-accent" aria-hidden="true" />
+        Handicap Calculators
+      </h3>
+      <p className="text-white/90 max-w-2xl mx-auto mb-8">
         Compute your Course Handicap and Playing Handicap for any round.
       </p>
 
