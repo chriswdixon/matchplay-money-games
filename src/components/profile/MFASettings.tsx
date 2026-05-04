@@ -84,24 +84,15 @@ export function MFASettings() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle className="flex items-center gap-2">
-              <Shield className="w-5 h-5" />
-              Two-Factor Authentication
-            </CardTitle>
+            <CardTitle>Two-Factor Authentication</CardTitle>
             <CardDescription>
               Add an extra layer of security to your account
             </CardDescription>
           </div>
           {mfaEnabled ? (
-            <Badge variant="default" className="gap-1">
-              <ShieldCheck className="w-3 h-3" />
-              Enabled
-            </Badge>
+            <Badge variant="default">Enabled</Badge>
           ) : (
-            <Badge variant="secondary" className="gap-1">
-              <ShieldAlert className="w-3 h-3" />
-              Disabled
-            </Badge>
+            <Badge variant="secondary">Disabled</Badge>
           )}
         </div>
       </CardHeader>
