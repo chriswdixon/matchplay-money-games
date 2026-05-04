@@ -98,13 +98,19 @@ export const useLocation = () => {
       (navigator as any).permissions
         .query({ name: 'geolocation' })
         .then((status: PermissionStatus) => {
-          if (status.state === 'granted' || status.state === 'prompt') {
+          // Only auto-fetch when permission is already granted.
+          // On iOS Safari, calling getCurrentPosition() without a user
+          // gesture (e.g. on mount during 'prompt' state) triggers the
+          // permission dialog out of context and gets auto-denied,
+          // permanently sticking the page to "denied".
+          if (status.state === 'granted') {
             start();
           }
         })
-        .catch(() => start());
-    } else {
-      start();
+        .catch(() => {
+          // Permissions API unavailable — do NOT auto-request; wait for
+          // an explicit user gesture (e.g. button click).
+        });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
