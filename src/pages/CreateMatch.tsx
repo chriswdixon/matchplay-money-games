@@ -11,7 +11,6 @@ import { Calendar } from '@/components/ui/calendar';
 import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Info, AlertCircle, X } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
-import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
@@ -235,14 +234,6 @@ const CreateMatch = () => {
     }
   };
 
-  // Auto-request GPS on mount so courses are populated immediately
-  useEffect(() => {
-    if (!locationCoords) {
-      handleGPSSearch();
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
   // Watch the browser's geolocation permission and auto-retry the moment
   // the user flips it from "denied" to "granted" in their browser settings.
   useEffect(() => {
@@ -254,8 +245,7 @@ const CreateMatch = () => {
     const onChange = () => {
       if (!status || cancelled) return;
       if (status.state === 'granted') {
-        toast.success('Location enabled — refreshing nearby courses');
-        handleGPSSearch();
+        toast.success('Location enabled — tap "Try again" to refresh nearby courses');
       }
     };
     navigator.permissions
@@ -274,20 +264,6 @@ const CreateMatch = () => {
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
-
-  // When the tab regains focus after the user changes browser settings,
-  // give GPS one more shot if we still don't have coordinates.
-  useEffect(() => {
-    const onVisible = () => {
-      if (document.visibilityState === 'visible' && !locationCoords && !loadingGPS) {
-        handleGPSSearch();
-      }
-    };
-    document.addEventListener('visibilitychange', onVisible);
-    return () => document.removeEventListener('visibilitychange', onVisible);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [locationCoords, loadingGPS]);
-
 
   const handleCourseSelect = async (course: any) => {
     setSelectedCourse(course);

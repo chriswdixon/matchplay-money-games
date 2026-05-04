@@ -31,7 +31,7 @@ const JoinMatchConfirmDialog = lazy(() => import("./JoinMatchConfirmDialog"));
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
-  const { location, requestLocation, formatDistance } = useLocation();
+  const { location, formatDistance } = useLocation();
   const { hasAccess } = useFreeTier();
   const isMobile = useIsMobile();
   const [visibleCount, setVisibleCount] = useState(10);
@@ -56,13 +56,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
   const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
-
-  // Request location on component mount (only for current matches, not past, and only if user has access)
-  useEffect(() => {
-    if (user && !location && !showPastMatches && hasAccess('gps_matching')) {
-      requestLocation();
-    }
-  }, [user, location, requestLocation, showPastMatches, hasAccess]);
 
   // Refetch matches when location changes (with debouncing)
   useEffect(() => {
