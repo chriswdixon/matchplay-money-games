@@ -65,7 +65,18 @@ const NearbyCoursesWithMatches = () => {
         .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
         .sort((a, b) => (a.distance || 0) - (b.distance || 0));
     } else {
-      results = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
+      const nearby = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
+      results = nearby
+        .map((c) => ({
+          ...c,
+          distance:
+            c.distance ??
+            (c.latitude && c.longitude
+              ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+              : undefined),
+        }))
+        .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
+        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
     }
     setCourses(results.slice(0, 50));
   };
