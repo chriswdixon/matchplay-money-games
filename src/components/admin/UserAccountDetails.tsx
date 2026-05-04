@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -16,13 +16,19 @@ interface AccountInfo {
   transaction_count: number;
 }
 
-export function UserAccountDetails() {
-  const [userId, setUserId] = useState('');
+interface UserAccountDetailsProps {
+  initialUserId?: string;
+  hideLookup?: boolean;
+}
+
+export function UserAccountDetails({ initialUserId, hideLookup }: UserAccountDetailsProps = {}) {
+  const [userId, setUserId] = useState(initialUserId ?? '');
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchAccountInfo = async () => {
-    if (!userId.trim()) {
+  const fetchAccountInfo = async (idOverride?: string) => {
+    const targetId = (idOverride ?? userId).trim();
+    if (!targetId) {
       toast.error('Please enter a user ID');
       return;
     }
@@ -30,7 +36,7 @@ export function UserAccountDetails() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .rpc('get_user_account_info', { target_user_id: userId });
+        .rpc('get_user_account_info', { target_user_id: targetId });
 
       if (error) throw error;
 
@@ -49,44 +55,45 @@ export function UserAccountDetails() {
     }
   };
 
+  useEffect(() => {
+    if (initialUserId) {
+      fetchAccountInfo(initialUserId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialUserId]);
+
   return (
     <div className="space-y-6">
-      <Card>
-        <CardHeader>
-          <CardTitle>User Account Lookup</CardTitle>
-          <CardDescription>
-            View account balance and transaction summary for any user
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="flex gap-2">
-            <div className="flex-1">
-              <Label htmlFor="userId">User ID</Label>
-              <Input
-                id="userId"
-                value={userId}
-                onChange={(e) => setUserId(e.target.value)}
-                placeholder="Enter user UUID"
-              />
+      {!hideLookup && (
+        <Card>
+          <CardHeader>
+            <CardTitle>User Account Lookup</CardTitle>
+            <CardDescription>
+              View account balance and transaction summary for any user
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <Label htmlFor="userId">User ID</Label>
+                <Input
+                  id="userId"
+                  value={userId}
+                  onChange={(e) => setUserId(e.target.value)}
+                  placeholder="Enter user UUID"
+                />
+              </div>
+              <Button
+                onClick={() => fetchAccountInfo()}
+                disabled={loading}
+                className="mt-auto bg-gradient-primary"
+              >
+                {loading ? 'Loading...' : 'Lookup'}
+              </Button>
             </div>
-            <Button
-              onClick={fetchAccountInfo}
-              disabled={loading}
-              className="mt-auto bg-gradient-primary"
-            >
-              {loading ? (
-                <>
-                  Loading...
-                </>
-              ) : (
-                <>
-                  Lookup
-                </>
-              )}
-            </Button>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      )}
 
       {accountInfo && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

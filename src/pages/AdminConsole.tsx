@@ -6,14 +6,14 @@ import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
+import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
 import { AuditLog } from "@/components/admin/AuditLog";
 import { PageTitleCard } from "@/components/ui/page-title-card";
 import { AuditAlerts } from "@/components/admin/AuditAlerts";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
-import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
+
 import { CancellationReviews } from "@/components/admin/CancellationReviews";
 import { IncompleteMatchReviews } from "@/components/admin/IncompleteMatchReviews";
 import { InviteManagement } from "@/components/admin/InviteManagement";
@@ -89,7 +89,6 @@ const AdminConsole = () => {
                     { id: 'reports', label: 'Reports', Icon: BarChart3 },
                     { id: 'matches', label: 'Matches', Icon: TrendingUp },
                     { id: 'users', label: 'Users', Icon: Users },
-                    { id: 'accounts', label: 'Accounts', Icon: DollarSign },
                     { id: 'invites', label: 'Invites', Icon: Mail },
                     { id: 'coupons', label: 'Coupons', Icon: Ticket },
                     { id: 'reviews', label: 'Reviews', Icon: AlertCircle },
@@ -135,9 +134,7 @@ const AdminConsole = () => {
             <UserManagement />
           </TabsContent>
 
-          <TabsContent value="accounts">
-            <UserAccountDetails />
-          </TabsContent>
+
 
           <TabsContent value="invites">
             <InviteManagement />

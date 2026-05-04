@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy } from "lucide-react";
+import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy, Wallet } from "lucide-react";
+import { UserAccountDetails } from "./UserAccountDetails";
 import {
   Dialog,
   DialogContent,
@@ -40,6 +41,7 @@ const UserManagement = () => {
     title: string;
     description: string;
   }>({ open: false, action: '', title: '', description: '' });
+  const [accountDialog, setAccountDialog] = useState<{ open: boolean; user: UserData | null }>({ open: false, user: null });
   const { toast } = useToast();
 
   useEffect(() => {
@@ -363,6 +365,21 @@ const UserManagement = () => {
                             <p>Disable user account</p>
                           </TooltipContent>
                         </Tooltip>
+
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => setAccountDialog({ open: true, user })}
+                            >
+                              <Wallet className="h-4 w-4" />
+                            </Button>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            <p>Edit account & balance</p>
+                          </TooltipContent>
+                        </Tooltip>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -392,6 +409,20 @@ const UserManagement = () => {
               Confirm
             </Button>
           </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={accountDialog.open} onOpenChange={(open) => setAccountDialog({ open, user: open ? accountDialog.user : null })}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Account Details</DialogTitle>
+            <DialogDescription>
+              {accountDialog.user ? `${accountDialog.user.display_name} (${accountDialog.user.email})` : ''}
+            </DialogDescription>
+          </DialogHeader>
+          {accountDialog.user && (
+            <UserAccountDetails initialUserId={accountDialog.user.user_id} hideLookup />
+          )}
         </DialogContent>
       </Dialog>
     </TooltipProvider>
