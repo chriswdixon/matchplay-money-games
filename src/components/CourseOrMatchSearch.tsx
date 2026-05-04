@@ -120,7 +120,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
 
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" aria-hidden="true" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-success-foreground/80" aria-hidden="true" />
           <Input
             value={query}
             onChange={(e) => {
@@ -132,7 +132,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
                 ? "Search by course or location..."
                 : "Course name, city, or leave blank for nearby"
             }
-            className="pl-10 h-11"
+            className="pl-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
             aria-label={mode === "matches" ? "Search matches" : "Search courses"}
           />
         </div>
