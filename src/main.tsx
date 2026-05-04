@@ -8,6 +8,11 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
+import { runPreviewCacheGuard } from "@/lib/preview-cache-guard";
+
+// Clean up any stale service worker / cache from previous PWA builds.
+// Safe no-op on fresh installs. Does NOT register a service worker.
+runPreviewCacheGuard();
 
 const queryClient = new QueryClient({
   defaultOptions: {
