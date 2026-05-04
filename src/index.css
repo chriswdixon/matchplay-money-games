@@ -24,12 +24,12 @@
     --primary-glow: 145 75% 38%;
     
     /* Secondary - Sophisticated Gray */
-    --secondary: 210 15% 92%;
-    --secondary-foreground: 140 25% 15%;
+    --secondary: 140 10% 87%;
+    --secondary-foreground: 140 25% 12%;
     
     /* Muted Tones - WCAG AA compliant (4.5:1 contrast ratio) */
-    --muted: 210 15% 95%;
-    --muted-foreground: 140 15% 35%;
+    --muted: 140 10% 90%;
+    --muted-foreground: 140 15% 32%;
     
     /* Accent - Tyche Vibrant Green (WCAG AA on white & muted) */
     --accent: 145 70% 29%;
@@ -45,8 +45,8 @@
     --warning-foreground: 0 0% 98%;
     
     /* Form Elements */
-    --border: 210 15% 88%;
-    --input: 210 15% 95%;
+    --border: 140 12% 80%;
+    --input: 140 10% 90%;
     --ring: 145 70% 29%;
     
     /* Premium Gradients */
