@@ -21,6 +21,7 @@ interface BottomTabBarProps {
 
 const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps) => {
   const navigate = useNavigate();
+  const { unreadCount } = useNotifications();
 
   const items: { id: BottomTab; label: string; Icon: typeof Home }[] = [
     { id: "home", label: "Home", Icon: Home },
