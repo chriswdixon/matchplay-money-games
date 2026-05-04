@@ -84,9 +84,10 @@ export default function Profile() {
     setPendingTab(null);
   };
 
-  const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean }[] = [
+  const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean; badge?: number }[] = [
     { id: 'profile', label: 'Profile & Handicap', Icon: User, show: true },
     { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: showAccountTab },
+    { id: 'notifications', label: 'Notifications', Icon: Bell, show: true, badge: unreadCount },
     { id: 'settings', label: 'Settings', Icon: Settings, show: true },
     { id: 'security', label: 'Security', Icon: Shield, show: true },
     { id: 'privacy', label: 'Privacy', Icon: FileText, show: true },
