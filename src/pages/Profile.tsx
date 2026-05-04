@@ -12,6 +12,7 @@ import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Troph
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
+import { ChangePassword } from '@/components/profile/ChangePassword';
 import { AccountBalance } from '@/components/profile/AccountBalance';
 import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
@@ -173,6 +174,9 @@ export default function Profile() {
                 <ProfileDisplay />
               </div>
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <ProfileForm />
+              </div>
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
                   <HandicapSettings />
                 </Suspense>
@@ -202,15 +206,17 @@ export default function Profile() {
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <AppearanceSettings />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-                <ProfileForm />
-              </div>
             </div>
           )}
 
           {activeTab === 'security' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-              <MFASettings />
+            <div className="space-y-6">
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <ChangePassword />
+              </div>
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <MFASettings />
+              </div>
             </div>
           )}
 
