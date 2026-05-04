@@ -6,6 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Trophy, MapPin, Users } from "lucide-react";
 import BottomTabBar from "@/components/home/BottomTabBar";
+import { PageTitleCard } from "@/components/ui/page-title-card";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useAuth } from "@/hooks/useAuth";
 import { useWinsFeed } from "@/hooks/useWinsFeed";
@@ -31,10 +32,11 @@ const WinsFeed = () => {
   return (
     <main className="min-h-screen bg-muted/40 pb-32 md:pb-12 md:pt-24">
       <div className="max-w-2xl mx-auto px-4 pt-4">
-        <div className="flex items-center gap-2 mb-4">
-          <Trophy className="w-5 h-5 text-primary" />
-          <h1 className="text-2xl font-bold">Wins Feed</h1>
-        </div>
+        <PageTitleCard
+          icon={<Trophy className="w-5 h-5" aria-hidden="true" />}
+          title="Wins Feed"
+          description="Recent victories from across the Tyche community"
+        />
       </div>
 
       <section className="max-w-2xl mx-auto px-4 py-6 space-y-3">

@@ -5,6 +5,7 @@ import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
 import { AuditLog } from "@/components/admin/AuditLog";
+import { PageTitleCard } from "@/components/ui/page-title-card";
 import { AuditAlerts } from "@/components/admin/AuditAlerts";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
@@ -62,8 +63,11 @@ const AdminConsole = () => {
       <AppHeader hideReturnButton />
       <main className="container mx-auto py-8 px-4">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold tracking-tight mb-2 text-foreground">Admin Console</h1>
-          <p className="text-muted-foreground">Manage users, coupons, and view reports</p>
+          <PageTitleCard
+            icon={<ShieldCheck className="w-5 h-5" aria-hidden="true" />}
+            title="Admin Console"
+            description="Manage users, coupons, and view reports"
+          />
         </div>
 
         <Tabs defaultValue="reports" className="space-y-6">

@@ -9,6 +9,7 @@ import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy } from 'lucide-react';
+import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
@@ -151,8 +152,11 @@ export default function Profile() {
             </Button>
           )}
           <div className="flex-1">
-            <h1 className="text-2xl font-bold">Profile</h1>
-            <p className="text-sm text-muted-foreground">Manage your Tyche profile and preferences</p>
+            <PageTitleCard
+              icon={<User className="w-5 h-5" aria-hidden="true" />}
+              title="Profile"
+              description="Manage your Tyche profile and preferences"
+            />
           </div>
         </div>
       </header>
