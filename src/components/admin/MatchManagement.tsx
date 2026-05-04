@@ -318,7 +318,6 @@ export const MatchManagement = () => {
                     onClick={() => setShowBulkDeleteDialog(true)}
                     disabled={bulkDeleteMutation.isPending}
                   >
-                    <Trash2 className="w-4 h-4 mr-2" />
                     Delete {selectedMatches.length} Selected
                   </Button>
                 )}

@@ -320,7 +320,6 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                 disabled={saving}
                 className="bg-gradient-primary text-primary-foreground hover:shadow-premium"
               >
-                <CheckCircle className="w-4 h-4 mr-2" />
                 {saving ? "Confirming..." : "Confirm Results"}
               </Button>
             ) : (

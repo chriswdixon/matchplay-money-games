@@ -86,7 +86,6 @@ export default function Profile() {
               onClick={() => navigate('/')}
               className="text-muted-foreground hover:text-foreground"
             >
-              <ArrowLeft className="w-4 h-4 mr-2" />
               {!isMobile && "Back to Home"}
             </Button>
             

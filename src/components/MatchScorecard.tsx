@@ -725,7 +725,6 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             onClick={() => setCancelDialogOpen(true)}
                             className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
                           >
-                            <AlertTriangle className="w-4 h-4 mr-2" />
                             Leave Match
                           </Button>
                         </div>
@@ -760,7 +759,6 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
-            <Trophy className="w-5 h-5 mr-2" />
             {saving ? "Finishing..." : "Finish the Match"}
           </Button>
         </div>
@@ -1551,7 +1549,6 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
-            <Trophy className="w-5 h-5 mr-2" />
             {confirmations.find(c => c.player_id === user?.id)?.confirmed 
               ? "Waiting for others..." 
               : saving ? "Confirming..." : "Confirm Results"}
@@ -1801,7 +1798,6 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             onClick={() => setCancelDialogOpen(true)}
             className="bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
           >
-            <AlertTriangle className="w-4 h-4 mr-2" />
             Leave Match
           </Button>
         </div>

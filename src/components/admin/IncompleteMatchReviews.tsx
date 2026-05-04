@@ -143,7 +143,6 @@ export function IncompleteMatchReviews() {
                           size="sm"
                           className="flex-1"
                         >
-                          <XCircle className="h-4 w-4 mr-2" />
                           Forfeit Incomplete
                         </Button>
                         <Button
@@ -152,7 +151,6 @@ export function IncompleteMatchReviews() {
                           size="sm"
                           className="flex-1"
                         >
-                          <AlertCircle className="h-4 w-4 mr-2" />
                           Cancel Match
                         </Button>
                       </div>

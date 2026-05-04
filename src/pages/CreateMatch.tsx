@@ -513,9 +513,7 @@ const CreateMatch = () => {
           className="w-full"
         >
           {loadingGPS ? (
-            <Loader2 className="w-4 h-4 animate-spin mr-2" />
           ) : (
-            <MapPin className="w-4 h-4 mr-2" />
           )}
           {locationCoords ? 'Refresh nearby courses' : 'Use my location to find courses'}
         </Button>
@@ -593,9 +591,7 @@ const CreateMatch = () => {
                     className="mt-2"
                   >
                     {loadingGPS ? (
-                      <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
                     ) : (
-                      <MapPin className="w-3 h-3 mr-1.5" />
                     )}
                     Try again
                   </Button>
@@ -623,7 +619,6 @@ const CreateMatch = () => {
                 )}
               </div>
             ) : formData.course_name || "Type or select a course..."}
-            <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-[--radix-popover-trigger-width] p-0" align="start">
@@ -744,7 +739,6 @@ const CreateMatch = () => {
             className="w-full justify-start"
             onClick={() => window.open(formData.booking_url, '_blank')}
           >
-            <ExternalLink className="h-4 w-4 mr-2" />
             Book Tee Time
           </Button>
           <p className="text-xs text-muted-foreground">
@@ -765,7 +759,6 @@ const CreateMatch = () => {
               variant="outline"
               className={cn("w-full justify-start", !formData.scheduled_date && "text-muted-foreground")}
             >
-              <Clock className="mr-2 h-4 w-4" />
               {formData.scheduled_date ? format(formData.scheduled_date, "MMM d, yyyy") : "Pick date"}
             </Button>
           </PopoverTrigger>
@@ -1294,7 +1287,6 @@ const CreateMatch = () => {
                 >
                   {submitting ? (
                     <>
-                      <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                       Creating...
                     </>
                   ) : (
@@ -1328,7 +1320,6 @@ const CreateMatch = () => {
               >
                 {submitting ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Creating...
                   </>
                 ) : (

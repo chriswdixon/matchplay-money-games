@@ -528,7 +528,6 @@ export function AuthForm() {
                 onClick={() => setShowResetForm(false)}
                 className="mb-4 p-0 h-auto font-normal text-muted-foreground hover:text-foreground"
               >
-                <ArrowLeft className="w-4 h-4 mr-2" />
                 Back to sign in
               </Button>
               

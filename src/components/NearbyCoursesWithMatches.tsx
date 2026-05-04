@@ -175,7 +175,6 @@ const NearbyCoursesWithMatches = () => {
 
       {!location && (
         <Button variant="outline" className="w-full" onClick={() => requestLocation()}>
-          <Navigation className="w-4 h-4 mr-2" />
           Enable location to see nearby courses
         </Button>
       )}
@@ -245,7 +244,6 @@ const NearbyCoursesWithMatches = () => {
                     onClick={() => handleCreateAtCourse(course)}
                     className="shrink-0"
                   >
-                    <Plus className="w-4 h-4 mr-1" />
                     Create
                   </Button>
                 )}

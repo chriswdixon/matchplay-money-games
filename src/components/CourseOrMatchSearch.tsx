@@ -170,7 +170,6 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
                   onClick={() => handleCreateAtCourse(course)}
                   className="shrink-0"
                 >
-                  <Plus className="w-4 h-4 mr-1" />
                   Match
                 </Button>
               </CardContent>
@@ -178,7 +177,6 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
           ))}
           {!location && courseResults.length === 0 && !loading && (
             <Button variant="outline" className="w-full" onClick={() => requestLocation()}>
-              <Navigation className="w-4 h-4 mr-2" />
               Enable location for nearby courses
             </Button>
           )}

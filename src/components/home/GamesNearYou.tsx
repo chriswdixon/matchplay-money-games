@@ -199,7 +199,6 @@ const GamesNearYou = ({
                 onClick={onClearSearch}
                 className="rounded-full bg-background text-foreground hover:bg-background/90 h-9 px-5"
               >
-                <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
                 Clear filters
               </Button>
             )}
