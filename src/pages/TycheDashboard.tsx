@@ -135,7 +135,7 @@ const TycheDashboard = () => {
           </div>
         )}
         {currentTab === "handicap" && (
-          <Suspense fallback={<TabLoader />}><HandicapSettings /></Suspense>
+          <Suspense fallback={<TabLoader />}><HandicapCalculatorsInline /></Suspense>
         )}
       </main>
 
