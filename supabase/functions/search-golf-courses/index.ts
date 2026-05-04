@@ -114,6 +114,24 @@ serve(async (req) => {
     }
 
     const { type, lat, lon, radius, name, courseId } = await req.json();
+    const blockedStateCodes = await getBlockedStateCodes();
+    const isBlockedCourse = (c: GolfCourse): boolean => {
+      const code = normalizeStateToCode(c.state);
+      if (code && blockedStateCodes.has(code)) return true;
+      // Fallback: check address text for blocked state name or " XX " token
+      if (!c.address) return false;
+      const addr = c.address.toLowerCase();
+      for (const blocked of blockedStateCodes) {
+        // Match standalone state code preceded by comma/space and followed by space/comma/zip
+        const re = new RegExp(`(?:^|,\\s|\\s)${blocked.toLowerCase()}(?=$|,|\\s)`, 'i');
+        if (re.test(c.address)) return true;
+        // Match state name
+        const stateName = Object.entries(US_STATE_CODES).find(([, code]) => code === blocked)?.[0];
+        if (stateName && addr.includes(stateName)) return true;
+      }
+      return false;
+    };
+
 
     // --- Get course detail by ID ---
     if (type === 'detail' && courseId) {
