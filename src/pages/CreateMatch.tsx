@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Plus, Info, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Info, AlertCircle } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
