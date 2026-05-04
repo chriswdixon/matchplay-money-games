@@ -777,6 +777,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 })
               )}
             </div>
+            {isMobile && visibleCount < filteredMatches.length && (
+              <div ref={sentinelRef} className="py-6 text-center text-sm text-muted-foreground">
+                Loading more...
+              </div>
+            )}
 
         {/* Rating Dialog */}
         <Suspense fallback={null}>
