@@ -1570,6 +1570,18 @@ export type Database = {
           team_number: number
         }[]
       }
+      write_audit: {
+        Args: {
+          p_actor_id?: string
+          p_category: Database["public"]["Enums"]["audit_category"]
+          p_event_type: string
+          p_match_id?: string
+          p_payload?: Json
+          p_summary: string
+          p_user_id?: string
+        }
+        Returns: undefined
+      }
       write_audit_log: {
         Args: {
           p_actor_id: string
@@ -1591,6 +1603,7 @@ export type Database = {
         | "payout"
         | "dispute"
         | "admin_override"
+        | "access"
       transaction_type:
         | "winning"
         | "match_buyin"
@@ -1733,6 +1746,7 @@ export const Constants = {
         "payout",
         "dispute",
         "admin_override",
+        "access",
       ],
       transaction_type: [
         "winning",
