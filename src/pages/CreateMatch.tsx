@@ -359,16 +359,16 @@ const CreateMatch = () => {
   };
 
   const canGoNext = () => {
-    // Course is prefilled when arriving from a course card and is no longer
-    // a hard requirement to advance past step 0.
+    // Course is prefilled when arriving from a course card.
     if (currentStep === 0) return true;
-    if (currentStep === 1) return formData.scheduled_date && formData.scheduled_time;
-    if (currentStep === 2) return formData.format && formData.default_tees;
+    if (currentStep === 1) {
+      return formData.scheduled_date && formData.scheduled_time && formData.format && formData.default_tees;
+    }
     return true;
   };
 
   const handleNext = () => {
-    if (canGoNext() && currentStep < 3) {
+    if (canGoNext() && currentStep < 2) {
       setCurrentStep(currentStep + 1);
     }
   };
