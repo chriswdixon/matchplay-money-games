@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import TycheHero from "@/components/TycheHero";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
@@ -22,6 +23,7 @@ const SectionLoader = () => (
 
 const TychePublicLanding = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
+  const [showStickyAuth, setShowStickyAuth] = useState(false);
   const [hydrateBelowFold, setHydrateBelowFold] = useState(false);
   
 
@@ -45,6 +47,7 @@ const TychePublicLanding = () => {
       ticking = true;
       requestAnimationFrame(() => {
         setShowScrollTop(window.scrollY > 400);
+        setShowStickyAuth(window.scrollY > 100);
         if (!hydrateBelowFold && window.scrollY > 50) setHydrateBelowFold(true);
         ticking = false;
       });
@@ -58,6 +61,23 @@ const TychePublicLanding = () => {
   return (
     <div className="min-h-screen bg-background">
       <a href="#main-content" className="skip-link">Skip to main content</a>
+
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 border-b border-border bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/70 pt-[env(safe-area-inset-top)] transition-transform duration-300 ${
+          showStickyAuth ? "translate-y-0" : "-translate-y-full"
+        }`}
+        role="region"
+        aria-label="Sign up or sign in"
+      >
+        <div className="flex items-center justify-end gap-2 px-4 py-2 max-w-7xl mx-auto">
+          <Button asChild size="sm" variant="outline">
+            <Link to="/auth">Sign In</Link>
+          </Button>
+          <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground border-0">
+            <Link to="/auth">Join Tyche</Link>
+          </Button>
+        </div>
+      </div>
 
       <TycheHero />
 
