@@ -24,7 +24,7 @@ const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
 );
 
-type TabId = 'profile' | 'handicap' | 'account' | 'settings' | 'security' | 'privacy';
+type TabId = 'profile' | 'account' | 'settings' | 'security' | 'privacy';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -80,8 +80,7 @@ export default function Profile() {
   };
 
   const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean }[] = [
-    { id: 'profile', label: 'Profile', Icon: User, show: true },
-    { id: 'handicap', label: 'Handicap', Icon: Trophy, show: true },
+    { id: 'profile', label: 'Profile & Handicap', Icon: User, show: true },
     { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: showAccountTab },
     { id: 'settings', label: 'Settings', Icon: Settings, show: true },
     { id: 'security', label: 'Security', Icon: Shield, show: true },
@@ -169,16 +168,15 @@ export default function Profile() {
 
         <div className="space-y-6">
           {activeTab === 'profile' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-              <ProfileDisplay />
-            </div>
-          )}
-
-          {activeTab === 'handicap' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-              <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
-                <HandicapSettings />
-              </Suspense>
+            <div className="space-y-6">
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <ProfileDisplay />
+              </div>
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
+                  <HandicapSettings />
+                </Suspense>
+              </div>
             </div>
           )}
 
