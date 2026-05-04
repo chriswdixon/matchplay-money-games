@@ -153,8 +153,8 @@ const TycheLanding = () => {
   // Logged-in user experience
   if (user) {
     // Map currentTab to the new bottom tab system
-    const homeTabs: BottomTab[] = ["home", "past", "subscription"];
-    const activeBottomTab: BottomTab = homeTabs.includes(currentTab as BottomTab)
+    const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap", "subscription"];
+    const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
       ? (currentTab as BottomTab)
       : "home";
 
@@ -165,10 +165,6 @@ const TycheLanding = () => {
           Skip to main content
         </a>
         <AppHeader
-          showNavMenu
-          onNavSelect={(v) => setCurrentTab(v)}
-          currentTab={currentTab}
-          navItems={navItems}
           onReturnToMatch={handleReturnToMatch}
           hideReturnButton={currentTab === "active-match"}
         />
