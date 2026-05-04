@@ -69,8 +69,15 @@ const NearbyCoursesWithMatches = () => {
       .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
 
     if (term.length >= 3) {
-      // Substring match against nearby first (so "tera" → "Teravista")
-      let matched = results.filter((c) => c.name.toLowerCase().includes(term));
+      // Prefix match against name or any word in the name
+      // (so "ter" → "Teravista", "Terra Verde", "Lake Terrace")
+      const matchesPrefix = (name: string) => {
+        const lower = name.toLowerCase();
+        if (lower.startsWith(term)) return true;
+        return lower.split(/[\s\-']+/).some((w) => w.startsWith(term));
+      };
+
+      let matched = results.filter((c) => matchesPrefix(c.name));
 
       // If nothing matched nearby, fall back to name search across all courses,
       // still constrained to the radius
@@ -87,7 +94,7 @@ const NearbyCoursesWithMatches = () => {
           }))
           .filter(
             (c) =>
-              c.name.toLowerCase().includes(term) &&
+              matchesPrefix(c.name) &&
               c.distance !== undefined &&
               c.distance <= RADIUS_MI,
           );
