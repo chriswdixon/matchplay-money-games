@@ -1901,7 +1901,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             <Button 
               onClick={() => handleDoubleDownVote(true)} 
               disabled={isProcessingDoubleDown}
-              className="bg-amber-500 hover:bg-amber-600 text-white"
+              className="bg-amber-500 hover:bg-amber-600 text-primary-foreground"
             >
               {isProcessingDoubleDown ? "Processing..." : "Double Down 🎲"}
             </Button>

@@ -417,7 +417,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                     
                     return (
                       <Card key={match.id} className="border-2 border-destructive/30 bg-card relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive via-orange-500 to-destructive animate-pulse" />
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive via-warning to-destructive animate-pulse" />
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
@@ -522,7 +522,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       key={match.id} 
                       className={cn(
                         "relative border transition-all duration-300 hover:shadow-lg animate-slide-up",
-                        isHighStakes ? "bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/30 hover:border-amber-500/50" :
+                        isHighStakes ? "bg-gradient-to-br from-warning/5 to-warning/10 border-warning/30 hover:border-warning/50" :
                         isMediumStakes ? "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50" :
                         "bg-card border-border hover:border-accent"
                       )}
@@ -534,13 +534,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         </Badge>
                       )}
                       {match.status === 'completed' && match.winner_id === user?.id && (
-                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white border border-amber-400">
+                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-warning to-warning/70 text-primary-foreground border border-warning/40">
                           <Trophy className="w-3 h-3 mr-1" />
                           WINNER
                         </Badge>
                       )}
                       {isCreatedRecently && match.status !== 'cancelled' && match.status !== 'completed' && (
-                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse border border-green-400">
+                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-success to-success/70 text-primary-foreground animate-pulse border border-success/40">
                           <Zap className="w-3 h-3 mr-1" />
                           NEW
                         </Badge>

@@ -165,7 +165,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
 
       {/* Winner Announcement */}
       {winner && winner.net_total > 0 && (
-        <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50">
+        <Card className="border-warning/30 bg-warning/10">
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-4">
               <Crown className="w-8 h-8 text-yellow-500" />
@@ -199,7 +199,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
               <div
                 key={player.player_id}
                 className={`flex items-center justify-between p-4 rounded-lg border ${
-                  index === 0 ? 'border-yellow-200 bg-yellow-50' : 'border-border bg-background'
+                  index === 0 ? 'border-warning/30 bg-yellow-50' : 'border-border bg-background'
                 } ${
                   player.player_id === user?.id ? 'ring-2 ring-primary' : ''
                 }`}
