@@ -622,7 +622,7 @@ const CreateMatch = () => {
 
 
 
-      {isPaidSubscription && formData.booking_url && (
+      {formData.booking_url && (
         <div className="space-y-2">
           <Label>Tee Time Booking</Label>
           <Button
