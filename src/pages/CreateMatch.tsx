@@ -121,10 +121,18 @@ const CreateMatch = () => {
     checkIncompleteMatches();
   }, [user]);
 
-  // Prefill course from navigation state (e.g. clicking "Create Match" on a course card)
+  // Prefill course from navigation state OR sessionStorage (survives refresh).
   useEffect(() => {
-    const prefilled = (routerLocation.state as any)?.prefilledCourse;
+    let prefilled: any = (routerLocation.state as any)?.prefilledCourse;
+    if (!prefilled?.name) {
+      try {
+        const raw = sessionStorage.getItem("tyche-prefilled-course");
+        if (raw) prefilled = JSON.parse(raw);
+      } catch {}
+    }
     if (!prefilled?.name) return;
+
+    const bookingUrl = prefilled.booking_url || prefilled.website || "";
     setSelectedCourse({
       name: prefilled.name,
       address: prefilled.address,
@@ -136,10 +144,16 @@ const CreateMatch = () => {
     setFormData((prev) => ({
       ...prev,
       course_name: prefilled.name,
-      booking_url: prefilled.website || prev.booking_url,
+      booking_url: bookingUrl || prev.booking_url,
     }));
-    // Clear state so a refresh doesn't re-prefill
-    navigate(routerLocation.pathname, { replace: true, state: {} });
+
+    // Consume the prefill so it doesn't apply again on later visits
+    try {
+      sessionStorage.removeItem("tyche-prefilled-course");
+    } catch {}
+    if ((routerLocation.state as any)?.prefilledCourse) {
+      navigate(routerLocation.pathname, { replace: true, state: {} });
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
