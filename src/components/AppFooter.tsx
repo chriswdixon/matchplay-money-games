@@ -38,7 +38,7 @@ const AppFooter = () => {
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Copyright */}
           <div className="text-sm text-muted-foreground">
-            © {currentYear} MatchPlay. All rights reserved.
+            © {currentYear} Tyche. All rights reserved.
           </div>
 
           {/* Legal Links */}

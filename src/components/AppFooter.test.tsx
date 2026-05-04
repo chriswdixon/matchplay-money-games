@@ -9,7 +9,7 @@ vi.mock("@/hooks/useAyrshareProfiles", () => ({
 describe("AppFooter", () => {
   it("renders copyright with current year", () => {
     renderWithProviders(<AppFooter />);
-    expect(screen.getByText(new RegExp(`© ${new Date().getFullYear()} MatchPlay`))).toBeInTheDocument();
+    expect(screen.getByText(new RegExp(`© ${new Date().getFullYear()} Tyche`))).toBeInTheDocument();
   });
 
   it("renders Terms, Privacy, Support links", () => {
