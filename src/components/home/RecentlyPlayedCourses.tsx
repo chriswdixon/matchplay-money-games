@@ -76,7 +76,7 @@ const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) =
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-background/15">
         <h2 id="recently-played-heading" className="text-lg font-bold flex items-center gap-2">
           <History className="w-5 h-5" aria-hidden="true" />
-          Recently Played
+          Recent Matches
         </h2>
       </div>
 
