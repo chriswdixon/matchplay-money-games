@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy } from "lucide-react";
+import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy, Wallet } from "lucide-react";
+import { UserAccountDetails } from "./UserAccountDetails";
 import {
   Dialog,
   DialogContent,
