@@ -36,7 +36,7 @@ const CreateMatch = () => {
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
 
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
   const [checkingIncomplete, setCheckingIncomplete] = useState(true);
   const [formData, setFormData] = useState({
