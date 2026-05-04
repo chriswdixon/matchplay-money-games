@@ -1,6 +1,7 @@
 import { Home, Search, Trophy, UserCircle2, Target, Landmark } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
+import { useNotifications } from "@/hooks/useNotifications";
 
 export type BottomTab =
   | "home"
