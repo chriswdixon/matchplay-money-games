@@ -33,9 +33,21 @@ const detectIOS = () =>
 const detectAndroid = () =>
   typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
 
+// True when the page is launched as an installed PWA (added to Home Screen)
+// rather than inside the regular mobile browser. iOS and Android each store
+// the location permission against the installed app, not the browser.
+const isStandalonePWA = (): boolean => {
+  if (typeof window === "undefined") return false;
+  const displayMode = window.matchMedia?.("(display-mode: standalone)").matches;
+  // iOS Safari exposes navigator.standalone for home-screen apps
+  const iosStandalone = (window.navigator as any).standalone === true;
+  return Boolean(displayMode || iosStandalone);
+};
+
 function getDetail(error: LocationError): Detail {
   const ios = detectIOS();
   const android = detectAndroid();
+  const pwa = isStandalonePWA();
 
   // Insecure context overrides everything — no permission prompt is even possible.
   if (isInsecureContext()) {
@@ -61,17 +73,29 @@ function getDetail(error: LocationError): Detail {
         description:
           "We can't read your location because permission was blocked for this site.",
         steps: ios
-          ? [
-              "Open iOS Settings → Privacy & Security → Location Services (must be ON).",
-              "Settings → Safari → Location → set to Ask or Allow.",
-              "Return to this tab, fully reload the page, then try again.",
-            ]
+          ? pwa
+            ? [
+                "Open iOS Settings → Privacy & Security → Location Services (must be ON).",
+                "Scroll down to Tyche and set Location to While Using the App.",
+                "Return to Tyche and tap Try again.",
+              ]
+            : [
+                "Open iOS Settings → Privacy & Security → Location Services (must be ON).",
+                "Settings → Safari → Location → set to Ask or Allow.",
+                "Return to this tab, fully reload the page, then try again.",
+              ]
           : android
-          ? [
-              "Tap the lock/info icon in the address bar.",
-              "Set Location to Allow for this site.",
-              "Reload the page and try again.",
-            ]
+          ? pwa
+            ? [
+                "Open Android Settings → Apps → Tyche → Permissions → Location.",
+                "Set to Allow only while using the app.",
+                "Reopen Tyche and tap Try again.",
+              ]
+            : [
+                "Tap the lock/info icon in the address bar.",
+                "Set Location to Allow for this site.",
+                "Reload the page and try again.",
+              ]
           : [
               "Click the lock icon in your browser's address bar.",
               "Set Location permission to Allow.",
