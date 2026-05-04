@@ -136,9 +136,11 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
             aria-label={mode === "matches" ? "Search matches" : "Search courses"}
           />
         </div>
-        <Button type="submit" className="h-11" disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
-        </Button>
+        {loading && (
+          <div className="flex items-center px-2" aria-live="polite">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          </div>
+        )}
       </form>
 
       {mode === "courses" && searched && (
