@@ -383,11 +383,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           {!showPastMatches && (
             <div className="mt-8 flex flex-col items-center justify-center gap-2">
               <CreateMatchButton onMatchCreated={refetch} />
-              {location && (
-                <p className="text-sm text-muted-foreground">
-                  <span aria-hidden="true">📍</span> Location enabled • Showing matches within {searchRadius}mi
-                </p>
-              )}
             </div>
           )}
         </div>
