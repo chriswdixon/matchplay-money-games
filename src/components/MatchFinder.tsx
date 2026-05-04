@@ -16,7 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import EditMatchDialog from "./EditMatchDialog";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Lazy load heavy dialog components - only loaded when user interacts
 const PlayerRatingDialog = lazy(() => import("./PlayerRatingDialog"));
@@ -32,6 +33,9 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
   const { hasAccess } = useFreeTier();
+  const isMobile = useIsMobile();
+  const [visibleCount, setVisibleCount] = useState(10);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
@@ -205,6 +209,29 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
 
     return filtered;
   }, [matches, filters, showPastMatches]);
+
+  // Mobile pagination: 10 at a time, infinite scroll
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [filters, showPastMatches, matches.length]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((c) => Math.min(c + 10, filteredMatches.length));
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [isMobile, filteredMatches.length]);
+
+  const visibleMatches = isMobile ? filteredMatches.slice(0, visibleCount) : filteredMatches;
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
@@ -510,7 +537,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                   )}
                 </div>
               ) : (
-                filteredMatches.map((match, index) => {
+                visibleMatches.map((match, index) => {
                   const isFull = isMatchFull(match);
                   const isCreatedRecently = new Date(match.created_at) > new Date(Date.now() - 5 * 60 * 1000); // Within 5 minutes
                   const buyInDollars = match.buy_in_amount / 100;
@@ -750,6 +777,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 })
               )}
             </div>
+            {isMobile && visibleCount < filteredMatches.length && (
+              <div ref={sentinelRef} className="py-6 text-center text-sm text-muted-foreground">
+                Loading more...
+              </div>
+            )}
 
         {/* Rating Dialog */}
         <Suspense fallback={null}>
