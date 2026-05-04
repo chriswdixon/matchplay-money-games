@@ -320,17 +320,10 @@ const TycheLanding = () => {
             Start playing golf the way it was meant to be played - competitively and fairly.
           </p>
           
-          <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-            <Button 
+          <div className="flex justify-center items-center mb-12">
+            <Button
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent-glow shadow-accent transition-all duration-300 px-8 py-4 text-lg font-semibold"
-            >
-              Get Early Access
-            </Button>
-            <Button 
-              variant="outline" 
-              size="lg"
-              className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 py-4 text-lg"
             >
               Schedule Demo
             </Button>
