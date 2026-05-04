@@ -598,14 +598,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               "text-xs font-medium",
                               match.format === 'stroke-play' && "border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/10",
                               match.format === 'match-play' && "border-purple-500/50 text-purple-600 dark:text-purple-400 bg-purple-500/10",
-                              match.format === 'best-ball' && "border-green-500/50 text-green-600 dark:text-green-400 bg-green-500/10",
+                              match.format === 'best-ball' && "border-green-500/50 text-success bg-green-500/10",
                               match.format === 'scramble' && "border-pink-500/50 text-pink-600 dark:text-pink-400 bg-pink-500/10"
                             )}
                           >
                             {formatMatchFormat(match.format)}
                           </Badge>
                           {match.pin && (
-                            <Badge variant="outline" className="text-xs font-medium border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-500/10">
+                            <Badge variant="outline" className="text-xs font-medium border-warning/50 text-warning bg-warning/10">
                               <Lock className="w-3 h-3 mr-1" />
                               PIN Required
                             </Badge>

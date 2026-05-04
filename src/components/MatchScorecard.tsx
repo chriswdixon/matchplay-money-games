@@ -511,14 +511,14 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           
           // Determine urgency level based on 24-hour deadline
           const urgency = hoursElapsed < 24 ? 'warning' : hoursElapsed < 48 ? 'alert' : 'critical';
-          const bgColor = urgency === 'warning' ? 'bg-yellow-500/10 border-yellow-500/30' : 
-                         urgency === 'alert' ? 'bg-orange-500/10 border-orange-500/30' :
+          const bgColor = urgency === 'warning' ? 'bg-warning/10 border-warning/30' : 
+                         urgency === 'alert' ? 'bg-warning/10 border-warning/30' :
                          'bg-destructive/10 border-destructive/30';
-          const textColor = urgency === 'warning' ? 'text-yellow-600 dark:text-yellow-400' :
-                           urgency === 'alert' ? 'text-orange-600 dark:text-orange-400' :
+          const textColor = urgency === 'warning' ? 'text-warning' :
+                           urgency === 'alert' ? 'text-warning' :
                            'text-destructive';
-          const iconColor = urgency === 'warning' ? 'text-yellow-500' :
-                           urgency === 'alert' ? 'text-orange-500' :
+          const iconColor = urgency === 'warning' ? 'text-warning' :
+                           urgency === 'alert' ? 'text-warning' :
                            'text-destructive';
           
           return (
@@ -681,7 +681,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                           )}
                         </div>
                         {hasConfirmed && (
-                          <Check className="w-5 h-5 text-green-600" />
+                          <Check className="w-5 h-5 text-success" />
                         )}
                       </div>
                       <div className="flex items-start justify-between mt-2">
@@ -713,7 +713,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                         <div className="text-xs text-muted-foreground mt-1 text-center">
                           {Math.round((Object.keys(player.scores).length / (matchData?.holes || 18)) * 100)}% Complete
                           {hasConfirmed && (
-                            <span className="ml-2 text-green-600 font-medium">✓ Finished</span>
+                            <span className="ml-2 text-success font-medium">✓ Finished</span>
                           )}
                         </div>
                       </div>
@@ -1855,7 +1855,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                   </div>
                 </div>
 
-                <div className="bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800 p-3 rounded-lg">
+                <div className="bg-warning/10 border border-warning/30 p-3 rounded-lg">
                   <p className="text-sm text-amber-800 dark:text-amber-200">
                     ⚠️ Payment will only be processed if <strong>ALL</strong> players agree
                   </p>
@@ -1876,7 +1876,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                             </span>
                             {status?.responded ? (
                               status.opted_in ? (
-                                <span className="text-green-600 dark:text-green-400 flex items-center gap-1">
+                                <span className="text-success flex items-center gap-1">
                                   <Check className="h-3 w-3" /> Agreed
                                 </span>
                               ) : (
@@ -1901,7 +1901,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             <Button 
               onClick={() => handleDoubleDownVote(true)} 
               disabled={isProcessingDoubleDown}
-              className="bg-amber-500 hover:bg-amber-600 text-primary-foreground"
+              className="bg-warning hover:bg-warning/90 text-primary-foreground"
             >
               {isProcessingDoubleDown ? "Processing..." : "Double Down 🎲"}
             </Button>

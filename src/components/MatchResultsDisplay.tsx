@@ -39,16 +39,16 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   }
 
   const getPositionIcon = (index: number) => {
-    if (index === 0) return <Trophy className="w-6 h-6 text-yellow-500" />;
+    if (index === 0) return <Trophy className="w-6 h-6 text-warning" />;
     if (index === 1) return <Medal className="w-6 h-6 text-gray-400" />;
     if (index === 2) return <Medal className="w-6 h-6 text-amber-700" />;
     return null;
   };
 
   const getPositionBadge = (index: number) => {
-    if (index === 0) return <Badge className="bg-yellow-500 hover:bg-yellow-600">1st Place</Badge>;
+    if (index === 0) return <Badge className="bg-warning/100 hover:bg-yellow-600">1st Place</Badge>;
     if (index === 1) return <Badge className="bg-gray-400 hover:bg-gray-500">2nd Place</Badge>;
-    if (index === 2) return <Badge className="bg-amber-700 hover:bg-amber-800">3rd Place</Badge>;
+    if (index === 2) return <Badge className="bg-warning/80 hover:bg-warning/90">3rd Place</Badge>;
     return <Badge variant="outline">{index + 1}th Place</Badge>;
   };
 
@@ -59,7 +59,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
     )}>
       <div className="text-center space-y-2">
         <div className="flex items-center justify-center gap-2">
-          <Trophy className="w-8 h-8 text-yellow-500" />
+          <Trophy className="w-8 h-8 text-warning" />
           <h2 className="text-3xl font-bold">Match Complete!</h2>
         </div>
         <p className="text-muted-foreground">Final Results</p>
@@ -109,8 +109,8 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
               </div>
 
               {payouts[player.player_id] && (
-                <div className="flex items-center justify-center gap-2 pt-2 border-t bg-green-50 dark:bg-green-950 rounded-lg p-2">
-                  <span className="text-2xl font-bold text-green-600">
+                <div className="flex items-center justify-center gap-2 pt-2 border-t bg-success/10 rounded-lg p-2">
+                  <span className="text-2xl font-bold text-success">
                     ${payouts[player.player_id].toFixed(0)}
                   </span>
                 </div>
@@ -175,7 +175,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
       {/* Testing Mode Notice */}
       {isTestingMode && (
         <Card className={cn(
-          "bg-amber-50 dark:bg-amber-950/20 border-amber-200 dark:border-amber-800",
+          "bg-warning/10 border-warning/30",
           !inline && "max-w-4xl mx-auto"
         )}>
           <CardContent className="p-6">
@@ -219,7 +219,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                             <div 
                               key={player.player_id}
                               className={`flex items-center justify-between p-2 rounded ${
-                                index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : 'bg-muted/30'
+                                index === 0 ? 'bg-warning/10' : 'bg-muted/30'
                               }`}
                             >
                               <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -257,7 +257,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                             <div 
                               key={player.player_id}
                               className={`flex items-center justify-between p-2 rounded ${
-                                index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : 'bg-muted/30'
+                                index === 0 ? 'bg-warning/10' : 'bg-muted/30'
                               }`}
                             >
                               <div className="flex items-center gap-2 flex-1 min-w-0">
@@ -300,7 +300,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                     <tr 
                       key={player.player_id} 
                       className={`border-b ${
-                        index === 0 ? 'bg-yellow-50 dark:bg-yellow-950/20' : ''
+                        index === 0 ? 'bg-warning/10' : ''
                       }`}
                     >
                       <td className="p-2 font-medium">
