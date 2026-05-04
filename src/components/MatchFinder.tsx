@@ -16,7 +16,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import EditMatchDialog from "./EditMatchDialog";
 import { cn } from "@/lib/utils";
-import { useState, useEffect, useMemo, lazy, Suspense } from "react";
+import { useState, useEffect, useMemo, useRef, lazy, Suspense } from "react";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 // Lazy load heavy dialog components - only loaded when user interacts
 const PlayerRatingDialog = lazy(() => import("./PlayerRatingDialog"));
@@ -32,6 +33,9 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { user } = useAuth();
   const { location, requestLocation, formatDistance } = useLocation();
   const { hasAccess } = useFreeTier();
+  const isMobile = useIsMobile();
+  const [visibleCount, setVisibleCount] = useState(10);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
