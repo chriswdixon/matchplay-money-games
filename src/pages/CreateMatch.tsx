@@ -30,15 +30,10 @@ const CreateMatch = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { subscribed, tierName } = useSubscription();
-  const { isFree, hasAccess } = useFreeTier();
   const { createMatch } = useMatches();
   
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
-  
-
-  const isPaidSubscription = subscribed && tierName !== 'free';
 
   const [currentStep, setCurrentStep] = useState(0);
   const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
