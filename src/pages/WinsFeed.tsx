@@ -118,6 +118,16 @@ const WinsFeed = () => {
           })
         )}
       </section>
+
+      <BottomTabBar
+        activeTab={"home" as any}
+        onChange={(tab) => {
+          if (tab === 'home') navigate('/');
+          else if (tab === 'profile') navigate('/profile');
+          else navigate(`/?tab=${tab}`);
+        }}
+        hasActiveMatch={hasActiveMatch}
+      />
     </main>
   );
 };
