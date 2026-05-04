@@ -53,21 +53,9 @@ export const useGolfCourses = () => {
   const MAX_API_FAILURES = 3;
   const API_BLOCK_DURATION = 60000; // 1 minute
 
-  const showToastOnce = (message: string, type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
-    const now = Date.now();
-    // Prevent duplicate toasts within 3 seconds
-    if (lastToastMessage.current === message && now - toastTimestamp.current < 3000) {
-      return;
-    }
-    lastToastMessage.current = message;
-    toastTimestamp.current = now;
-    
-    switch(type) {
-      case 'success': toast.success(message); break;
-      case 'warning': toast.warning(message); break;
-      case 'error': toast.error(message); break;
-      default: toast.info(message);
-    }
+  // Toast notifications intentionally suppressed for course search.
+  const showToastOnce = (_message: string, _type: 'success' | 'info' | 'warning' | 'error' = 'info') => {
+    // no-op
   };
 
   const searchNearbyCourses = async (latitude: number, longitude: number, radius: number = 30) => {
