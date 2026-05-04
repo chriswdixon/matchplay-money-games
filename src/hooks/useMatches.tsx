@@ -130,7 +130,7 @@ export const useMatches = () => {
         matchesData = data || [];
         console.log('Successfully fetched matches:', matchesData.length);
       } catch (basicError) {
-        console.error('Basic query failed:', basicError);
+        console.warn('Basic query failed:', basicError);
         
         // If basic query fails due to network, don't try complex queries
         if (basicError.name === 'AbortError') {
@@ -261,7 +261,7 @@ export const useMatches = () => {
         return;
       }
       
-      console.error('Error fetching matches:', error);
+      console.warn('Error fetching matches:', error);
       
       // Only show user-facing errors for non-network issues
       if (!error.message?.includes('Failed to fetch') && !error.message?.includes('Network')) {

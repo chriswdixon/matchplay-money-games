@@ -46,7 +46,7 @@ export const GeoBlockingProvider = ({ children }: { children: ReactNode }) => {
       setBlockedStates(data || []);
       return data || [];
     } catch (error) {
-      console.error('Failed to fetch blocked states:', error);
+      console.warn('Failed to fetch blocked states:', error);
       return [];
     }
   };
