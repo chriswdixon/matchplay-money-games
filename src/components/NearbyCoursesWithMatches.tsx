@@ -33,7 +33,9 @@ const NearbyCoursesWithMatches = () => {
   const [courses, setCourses] = useState<GolfCourse[]>([]);
   const [searched, setSearched] = useState(false);
   const { searchCoursesByName, searchNearbyCourses, loading } = useGolfCourses();
-  const { location, requestLocation, error: locationError, loading: locationLoading } = useLocation();
+  const { location, requestLocation, error: locationError, loading: locationLoading, geocodeAddress } = useLocation();
+  const [manualLocation, setManualLocation] = useState<{ latitude: number; longitude: number; label: string } | null>(null);
+  const effectiveLocation = location ?? manualLocation;
   const { matches } = useMatches();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -47,14 +49,15 @@ const NearbyCoursesWithMatches = () => {
   const getStep = () => 10;
 
   // Realtime auto-search: filter on every keystroke once we have GPS.
+  // Realtime auto-search: filter on every keystroke once we have a location.
   useEffect(() => {
-    if (!location) return;
+    if (!effectiveLocation) return;
     const handle = setTimeout(() => {
       runSearch(query);
     }, 80);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, location, radius]);
+  }, [query, effectiveLocation?.latitude, effectiveLocation?.longitude, radius]);
 
   // Reset pagination when results change
   useEffect(() => {
@@ -79,48 +82,77 @@ const NearbyCoursesWithMatches = () => {
 
   const visibleCourses = courses.slice(0, visibleCount);
 
+  // Detect a ZIP code (US 5-digit, optional +4) or a "City, ST" / "City Name" pattern
+  // that the user can type into the same search to override GPS.
+  const isZip = (s: string) => /^\d{5}(-\d{4})?$/.test(s.trim());
+  const looksLikePlace = (s: string) =>
+    /^[A-Za-z][A-Za-z .'\-]{1,48},\s*[A-Za-z]{2,}$/.test(s.trim());
+
   const runSearch = async (q: string) => {
-    if (!location) {
+    const term = q.trim();
+
+    // If the query is a ZIP/city and we have no GPS, geocode it as the search origin.
+    if (term && (isZip(term) || looksLikePlace(term))) {
+      const geo = await geocodeAddress(term);
+      if (geo) {
+        setManualLocation({ latitude: geo.latitude, longitude: geo.longitude, label: term });
+        setSearched(true);
+        const nearby = await searchNearbyCourses(geo.latitude, geo.longitude, radius);
+        const results = nearby
+          .map((c) => ({
+            ...c,
+            distance:
+              c.distance ??
+              (c.latitude && c.longitude
+                ? distanceMi(geo.latitude, geo.longitude, c.latitude, c.longitude)
+                : undefined),
+          }))
+          .filter((c) => c.distance !== undefined && c.distance <= radius)
+          .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+        setCourses(results.slice(0, 50));
+        return;
+      }
+    }
+
+    const origin = effectiveLocation;
+    if (!origin) {
       await requestLocation();
       return;
     }
     setSearched(true);
-    const term = q.trim().toLowerCase();
+    const lower = term.toLowerCase();
 
     // Always start from nearby courses within radius
-    const nearby = await searchNearbyCourses(location.latitude, location.longitude, radius);
+    const nearby = await searchNearbyCourses(origin.latitude, origin.longitude, radius);
     let results = nearby
       .map((c) => ({
         ...c,
         distance:
           c.distance ??
           (c.latitude && c.longitude
-            ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+            ? distanceMi(origin.latitude, origin.longitude, c.latitude, c.longitude)
             : undefined),
       }))
       .filter((c) => c.distance !== undefined && c.distance <= radius);
 
-    if (term.length >= 1) {
-      // Prefix match against name or any word in the name
-      // (so "t" → "Teravista", "ter" → "Terra Verde", etc.)
+    if (lower.length >= 1) {
       const matchesPrefix = (name: string) => {
-        const lower = name.toLowerCase();
-        if (lower.startsWith(term)) return true;
-        return lower.split(/[\s\-']+/).some((w) => w.startsWith(term));
+        const low = name.toLowerCase();
+        if (low.startsWith(lower)) return true;
+        return low.split(/[\s\-']+/).some((w) => w.startsWith(lower));
       };
 
       let matched = results.filter((c) => matchesPrefix(c.name));
 
-      // For 3+ chars, fall back to name search across all courses if nothing nearby matched
-      if (matched.length === 0 && term.length >= 3) {
-        const named = await searchCoursesByName(term);
+      if (matched.length === 0 && lower.length >= 3) {
+        const named = await searchCoursesByName(lower);
         matched = named
           .map((c) => ({
             ...c,
             distance:
               c.distance ??
               (c.latitude && c.longitude
-                ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+                ? distanceMi(origin.latitude, origin.longitude, c.latitude, c.longitude)
                 : undefined),
           }))
           .filter(
@@ -196,9 +228,11 @@ const NearbyCoursesWithMatches = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search Courses & Matches"
+            placeholder="Search course, ZIP code, or city, ST"
             className="pl-10 h-11 rounded-full bg-success text-white font-bold placeholder:text-white/80 placeholder:font-bold border-success focus-visible:ring-success"
-            aria-label="Search courses and matches near you"
+            aria-label="Search courses, ZIP code, or city to find nearby matches"
+            inputMode="search"
+            maxLength={60}
           />
         </div>
         {loading && (
@@ -208,7 +242,7 @@ const NearbyCoursesWithMatches = () => {
         )}
       </form>
 
-      {!location && (
+      {!effectiveLocation && (
         <>
           <Button
             variant="outline"
@@ -218,12 +252,38 @@ const NearbyCoursesWithMatches = () => {
           >
             {locationLoading ? "Locating…" : "Enable location to see nearby courses"}
           </Button>
+          <p className="text-xs text-muted-foreground text-center px-1">
+            Or type a <span className="font-semibold">ZIP code</span> or{" "}
+            <span className="font-semibold">City, ST</span> in the search above to find nearby matches without GPS.
+          </p>
           <LocationStatusBanner
             error={locationError}
             loading={locationLoading}
             onRetry={() => requestLocation()}
           />
         </>
+      )}
+
+      {!location && manualLocation && (
+        <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground" aria-live="polite">
+          <span className="flex items-center gap-1 min-w-0 truncate">
+            <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
+            Searching near <span className="font-semibold text-foreground truncate">{manualLocation.label}</span>
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              setManualLocation(null);
+              setCourses([]);
+              setSearched(false);
+            }}
+          >
+            Clear
+          </Button>
+        </div>
       )}
 
       {location && (
