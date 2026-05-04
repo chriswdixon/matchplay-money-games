@@ -134,9 +134,7 @@ const AdminConsole = () => {
             <UserManagement />
           </TabsContent>
 
-          <TabsContent value="accounts">
-            <UserAccountDetails />
-          </TabsContent>
+
 
           <TabsContent value="invites">
             <InviteManagement />
