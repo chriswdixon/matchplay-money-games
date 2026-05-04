@@ -11,10 +11,15 @@ const TycheHero = () => {
   const { user } = useAuth();
 
   const handleScrollDown = () => {
-    const nextSection = document.querySelector('section:nth-of-type(2)');
-    if (nextSection) {
-      nextSection.scrollIntoView({ behavior: 'smooth' });
+    const target =
+      document.getElementById("matches-section") ||
+      (document.querySelector("main") as HTMLElement | null);
+    if (!target) {
+      window.scrollTo({ top: window.innerHeight, behavior: "smooth" });
+      return;
     }
+    const top = target.getBoundingClientRect().top + window.scrollY;
+    window.scrollTo({ top, behavior: "smooth" });
   };
   
   return (
