@@ -1,18 +1,32 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useProfile } from '@/hooks/useProfile';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
-import { User, Phone, Trophy, Calendar, Mail, Star, Crown, Zap } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { User, Phone, Trophy, Calendar, Mail, Star, Crown, Zap, Calculator, X } from 'lucide-react';
 import StarRating from '@/components/StarRating';
+import { HandicapCalculators } from '@/components/HandicapCalculators';
 
 export function ProfileDisplay() {
   const { profile, loading } = useProfile();
   const { privateData, loading: privateLoading } = usePrivateProfile();
   const { user } = useAuth();
   const { tierName, loading: subscriptionLoading } = useSubscription();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const [calcOpen, setCalcOpen] = useState(false);
+
+  const openCalculators = () => {
+    if (isMobile) setCalcOpen(true);
+    else navigate('/handicap-calculators');
+  };
 
   if (loading || privateLoading || subscriptionLoading) {
     return (
@@ -86,6 +100,30 @@ export function ProfileDisplay() {
           </div>
         </div>
 
+        {/* Featured Handicap card */}
+        <div className="rounded-2xl bg-foreground text-background p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <Trophy className="w-6 h-6 text-primary" aria-hidden="true" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs uppercase tracking-wide text-background/70">Handicap</div>
+            <div className="text-3xl font-bold leading-tight">
+              {profile?.handicap !== null && profile?.handicap !== undefined ? profile.handicap : '—'}
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={openCalculators}
+            className="gap-2 shrink-0"
+            aria-label="Open handicap calculators"
+          >
+            <Calculator className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Calculators</span>
+          </Button>
+        </div>
+
         {/* Profile Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {privateData?.phone && (
@@ -94,16 +132,6 @@ export function ProfileDisplay() {
               <div>
                 <div className="text-sm font-medium">Phone</div>
                 <div className="text-sm text-muted-foreground">{privateData.phone}</div>
-              </div>
-            </div>
-          )}
-
-          {profile?.handicap !== null && profile?.handicap !== undefined && (
-            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-              <Trophy className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <div className="text-sm font-medium">Handicap</div>
-                <div className="text-sm text-muted-foreground">{profile.handicap}</div>
               </div>
             </div>
           )}
@@ -144,6 +172,24 @@ export function ProfileDisplay() {
           </div>
         )}
       </CardContent>
+
+      {/* Mobile: handicap calculators in a popup */}
+      <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
+        <DialogContent className="w-screen h-[100dvh] max-w-none rounded-none p-0 gap-0 overflow-hidden">
+          <DialogTitle className="sr-only">Handicap Calculators</DialogTitle>
+          <button
+            type="button"
+            onClick={() => setCalcOpen(false)}
+            aria-label="Close"
+            className="absolute top-3 right-3 z-50 inline-flex h-9 w-9 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="h-[100dvh] overflow-y-auto pt-12">
+            <HandicapCalculators />
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
