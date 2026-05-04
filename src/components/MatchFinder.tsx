@@ -11,6 +11,7 @@ import { useLocation } from "@/hooks/useLocation";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import CreateMatchButton from "./CreateMatchButton";
 import MatchFilters, { MatchFilters as FilterType } from "./MatchFilters";
+import CourseOrMatchSearch from "./CourseOrMatchSearch";
 import { supabase } from "@/integrations/supabase/client";
 import { format } from "date-fns";
 import EditMatchDialog from "./EditMatchDialog";
@@ -364,6 +365,16 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           )}
         </div>
 
+        {/* Unified Course/Match Search */}
+        {!showPastMatches && user && (
+          <div className="mb-4">
+            <CourseOrMatchSearch
+              matchSearch={filters.search}
+              onMatchSearchChange={(v) => setFilters({ ...filters, search: v })}
+            />
+          </div>
+        )}
+
         {/* Match Filters - Only show for current matches and logged-in users */}
         {!showPastMatches && user && (
           <MatchFilters
@@ -372,6 +383,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             matchCount={filteredMatches.length}
             showFilters={showFilters}
             onToggleFilters={() => setShowFilters(!showFilters)}
+            hideSearch
           />
         )}
 
