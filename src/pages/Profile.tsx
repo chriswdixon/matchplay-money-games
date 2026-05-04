@@ -151,6 +151,18 @@ export default function Profile() {
               <span className="sm:hidden">Active Match</span>
             </Button>
           )}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin')}
+              className="gap-2"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span className="hidden sm:inline">Admin Portal</span>
+              <span className="sm:hidden">Admin</span>
+            </Button>
+          )}
           <div className="flex-1">
             <PageTitleCard
               icon={<User className="w-5 h-5" aria-hidden="true" />}
