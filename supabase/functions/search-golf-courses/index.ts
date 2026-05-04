@@ -184,14 +184,17 @@ serve(async (req) => {
         console.log('[SEARCH-GOLF-COURSES] OSM nearby query failed:', osmError.message);
       }
 
-      // Calculate distances
-      courses.forEach(course => {
-        if (course.latitude && course.longitude) {
-          course.distance = calculateDistance(lat, lon, course.latitude, course.longitude);
-        }
-      });
-
-      courses.sort((a, b) => (a.distance || 999) - (b.distance || 999));
+      // Calculate distances and keep only courses inside the requested radius.
+      const maxDistance = typeof radius === 'number' ? radius : 30;
+      courses = courses
+        .map(course => ({
+          ...course,
+          distance: course.latitude && course.longitude
+            ? calculateDistance(lat, lon, course.latitude, course.longitude)
+            : undefined,
+        }))
+        .filter(course => course.distance !== undefined && course.distance <= maxDistance)
+        .sort((a, b) => (a.distance || 999) - (b.distance || 999));
 
       console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'nearby courses');
 
@@ -265,7 +268,7 @@ async function queryOpenStreetMap(
     const west = lon - radiusDegrees;
     const north = lat + radiusDegrees;
     const east = lon + radiusDegrees;
-    osmUrl = `https://nominatim.openstreetmap.org/search?q=golf+course&viewbox=${west},${south},${east},${north}&bounded=1&format=json&limit=20`;
+    osmUrl = `https://nominatim.openstreetmap.org/search?q=golf+course&viewbox=${west},${south},${east},${north}&bounded=1&format=json&limit=50`;
   } else if (type === 'name' && name) {
     const trimmedName = name.trim();
     if (trimmedName.length === 0 || trimmedName.length > MAX_NAME_LENGTH || !NAME_REGEX.test(trimmedName)) {
@@ -286,14 +289,18 @@ async function queryOpenStreetMap(
 
   const data = await response.json();
 
-  return data.map((place: any) => ({
-    name: place.display_name.split(',')[0] || place.name || 'Golf Course',
-    address: place.display_name || 'Address not available',
-    latitude: parseFloat(place.lat),
-    longitude: parseFloat(place.lon),
-  })).filter((course: GolfCourse) =>
+  return data.map((place: any) => {
+    const displayName = place.display_name || '';
+    return {
+      name: displayName.split(',')[0] || place.name || 'Golf Course',
+      address: displayName || 'Address not available',
+      latitude: parseFloat(place.lat),
+      longitude: parseFloat(place.lon),
+      searchText: `${displayName} ${place.type || ''} ${place.category || ''}`.toLowerCase(),
+    };
+  }).filter((course: GolfCourse & { searchText: string }) =>
     course.latitude !== undefined &&
     course.longitude !== undefined &&
-    course.name.toLowerCase().includes('golf')
-  );
+    (course.searchText.includes('golf') || course.searchText.includes('country club'))
+  ).map(({ searchText, ...course }) => course);
 }
