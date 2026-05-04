@@ -88,9 +88,7 @@ const AdminConsole = () => {
                 <div
                   className={cn(
                     "bg-foreground text-background shadow-premium",
-                    isMobile
-                      ? "flex flex-wrap items-center justify-center gap-1 rounded-3xl px-2 py-2"
-                      : "flex items-center gap-1 rounded-full px-2 py-2 overflow-x-auto scrollbar-hide justify-between"
+                    "flex flex-wrap items-center justify-center gap-1 rounded-3xl px-2 py-2"
                   )}
                 >
                   {[
