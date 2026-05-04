@@ -6,7 +6,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck, LifeBuoy } from "lucide-react";
+import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck, LifeBuoy, X } from "lucide-react";
 import { SupportRequests } from "@/components/admin/SupportRequests";
 import { AuditLog } from "@/components/admin/AuditLog";
 import { PageTitleCard } from "@/components/ui/page-title-card";
@@ -85,7 +85,14 @@ const AdminConsole = () => {
               )}
             >
               <div className="mx-auto max-w-5xl pointer-events-auto">
-                <div className="flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide justify-between">
+                <div
+                  className={cn(
+                    "bg-foreground text-background shadow-premium",
+                    isMobile
+                      ? "flex flex-wrap items-center justify-center gap-1 rounded-3xl px-2 py-2"
+                      : "flex items-center gap-1 rounded-full px-2 py-2 overflow-x-auto scrollbar-hide justify-between"
+                  )}
+                >
                   {[
                     { id: 'reports', label: 'Reports', Icon: BarChart3 },
                     { id: 'matches', label: 'Matches', Icon: TrendingUp },
@@ -123,6 +130,19 @@ const AdminConsole = () => {
                       </Tooltip>
                     );
                   })}
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <button
+                        type="button"
+                        onClick={() => navigate('/profile')}
+                        aria-label="Exit Admin Console"
+                        className="relative flex items-center justify-center rounded-full transition-all w-10 h-10 shrink-0 text-background/90 hover:text-background hover:bg-destructive/80 ml-1"
+                      >
+                        <X className="w-5 h-5" strokeWidth={2.5} aria-hidden="true" />
+                      </button>
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Exit</TooltipContent>
+                  </Tooltip>
                 </div>
               </div>
             </nav>
