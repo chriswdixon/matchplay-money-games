@@ -100,6 +100,30 @@ export function ProfileDisplay() {
           </div>
         </div>
 
+        {/* Featured Handicap card */}
+        <div className="rounded-2xl bg-foreground text-background p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
+            <Trophy className="w-6 h-6 text-primary" aria-hidden="true" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-xs uppercase tracking-wide text-background/70">Handicap</div>
+            <div className="text-3xl font-bold leading-tight">
+              {profile?.handicap !== null && profile?.handicap !== undefined ? profile.handicap : '—'}
+            </div>
+          </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={openCalculators}
+            className="gap-2 shrink-0"
+            aria-label="Open handicap calculators"
+          >
+            <Calculator className="w-4 h-4" aria-hidden="true" />
+            <span className="hidden sm:inline">Calculators</span>
+          </Button>
+        </div>
+
         {/* Profile Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {privateData?.phone && (
@@ -108,16 +132,6 @@ export function ProfileDisplay() {
               <div>
                 <div className="text-sm font-medium">Phone</div>
                 <div className="text-sm text-muted-foreground">{privateData.phone}</div>
-              </div>
-            </div>
-          )}
-
-          {profile?.handicap !== null && profile?.handicap !== undefined && (
-            <div className="flex items-center gap-3 p-3 bg-muted/50 rounded-lg">
-              <Trophy className="w-4 h-4 text-muted-foreground" />
-              <div>
-                <div className="text-sm font-medium">Handicap</div>
-                <div className="text-sm text-muted-foreground">{profile.handicap}</div>
               </div>
             </div>
           )}
