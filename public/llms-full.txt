@@ -1,0 +1,70 @@
+# Tyche — Full Reference for AI Assistants
+
+## What is Tyche?
+Tyche is a competitive gaming platform for golfers. Players join skill-based golf matches with entry fees and Play Money prizes. There is no real-money wagering on the platform — every account starts with a $500 Play Money balance.
+
+## Match formats
+- **Match Play**: 2 players, hole-by-hole scoring.
+- **Team**: 4 players (2 vs 2), team-based scoring.
+- **Stroke Play**: Manual player count, total-stroke scoring across 9 or 18 holes.
+
+## How a match works
+1. A player creates a match, selecting course, tees, format, hole count (9 or 18), and entry fee.
+2. Other players join until the match is full.
+3. Players record scores hole-by-hole using the in-app scorecard, which works offline.
+4. Matches auto-finalize after the last hole or after a 24-hour limit.
+5. Prizes (Play Money) are distributed to winners. Cancellations refund entry fees minus a $2 fee.
+
+## Handicap
+Tyche uses a simplified USGA-style course handicap calculation with a fixed slope of 113. Players enter their handicap index; the app computes course handicap per tee.
+
+## Compliance
+- Users must be 18 or older (verified via age attestation).
+- Tyche is geo-blocked in U.S. states where skill-based competitions are restricted.
+- GDPR-compliant: cookie consent, data minimization, account deletion on request.
+- Tyche does not handle real-money payouts. All prizes are Play Money.
+
+## Technology
+- Web app built on React, Vite, Tailwind, TypeScript.
+- Installable PWA (Progressive Web App) with offline scoring.
+- Backend on Supabase (Postgres, Auth, Edge Functions) with Row-Level Security.
+
+## Brand
+- Name: Tyche (named after the Greek goddess of fortune).
+- Tone: confident, sporty, modern.
+- Terminology: "competitive gaming", "entry fees & prizes". Avoid gambling terminology.
+
+## Frequently asked questions
+
+### Is Tyche real-money gambling?
+No. Tyche uses Play Money only. Every account starts with $500 of Play Money. No real-money wagering or payouts.
+
+### Who can use Tyche?
+Adults aged 18+ in supported regions. Some U.S. states are restricted.
+
+### What golf formats are supported?
+Match Play (2 players), Team (4 players), and Stroke Play (manual player count). Matches can be 9 or 18 holes.
+
+### Does the scorecard work without service on the course?
+Yes. Tyche is a PWA and supports offline score entry; scores sync when connectivity returns.
+
+### How is the course handicap calculated?
+Using a simplified USGA-style course handicap formula with a fixed slope rating of 113.
+
+### How do I sign up?
+Visit https://match-play.co/auth?tab=signup. A beta invite code is currently required for non-Tyche staff emails.
+
+### How are prizes paid out?
+Prizes are credited as Play Money to the winners' in-app wallets. There are no real-money payouts.
+
+### What happens if a match is cancelled?
+Players are refunded their entry fee minus a $2 cancellation fee in Play Money.
+
+### Is my data private?
+Yes. Tyche follows GDPR principles, uses Postgres Row-Level Security, and minimizes PII retention. Users can request account deletion.
+
+### How do I install Tyche on my phone?
+On Android/Chrome use "Install app" from the menu. On iOS use "Add to Home Screen" from Safari.
+
+## Contact
+Website: https://match-play.co
