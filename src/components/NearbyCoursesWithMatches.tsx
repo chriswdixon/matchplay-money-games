@@ -9,6 +9,7 @@ import { useLocation } from "@/hooks/useLocation";
 import { useMatches } from "@/hooks/useMatches";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import CourseDetailDialog from "./CourseDetailDialog";
 
 const RADIUS_MI = 30;
 
@@ -35,6 +36,8 @@ const NearbyCoursesWithMatches = () => {
   const { user } = useAuth();
   const [visibleCount, setVisibleCount] = useState(10);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
 
   // md breakpoint = 768px. Desktop loads 10 at a time, mobile loads 5.
   const getStep = () =>
@@ -232,8 +235,24 @@ const NearbyCoursesWithMatches = () => {
           const openMatches =
             openMatchesByCourse.get(course.name.toLowerCase().trim()) || [];
           const hasOpenMatch = openMatches.length > 0;
+          const openCourse = () => {
+            setSelectedCourse(course);
+            setDialogOpen(true);
+          };
           return (
-            <Card key={`${course.name}-${i}`} className="bg-card">
+            <Card
+              key={`${course.name}-${i}`}
+              className="bg-card cursor-pointer hover:bg-accent/50 transition-colors"
+              onClick={openCourse}
+              role="button"
+              tabIndex={0}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" || e.key === " ") {
+                  e.preventDefault();
+                  openCourse();
+                }
+              }}
+            >
               <CardContent className="p-3 flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center gap-2">
@@ -265,19 +284,24 @@ const NearbyCoursesWithMatches = () => {
                 {hasOpenMatch ? (
                   <Button
                     size="sm"
-                    onClick={() => handleViewMatch(openMatches[0].id)}
-                    className="shrink-0 bg-gradient-primary text-primary-foreground"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleViewMatch(openMatches[0].id);
+                    }}
+                    className="shrink-0 bg-gradient-primary text-primary-foreground hover:shadow-[0_0_20px_hsl(var(--primary)/0.7)] transition-shadow"
                   >
-                    Open Match
+                    Join Match
                   </Button>
                 ) : (
                   <Button
                     size="sm"
-                    variant="outline"
-                    onClick={() => handleCreateAtCourse(course)}
-                    className="shrink-0"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleCreateAtCourse(course);
+                    }}
+                    className="shrink-0 bg-success text-success-foreground hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
                   >
-                    Create
+                    Create Match
                   </Button>
                 )}
               </CardContent>
