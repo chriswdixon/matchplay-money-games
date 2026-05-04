@@ -1,4 +1,4 @@
-import { Home, Search, History, Trophy, Crown, UserCircle2, Target } from "lucide-react";
+import { Home, Search, History, Trophy, UserCircle2, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
