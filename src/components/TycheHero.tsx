@@ -32,7 +32,7 @@ const TycheHero = () => {
       <div className="absolute inset-0 z-0">
         <img 
           src={heroImage} 
-          alt="Premium golf course at sunset"
+          alt="Lush green golf course on a bright sunny day"
           className="w-full h-full object-cover"
           fetchPriority="high"
           loading="eager"
