@@ -1,22 +1,9 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { ArrowLeft, Shield, Database, Eye, Lock, Globe, Trash2 } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Shield, Database, Eye, Lock, Globe, Trash2 } from "lucide-react";
 
 const Privacy = () => {
   return (
     <div className="min-h-screen bg-background">
-      {/* Header */}
-      <header className="border-b bg-card/50 backdrop-blur-sm sticky top-0 z-50">
-        <div className="container flex h-16 items-center justify-between px-4">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/" className="flex items-center gap-2">
-              <ArrowLeft className="w-4 h-4" />
-              Back to Tyche
-            </Link>
-          </Button>
-        </div>
-      </header>
 
       <main className="container py-12 px-4 max-w-4xl">
         {/* Hero Section */}
@@ -278,12 +265,6 @@ const Privacy = () => {
           </section>
         </div>
 
-        {/* Back to Home */}
-        <div className="mt-12 text-center">
-          <Button asChild>
-            <Link to="/">Return to Tyche</Link>
-          </Button>
-        </div>
       </main>
     </div>
   );
