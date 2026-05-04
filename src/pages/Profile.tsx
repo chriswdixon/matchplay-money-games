@@ -26,6 +26,16 @@ import { NotificationsPanel } from '@/components/profile/NotificationsPanel';
 import { useNotifications } from '@/hooks/useNotifications';
 import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
@@ -45,6 +55,7 @@ export default function Profile() {
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [adminTooltipOpen, setAdminTooltipOpen] = useState(false);
+  const [adminConfirmOpen, setAdminConfirmOpen] = useState(false);
   const [showSupportDialog, setShowSupportDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<TabId | null>(null);
@@ -187,7 +198,7 @@ export default function Profile() {
                         return;
                       }
                       setAdminTooltipOpen(false);
-                      navigate('/admin');
+                      setAdminConfirmOpen(true);
                     }}
                     aria-label={
                       openSupportCount > 0
@@ -219,6 +230,29 @@ export default function Profile() {
               </Tooltip>
             </TooltipProvider>
           )}
+          <AlertDialog open={adminConfirmOpen} onOpenChange={setAdminConfirmOpen}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Enter Admin Console?</AlertDialogTitle>
+                <AlertDialogDescription>
+                  You're about to access the Admin Console, where you can manage users,
+                  matches, coupons, and support requests. All admin actions are logged.
+                </AlertDialogDescription>
+              </AlertDialogHeader>
+              <AlertDialogFooter>
+                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogAction
+                  onClick={() => {
+                    setAdminConfirmOpen(false);
+                    navigate('/admin');
+                  }}
+                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  Continue to Admin
+                </AlertDialogAction>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
           <TooltipProvider delayDuration={200}>
             <Tooltip>
               <TooltipTrigger asChild>
