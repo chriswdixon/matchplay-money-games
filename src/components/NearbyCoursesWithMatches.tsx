@@ -194,14 +194,14 @@ const NearbyCoursesWithMatches = () => {
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/70"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-white"
             aria-hidden="true"
           />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search courses near you (or leave blank)"
-            className="pl-10 h-11 bg-success text-foreground placeholder:text-foreground/60 border-success focus-visible:ring-success"
+            className="pl-10 h-11 rounded-full bg-success text-white font-bold placeholder:text-white/80 placeholder:font-bold border-success focus-visible:ring-success"
             aria-label="Search courses and matches near you"
           />
         </div>
@@ -245,7 +245,7 @@ const NearbyCoursesWithMatches = () => {
           return (
             <Card
               key={`${course.name}-${i}`}
-              className="bg-card cursor-pointer hover:bg-accent/50 transition-colors"
+              className="bg-card cursor-pointer hover:bg-accent/50 transition-colors border-success"
               onClick={openCourse}
               role="button"
               tabIndex={0}
