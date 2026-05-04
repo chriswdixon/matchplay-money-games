@@ -44,6 +44,21 @@ serve(async (req) => {
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
+    // Require authenticated user; ensure userId matches the JWT subject
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader?.startsWith("Bearer ")) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+    const jwt = authHeader.replace("Bearer ", "");
+    const { data: authData, error: authErr } = await supabaseClient.auth.getUser(jwt);
+    if (authErr || !authData.user) {
+      return new Response(JSON.stringify({ error: "Unauthorized" }), {
+        status: 401, headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
+
     // Parse and validate input
     const rawBody = await req.json();
     const validationResult = ageVerificationSchema.safeParse(rawBody);
@@ -57,6 +72,13 @@ serve(async (req) => {
     }
 
     const { userId, email, firstName, dateOfBirth } = validationResult.data;
+
+    // Prevent IDOR — caller can only request verification for themselves
+    if (authData.user.id !== userId) {
+      return new Response(JSON.stringify({ error: "Forbidden" }), {
+        status: 403, headers: { "Content-Type": "application/json", ...corsHeaders },
+      });
+    }
     
     // HTML-encode firstName for safe use in email template
     const escapeHtml = (str: string) => str
