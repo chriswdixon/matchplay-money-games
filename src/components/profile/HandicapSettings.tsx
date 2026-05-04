@@ -12,6 +12,7 @@ import { useFreeTier } from '@/hooks/useFreeTier';
 import { Trophy, Calculator, Lock, Info, ChevronDown } from 'lucide-react';
 import { toast } from 'sonner';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { format } from 'date-fns';
 
 export function HandicapSettings() {
@@ -326,7 +327,7 @@ export function HandicapSettings() {
         </CardContent>
       </Card>
 
-      {/* Course Handicap Calculator */}
+      {/* Calculator launchers */}
       <Card className="shadow-card">
         <CardHeader className="pb-4">
           <div className="flex items-center gap-3">
@@ -334,189 +335,199 @@ export function HandicapSettings() {
               <Calculator className="w-5 h-5 text-primary-foreground" />
             </div>
             <div>
-              <CardTitle>Course Handicap™ Calculator</CardTitle>
+              <CardTitle>Handicap Calculators</CardTitle>
               <CardDescription>
-                Calculate your course handicap for a specific golf course
+                Open a calculator to compute your Course or Playing Handicap
               </CardDescription>
             </div>
           </div>
         </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="handicapIndex">Handicap Index®</Label>
-              <Input
-                id="handicapIndex"
-                type="number"
-                step="0.1"
-                min="-10"
-                max="54"
-                placeholder="e.g., 15.0"
-                value={handicapIndex}
-                onChange={(e) => setHandicapIndex(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Range: -10 to 54
-              </p>
-            </div>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {/* Course Handicap Calculator Dialog */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center gap-2"
+                >
+                  <Calculator className="w-5 h-5" aria-hidden="true" />
+                  <span className="font-semibold">Course Handicap™</span>
+                  <span className="text-xs text-muted-foreground">For a specific course</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Calculator className="w-5 h-5" aria-hidden="true" />
+                    Course Handicap™ Calculator
+                  </DialogTitle>
+                  <DialogDescription>
+                    Calculate your course handicap for a specific golf course
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="handicapIndex">Handicap Index®</Label>
+                      <Input
+                        id="handicapIndex"
+                        type="number"
+                        step="0.1"
+                        min="-10"
+                        max="54"
+                        placeholder="e.g., 15.0"
+                        value={handicapIndex}
+                        onChange={(e) => setHandicapIndex(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">Range: -10 to 54</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="courseRating">Course Rating</Label>
+                      <Input
+                        id="courseRating"
+                        type="number"
+                        step="0.1"
+                        placeholder="e.g., 72.5"
+                        value={courseRating}
+                        onChange={(e) => setCourseRating(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">From course scorecard</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="slopeRating">Slope Rating™</Label>
+                      <Input
+                        id="slopeRating"
+                        type="number"
+                        min="55"
+                        max="155"
+                        placeholder="e.g., 130"
+                        value={slopeRating}
+                        onChange={(e) => setSlopeRating(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">Range: 55 to 155</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="par">Par</Label>
+                      <Input
+                        id="par"
+                        type="number"
+                        min="20"
+                        max="90"
+                        placeholder="e.g., 72"
+                        value={par}
+                        onChange={(e) => setPar(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">Range: 20 to 90</p>
+                    </div>
+                  </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="courseRating">Course Rating</Label>
-              <Input
-                id="courseRating"
-                type="number"
-                step="0.1"
-                placeholder="e.g., 72.5"
-                value={courseRating}
-                onChange={(e) => setCourseRating(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                From course scorecard
-              </p>
-            </div>
+                  {courseHandicap !== null && (
+                    <div className="p-4 bg-accent/10 rounded-lg border border-accent/20 text-center">
+                      <p className="text-sm text-muted-foreground mb-1">Your Course Handicap is:</p>
+                      <p className="text-4xl font-bold text-accent">{courseHandicap}</p>
+                    </div>
+                  )}
 
-            <div className="space-y-2">
-              <Label htmlFor="slopeRating">Slope Rating™</Label>
-              <Input
-                id="slopeRating"
-                type="number"
-                min="55"
-                max="155"
-                placeholder="e.g., 130"
-                value={slopeRating}
-                onChange={(e) => setSlopeRating(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Range: 55 to 155
-              </p>
-            </div>
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      onClick={calculateCourseHandicap}
+                      className="flex-1 bg-gradient-primary text-primary-foreground"
+                    >
+                      Calculate
+                    </Button>
+                    <Button type="button" variant="outline" onClick={resetCourseCalculator}>
+                      Reset
+                    </Button>
+                  </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="par">Par</Label>
-              <Input
-                id="par"
-                type="number"
-                min="20"
-                max="90"
-                placeholder="e.g., 72"
-                value={par}
-                onChange={(e) => setPar(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                Range: 20 to 90
-              </p>
-            </div>
-          </div>
+                  <p className="text-xs text-muted-foreground">
+                    Note: For 9-hole Course Handicap, use half of your 18-hole Handicap Index and 9-hole course ratings.
+                  </p>
+                </div>
+              </DialogContent>
+            </Dialog>
 
-          {courseHandicap !== null && (
-            <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-1">Your Course Handicap is:</p>
-                <p className="text-4xl font-bold text-accent">{courseHandicap}</p>
-              </div>
-            </div>
-          )}
+            {/* Playing Handicap Calculator Dialog */}
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="h-auto py-4 flex flex-col items-center gap-2"
+                >
+                  <Calculator className="w-5 h-5" aria-hidden="true" />
+                  <span className="font-semibold">Playing Handicap</span>
+                  <span className="text-xs text-muted-foreground">Based on match format</span>
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-lg max-h-[90vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle className="flex items-center gap-2">
+                    <Calculator className="w-5 h-5" aria-hidden="true" />
+                    Playing Handicap Calculator
+                  </DialogTitle>
+                  <DialogDescription>
+                    Calculate your playing handicap based on match format
+                  </DialogDescription>
+                </DialogHeader>
+                <div className="space-y-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="courseHandicapInput">Course Handicap</Label>
+                      <Input
+                        id="courseHandicapInput"
+                        type="number"
+                        placeholder="e.g., 18"
+                        value={courseHandicapInput}
+                        onChange={(e) => setCourseHandicapInput(e.target.value)}
+                      />
+                      <p className="text-xs text-muted-foreground">From Course Handicap calculator</p>
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="handicapAllowance">Handicap Allowance</Label>
+                      <Select value={handicapAllowance} onValueChange={setHandicapAllowance}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="100">100% (Individual Stroke Play)</SelectItem>
+                          <SelectItem value="95">95% (Individual Match Play)</SelectItem>
+                          <SelectItem value="85">85% (Four-Ball Stroke Play)</SelectItem>
+                          <SelectItem value="90">90% (Four-Ball Match Play)</SelectItem>
+                          <SelectItem value="50">50% (Scramble - 2 players)</SelectItem>
+                          <SelectItem value="35">35% (Scramble - 4 players)</SelectItem>
+                          <SelectItem value="75">75% (Chapman/Pinehurst)</SelectItem>
+                        </SelectContent>
+                      </Select>
+                      <p className="text-xs text-muted-foreground">Based on your match format</p>
+                    </div>
+                  </div>
 
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={calculateCourseHandicap}
-              className="flex-1 bg-gradient-primary text-primary-foreground"
-            >
-              Calculate Course Handicap
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={resetCourseCalculator}
-            >
-              Reset
-            </Button>
-          </div>
+                  {playingHandicap !== null && (
+                    <div className="p-4 bg-accent/10 rounded-lg border border-accent/20 text-center">
+                      <p className="text-sm text-muted-foreground mb-1">Your Playing Handicap is:</p>
+                      <p className="text-4xl font-bold text-accent">{playingHandicap}</p>
+                    </div>
+                  )}
 
-          <p className="text-xs text-muted-foreground">
-            Note: For 9-hole Course Handicap, use half of your 18-hole Handicap Index and 9-hole course ratings.
-          </p>
-        </CardContent>
-      </Card>
-
-      {/* Playing Handicap Calculator */}
-      <Card className="shadow-card">
-        <CardHeader className="pb-4">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-gradient-primary rounded-lg">
-              <Calculator className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <div>
-              <CardTitle>Playing Handicap Calculator</CardTitle>
-              <CardDescription>
-                Calculate your playing handicap based on match format
-              </CardDescription>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="courseHandicapInput">Course Handicap</Label>
-              <Input
-                id="courseHandicapInput"
-                type="number"
-                placeholder="e.g., 18"
-                value={courseHandicapInput}
-                onChange={(e) => setCourseHandicapInput(e.target.value)}
-              />
-              <p className="text-xs text-muted-foreground">
-                From Course Handicap calculator above
-              </p>
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="handicapAllowance">Handicap Allowance</Label>
-              <Select value={handicapAllowance} onValueChange={setHandicapAllowance}>
-                <SelectTrigger>
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="100">100% (Individual Stroke Play)</SelectItem>
-                  <SelectItem value="95">95% (Individual Match Play)</SelectItem>
-                  <SelectItem value="85">85% (Four-Ball Stroke Play)</SelectItem>
-                  <SelectItem value="90">90% (Four-Ball Match Play)</SelectItem>
-                  <SelectItem value="50">50% (Scramble - 2 players)</SelectItem>
-                  <SelectItem value="35">35% (Scramble - 4 players)</SelectItem>
-                  <SelectItem value="75">75% (Chapman/Pinehurst)</SelectItem>
-                </SelectContent>
-              </Select>
-              <p className="text-xs text-muted-foreground">
-                Based on your match format
-              </p>
-            </div>
-          </div>
-
-          {playingHandicap !== null && (
-            <div className="p-4 bg-accent/10 rounded-lg border border-accent/20">
-              <div className="text-center">
-                <p className="text-sm text-muted-foreground mb-1">Your Playing Handicap is:</p>
-                <p className="text-4xl font-bold text-accent">{playingHandicap}</p>
-              </div>
-            </div>
-          )}
-
-          <div className="flex gap-3 pt-2">
-            <Button
-              type="button"
-              onClick={calculatePlayingHandicap}
-              className="flex-1 bg-gradient-primary text-primary-foreground"
-            >
-              Calculate Playing Handicap
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              onClick={resetPlayingCalculator}
-            >
-              Reset
-            </Button>
+                  <div className="flex gap-3">
+                    <Button
+                      type="button"
+                      onClick={calculatePlayingHandicap}
+                      className="flex-1 bg-gradient-primary text-primary-foreground"
+                    >
+                      Calculate
+                    </Button>
+                    <Button type="button" variant="outline" onClick={resetPlayingCalculator}>
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         </CardContent>
       </Card>
