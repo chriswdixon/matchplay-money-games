@@ -195,6 +195,13 @@ const TycheLanding = () => {
 
               <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
 
+              <GamesNearYou
+                searchQuery={searchQuery}
+                onClearSearch={() => setSearchQuery("")}
+                onPickSuggestion={(v) => setSearchQuery(v)}
+                onOpenFilters={() => setCurrentTab("matches")}
+              />
+
               <button
                 type="button"
                 onClick={() => navigate("/wins")}
