@@ -50,7 +50,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
 
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-[env(safe-area-inset-top)]" role="banner">
-      <nav className="flex h-16 items-center gap-2 px-4 md:container md:justify-between" aria-label="Main navigation">
+      <nav className="flex h-12 items-center gap-2 px-4 md:container md:justify-between" aria-label="Main navigation">
         {/* Left: Logo */}
         <div className="flex items-center shrink-0">
           <Link to="/" className="flex items-center">
