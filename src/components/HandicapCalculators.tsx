@@ -162,7 +162,7 @@ function PlayingHandicapForm({ onClose }: { onClose?: () => void }) {
 export function HandicapCalculators() {
   return (
     <section className="py-20 px-6 bg-background" aria-labelledby="handicap-calculators-heading">
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-7xl mx-auto">
         <aside className="bg-gradient-hero text-primary-foreground rounded-2xl p-8 md:p-12 shadow-card" aria-labelledby="handicap-calculators-heading">
           <div className="text-center mb-8">
             <div className="w-12 h-12 mx-auto mb-4 bg-accent text-accent-foreground rounded-xl flex items-center justify-center" aria-hidden="true">
