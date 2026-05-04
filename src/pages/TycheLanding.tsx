@@ -285,10 +285,11 @@ const TycheLanding = () => {
           
           <div className="flex justify-center items-center mb-12">
             <Button
+              asChild
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent-glow shadow-accent transition-all duration-300 px-8 py-4 text-lg font-semibold"
             >
-              Schedule Demo
+              <Link to="/auth">Join Tyche</Link>
             </Button>
           </div>
           
