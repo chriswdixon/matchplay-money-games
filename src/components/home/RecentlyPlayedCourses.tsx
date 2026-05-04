@@ -1,16 +1,14 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
-import { Star } from "lucide-react";
+import { MapPin, History, Star } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
-import CourseImage from "@/components/CourseImage";
+import { formatDistanceToNow } from "date-fns";
 
 interface RecentCourse {
   course_name: string;
   match_id: string;
   played_at: string;
-  score?: string; // e.g. "4/7" derived from completed_holes / total_holes
   rating?: number;
 }
 
@@ -26,7 +24,6 @@ const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) =
         return;
       }
       try {
-        // Get last 12 completed matches the user joined, dedupe by course_name, take 3
         const { data: participations } = await supabase
           .from("match_participants")
           .select("match_id")
@@ -71,62 +68,58 @@ const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) =
     load();
   }, [user]);
 
-  if (loading) {
-    return (
-      <div>
-        <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Recently Played</h3>
-        <div className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 snap-x snap-mandatory">
-          {[0, 1, 2].map((i) => (
-            <Skeleton key={i} className="w-36 h-36 rounded-2xl shrink-0 snap-start" />
-          ))}
-        </div>
-      </div>
-    );
-  }
-
-  if (courses.length === 0) return null;
-
   return (
-    <div>
-      <h3 className="text-sm font-semibold text-muted-foreground mb-3 px-1">Recently Played</h3>
-      <div
-        className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1 snap-x snap-mandatory scroll-pl-4"
-        role="list"
-      >
-        {courses.map((c, idx) => {
-          const playedDate = new Date(c.played_at);
-          const dateLabel = `${playedDate.getMonth() + 1}/${playedDate.getDate()}`;
-          return (
+    <section
+      aria-labelledby="recently-played-heading"
+      className="rounded-3xl bg-foreground text-background p-4 md:p-6 shadow-card"
+    >
+      <div className="flex items-center justify-between mb-4 pb-3 border-b border-background/15">
+        <h2 id="recently-played-heading" className="text-lg font-bold flex items-center gap-2">
+          <History className="w-5 h-5" aria-hidden="true" />
+          Recently Played
+        </h2>
+      </div>
+
+      <div className="space-y-2">
+        {loading ? (
+          [1, 2, 3].map((i) => (
+            <Skeleton key={i} className="h-16 w-full rounded-2xl bg-background/10" />
+          ))
+        ) : courses.length === 0 ? (
+          <div className="py-6 text-center text-sm text-background/70">
+            <History className="w-8 h-8 mx-auto mb-2 opacity-40" aria-hidden="true" />
+            No recently played courses yet.
+          </div>
+        ) : (
+          courses.map((c) => (
             <button
               key={c.match_id}
               type="button"
-              role="listitem"
               onClick={() => onSelect?.(c.course_name)}
-              className={cn(
-                "group relative w-36 h-36 shrink-0 snap-start rounded-2xl overflow-hidden ring-2 ring-primary/70 hover:ring-primary transition-all text-left",
-                idx === courses.length - 1 && "mr-4",
-              )}
+              className="w-full flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-3 py-3 text-left hover:bg-background transition-colors"
             >
-              <CourseImage
-                src={null}
-                alt={c.course_name}
-                containerClassName="absolute inset-0 w-full h-full"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-2.5 text-white">
-                <div className="text-xs font-bold truncate leading-tight">{c.course_name}</div>
-                <div className="flex items-center gap-1.5 text-[11px] mt-0.5 opacity-95">
-                  <span className="font-semibold">{dateLabel}</span>
-                  <span aria-hidden="true" className="opacity-70">|</span>
-                  <Star className="w-2.5 h-2.5 fill-current" aria-hidden="true" />
-                  <span className="font-semibold">{c.rating?.toFixed(1) ?? "—"}</span>
+              <div className="flex-1 min-w-0">
+                <div className="font-semibold truncate text-sm">{c.course_name}</div>
+                <div className="flex items-center gap-1 text-xs text-muted-foreground truncate mt-0.5">
+                  <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
+                  <span className="truncate">Played</span>
+                  {c.rating != null && (
+                    <>
+                      <span aria-hidden="true" className="opacity-60">•</span>
+                      <Star className="w-3 h-3 fill-current" aria-hidden="true" />
+                      <span>{c.rating.toFixed(1)}</span>
+                    </>
+                  )}
                 </div>
               </div>
+              <span className="text-xs text-muted-foreground shrink-0">
+                {formatDistanceToNow(new Date(c.played_at), { addSuffix: true })}
+              </span>
             </button>
-          );
-        })}
+          ))
+        )}
       </div>
-    </div>
+    </section>
   );
 };
 
