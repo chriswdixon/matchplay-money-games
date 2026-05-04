@@ -48,11 +48,6 @@ export function PasswordVerificationDialog({
         return;
       }
 
-      toast({
-        title: "Verification successful",
-        description: "You can now access this section.",
-      });
-      
       setPassword('');
       onVerified();
     } catch (err) {
@@ -102,14 +97,9 @@ export function PasswordVerificationDialog({
               </div>
             )}
           </div>
-          <div className="flex gap-3">
-            <Button type="button" variant="outline" onClick={handleCancel} className="flex-1">
-              Cancel
-            </Button>
-            <Button type="submit" disabled={loading || !password} className="flex-1">
-              {loading ? "Verifying..." : "Verify"}
-            </Button>
-          </div>
+          <Button type="submit" disabled={loading || !password} className="w-full">
+            {loading ? "Verifying..." : "Verify"}
+          </Button>
         </form>
       </DialogContent>
     </Dialog>
