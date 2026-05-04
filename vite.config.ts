@@ -75,14 +75,21 @@ export default defineConfig(({ mode }) => ({
       registerType: "autoUpdate",
       injectRegister: false, // we register manually with host guards
       devOptions: { enabled: false },
-      includeAssets: ["favicon.png", "icons/icon-192.png", "icons/icon-512.png"],
+      includeAssets: [
+        "favicon.png",
+        "icons/icon-192.png",
+        "icons/icon-512.png",
+        "icons/icon-192-maskable.png",
+        "icons/icon-512-maskable.png",
+        "icons/apple-touch-icon.png",
+      ],
       manifest: {
         name: "Tyche - Competitive Golf",
         short_name: "Tyche",
         description:
           "Track golf scores offline on the course. Book matches, track real handicaps, and play.",
-        theme_color: "#0F172A",
-        background_color: "#0F172A",
+        theme_color: "#22C55E",
+        background_color: "#22C55E",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
@@ -90,7 +97,8 @@ export default defineConfig(({ mode }) => ({
         icons: [
           { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
           { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
+          { src: "/icons/icon-192-maskable.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
+          { src: "/icons/icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
         ],
       },
       workbox: {
