@@ -18,7 +18,7 @@ import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 import HomeProfileCard from "@/components/home/HomeProfileCard";
 import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
-import GamesNearYou from "@/components/home/GamesNearYou";
+
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 import HeroThemeSwitcher, { applyHeroTheme, getStoredHeroTheme } from "@/components/HeroThemeSwitcher";
 
@@ -220,11 +220,6 @@ const TycheLanding = () => {
                 <ArrowUp className="w-4 h-4 rotate-45 text-muted-foreground" />
               </button>
 
-              <GamesNearYou
-                searchQuery={searchQuery}
-                onClearSearch={() => setSearchQuery("")}
-                onPickSuggestion={(v) => setSearchQuery(v)}
-              />
             </div>
           )}
 
