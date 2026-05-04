@@ -36,7 +36,6 @@ const TycheHero = () => {
           poster={heroImage}
           autoPlay
           muted
-          loop
           playsInline
           preload="auto"
           aria-label="Golf ball bouncing and rolling on a lush green golf course"
