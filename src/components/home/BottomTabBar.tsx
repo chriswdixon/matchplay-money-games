@@ -1,4 +1,4 @@
-import { Home, Search, History, Trophy, Crown, UserCircle2, Target } from "lucide-react";
+import { Home, Search, History, Trophy, UserCircle2, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
@@ -28,7 +28,6 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
       : []),
     { id: "past", label: "Past Matches", Icon: History },
     { id: "handicap", label: "Handicap", Icon: Trophy },
-    { id: "subscription", label: "Membership", Icon: Crown },
     { id: "profile", label: "Profile", Icon: UserCircle2 },
   ];
 

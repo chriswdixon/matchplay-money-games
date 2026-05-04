@@ -121,7 +121,6 @@ const TycheLanding = () => {
       { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
       { value: "past", label: "Past Matches", icon: <History className="w-4 h-4" /> },
       { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
-      { value: "subscription", label: "Subscription", icon: <Crown className="w-4 h-4" /> },
     ];
     
     if (hasActiveMatch) {
@@ -154,7 +153,7 @@ const TycheLanding = () => {
   // Logged-in user experience
   if (user) {
     // Map currentTab to the new bottom tab system
-    const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap", "subscription"];
+    const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap"];
     const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
       ? (currentTab as BottomTab)
       : "home";
@@ -237,11 +236,6 @@ const TycheLanding = () => {
             </Suspense>
           )}
 
-          {currentTab === "subscription" && (
-            <Suspense fallback={<TabLoader />}>
-              <SubscriptionManagement />
-            </Suspense>
-          )}
         </main>
 
         <BottomTabBar
