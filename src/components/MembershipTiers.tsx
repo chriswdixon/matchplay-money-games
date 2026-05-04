@@ -198,10 +198,12 @@ const MembershipTiers = () => {
                 <Button 
                   onClick={() => 'isContactOnly' in tier && tier.isContactOnly ? undefined : handleSubscribe(tier.tierKey, billingPeriod)}
                   disabled={'isContactOnly' in tier && tier.isContactOnly}
-                  className={`w-full transform hover:scale-105 transition-all duration-300 ${
-                    tier.colorScheme === 'primary' ? 'bg-primary hover:bg-primary/90 text-primary-foreground' :
-                    tier.colorScheme === 'warning' ? 'bg-warning hover:bg-warning/90 text-warning-foreground' :
-                    'bg-secondary hover:bg-secondary/80 text-secondary-foreground'
+                  className={`w-full font-bold text-white transform hover:scale-105 transition-all duration-300 disabled:opacity-100 disabled:text-white ${
+                    'isContactOnly' in tier && tier.isContactOnly
+                      ? 'bg-yellow-400 hover:bg-yellow-300 disabled:bg-yellow-400'
+                      : tier.colorScheme === 'primary' ? 'bg-primary hover:bg-primary/90' :
+                        tier.colorScheme === 'warning' ? 'bg-warning hover:bg-warning/90' :
+                        'bg-secondary hover:bg-secondary/80'
                   }`}
                   size="lg"
                 >
