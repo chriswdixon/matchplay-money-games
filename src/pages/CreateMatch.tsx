@@ -65,7 +65,7 @@ const CreateMatch = () => {
   const [selectedCourse, setSelectedCourse] = useState<any>(null);
   const [locationCoords, setLocationCoords] = useState<{ latitude: number; longitude: number } | null>(null);
   const [searchRadius] = useState(30);
-  const [loadingZipcode, setLoadingZipcode] = useState(false);
+  
   const [loadingGPS, setLoadingGPS] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
