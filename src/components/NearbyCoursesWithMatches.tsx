@@ -228,9 +228,11 @@ const NearbyCoursesWithMatches = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search Courses & Matches"
+            placeholder="Search course, ZIP code, or city, ST"
             className="pl-10 h-11 rounded-full bg-success text-white font-bold placeholder:text-white/80 placeholder:font-bold border-success focus-visible:ring-success"
-            aria-label="Search courses and matches near you"
+            aria-label="Search courses, ZIP code, or city to find nearby matches"
+            inputMode="search"
+            maxLength={60}
           />
         </div>
         {loading && (
@@ -240,7 +242,7 @@ const NearbyCoursesWithMatches = () => {
         )}
       </form>
 
-      {!location && (
+      {!effectiveLocation && (
         <>
           <Button
             variant="outline"
@@ -250,12 +252,38 @@ const NearbyCoursesWithMatches = () => {
           >
             {locationLoading ? "Locating…" : "Enable location to see nearby courses"}
           </Button>
+          <p className="text-xs text-muted-foreground text-center px-1">
+            Or type a <span className="font-semibold">ZIP code</span> or{" "}
+            <span className="font-semibold">City, ST</span> in the search above to find nearby matches without GPS.
+          </p>
           <LocationStatusBanner
             error={locationError}
             loading={locationLoading}
             onRetry={() => requestLocation()}
           />
         </>
+      )}
+
+      {!location && manualLocation && (
+        <div className="flex items-center justify-between gap-2 px-1 text-xs text-muted-foreground" aria-live="polite">
+          <span className="flex items-center gap-1 min-w-0 truncate">
+            <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
+            Searching near <span className="font-semibold text-foreground truncate">{manualLocation.label}</span>
+          </span>
+          <Button
+            type="button"
+            size="sm"
+            variant="ghost"
+            className="h-7 px-2 text-xs"
+            onClick={() => {
+              setManualLocation(null);
+              setCourses([]);
+              setSearched(false);
+            }}
+          >
+            Clear
+          </Button>
+        </div>
       )}
 
       {location && (
