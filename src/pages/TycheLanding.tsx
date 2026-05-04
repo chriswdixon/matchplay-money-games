@@ -184,23 +184,17 @@ const TycheLanding = () => {
 
           {currentTab === "home" && (
             <div className="space-y-6">
-              {/* Profile + Search card */}
-              <div className="bg-card rounded-3xl p-4 shadow-card space-y-4">
+              <div className="bg-card rounded-3xl p-4 shadow-card">
                 <HomeProfileCard />
-                <HomeSearchBar value={searchQuery} onChange={setSearchQuery} />
               </div>
 
               <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
 
-              <GamesNearYou
-                searchQuery={searchQuery}
-                onClearSearch={() => setSearchQuery("")}
-                onPickSuggestion={(v) => setSearchQuery(v)}
-                onOpenFilters={() => setCurrentTab("matches")}
-              />
+              <div className="bg-card rounded-3xl p-4 shadow-card">
+                <NearbyCoursesWithMatches />
+              </div>
 
               <RecentWins />
-
             </div>
           )}
 
