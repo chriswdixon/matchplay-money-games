@@ -390,10 +390,10 @@ const CreateMatch = () => {
 
   const handleSubmit = async () => {
     // Prevent form submission if not on the final step
-    if (currentStep !== 3) {
+    if (currentStep !== 2) {
       return;
     }
-    
+
     if (!user) {
       toast.error('Please sign in to create a match');
       navigate('/auth');
