@@ -21,6 +21,7 @@ const formatLabel = (format: string, isTeam: boolean) => {
 const WinsFeed = () => {
   const { user, loading: authLoading } = useAuth();
   const navigate = useNavigate();
+  const { hasActiveMatch } = useActiveMatch();
   const { posts, loading } = useWinsFeed(100);
 
   useEffect(() => {
