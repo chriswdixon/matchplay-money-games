@@ -30,7 +30,7 @@ export const getStoredHeroTheme = (): HeroTheme => {
   } catch {
     /* ignore */
   }
-  return "gold";
+  return "green";
 };
 
 const HeroThemeSwitcher = () => {
