@@ -79,16 +79,23 @@ const CourseDetailDialog = ({
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <div className="flex gap-3 items-start">
-            {(detail?.latitude || course.latitude) && (detail?.longitude || course.longitude) && (
-              <img
-                src={`https://staticmap.openstreetmap.de/staticmap.php?center=${detail?.latitude || course.latitude},${detail?.longitude || course.longitude}&zoom=15&size=120x120&maptype=mapnik&markers=${detail?.latitude || course.latitude},${detail?.longitude || course.longitude},red-pushpin`}
-                alt={`Map of ${detail?.name || course.name}`}
-                width={80}
-                height={80}
-                loading="lazy"
-                className="w-20 h-20 rounded-lg object-cover border border-border shrink-0"
-                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
-              />
+            {(detail?.latitude || course.latitude) && (detail?.longitude || course.longitude) ? (
+              <a
+                href={`https://www.openstreetmap.org/?mlat=${detail?.latitude || course.latitude}&mlon=${detail?.longitude || course.longitude}#map=15/${detail?.latitude || course.latitude}/${detail?.longitude || course.longitude}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                aria-label={`Open map for ${detail?.name || course.name}`}
+                className="w-20 h-20 rounded-lg border border-border shrink-0 bg-gradient-to-br from-primary/15 to-primary/5 flex items-center justify-center hover:from-primary/25 hover:to-primary/10 transition-colors"
+              >
+                <MapPin className="w-8 h-8 text-primary" aria-hidden="true" />
+              </a>
+            ) : (
+              <div
+                aria-hidden="true"
+                className="w-20 h-20 rounded-lg border border-border shrink-0 bg-muted flex items-center justify-center"
+              >
+                <Flag className="w-8 h-8 text-muted-foreground" />
+              </div>
             )}
             <div className="min-w-0 flex-1">
               <DialogTitle className="pr-6">{detail?.name || course.name}</DialogTitle>
