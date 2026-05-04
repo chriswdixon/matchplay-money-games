@@ -195,20 +195,22 @@ const NearbyCoursesWithMatches = () => {
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-success-foreground/80"
             aria-hidden="true"
           />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search courses near you (or leave blank)"
-            className="pl-10 h-11"
+            className="pl-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
             aria-label="Search courses and matches near you"
           />
         </div>
-        <Button type="submit" className="h-11 hover:shadow-[0_0_20px_hsl(var(--primary)/0.7)] transition-shadow" disabled={loading}>
-          {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
-        </Button>
+        {loading && (
+          <div className="flex items-center px-2" aria-live="polite">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />
+          </div>
+        )}
       </form>
 
       {!location && (
