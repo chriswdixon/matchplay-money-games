@@ -154,25 +154,24 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
             </p>
           )}
           {courseResults.map((course, i) => (
-            <Card key={`${course.name}-${i}`} className="bg-card">
+            <Card key={`${course.name}-${i}`} className="bg-foreground text-background border-foreground/20 rounded-2xl">
               <CardContent className="p-3 flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">{course.name}</p>
-                  <p className="text-xs text-muted-foreground flex items-center gap-1 truncate">
+                  <p className="text-xs text-background/70 flex items-center gap-1 truncate">
                     <MapPin className="w-3 h-3 shrink-0" aria-hidden="true" />
                     <span className="truncate">{course.address}</span>
                     {course.distance !== undefined && (
-                      <span className="text-primary shrink-0">
-                        • {course.distance.toFixed(1)}mi
+                      <span className="text-primary-foreground bg-primary/80 px-1.5 py-0.5 rounded-full shrink-0 text-[10px] font-medium">
+                        {course.distance.toFixed(1)}mi
                       </span>
                     )}
                   </p>
                 </div>
                 <Button
                   size="sm"
-                  variant="outline"
                   onClick={() => handleCreateAtCourse(course)}
-                  className="shrink-0"
+                  className="shrink-0 rounded-full bg-background text-foreground hover:bg-background/90"
                 >
                   Match
                 </Button>
