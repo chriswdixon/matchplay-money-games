@@ -6,7 +6,8 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
+import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck, LifeBuoy } from "lucide-react";
+import { SupportRequests } from "@/components/admin/SupportRequests";
 import { AuditLog } from "@/components/admin/AuditLog";
 import { PageTitleCard } from "@/components/ui/page-title-card";
 import { AuditAlerts } from "@/components/admin/AuditAlerts";
@@ -96,6 +97,7 @@ const AdminConsole = () => {
                     { id: 'geo', label: 'Geo', Icon: Globe },
                     { id: 'golf-data', label: 'Golf Data', Icon: Database },
                     { id: 'social', label: 'Social', Icon: Share2 },
+                    { id: 'support', label: 'Support', Icon: LifeBuoy },
                     { id: 'audit', label: 'Audit', Icon: ShieldCheck },
                   ].map(({ id, label, Icon }) => {
                     const active = id === activeTab;
@@ -168,6 +170,10 @@ const AdminConsole = () => {
 
             <TabsContent value="social">
               <SocialLinksManagement />
+            </TabsContent>
+
+            <TabsContent value="support">
+              <SupportRequests />
             </TabsContent>
 
             <TabsContent value="audit" className="space-y-6">
