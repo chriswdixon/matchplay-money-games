@@ -24,7 +24,7 @@ const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
 );
 
-type TabId = 'profile' | 'handicap' | 'account' | 'settings' | 'security' | 'subscription' | 'privacy';
+type TabId = 'profile' | 'handicap' | 'account' | 'settings' | 'security' | 'privacy';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -57,7 +57,7 @@ export default function Profile() {
   if (!user) return null;
 
   const handleTabChange = (value: TabId) => {
-    if ((value === 'account' || value === 'subscription') && !isVerified) {
+    if (value === 'account' && !isVerified) {
       setPendingTab(value);
       setShowPasswordDialog(true);
       return;
@@ -82,10 +82,9 @@ export default function Profile() {
   const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean }[] = [
     { id: 'profile', label: 'Profile', Icon: User, show: true },
     { id: 'handicap', label: 'Handicap', Icon: Trophy, show: true },
-    { id: 'account', label: 'Account', Icon: DollarSign, show: showAccountTab },
+    { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: showAccountTab },
     { id: 'settings', label: 'Settings', Icon: Settings, show: true },
     { id: 'security', label: 'Security', Icon: Shield, show: true },
-    { id: 'subscription', label: 'Subscription', Icon: CreditCard, show: true },
     { id: 'privacy', label: 'Privacy', Icon: FileText, show: true },
   ];
   const tabs = allTabs.filter(t => t.show);
@@ -191,6 +190,12 @@ export default function Profile() {
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <TransactionHistory />
               </div>
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <SubscriptionManagement
+                  isVerified={isVerified}
+                  onRequestVerification={() => setShowPasswordDialog(true)}
+                />
+              </div>
             </div>
           )}
 
@@ -208,15 +213,6 @@ export default function Profile() {
           {activeTab === 'security' && (
             <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
               <MFASettings />
-            </div>
-          )}
-
-          {activeTab === 'subscription' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-              <SubscriptionManagement
-                isVerified={isVerified}
-                onRequestVerification={() => setShowPasswordDialog(true)}
-              />
             </div>
           )}
 
