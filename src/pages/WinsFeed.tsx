@@ -30,7 +30,7 @@ const WinsFeed = () => {
   }, [authLoading, user, navigate]);
 
   return (
-    <main className="min-h-screen bg-muted/40 pb-32 md:pb-12 md:pt-24">
+    <main className="min-h-screen bg-muted/40 pb-32 md:pb-12 md:pt-20">
       <div className="max-w-2xl mx-auto px-4 pt-4">
         <PageTitleCard
           icon={<Trophy className="w-5 h-5" aria-hidden="true" />}

@@ -39,7 +39,7 @@ export default function Wallet() {
     <div className="min-h-screen bg-muted/40 flex flex-col">
       <a href="#wallet-main" className="skip-link">Skip to main content</a>
 
-      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-24" role="banner">
+      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
         <PageTitleCard
           icon={<Landmark className="w-5 h-5" aria-hidden="true" />}
           title="Wallet & Subscription"
