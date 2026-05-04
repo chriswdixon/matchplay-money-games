@@ -118,6 +118,12 @@ const TycheDashboard = () => {
               <HomeSearchBar value={searchQuery} onChange={setSearchQuery} />
             </div>
             <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
+            <GamesNearYou
+              searchQuery={searchQuery}
+              onClearSearch={() => setSearchQuery("")}
+              onPickSuggestion={(v) => setSearchQuery(v)}
+              onOpenFilters={() => setCurrentTab("matches")}
+            />
             <button
               type="button"
               onClick={() => navigate("/wins")}
