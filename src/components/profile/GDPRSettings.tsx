@@ -4,17 +4,21 @@ import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { 
-  Download, 
-  Trash2, 
-  Shield, 
-  Loader2, 
-  CheckCircle, 
+import {
+  Download,
+  Trash2,
+  Shield,
+  Loader2,
+  CheckCircle,
   AlertTriangle,
   FileJson,
   Mail,
-  BadgeCheck
+  BadgeCheck,
+  Lock,
+  ScrollText,
 } from "lucide-react";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { toast } from "sonner";
@@ -412,26 +416,48 @@ export const GDPRSettings = () => {
       {/* Privacy Links */}
       <Card>
         <CardContent className="pt-6">
-          <div className="flex flex-wrap gap-4 text-sm">
-            <a 
-              href="/privacy" 
-              className="text-primary hover:underline"
-            >
-              Privacy Policy
-            </a>
-            <a 
-              href="/terms" 
-              className="text-primary hover:underline"
-            >
-              Terms of Service
-            </a>
-            <a 
-              href="mailto:privacy@match-play.co" 
-              className="text-primary hover:underline"
-            >
-              Contact Privacy Team
-            </a>
-          </div>
+          <TooltipProvider delayDuration={150}>
+            <div className="flex flex-wrap items-center gap-3">
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/privacy"
+                    aria-label="Privacy Policy"
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted hover:bg-accent text-foreground transition-colors"
+                  >
+                    <Lock className="w-5 h-5" aria-hidden="true" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>Privacy Policy</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/terms"
+                    aria-label="Terms of Service"
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted hover:bg-accent text-foreground transition-colors"
+                  >
+                    <ScrollText className="w-5 h-5" aria-hidden="true" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent>Terms of Service</TooltipContent>
+              </Tooltip>
+
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <a
+                    href="mailto:privacy@match-play.co"
+                    aria-label="Contact Privacy Team"
+                    className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-muted hover:bg-accent text-foreground transition-colors"
+                  >
+                    <Mail className="w-5 h-5" aria-hidden="true" />
+                  </a>
+                </TooltipTrigger>
+                <TooltipContent>Contact Privacy Team</TooltipContent>
+              </Tooltip>
+            </div>
+          </TooltipProvider>
         </CardContent>
       </Card>
     </div>
