@@ -163,15 +163,15 @@ export function HandicapCalculators() {
   return (
     <section className="py-20 px-6 bg-background" aria-labelledby="handicap-calculators-heading">
       <div className="max-w-7xl mx-auto">
-        <aside className="bg-gradient-hero text-primary-foreground rounded-2xl p-8 md:p-12 shadow-card" aria-labelledby="handicap-calculators-heading">
+        <aside className="bg-card text-foreground border border-border rounded-2xl p-8 md:p-12 shadow-card" aria-labelledby="handicap-calculators-heading">
           <div className="text-center mb-8">
             <div className="w-12 h-12 mx-auto mb-4 bg-accent text-accent-foreground rounded-xl flex items-center justify-center" aria-hidden="true">
               <Calculator className="w-6 h-6" />
             </div>
-            <h2 id="handicap-calculators-heading" className="text-3xl md:text-4xl font-bold mb-4">
+            <h2 id="handicap-calculators-heading" className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
               Handicap Calculators
             </h2>
-            <p className="text-primary-foreground/90 max-w-2xl mx-auto">
+            <p className="text-muted-foreground max-w-2xl mx-auto">
               Compute your Course Handicap and Playing Handicap before choosing your game level.
             </p>
           </div>
