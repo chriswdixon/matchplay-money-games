@@ -1,5 +1,6 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Database, Eye, Lock, Globe, Trash2 } from "lucide-react";
+import { PageTitleCard } from "@/components/ui/page-title-card";
 
 const Privacy = () => {
   return (
@@ -7,11 +8,12 @@ const Privacy = () => {
 
       <main className="container py-12 px-4 max-w-4xl">
         {/* Hero Section */}
-        <div className="text-center mb-12">
-          <h1 className="text-4xl font-bold mb-4 text-foreground">Privacy Policy</h1>
-          <p className="text-lg text-muted-foreground">
-            Last updated: {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-          </p>
+        <div className="mb-12">
+          <PageTitleCard
+            icon={<Lock className="w-5 h-5" aria-hidden="true" />}
+            title="Privacy Policy"
+            description={`Last updated: ${new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`}
+          />
         </div>
 
         {/* Key Points Cards */}
