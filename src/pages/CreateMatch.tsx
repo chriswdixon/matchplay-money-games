@@ -7,15 +7,13 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Lock, Plus, Info, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Plus, Info, AlertCircle } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
-import { useSubscription } from '@/hooks/useSubscription';
 import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useFreeTier } from '@/hooks/useFreeTier';
 
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
@@ -32,15 +30,10 @@ const CreateMatch = () => {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { user } = useAuth();
-  const { subscribed, tierName } = useSubscription();
-  const { isFree, hasAccess } = useFreeTier();
   const { createMatch } = useMatches();
   
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
-  
-
-  const isPaidSubscription = subscribed && tierName !== 'free';
 
   const [currentStep, setCurrentStep] = useState(0);
   const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
@@ -376,7 +369,7 @@ const CreateMatch = () => {
       const isTeamFormat = maxParticipants !== 1 && (formData.format === 'Best Ball' || formData.format === 'Scramble');
 
       // Parse numeric values safely
-      const parsedBuyIn = !hasAccess('buy_in') ? 0 : Math.max(0, parseInt(formData.buy_in_amount) || 0);
+      const parsedBuyIn = Math.max(0, parseInt(formData.buy_in_amount) || 0);
       const parsedHandicapMin = formData.handicap_min && formData.handicap_min.trim() !== '' 
         ? parseInt(formData.handicap_min) 
         : undefined;
@@ -629,7 +622,7 @@ const CreateMatch = () => {
 
 
 
-      {isPaidSubscription && formData.booking_url && (
+      {formData.booking_url && (
         <div className="space-y-2">
           <Label>Tee Time Booking</Label>
           <Button
@@ -841,7 +834,6 @@ const CreateMatch = () => {
         <div className="flex items-center gap-2">
           <Label htmlFor="buy_in" className="flex items-center gap-2">
             Buy-In Amount ($)
-            {!hasAccess('buy_in') && <Lock className="w-4 h-4 text-muted-foreground" />}
           </Label>
           <TooltipProvider>
             <Tooltip>
@@ -860,7 +852,7 @@ const CreateMatch = () => {
             type="number"
             min="0"
             max="500"
-            value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
+            value={formData.buy_in_amount}
             onKeyDown={handleKeyDown}
             onChange={(e) => {
               const value = e.target.value;
@@ -875,9 +867,7 @@ const CreateMatch = () => {
               setValidationErrors({ ...validationErrors, buy_in_amount: error });
               setFormData({ ...formData, buy_in_amount: value === '' ? '0' : value });
             }}
-            disabled={!hasAccess('buy_in')}
             className={cn(
-              !hasAccess('buy_in') && 'bg-muted cursor-not-allowed',
               validationErrors.buy_in_amount && 'border-destructive'
             )}
           />
@@ -902,11 +892,8 @@ const CreateMatch = () => {
             {validationErrors.buy_in_amount}
           </p>
         )}
-        {hasAccess('buy_in') && !validationErrors.buy_in_amount && (
+        {!validationErrors.buy_in_amount && (
           <p className="text-xs text-muted-foreground">Default: $50 • Max: $500</p>
-        )}
-        {!hasAccess('buy_in') && (
-          <p className="text-xs text-warning">Upgrade to Local Player or Tournament Pro to enable buy-ins</p>
         )}
       </div>
 
