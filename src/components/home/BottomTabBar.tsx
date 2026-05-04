@@ -28,7 +28,6 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
       : []),
     { id: "past", label: "Past Matches", Icon: History },
     { id: "handicap", label: "Handicap", Icon: Trophy },
-    { id: "subscription", label: "Membership", Icon: Crown },
     { id: "profile", label: "Profile", Icon: UserCircle2 },
   ];
 
