@@ -67,7 +67,7 @@ const NearbyCoursesWithMatches = () => {
     } else {
       results = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
     }
-    setCourses(results.slice(0, 20));
+    setCourses(results.slice(0, 50));
   };
 
   const handleSubmit = (e: React.FormEvent) => {
