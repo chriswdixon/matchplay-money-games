@@ -1,3 +1,4 @@
+import GolfBallLoader from "@/components/GolfBallLoader";
 import { Suspense, lazy } from "react";
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
@@ -36,7 +37,7 @@ const WalletPage = lazy(() => import("./pages/Wallet"));
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
-    <div className="animate-pulse text-muted-foreground">Loading...</div>
+    <GolfBallLoader size={64} />
   </div>
 );
 

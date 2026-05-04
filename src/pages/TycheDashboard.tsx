@@ -1,3 +1,4 @@
+import GolfBallLoader from "@/components/GolfBallLoader";
 import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import AppHeader from "@/components/AppHeader";
 import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";
@@ -22,7 +23,7 @@ const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m =
 
 const TabLoader = () => (
   <div className="flex items-center justify-center py-12">
-    <div className="animate-pulse text-muted-foreground">Loading...</div>
+    <GolfBallLoader />
   </div>
 );
 
