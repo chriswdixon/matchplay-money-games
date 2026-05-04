@@ -174,12 +174,12 @@ export const useLocation = () => {
   };
 
   const formatDistance = (distanceMiles: number): string => {
-    if (distanceMiles < 1) {
-      return `${Math.round(distanceMiles * 5280)}ft`;
+    if (distanceMiles < 0.1) {
+      return `${Math.round(distanceMiles * 5280)} ft`;
     } else if (distanceMiles < 10) {
-      return `${distanceMiles.toFixed(1)}mi`;
+      return `${distanceMiles.toFixed(1)} miles`;
     } else {
-      return `${Math.round(distanceMiles)}mi`;
+      return `${Math.round(distanceMiles)} miles`;
     }
   };
 
