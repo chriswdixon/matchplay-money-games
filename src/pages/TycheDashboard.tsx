@@ -1,3 +1,4 @@
+import GolfBallLoader from "@/components/GolfBallLoader";
 import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import AppHeader from "@/components/AppHeader";
 import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";

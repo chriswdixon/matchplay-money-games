@@ -1,3 +1,4 @@
+import GolfBallLoader from "@/components/GolfBallLoader";
 import { lazy, Suspense, useEffect, useState, useMemo } from "react";
 import TycheHero from "@/components/TycheHero";
 import AppHeader from "@/components/AppHeader";
