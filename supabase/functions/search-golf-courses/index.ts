@@ -351,6 +351,11 @@ async function queryOpenStreetMap(
     return [];
   }
 
+  // Add addressdetails=1 so we can read the state from the structured address
+  if (!osmUrl.includes('addressdetails=')) {
+    osmUrl += '&addressdetails=1';
+  }
+
   const response = await fetch(osmUrl, {
     headers: { 'User-Agent': 'Tyche-Golf-App/1.0' }
   });
