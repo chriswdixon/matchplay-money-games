@@ -24,7 +24,7 @@ const SectionLoader = () => (
 const TychePublicLanding = () => {
   const [showScrollTop, setShowScrollTop] = useState(false);
   const [hydrateBelowFold, setHydrateBelowFold] = useState(false);
-  const { theme, setTheme } = useTheme();
+  
 
   // Defer below-the-fold work until the browser is idle so the hero/LCP
   // and main-thread budget aren't blocked at startup.
@@ -59,20 +59,6 @@ const TychePublicLanding = () => {
   return (
     <div className="min-h-screen bg-background">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-
-      <header className="fixed top-0 left-0 right-0 z-50 p-4 flex justify-end" role="banner">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="bg-background/80 backdrop-blur-sm border border-border min-w-[44px] min-h-[44px] touch-manipulation relative"
-          style={{ WebkitTapHighlightColor: 'transparent' }}
-          onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-          aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
-        >
-          <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" aria-hidden="true" />
-          <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" aria-hidden="true" />
-        </Button>
-      </header>
 
       <TycheHero />
 
