@@ -33,7 +33,7 @@ const AppFooter = () => {
   );
 
   return (
-    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 py-8" role="contentinfo">
+    <footer className="border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 pt-8 pb-0" role="contentinfo">
       <div className="container">
         <div className="flex flex-col md:flex-row items-center justify-between gap-6">
           {/* Copyright */}
