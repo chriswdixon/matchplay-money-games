@@ -41,6 +41,7 @@ const UserManagement = () => {
     title: string;
     description: string;
   }>({ open: false, action: '', title: '', description: '' });
+  const [accountDialog, setAccountDialog] = useState<{ open: boolean; user: UserData | null }>({ open: false, user: null });
   const { toast } = useToast();
 
   useEffect(() => {
