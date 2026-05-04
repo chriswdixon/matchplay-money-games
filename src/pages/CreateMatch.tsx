@@ -35,7 +35,7 @@ const CreateMatch = () => {
   const { subscribed, tierName } = useSubscription();
   const { isFree, hasAccess } = useFreeTier();
   const { createMatch } = useMatches();
-  const { geocodeAddress } = useLocation();
+  
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
   
