@@ -726,10 +726,11 @@ export function AuthForm() {
                         placeholder="Create a strong password"
                         value={password}
                         onChange={(e) => handlePasswordChange(e.target.value)}
+                        onFocus={() => setPasswordFocused(true)}
                         required
                         className={validationErrors.password ? "border-destructive" : ""}
                       />
-                      {(() => {
+                      {passwordFocused && (() => {
                         const reqs = [
                           { label: 'At least 8 characters', ok: password.length >= 8 },
                           { label: 'One lowercase letter (a-z)', ok: /[a-z]/.test(password) },
