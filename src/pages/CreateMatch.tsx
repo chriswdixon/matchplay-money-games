@@ -206,6 +206,51 @@ const CreateMatch = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // Watch the browser's geolocation permission and auto-retry the moment
+  // the user flips it from "denied" to "granted" in their browser settings.
+  useEffect(() => {
+    if (typeof navigator === 'undefined' || !navigator.permissions?.query) {
+      return;
+    }
+    let status: PermissionStatus | null = null;
+    let cancelled = false;
+    const onChange = () => {
+      if (!status || cancelled) return;
+      if (status.state === 'granted') {
+        toast.success('Location enabled — refreshing nearby courses');
+        handleGPSSearch();
+      }
+    };
+    navigator.permissions
+      .query({ name: 'geolocation' as PermissionName })
+      .then((s) => {
+        if (cancelled) return;
+        status = s;
+        s.addEventListener('change', onChange);
+      })
+      .catch(() => {
+        // Permissions API unsupported for geolocation in this browser — ignore.
+      });
+    return () => {
+      cancelled = true;
+      status?.removeEventListener('change', onChange);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  // When the tab regains focus after the user changes browser settings,
+  // give GPS one more shot if we still don't have coordinates.
+  useEffect(() => {
+    const onVisible = () => {
+      if (document.visibilityState === 'visible' && !locationCoords && !loadingGPS) {
+        handleGPSSearch();
+      }
+    };
+    document.addEventListener('visibilitychange', onVisible);
+    return () => document.removeEventListener('visibilitychange', onVisible);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [locationCoords, loadingGPS]);
+
 
   const handleCourseSelect = async (course: any) => {
     setSelectedCourse(course);
