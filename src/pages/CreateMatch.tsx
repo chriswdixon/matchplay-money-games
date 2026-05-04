@@ -10,12 +10,10 @@ import { Calendar } from '@/components/ui/calendar';
 import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Plus, Info, AlertCircle } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
-import { useSubscription } from '@/hooks/useSubscription';
 import { useLocation } from '@/hooks/useLocation';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { useFreeTier } from '@/hooks/useFreeTier';
 
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
