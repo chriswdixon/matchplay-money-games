@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { MapPin, Plus, Trash2, Globe } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // US States list for dropdown
 const US_STATES = [
