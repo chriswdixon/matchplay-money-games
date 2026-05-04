@@ -96,8 +96,8 @@ const TychePublicLanding = () => {
       {hydrateBelowFold && (
         <>
           <Suspense fallback={<SectionLoader />}><AppFeatures /></Suspense>
-          <Suspense fallback={<SectionLoader />}><HandicapCalculators /></Suspense>
           <Suspense fallback={<SectionLoader />}><MembershipTiers /></Suspense>
+          <Suspense fallback={<SectionLoader />}><HandicapCalculators /></Suspense>
         </>
       )}
 
