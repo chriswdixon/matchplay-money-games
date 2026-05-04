@@ -18,7 +18,7 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation as useRouterLocation } from 'react-router-dom';
 
 
 
@@ -28,6 +28,7 @@ import { supabase } from '@/integrations/supabase/client';
 
 const CreateMatch = () => {
   const navigate = useNavigate();
+  const routerLocation = useRouterLocation();
   const isMobile = useIsMobile();
   const { user } = useAuth();
   const { createMatch } = useMatches();
@@ -119,6 +120,28 @@ const CreateMatch = () => {
 
     checkIncompleteMatches();
   }, [user]);
+
+  // Prefill course from navigation state (e.g. clicking "Create Match" on a course card)
+  useEffect(() => {
+    const prefilled = (routerLocation.state as any)?.prefilledCourse;
+    if (!prefilled?.name) return;
+    setSelectedCourse({
+      name: prefilled.name,
+      address: prefilled.address,
+      latitude: prefilled.latitude,
+      longitude: prefilled.longitude,
+      website: prefilled.website,
+      externalId: prefilled.externalId,
+    });
+    setFormData((prev) => ({
+      ...prev,
+      course_name: prefilled.name,
+      booking_url: prefilled.website || prev.booking_url,
+    }));
+    // Clear state so a refresh doesn't re-prefill
+    navigate(routerLocation.pathname, { replace: true, state: {} });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Load saved form data from localStorage on mount
   useEffect(() => {
