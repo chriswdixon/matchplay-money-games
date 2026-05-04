@@ -74,57 +74,58 @@ const AdminConsole = () => {
           />
         </div>
 
-        <Tabs defaultValue="reports" className="space-y-6">
-          <TabsList className="grid w-full grid-cols-12 lg:w-auto">
-            <TabsTrigger value="reports" className="gap-2">
-              <BarChart3 className="h-4 w-4" />
-              Reports
-            </TabsTrigger>
-            <TabsTrigger value="matches" className="gap-2">
-              <TrendingUp className="h-4 w-4" />
-              Matches
-            </TabsTrigger>
-            <TabsTrigger value="users" className="gap-2">
-              <Users className="h-4 w-4" />
-              Users
-            </TabsTrigger>
-            <TabsTrigger value="accounts" className="gap-2">
-              <DollarSign className="h-4 w-4" />
-              Accounts
-            </TabsTrigger>
-            <TabsTrigger value="invites" className="gap-2">
-              <Mail className="h-4 w-4" />
-              Invites
-            </TabsTrigger>
-            <TabsTrigger value="coupons" className="gap-2">
-              <Ticket className="h-4 w-4" />
-              Coupons
-            </TabsTrigger>
-            <TabsTrigger value="reviews" className="gap-2">
-              <AlertCircle className="h-4 w-4" />
-              Reviews
-            </TabsTrigger>
-            <TabsTrigger value="deletions" className="gap-2">
-              <Trash2 className="h-4 w-4" />
-              Deletions
-            </TabsTrigger>
-            <TabsTrigger value="geo" className="gap-2">
-              <Globe className="h-4 w-4" />
-              Geo
-            </TabsTrigger>
-            <TabsTrigger value="golf-data" className="gap-2">
-              <Database className="h-4 w-4" />
-              Golf Data
-            </TabsTrigger>
-            <TabsTrigger value="social" className="gap-2">
-              <Share2 className="h-4 w-4" />
-              Social
-            </TabsTrigger>
-            <TabsTrigger value="audit" className="gap-2">
-              <ShieldCheck className="h-4 w-4" />
-              Audit
-            </TabsTrigger>
-          </TabsList>
+        <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-6">
+          <TooltipProvider delayDuration={200}>
+            <nav
+              aria-label="Admin sections"
+              className={cn(
+                'z-30 px-2 pointer-events-none',
+                isMobile ? 'sticky top-2 mb-4' : 'sticky top-4 mb-6'
+              )}
+            >
+              <div className="mx-auto max-w-5xl pointer-events-auto">
+                <div className="flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide justify-between">
+                  {[
+                    { id: 'reports', label: 'Reports', Icon: BarChart3 },
+                    { id: 'matches', label: 'Matches', Icon: TrendingUp },
+                    { id: 'users', label: 'Users', Icon: Users },
+                    { id: 'accounts', label: 'Accounts', Icon: DollarSign },
+                    { id: 'invites', label: 'Invites', Icon: Mail },
+                    { id: 'coupons', label: 'Coupons', Icon: Ticket },
+                    { id: 'reviews', label: 'Reviews', Icon: AlertCircle },
+                    { id: 'deletions', label: 'Deletions', Icon: Trash2 },
+                    { id: 'geo', label: 'Geo', Icon: Globe },
+                    { id: 'golf-data', label: 'Golf Data', Icon: Database },
+                    { id: 'social', label: 'Social', Icon: Share2 },
+                    { id: 'audit', label: 'Audit', Icon: ShieldCheck },
+                  ].map(({ id, label, Icon }) => {
+                    const active = id === activeTab;
+                    return (
+                      <Tooltip key={id}>
+                        <TooltipTrigger asChild>
+                          <button
+                            type="button"
+                            onClick={() => setActiveTab(id)}
+                            aria-label={label}
+                            aria-current={active ? 'page' : undefined}
+                            className={cn(
+                              'relative flex items-center justify-center rounded-full transition-all w-10 h-10 shrink-0',
+                              active
+                                ? 'bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.6)]'
+                                : 'text-background/90 hover:text-background hover:bg-background/10 hover:shadow-[0_0_20px_hsl(var(--primary)/0.5)]'
+                            )}
+                          >
+                            <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                          </button>
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">{label}</TooltipContent>
+                      </Tooltip>
+                    );
+                  })}
+                </div>
+              </div>
+            </nav>
+          </TooltipProvider>
 
           <TabsContent value="matches">
             <MatchManagement />
