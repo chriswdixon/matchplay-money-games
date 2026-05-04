@@ -200,7 +200,7 @@ const NearbyCoursesWithMatches = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search courses near you (or leave blank)"
+            placeholder="Search Courses & Matches"
             className="pl-10 h-11 rounded-full bg-success text-white font-bold placeholder:text-white/80 placeholder:font-bold border-success focus-visible:ring-success"
             aria-label="Search courses and matches near you"
           />
