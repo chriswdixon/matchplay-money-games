@@ -152,19 +152,21 @@ export default function Profile() {
             </Button>
           )}
           {isAdmin && (
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => navigate('/admin')}
-                  aria-label="Admin Portal"
-                >
-                  <ShieldCheck className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Admin Portal</TooltipContent>
-            </Tooltip>
+            <TooltipProvider delayDuration={200}>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => navigate('/admin')}
+                    aria-label="Admin Portal"
+                  >
+                    <ShieldCheck className="h-4 w-4" />
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Admin Portal</TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           )}
           <div className="flex-1">
             <PageTitleCard
