@@ -93,33 +93,38 @@ const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) =
         className="flex gap-3 overflow-x-auto scrollbar-hide -mx-4 px-4 pb-1 snap-x snap-mandatory scroll-pl-4"
         role="list"
       >
-        {courses.map((c, idx) => (
-          <button
-            key={c.match_id}
-            type="button"
-            role="listitem"
-            onClick={() => onSelect?.(c.course_name)}
-            className={cn(
-              "group relative w-36 h-36 shrink-0 snap-start rounded-2xl overflow-hidden ring-2 ring-primary/70 hover:ring-primary transition-all text-left",
-              idx === courses.length - 1 && "mr-4",
-            )}
-          >
-            <CourseImage
-              src={null}
-              alt={c.course_name}
-              containerClassName="absolute inset-0 w-full h-full"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/25 to-transparent" />
-            <div className="absolute top-2 right-2 flex items-center gap-1 bg-black/45 backdrop-blur-sm rounded-full px-2 py-0.5 text-white text-[10px] font-semibold">
-              <Star className="w-2.5 h-2.5 fill-current" aria-hidden="true" />
-              <span>4.8</span>
-            </div>
-            <div className="absolute bottom-0 left-0 right-0 p-2.5 text-white">
-              <div className="text-xs font-semibold truncate leading-tight">{c.course_name}</div>
-              <div className="text-[10px] opacity-80 mt-0.5">Played recently</div>
-            </div>
-          </button>
-        ))}
+        {courses.map((c, idx) => {
+          const playedDate = new Date(c.played_at);
+          const dateLabel = `${playedDate.getMonth() + 1}/${playedDate.getDate()}`;
+          return (
+            <button
+              key={c.match_id}
+              type="button"
+              role="listitem"
+              onClick={() => onSelect?.(c.course_name)}
+              className={cn(
+                "group relative w-36 h-36 shrink-0 snap-start rounded-2xl overflow-hidden ring-2 ring-primary/70 hover:ring-primary transition-all text-left",
+                idx === courses.length - 1 && "mr-4",
+              )}
+            >
+              <CourseImage
+                src={null}
+                alt={c.course_name}
+                containerClassName="absolute inset-0 w-full h-full"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent" />
+              <div className="absolute bottom-0 left-0 right-0 p-2.5 text-white">
+                <div className="text-xs font-bold truncate leading-tight">{c.course_name}</div>
+                <div className="flex items-center gap-1.5 text-[11px] mt-0.5 opacity-95">
+                  <span className="font-semibold">{dateLabel}</span>
+                  <span aria-hidden="true" className="opacity-70">|</span>
+                  <Star className="w-2.5 h-2.5 fill-current" aria-hidden="true" />
+                  <span className="font-semibold">{c.rating?.toFixed(1) ?? "—"}</span>
+                </div>
+              </div>
+            </button>
+          );
+        })}
       </div>
     </div>
   );

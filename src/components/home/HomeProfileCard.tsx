@@ -39,9 +39,9 @@ const HomeProfileCard = () => {
 
   return (
     <div className="flex items-center gap-4 px-1">
-      <Avatar className="h-14 w-14 shrink-0 border-2 border-background shadow-card">
+      <Avatar className="h-16 w-16 shrink-0 shadow-card">
         <AvatarImage src={profile?.profile_picture_url || undefined} alt={displayName} />
-        <AvatarFallback className="bg-primary text-primary-foreground font-semibold">
+        <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
           {initials}
         </AvatarFallback>
       </Avatar>
@@ -49,18 +49,18 @@ const HomeProfileCard = () => {
       <div className="flex-1 min-w-0">
         {profileLoading ? (
           <>
-            <Skeleton className="h-5 w-28 mb-1" />
+            <Skeleton className="h-6 w-32 mb-1.5" />
             <Skeleton className="h-3 w-40" />
           </>
         ) : (
           <>
-            <h2 className="text-lg font-bold text-foreground truncate leading-tight">
+            <h2 className="text-xl font-bold text-foreground truncate leading-tight">
               {displayName}
             </h2>
-            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+            <div className="flex items-center gap-1 text-xs text-muted-foreground mt-0.5">
               <Star className="w-3 h-3 fill-foreground text-foreground" aria-hidden="true" />
               <span className="font-medium text-foreground">{rating}</span>
-              <span aria-hidden="true">|</span>
+              <span aria-hidden="true" className="opacity-60">|</span>
               <span>HC:{handicap}</span>
             </div>
           </>
