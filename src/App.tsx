@@ -29,6 +29,7 @@ const VerifyAge = lazy(() => import("./pages/VerifyAge"));
 const Terms = lazy(() => import("./pages/Terms"));
 const Privacy = lazy(() => import("./pages/Privacy"));
 const WinsFeed = lazy(() => import("./pages/WinsFeed"));
+const HandicapCalculatorsPage = lazy(() => import("./pages/HandicapCalculatorsPage"));
 
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
