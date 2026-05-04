@@ -1,5 +1,6 @@
 import { lazy, Suspense } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import GolfBallLoader from "@/components/GolfBallLoader";
 
 // Split the two experiences into separate chunks so visitors never download
 // the authenticated dashboard, and vice versa.
@@ -8,7 +9,7 @@ const TycheDashboard = lazy(() => import("./TycheDashboard"));
 
 const RouteFallback = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
-    <div className="animate-pulse text-muted-foreground">Loading...</div>
+    <GolfBallLoader />
   </div>
 );
 
