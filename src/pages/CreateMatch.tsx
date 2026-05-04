@@ -834,7 +834,6 @@ const CreateMatch = () => {
         <div className="flex items-center gap-2">
           <Label htmlFor="buy_in" className="flex items-center gap-2">
             Buy-In Amount ($)
-            {!hasAccess('buy_in') && <Lock className="w-4 h-4 text-muted-foreground" />}
           </Label>
           <TooltipProvider>
             <Tooltip>
@@ -853,7 +852,7 @@ const CreateMatch = () => {
             type="number"
             min="0"
             max="500"
-            value={!hasAccess('buy_in') ? '0' : formData.buy_in_amount}
+            value={formData.buy_in_amount}
             onKeyDown={handleKeyDown}
             onChange={(e) => {
               const value = e.target.value;
@@ -868,9 +867,7 @@ const CreateMatch = () => {
               setValidationErrors({ ...validationErrors, buy_in_amount: error });
               setFormData({ ...formData, buy_in_amount: value === '' ? '0' : value });
             }}
-            disabled={!hasAccess('buy_in')}
             className={cn(
-              !hasAccess('buy_in') && 'bg-muted cursor-not-allowed',
               validationErrors.buy_in_amount && 'border-destructive'
             )}
           />
@@ -895,11 +892,8 @@ const CreateMatch = () => {
             {validationErrors.buy_in_amount}
           </p>
         )}
-        {hasAccess('buy_in') && !validationErrors.buy_in_amount && (
+        {!validationErrors.buy_in_amount && (
           <p className="text-xs text-muted-foreground">Default: $50 • Max: $500</p>
-        )}
-        {!hasAccess('buy_in') && (
-          <p className="text-xs text-warning">Upgrade to Local Player or Tournament Pro to enable buy-ins</p>
         )}
       </div>
 
