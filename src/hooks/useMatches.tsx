@@ -263,10 +263,7 @@ export const useMatches = () => {
       
       console.warn('Error fetching matches:', error);
       
-      // Only show user-facing errors for non-network issues
-      if (!error.message?.includes('Failed to fetch') && !error.message?.includes('Network')) {
-        toast.error('Unable to load matches. Please refresh the page.');
-      }
+      // Silently fail — match loading errors should not interrupt the user with toasts
       
       // Set empty matches on error (but only if not aborted)
       if (!abortControllerRef.current?.signal.aborted) {
