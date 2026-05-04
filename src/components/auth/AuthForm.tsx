@@ -625,7 +625,7 @@ export function AuthForm() {
                       variant="outline"
                       onClick={handleMagicLink}
                       disabled={magicLinkLoading || !email}
-                      className="w-full"
+                      className="w-full transition-all hover:shadow-[0_0_20px_hsl(var(--accent)/0.6)] hover:border-accent hover:text-accent"
                     >
                       {magicLinkLoading ? "Sending magic link..." : "Send me a magic link"}
                     </Button>
@@ -878,7 +878,7 @@ export function AuthForm() {
                         type="button"
                         variant="outline"
                         onClick={() => setShowRequestInvite(true)}
-                        className="w-full"
+                        className="w-full transition-all hover:shadow-[0_0_20px_hsl(var(--accent)/0.6)] hover:border-accent hover:text-accent"
                       >
                         Request an Invite
                       </Button>
