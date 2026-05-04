@@ -198,7 +198,7 @@ const NearbyCoursesWithMatches = () => {
             aria-label="Search courses and matches near you"
           />
         </div>
-        <Button type="submit" className="h-11" disabled={loading}>
+        <Button type="submit" className="h-11 hover:shadow-[0_0_20px_hsl(var(--primary)/0.7)] transition-shadow" disabled={loading}>
           {loading ? <Loader2 className="h-4 w-4 animate-spin" /> : "Search"}
         </Button>
       </form>
