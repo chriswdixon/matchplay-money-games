@@ -17,47 +17,123 @@ export const useLocation = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<LocationError | null>(null);
 
-  const getCurrentLocation = (): Promise<Location> => {
+  // Try a single getCurrentPosition call with given options + a manual timeout guard
+  // (some mobile browsers — especially iOS Safari — silently never fire callbacks).
+  const tryGetPosition = (
+    options: PositionOptions,
+    manualTimeoutMs: number
+  ): Promise<Location> => {
     return new Promise((resolve, reject) => {
-      if (!navigator.geolocation) {
-        const error = {
-          code: 0,
-          message: 'Geolocation is not supported by this browser'
-        };
-        reject(error);
-        return;
+      let settled = false;
+      const timer = window.setTimeout(() => {
+        if (settled) return;
+        settled = true;
+        reject({ code: 3, message: getErrorMessage(3) } as LocationError);
+      }, manualTimeoutMs);
+
+      try {
+        navigator.geolocation.getCurrentPosition(
+          (position) => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timer);
+            resolve({
+              latitude: position.coords.latitude,
+              longitude: position.coords.longitude,
+              accuracy: position.coords.accuracy,
+            });
+          },
+          (err) => {
+            if (settled) return;
+            settled = true;
+            window.clearTimeout(timer);
+            reject({ code: err.code, message: getErrorMessage(err.code) } as LocationError);
+          },
+          options
+        );
+      } catch (e) {
+        if (settled) return;
+        settled = true;
+        window.clearTimeout(timer);
+        reject({ code: 2, message: getErrorMessage(2) } as LocationError);
       }
-
-      setLoading(true);
-      setError(null);
-
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          const location = {
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude,
-            accuracy: position.coords.accuracy
-          };
-          setLocation(location);
-          setLoading(false);
-          resolve(location);
-        },
-        (error) => {
-          const locationError = {
-            code: error.code,
-            message: getErrorMessage(error.code)
-          };
-          setError(locationError);
-          setLoading(false);
-          reject(locationError);
-        },
-        {
-          enableHighAccuracy: true,
-          timeout: 10000,
-          maximumAge: 300000 // 5 minutes
-        }
-      );
     });
+  };
+
+  // IP-based coarse fallback for when device GPS is unavailable (airplane mode,
+  // simulator, denied OS-level location, etc.). Best-effort, low accuracy.
+  const ipFallback = async (): Promise<Location | null> => {
+    try {
+      const res = await fetch('https://ipapi.co/json/');
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (typeof data?.latitude === 'number' && typeof data?.longitude === 'number') {
+        return {
+          latitude: data.latitude,
+          longitude: data.longitude,
+          accuracy: 50000, // ~city level
+        };
+      }
+    } catch {
+      // ignore
+    }
+    return null;
+  };
+
+  const getCurrentLocation = async (): Promise<Location> => {
+    if (!navigator.geolocation) {
+      const err: LocationError = { code: 0, message: 'Geolocation is not supported by this browser' };
+      setError(err);
+      throw err;
+    }
+
+    setLoading(true);
+    setError(null);
+
+    // 1) High accuracy (GPS) — short timeout so we don't hang on iOS
+    // 2) Low accuracy (Wi-Fi / cell) — longer timeout, allows cached position
+    // 3) Cached-only — accept any recent fix
+    // 4) IP-based coarse fallback
+    const attempts: Array<{ opts: PositionOptions; timeoutMs: number }> = [
+      { opts: { enableHighAccuracy: true, timeout: 8000, maximumAge: 60000 }, timeoutMs: 9000 },
+      { opts: { enableHighAccuracy: false, timeout: 15000, maximumAge: 300000 }, timeoutMs: 16000 },
+      { opts: { enableHighAccuracy: false, timeout: 5000, maximumAge: Infinity }, timeoutMs: 6000 },
+    ];
+
+    let lastError: LocationError | null = null;
+    for (const attempt of attempts) {
+      try {
+        const loc = await tryGetPosition(attempt.opts, attempt.timeoutMs);
+        setLocation(loc);
+        setLoading(false);
+        return loc;
+      } catch (e) {
+        const le = e as LocationError;
+        lastError = le;
+        // If the user denied permission, no retry will help.
+        if (le.code === 1) break;
+        // Otherwise (timeout / position unavailable), continue to next strategy.
+      }
+    }
+
+    // Final fallback: IP geolocation (only if not a permission denial)
+    if (!lastError || lastError.code !== 1) {
+      const ipLoc = await ipFallback();
+      if (ipLoc) {
+        setLocation(ipLoc);
+        setLoading(false);
+        toast.message('Using approximate location', {
+          description: 'GPS unavailable — using your network location instead.',
+        });
+        return ipLoc;
+      }
+    }
+
+    const finalError: LocationError =
+      lastError ?? { code: 2, message: getErrorMessage(2) };
+    setError(finalError);
+    setLoading(false);
+    throw finalError;
   };
 
   const getErrorMessage = (code: number): string => {
