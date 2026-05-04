@@ -3,8 +3,7 @@ import TycheHero from "@/components/TycheHero";
 import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { ArrowUp, Moon, Sun } from "lucide-react";
-import { useTheme } from "@/components/ThemeProvider";
+import { ArrowUp } from "lucide-react";
 
 // Defer all below-the-fold sections — visitors only need the hero immediately.
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));

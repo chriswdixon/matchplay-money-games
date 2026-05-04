@@ -7,7 +7,7 @@ import AppFooter from "@/components/AppFooter";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Search, Crown, ArrowUp, History, Trophy, Target, Moon, Sun } from "lucide-react";
+import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useSearchParams, useNavigate } from "react-router-dom";
