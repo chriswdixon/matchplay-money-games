@@ -55,6 +55,7 @@ export default function Profile() {
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [adminTooltipOpen, setAdminTooltipOpen] = useState(false);
+  const [adminConfirmOpen, setAdminConfirmOpen] = useState(false);
   const [showSupportDialog, setShowSupportDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<TabId | null>(null);
