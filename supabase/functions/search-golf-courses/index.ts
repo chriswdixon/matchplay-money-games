@@ -212,6 +212,7 @@ serve(async (req) => {
         latitude: c.location?.latitude,
         longitude: c.location?.longitude,
         externalId: c.id,
+        state: c.location?.state,
       }));
 
       // Also query OpenStreetMap for supplemental results
@@ -230,8 +231,11 @@ serve(async (req) => {
         console.log('[SEARCH-GOLF-COURSES] OSM query failed:', osmError.message);
       }
 
+      const filtered = courses.filter(c => !isBlockedCourse(c));
+      console.log('[SEARCH-GOLF-COURSES] Filtered out', courses.length - filtered.length, 'geo-blocked courses');
+
       return new Response(
-        JSON.stringify({ courses }),
+        JSON.stringify({ courses: filtered }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
