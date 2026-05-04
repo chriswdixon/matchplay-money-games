@@ -154,7 +154,8 @@ export default function Profile() {
             </TabsContent>
           )}
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" className="space-y-6">
+            <AppearanceSettings />
             <ProfileForm />
           </TabsContent>
 
