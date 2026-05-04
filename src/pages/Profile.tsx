@@ -274,7 +274,7 @@ export default function Profile() {
             <PageTitleCard
               icon={<User className="w-5 h-5" aria-hidden="true" />}
               title="Profile"
-              description="Manage your Tyche profile and preferences"
+              
             />
           </div>
           <TooltipProvider delayDuration={200}>
