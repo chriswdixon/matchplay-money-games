@@ -151,7 +151,7 @@ const TycheDashboard = () => {
         )}
       </main>
 
-      <BottomTabBar activeTab={activeBottomTab} onChange={(tab) => setCurrentTab(tab)} />
+      <BottomTabBar activeTab={activeBottomTab} onChange={(tab) => setCurrentTab(tab)} hasActiveMatch={hasActiveMatch} />
       
     </div>
   );
