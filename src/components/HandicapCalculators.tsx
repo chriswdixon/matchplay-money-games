@@ -165,7 +165,7 @@ export function HandicapCalculators() {
       <div className="max-w-7xl mx-auto">
         <aside className="bg-card text-foreground border border-border rounded-2xl p-8 md:p-12 shadow-card" aria-labelledby="handicap-calculators-heading">
           <div className="text-center mb-8">
-            <div className="w-12 h-12 mx-auto mb-4 bg-accent text-accent-foreground rounded-xl flex items-center justify-center" aria-hidden="true">
+            <div className="w-16 h-16 mx-auto mb-4 bg-gradient-primary text-primary-foreground rounded-2xl flex items-center justify-center" aria-hidden="true">
               <Calculator className="w-6 h-6" />
             </div>
             <h2 id="handicap-calculators-heading" className="text-3xl md:text-4xl font-bold mb-4 text-foreground">
