@@ -17,15 +17,12 @@ export function AccountBalance() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <DollarSign className="w-5 h-5 text-primary-foreground" />
-          </div>
-          Play Money Balance
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1.5">Your play money for matches</p>
-      </div>
+      <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
+        <div className="p-2 bg-gradient-primary rounded-lg">
+          <DollarSign className="w-5 h-5 text-primary-foreground" />
+        </div>
+        Play Money Balance
+      </h2>
 
       {/* Balance Display */}
       <div className="bg-gradient-subtle rounded-lg p-6 border border-border">
