@@ -709,7 +709,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             >
                               {startingMatch === match.id ? "Starting..." : "Start Match"}
                             </Button>
-                          ) : (
+                          ) : match.status === 'cancelled' ? null : (
                             <Button 
                               className={cn(
                                 "w-full hover:shadow-premium transition-all duration-300",
