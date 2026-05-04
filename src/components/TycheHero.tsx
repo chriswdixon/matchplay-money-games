@@ -111,7 +111,7 @@ const TycheHero = () => {
                 className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-all duration-300 transform hover:scale-105 w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold border-0"
                 asChild
               >
-                <Link to="/auth">Join Tyche</Link>
+                <Link to="/auth?tab=signup">Join Tyche</Link>
               </Button>
               <Button 
                 size="lg"
