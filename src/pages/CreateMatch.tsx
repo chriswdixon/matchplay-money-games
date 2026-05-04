@@ -1241,20 +1241,7 @@ const CreateMatch = () => {
 
   return (
     <div className="min-h-screen bg-muted/40">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background border-b pt-[env(safe-area-inset-top)]">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={handleCancel}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Create Match</h1>
-          {isMobile && (
-            <span className="ml-auto text-sm text-muted-foreground">
-              Step {currentStep + 1} of 4
-            </span>
-          )}
-        </div>
-      </header>
+      {/* Header removed per request */}
 
       {/* Form */}
       <form onSubmit={(e) => e.preventDefault()} className="container mx-auto px-4 py-6 max-w-2xl">
