@@ -206,12 +206,6 @@ const Terms = () => {
           </section>
         </div>
 
-        {/* Back to Home */}
-        <div className="mt-12 text-center">
-          <Button asChild>
-            <Link to="/">Return to Tyche</Link>
-          </Button>
-        </div>
       </main>
     </div>
   );
