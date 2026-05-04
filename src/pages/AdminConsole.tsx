@@ -64,7 +64,6 @@ const AdminConsole = () => {
 
   return (
     <div className="min-h-screen bg-muted/40">
-      <AppHeader hideReturnButton />
       <main className="container mx-auto py-8 px-4">
         <div className="mb-8">
           <PageTitleCard
