@@ -50,34 +50,49 @@ const NearbyCoursesWithMatches = () => {
       return;
     }
     setSearched(true);
-    let results: GolfCourse[];
-    if (q.trim().length >= 2) {
-      const named = await searchCoursesByName(q.trim());
-      results = named
-        .map((c) => ({
-          ...c,
-          distance:
-            c.distance ??
-            (c.latitude && c.longitude
-              ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
-              : undefined),
-        }))
-        .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
-        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
-    } else {
-      const nearby = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
-      results = nearby
-        .map((c) => ({
-          ...c,
-          distance:
-            c.distance ??
-            (c.latitude && c.longitude
-              ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
-              : undefined),
-        }))
-        .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
-        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+    const term = q.trim().toLowerCase();
+
+    // Always start from nearby courses within radius
+    const nearby = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
+    let results = nearby
+      .map((c) => ({
+        ...c,
+        distance:
+          c.distance ??
+          (c.latitude && c.longitude
+            ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+            : undefined),
+      }))
+      .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
+
+    if (term.length >= 2) {
+      // Substring match against nearby first (so "tera" → "Teravista")
+      let matched = results.filter((c) => c.name.toLowerCase().includes(term));
+
+      // If nothing matched nearby, fall back to name search across all courses,
+      // still constrained to the radius
+      if (matched.length === 0) {
+        const named = await searchCoursesByName(term);
+        matched = named
+          .map((c) => ({
+            ...c,
+            distance:
+              c.distance ??
+              (c.latitude && c.longitude
+                ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+                : undefined),
+          }))
+          .filter(
+            (c) =>
+              c.name.toLowerCase().includes(term) &&
+              c.distance !== undefined &&
+              c.distance <= RADIUS_MI,
+          );
+      }
+      results = matched;
     }
+
+    results.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     setCourses(results.slice(0, 50));
   };
 
