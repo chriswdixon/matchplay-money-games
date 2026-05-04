@@ -19,6 +19,14 @@ export function ProfileDisplay() {
   const { privateData, loading: privateLoading } = usePrivateProfile();
   const { user } = useAuth();
   const { tierName, loading: subscriptionLoading } = useSubscription();
+  const isMobile = useIsMobile();
+  const navigate = useNavigate();
+  const [calcOpen, setCalcOpen] = useState(false);
+
+  const openCalculators = () => {
+    if (isMobile) setCalcOpen(true);
+    else navigate('/handicap-calculators');
+  };
 
   if (loading || privateLoading || subscriptionLoading) {
     return (
