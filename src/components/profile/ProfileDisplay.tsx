@@ -31,19 +31,15 @@ export function ProfileDisplay() {
 
   if (loading || privateLoading || subscriptionLoading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="animate-pulse space-y-4">
-            <div className="flex items-center gap-4">
-              <div className="w-16 h-16 bg-muted rounded-full"></div>
-              <div className="space-y-2">
-                <div className="h-4 bg-muted rounded w-32"></div>
-                <div className="h-3 bg-muted rounded w-24"></div>
-              </div>
-            </div>
+      <div className="animate-pulse space-y-4">
+        <div className="flex items-center gap-4">
+          <div className="w-16 h-16 bg-muted rounded-full"></div>
+          <div className="space-y-2">
+            <div className="h-4 bg-muted rounded w-32"></div>
+            <div className="h-3 bg-muted rounded w-24"></div>
           </div>
-        </CardContent>
-      </Card>
+        </div>
+      </div>
     );
   }
 
@@ -66,16 +62,14 @@ export function ProfileDisplay() {
   };
 
   return (
-    <Card className="shadow-card border-0">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <User className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
-          </div>
-          Profile Overview
-        </CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-6">
+    <div>
+      <div className="flex items-center gap-3 pb-4">
+        <div className="p-2 bg-gradient-primary rounded-lg">
+          <User className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
+        </div>
+        <h2 className="text-lg font-semibold leading-none">Profile Overview</h2>
+      </div>
+      <div className="space-y-6">
         {/* Profile Header */}
         <div className="flex flex-row items-center gap-4">
           <AvatarUpload
@@ -160,7 +154,7 @@ export function ProfileDisplay() {
             <p>Complete your profile to <p>Complete your profile to get the most out of Tyche</p></p>
           </div>
         )}
-      </CardContent>
+      </div>
 
       {/* Mobile: handicap calculators in a popup */}
       <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
@@ -179,6 +173,6 @@ export function ProfileDisplay() {
           </div>
         </DialogContent>
       </Dialog>
-    </Card>
+    </div>
   );
 }
