@@ -477,43 +477,32 @@ const CreateMatch = () => {
 
 
           
-      {isPaidSubscription && (
-        <div className="space-y-2">
-          <div className="flex gap-2">
-            <Input
-              type="tel"
-              placeholder="Enter zipcode"
-              value={zipcode}
-              onChange={(e) => setZipcode(e.target.value.replace(/\D/g, '').slice(0, 5))}
-              maxLength={5}
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleZipcodeSearch}
-              disabled={loadingZipcode || zipcode.length < 5}
-            >
-              {loadingZipcode ? <Loader2 className="w-4 h-4 animate-spin" /> : 'Search'}
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={handleGPSSearch}
-              disabled={loadingGPS || !hasAccess('gps_matching')}
-              title={!hasAccess('gps_matching') ? 'Upgrade to enable GPS matching' : 'Use GPS location'}
-            >
-              {loadingGPS ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapPin className="w-4 h-4" />}
-            </Button>
-          </div>
-          {!hasAccess('gps_matching') && (
-            <p className="text-xs text-warning">🔒 Upgrade to Local Player or Tournament Pro for GPS-based matching</p>
+      <div className="space-y-2">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleGPSSearch}
+          disabled={loadingGPS}
+          className="w-full"
+        >
+          {loadingGPS ? (
+            <Loader2 className="w-4 h-4 animate-spin mr-2" />
+          ) : (
+            <MapPin className="w-4 h-4 mr-2" />
           )}
-          <p className="text-xs text-muted-foreground">Search courses within {searchRadius} miles</p>
-        </div>
-      )}
+          {locationCoords ? 'Refresh nearby courses' : 'Use my location to find courses'}
+        </Button>
+        {!locationCoords && (
+          <p className="text-xs text-muted-foreground">
+            Location access is required to find courses near you.
+          </p>
+        )}
+        {locationCoords && (
+          <p className="text-xs text-muted-foreground">
+            Showing courses within {searchRadius} miles
+          </p>
+        )}
+      </div>
 
       <Popover open={courseOpen} onOpenChange={setCourseOpen}>
         <PopoverTrigger asChild>
