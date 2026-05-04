@@ -171,17 +171,19 @@ const NearbyCoursesWithMatches = () => {
       navigate("/auth");
       return;
     }
-    navigate("/create-match", {
-      state: {
-        prefilledCourse: {
-          name: course.name,
-          address: course.address,
-          latitude: course.latitude,
-          longitude: course.longitude,
-          website: course.website,
-        },
-      },
-    });
+    const prefilledCourse = {
+      name: course.name,
+      address: course.address,
+      latitude: course.latitude,
+      longitude: course.longitude,
+      website: course.website,
+      externalId: course.externalId,
+      booking_url: course.website,
+    };
+    try {
+      sessionStorage.setItem("tyche-prefilled-course", JSON.stringify(prefilledCourse));
+    } catch {}
+    navigate("/create-match", { state: { prefilledCourse } });
   };
 
   const handleViewMatch = (matchId: string) => {
