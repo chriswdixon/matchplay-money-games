@@ -107,7 +107,7 @@ export default function Profile() {
       >
         <div className="mx-auto max-w-3xl pointer-events-auto">
           <div className="flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide justify-between">
-            {tabs.map(({ id, label, Icon }) => {
+            {tabs.map(({ id, label, Icon, badge }) => {
               const active = id === activeTab;
               return (
                 <Tooltip key={id}>
@@ -115,7 +115,7 @@ export default function Profile() {
                     <button
                       type="button"
                       onClick={() => handleTabChange(id)}
-                      aria-label={label}
+                      aria-label={badge ? `${label} (${badge} unread)` : label}
                       aria-current={active ? 'page' : undefined}
                       className={cn(
                         'relative flex items-center justify-center rounded-full transition-all w-10 h-10 shrink-0',
@@ -125,6 +125,14 @@ export default function Profile() {
                       )}
                     >
                       <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                      {badge && badge > 0 ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center border-2 border-foreground"
+                        >
+                          {badge > 99 ? '99+' : badge}
+                        </span>
+                      ) : null}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">{label}</TooltipContent>
