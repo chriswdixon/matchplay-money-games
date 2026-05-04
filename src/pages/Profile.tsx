@@ -41,7 +41,7 @@ const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
 );
 
-type TabId = 'profile' | 'account' | 'notifications' | 'settings' | 'security' | 'privacy';
+type TabId = 'profile' | 'account' | 'notifications' | 'settings';
 
 export default function Profile() {
   const { user, loading, signOut } = useAuth();
@@ -106,8 +106,6 @@ export default function Profile() {
     { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: showAccountTab },
     { id: 'notifications', label: 'Notifications', Icon: Bell, show: true, badge: unreadCount },
     { id: 'settings', label: 'Settings', Icon: Settings, show: true },
-    { id: 'security', label: 'Security', Icon: Shield, show: true },
-    { id: 'privacy', label: 'Privacy', Icon: FileText, show: true },
   ];
   const tabs = allTabs.filter(t => t.show);
 
@@ -351,23 +349,15 @@ export default function Profile() {
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <AppearanceSettings />
               </div>
-            </div>
-          )}
-
-          {activeTab === 'security' && (
-            <div className="space-y-6">
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <ChangePassword />
               </div>
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <MFASettings />
               </div>
-            </div>
-          )}
-
-          {activeTab === 'privacy' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-              <GDPRSettings />
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+                <GDPRSettings />
+              </div>
             </div>
           )}
         </div>
