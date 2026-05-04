@@ -9,10 +9,15 @@ import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { runPreviewCacheGuard } from "@/lib/preview-cache-guard";
+import { startDevAutoReload } from "@/lib/dev-auto-reload";
 
 // Clean up any stale service worker / cache from previous PWA builds.
 // Safe no-op on fresh installs. Does NOT register a service worker.
 runPreviewCacheGuard();
+
+// Detect new builds in dev/preview and force a single hard refresh.
+// No service worker involved; production builds are unaffected.
+startDevAutoReload();
 
 const queryClient = new QueryClient({
   defaultOptions: {
