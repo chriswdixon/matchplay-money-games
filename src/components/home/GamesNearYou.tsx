@@ -225,21 +225,21 @@ const GamesNearYou = ({
                 className="flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-4 py-3 cursor-pointer hover:bg-background transition-colors focus:outline-none focus:ring-2 focus:ring-primary"
               >
                 <div className="flex-1 min-w-0 space-y-0.5">
-                  <div className="text-base md:text-lg font-bold truncate leading-tight">
-                    {m.course_name}
-                  </div>
                   <div className="text-xs text-muted-foreground flex items-center gap-2 flex-wrap">
-                    <span className="text-accent font-bold">{time}</span>
+                    <span className="text-destructive font-bold">{time}</span>
                     {distance && (
                       <>
                         <span aria-hidden="true" className="opacity-60">•</span>
-                        <span>{distance}</span>
+                        <span>{distance} away</span>
                       </>
                     )}
                     <span aria-hidden="true" className="opacity-60">•</span>
                     <span className="font-medium">
-                      {m.participant_count || 0}/{m.max_participants} players
+                      {m.participant_count || 0}/{m.max_participants} Players
                     </span>
+                  </div>
+                  <div className="text-base md:text-lg font-bold truncate leading-tight mt-0.5">
+                    {m.course_name}
                   </div>
                 </div>
                 <Button
