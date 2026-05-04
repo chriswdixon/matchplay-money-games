@@ -122,13 +122,13 @@
   }
 
   /* === Hero accent themes — override primary/accent/hero gradient === */
-  .theme-gold {
-    --primary: 42 85% 48%;
-    --primary-glow: 45 95% 60%;
-    --accent: 38 90% 52%;
-    --accent-glow: 42 95% 62%;
-    --ring: 42 85% 48%;
-    --gradient-hero: linear-gradient(135deg, hsl(42 85% 45%), hsl(45 95% 60%));
+  .theme-pewter {
+    --primary: 220 8% 45%;
+    --primary-glow: 220 8% 58%;
+    --accent: 142 76% 36%;
+    --accent-glow: 142 80% 45%;
+    --ring: 220 8% 45%;
+    --gradient-hero: linear-gradient(135deg, hsl(220 10% 38%), hsl(220 8% 55%));
   }
   .theme-green {
     --primary: 142 76% 36%;
@@ -147,13 +147,13 @@
     --gradient-hero: linear-gradient(135deg, hsl(178 75% 35%), hsl(188 85% 50%));
   }
 
-  .dark .theme-gold {
-    --primary: 42 80% 55%;
-    --primary-glow: 45 90% 65%;
-    --accent: 38 85% 58%;
-    --accent-glow: 42 90% 68%;
-    --ring: 42 80% 55%;
-    --gradient-hero: linear-gradient(135deg, hsl(40 70% 30%), hsl(45 85% 50%));
+  .dark .theme-pewter {
+    --primary: 220 8% 70%;
+    --primary-glow: 220 8% 80%;
+    --accent: 142 76% 48%;
+    --accent-glow: 142 80% 58%;
+    --ring: 220 8% 70%;
+    --gradient-hero: linear-gradient(135deg, hsl(220 10% 22%), hsl(220 8% 38%));
   }
   .dark .theme-green {
     --primary: 145 70% 50%;
