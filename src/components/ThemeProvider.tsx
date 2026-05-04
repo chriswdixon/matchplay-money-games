@@ -31,16 +31,19 @@ export function ThemeProvider({
   useEffect(() => {
     const root = window.document.documentElement
 
+    const applySystem = () => {
+      root.classList.remove("light", "dark")
+      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
+      root.classList.add(systemTheme)
+    }
+
     root.classList.remove("light", "dark")
 
     if (theme === "system") {
-      const systemTheme = window.matchMedia("(prefers-color-scheme: dark)")
-        .matches
-        ? "dark"
-        : "light"
-
-      root.classList.add(systemTheme)
-      return
+      applySystem()
+      const mql = window.matchMedia("(prefers-color-scheme: dark)")
+      mql.addEventListener("change", applySystem)
+      return () => mql.removeEventListener("change", applySystem)
     }
 
     root.classList.add(theme)
