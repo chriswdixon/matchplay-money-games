@@ -100,7 +100,7 @@ export const DeletionRequestReviews = () => {
       case 'pending':
         return <Badge variant="outline" className="gap-1"><Clock className="h-3 w-3" /> Pending</Badge>;
       case 'approved':
-        return <Badge className="bg-primary/100/20 text-primary gap-1"><CheckCircle className="h-3 w-3" /> Approved</Badge>;
+        return <Badge className="bg-primary/20 text-primary gap-1"><CheckCircle className="h-3 w-3" /> Approved</Badge>;
       case 'rejected':
         return <Badge variant="destructive" className="gap-1"><XCircle className="h-3 w-3" /> Rejected</Badge>;
       case 'cancelled':

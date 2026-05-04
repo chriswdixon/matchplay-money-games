@@ -59,7 +59,7 @@ const VerifyAge = () => {
           
           {(status === 'success' || status === 'already_verified') && (
             <>
-              <div className="mx-auto w-16 h-16 rounded-full bg-primary/100/10 flex items-center justify-center mb-4">
+              <div className="mx-auto w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center mb-4">
                 <CheckCircle className="h-8 w-8 text-primary" />
               </div>
               <CardTitle className="text-primary">
