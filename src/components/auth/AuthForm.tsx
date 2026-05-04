@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Shield, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Shield, AlertCircle, CheckCircle2, Loader2, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter, inviteCodeSchema } from '@/lib/validation';
@@ -728,9 +728,42 @@ export function AuthForm() {
                         required
                         className={validationErrors.password ? "border-destructive" : ""}
                       />
-                      {validationErrors.password && (
-                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.password}</p>
-                      )}
+                      {(() => {
+                        const reqs = [
+                          { label: 'At least 8 characters', ok: password.length >= 8 },
+                          { label: 'One lowercase letter (a-z)', ok: /[a-z]/.test(password) },
+                          { label: 'One uppercase letter (A-Z)', ok: /[A-Z]/.test(password) },
+                          { label: 'One number (0-9)', ok: /[0-9]/.test(password) },
+                          { label: 'One special character', ok: /[^a-zA-Z0-9]/.test(password) },
+                          {
+                            label: 'No common patterns (e.g. password, 123456)',
+                            ok:
+                              password.length > 0 &&
+                              ![/123456/, /password/i, /qwerty/i, /abc123/i, /letmein/i, /welcome/i, /monkey/i, /dragon/i].some(
+                                (p) => p.test(password)
+                              ),
+                          },
+                        ];
+                        return (
+                          <ul className="space-y-1 mt-1" aria-live="polite">
+                            {reqs.map((r) => (
+                              <li
+                                key={r.label}
+                                className={`flex items-center gap-2 text-xs ${
+                                  r.ok ? 'text-primary' : password.length === 0 ? 'text-muted-foreground' : 'text-destructive'
+                                }`}
+                              >
+                                {r.ok ? (
+                                  <Check className="w-3.5 h-3.5" aria-hidden="true" />
+                                ) : (
+                                  <X className="w-3.5 h-3.5" aria-hidden="true" />
+                                )}
+                                <span>{r.label}</span>
+                              </li>
+                            ))}
+                          </ul>
+                        );
+                      })()}
                       {passwordWarnings.length > 0 && (
                         <Alert className="mt-2">
                           <AlertCircle className="h-4 w-4" />
@@ -769,7 +802,7 @@ export function AuthForm() {
                               inviteStatus.kind === 'format' ||
                               !!validationErrors.inviteCode
                             }
-                            aria-describedby="invite-code-status invite-code-hint"
+                            aria-describedby="invite-code-status"
                             autoComplete="off"
                             spellCheck={false}
                             className={`pr-10 ${
@@ -833,10 +866,6 @@ export function AuthForm() {
                             <span className="text-destructive">{validationErrors.inviteCode}</span>
                           )}
                         </div>
-
-                        <p id="invite-code-hint" className="text-xs text-muted-foreground">
-                          6–32 letters or numbers. Beta invites are required to sign up.
-                        </p>
                       </div>
                     )}
                     <Button type="submit" className="w-full" disabled={loading}>
