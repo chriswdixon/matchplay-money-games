@@ -7,6 +7,8 @@ import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import BottomTabBar from '@/components/home/BottomTabBar';
+import { PageTitleCard } from '@/components/ui/page-title-card';
+import { Landmark } from 'lucide-react';
 
 export default function Wallet() {
   const { user, loading } = useAuth();
@@ -38,8 +40,11 @@ export default function Wallet() {
       <a href="#wallet-main" className="skip-link">Skip to main content</a>
 
       <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-24" role="banner">
-        <h1 className="text-2xl font-bold">Wallet & Subscription</h1>
-        <p className="text-sm text-muted-foreground">Your play money history and subscription details</p>
+        <PageTitleCard
+          icon={<Landmark className="w-5 h-5" aria-hidden="true" />}
+          title="Wallet & Subscription"
+          description="Your play money history and subscription details"
+        />
       </header>
 
       <main
