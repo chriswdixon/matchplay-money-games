@@ -800,6 +800,8 @@ const CreateMatch = () => {
               onSelect={(date) => {
                 setFormData({ ...formData, scheduled_date: date || null });
                 setDateOpen(false);
+                // Auto-focus time field next
+                setTimeout(() => document.getElementById('time')?.focus(), 50);
               }}
               disabled={(date) => date < new Date()}
               initialFocus
@@ -815,6 +817,12 @@ const CreateMatch = () => {
           type="time"
           value={formData.scheduled_time}
           onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
+          onBlur={() => {
+            // When time has a value and step can advance, jump to next step
+            if (formData.scheduled_time && isMobile && currentStep === 1) {
+              // do nothing here — Next button handles advance
+            }
+          }}
         />
       </div>
     </div>
