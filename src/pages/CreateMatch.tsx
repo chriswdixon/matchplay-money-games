@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Info, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Info, AlertCircle, X } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -1279,30 +1279,40 @@ const CreateMatch = () => {
   );
 
   return (
-    <div className="min-h-screen bg-muted/40">
-      {/* Header removed per request */}
+    <div className="min-h-screen bg-muted/40 md:pb-0">
+      {/* Close button - top right on all screen sizes */}
+      <button
+        type="button"
+        onClick={handleCancel}
+        aria-label="Cancel and close"
+        className="fixed top-4 right-4 z-50 inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
+      >
+        <X className="h-5 w-5" />
+      </button>
 
       {/* Form */}
-      <form onSubmit={(e) => e.preventDefault()} className="container mx-auto px-4 py-6 max-w-2xl">
+      <form
+        onSubmit={(e) => e.preventDefault()}
+        className={cn(
+          "container mx-auto max-w-2xl",
+          isMobile
+            ? "px-0 pt-4 pb-28 min-h-screen flex flex-col"
+            : "px-4 py-6"
+        )}
+      >
         {isMobile ? (
-          <div className="space-y-6">
-            <div className={cn(
-              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground bg-card transition-colors hover:bg-success/10",
-            )}>
-              {currentStep === 1 && renderDateTimeStep()}
-              {currentStep === 2 && renderFormatTeesStep()}
-              {currentStep === 3 && renderDetailsStep()}
+          <>
+            <div className="flex-1 px-3">
+              <div className={cn(
+                "rounded-3xl p-4 shadow-card text-base text-foreground bg-card transition-colors hover:bg-success/10 h-full",
+              )}>
+                {currentStep === 1 && renderDateTimeStep()}
+                {currentStep === 2 && renderFormatTeesStep()}
+                {currentStep === 3 && renderDetailsStep()}
+              </div>
             </div>
 
-            <div className="flex gap-3 pt-4 sticky bottom-0 bg-muted/40 pb-4">
-              <Button
-                type="button"
-                variant="outline"
-                onClick={handleCancel}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
+            <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-3 px-3 py-3 bg-muted/95 backdrop-blur border-t border-border">
               {currentStep > 1 && (
                 <Button
                   type="button"
@@ -1329,17 +1339,11 @@ const CreateMatch = () => {
                   disabled={!isFormValid || submitting}
                   className="flex-1"
                 >
-                  {submitting ? (
-                    <>
-                      Creating...
-                    </>
-                  ) : (
-                    'Create'
-                  )}
+                  {submitting ? 'Creating...' : 'Create'}
                 </Button>
               )}
             </div>
-          </div>
+          </>
         ) : (
           <div className="space-y-6">
             <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDateTimeStep()}</div>
@@ -1349,31 +1353,16 @@ const CreateMatch = () => {
             <div className="flex gap-3 pt-2">
               <Button
                 type="button"
-                variant="outline"
-                onClick={handleCancel}
-                className="flex-1"
-              >
-                Cancel
-              </Button>
-              <Button
-                type="button"
                 onClick={handleSubmit}
                 disabled={!isFormValid || submitting}
                 className="flex-1"
               >
-                {submitting ? (
-                  <>
-                    Creating...
-                  </>
-                ) : (
-                  'Create Match'
-                )}
+                {submitting ? 'Creating...' : 'Create Match'}
               </Button>
             </div>
           </div>
         )}
       </form>
-
     </div>
   );
 };
