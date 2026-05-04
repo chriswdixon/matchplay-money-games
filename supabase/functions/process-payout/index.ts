@@ -92,7 +92,10 @@ serve(async (req) => {
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const safeMsg = errorMessage.startsWith("Payouts are temporarily disabled")
+      ? errorMessage
+      : "Unable to process payout.";
+    return new Response(JSON.stringify({ error: safeMsg }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 500,
     });

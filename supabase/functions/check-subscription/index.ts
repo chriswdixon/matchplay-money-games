@@ -38,7 +38,7 @@ serve(async (req) => {
     logStep("Authenticating user with token");
     
     const { data: userData, error: userError } = await supabaseClient.auth.getUser(token);
-    if (userError) throw new Error(`Authentication error: ${userError.message}`);
+    if (userError) throw new Error("Authentication failed");
     const requestingUser = userData.user;
     if (!requestingUser) throw new Error("User not authenticated");
     logStep("User authenticated", { userId: requestingUser.id });
@@ -118,9 +118,10 @@ serve(async (req) => {
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in check-subscription", { message: errorMessage });
-    return new Response(JSON.stringify({ error: errorMessage }), {
+    const isAuth = errorMessage === "Authentication failed" || errorMessage === "No authorization header provided" || errorMessage === "User not authenticated";
+    return new Response(JSON.stringify({ error: isAuth ? "Authentication failed" : "Unable to check subscription." }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
-      status: 500,
+      status: isAuth ? 401 : 500,
     });
   }
 });
