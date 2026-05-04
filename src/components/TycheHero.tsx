@@ -111,9 +111,8 @@ const TycheHero = () => {
                 <Link to="/auth">Join Tyche</Link>
               </Button>
               <Button 
-                variant="outline" 
                 size="lg"
-                className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-medium transition-smooth"
+                className="bg-white text-primary hover:bg-white/90 shadow-premium w-full sm:w-auto px-6 sm:px-8 py-3 sm:py-4 text-base sm:text-lg font-semibold border-0 transition-smooth"
                 asChild
               >
                 <Link to="/auth">Sign In</Link>
