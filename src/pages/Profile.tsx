@@ -224,7 +224,15 @@ export default function Profile() {
         </div>
       </main>
 
-      {isMobile && <Toolbar />}
+      <BottomTabBar
+        activeTab="profile"
+        onChange={(tab) => {
+          if (tab === 'profile') return;
+          if (tab === 'home') navigate('/');
+          else navigate(`/?tab=${tab}`);
+        }}
+        hasActiveMatch={hasActiveMatch}
+      />
 
       <PasswordVerificationDialog
         open={showPasswordDialog}
