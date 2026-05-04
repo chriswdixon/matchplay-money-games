@@ -157,7 +157,8 @@ const AdminConsole = () => {
               <GeoBlockingManagement />
             </TabsContent>
             
-            <TabsContent value="reports">
+            <TabsContent value="reports" className="space-y-6">
+              <AdminNotifications onNavigate={setActiveTab} />
               <AdminReporting />
             </TabsContent>
 
