@@ -42,7 +42,7 @@ const TycheHero = () => {
           aria-label="Golf ball bouncing and rolling on a lush green golf course"
           className="w-full h-full object-cover"
         />
-        <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
+        <div className="absolute inset-0 bg-black/55" />
       </div>
       
       {/* Content */}
