@@ -152,16 +152,19 @@ export default function Profile() {
             </Button>
           )}
           {isAdmin && (
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={() => navigate('/admin')}
-              className="gap-2"
-            >
-              <ShieldCheck className="h-4 w-4" />
-              <span className="hidden sm:inline">Admin Portal</span>
-              <span className="sm:hidden">Admin</span>
-            </Button>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => navigate('/admin')}
+                  aria-label="Admin Portal"
+                >
+                  <ShieldCheck className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Admin Portal</TooltipContent>
+            </Tooltip>
           )}
           <div className="flex-1">
             <PageTitleCard
