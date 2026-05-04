@@ -21,6 +21,7 @@ import { useInvites } from '@/hooks/useInvites';
 
 
 export function AuthForm() {
+  const [searchParams] = useSearchParams();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [firstName, setFirstName] = useState('');
