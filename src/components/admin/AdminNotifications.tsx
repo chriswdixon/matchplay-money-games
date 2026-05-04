@@ -3,7 +3,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { AlertCircle, AlertTriangle, Trash2, Bell, Clock } from "lucide-react";
+import { AlertCircle, AlertTriangle, Trash2, Bell, Clock, LifeBuoy } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface AdminNotificationsProps {
@@ -24,13 +24,14 @@ export const AdminNotifications = ({ onNavigate }: AdminNotificationsProps) => {
   const [cancellations, setCancellations] = useState<CountRow>({ total: 0, overdue: 0 });
   const [deletions, setDeletions] = useState<CountRow>({ total: 0, overdue: 0 });
   const [auditAlerts, setAuditAlerts] = useState<CountRow>({ total: 0, overdue: 0 });
+  const [support, setSupport] = useState<CountRow>({ total: 0, overdue: 0 });
 
   useEffect(() => {
     const overdueCutoff = new Date(Date.now() - OVERDUE_HOURS * 60 * 60 * 1000).toISOString();
 
     const load = async () => {
       setLoading(true);
-      const [im, cr, dr, aa] = await Promise.all([
+      const [im, cr, dr, aa, sr] = await Promise.all([
         supabase
           .from("incomplete_match_reviews")
           .select("flagged_at", { count: "exact" })
@@ -51,6 +52,11 @@ export const AdminNotifications = ({ onNavigate }: AdminNotificationsProps) => {
           .select("created_at", { count: "exact" })
           .eq("status", "open")
           .order("created_at", { ascending: true }),
+        supabase
+          .from("support_requests")
+          .select("created_at", { count: "exact" })
+          .eq("status", "open")
+          .order("created_at", { ascending: true }),
       ]);
 
       const summarize = (rows: any[] | null, total: number | null, dateKey: string): CountRow => {
@@ -63,6 +69,7 @@ export const AdminNotifications = ({ onNavigate }: AdminNotificationsProps) => {
       setCancellations(summarize(cr.data as any[], cr.count, "created_at"));
       setDeletions(summarize(dr.data as any[], dr.count, "requested_at"));
       setAuditAlerts(summarize(aa.data as any[], aa.count, "created_at"));
+      setSupport(summarize(sr.data as any[], sr.count, "created_at"));
       setLoading(false);
     };
 
@@ -99,6 +106,13 @@ export const AdminNotifications = ({ onNavigate }: AdminNotificationsProps) => {
       Icon: Bell,
       data: auditAlerts,
       tab: "audit",
+    },
+    {
+      key: "support",
+      label: "Support Requests",
+      Icon: LifeBuoy,
+      data: support,
+      tab: "support",
     },
   ];
 
