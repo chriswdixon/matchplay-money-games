@@ -88,8 +88,8 @@ export default defineConfig(({ mode }) => ({
         short_name: "Tyche",
         description:
           "Track golf scores offline on the course. Book matches, track real handicaps, and play.",
-        theme_color: "#22C55E",
-        background_color: "#22C55E",
+        theme_color: "#00D25D",
+        background_color: "#00D25D",
         display: "standalone",
         orientation: "portrait",
         scope: "/",
