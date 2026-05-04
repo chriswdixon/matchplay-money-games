@@ -1260,7 +1260,10 @@ const CreateMatch = () => {
       <form onSubmit={(e) => e.preventDefault()} className="container mx-auto px-4 py-6 max-w-2xl">
         {isMobile ? (
           <div className="space-y-6">
-            <div className="bg-card rounded-3xl p-4 shadow-card min-h-[60vh]">
+            <div className={cn(
+              "rounded-3xl p-4 shadow-card min-h-[60vh]",
+              currentStep === 0 ? "bg-success text-success-foreground" : "bg-card"
+            )}>
               {currentStep === 0 && renderCourseStep()}
               {currentStep === 1 && renderDateTimeStep()}
               {currentStep === 2 && renderFormatTeesStep()}
