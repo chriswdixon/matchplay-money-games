@@ -10,14 +10,16 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
 import { runPreviewCacheGuard } from "@/lib/preview-cache-guard";
 import { startDevAutoReload } from "@/lib/dev-auto-reload";
+import { registerPWA } from "@/lib/pwa-register";
 
-// Clean up any stale service worker / cache from previous PWA builds.
-// Safe no-op on fresh installs. Does NOT register a service worker.
+// Clean up legacy SW + caches when running in unsafe contexts (Lovable preview iframes).
 runPreviewCacheGuard();
 
 // Detect new builds in dev/preview and force a single hard refresh.
-// No service worker involved; production builds are unaffected.
 startDevAutoReload();
+
+// Register the PWA service worker in production hosts only.
+void registerPWA();
 
 const queryClient = new QueryClient({
   defaultOptions: {
