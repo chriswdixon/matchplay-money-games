@@ -851,7 +851,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (
-          <div className="bg-gradient-card rounded-2xl p-8 md:p-12">
+          <div className="bg-muted rounded-2xl p-8 md:p-12">
             <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
             <div className="grid md:grid-cols-4 gap-6">
               {[
