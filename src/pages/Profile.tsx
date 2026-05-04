@@ -169,11 +169,11 @@ export default function Profile() {
         <div className="space-y-6">
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card space-y-6">
                 <ProfileDisplay />
-              </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
-                <ProfileForm />
+                <div className="border-t pt-6">
+                  <ProfileForm />
+                </div>
               </div>
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
                 <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
