@@ -153,12 +153,14 @@ const CreateMatch = () => {
 
   const handleGPSSearch = async () => {
     if (!navigator.geolocation) {
+      setGpsError('unsupported');
       toast.error('Geolocation is not supported by your browser');
       return;
     }
 
     try {
       setLoadingGPS(true);
+      setGpsError(null);
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const coords = {
@@ -166,17 +168,32 @@ const CreateMatch = () => {
             longitude: position.coords.longitude
           };
           setLocationCoords(coords);
+          setGpsError(null);
           await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
           toast.success(`Found courses within ${searchRadius} miles`);
           setLoadingGPS(false);
         },
-        () => {
+        (err) => {
           setLoadingGPS(false);
-          toast.error('Location access denied. Please enable location permissions.');
-        }
+          if (err.code === err.PERMISSION_DENIED) {
+            setGpsError('denied');
+            toast.error('Location access denied. Enable it in your browser settings to find nearby courses.');
+          } else if (err.code === err.POSITION_UNAVAILABLE) {
+            setGpsError('unavailable');
+            toast.error('Location unavailable. Check that location services are turned on.');
+          } else if (err.code === err.TIMEOUT) {
+            setGpsError('timeout');
+            toast.error('Location request timed out. Please try again.');
+          } else {
+            setGpsError('unavailable');
+            toast.error('Could not get your location.');
+          }
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
       );
     } catch (error) {
       setLoadingGPS(false);
+      setGpsError('unavailable');
       toast.error('Failed to access GPS');
     }
   };
