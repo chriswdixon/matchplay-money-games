@@ -194,9 +194,6 @@ export const GDPRSettings = () => {
             <Shield className="h-5 w-5 text-primary" />
             Your Data Rights
           </CardTitle>
-          <CardDescription>
-            Under GDPR and CCPA, you have the right to access, export, and delete your personal data.
-          </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -235,9 +232,6 @@ export const GDPRSettings = () => {
             <BadgeCheck className="h-5 w-5 text-primary" />
             Age Verification
           </CardTitle>
-          <CardDescription>
-            You must be 18+ to use Tyche for skill-based competitions.
-          </CardDescription>
         </CardHeader>
         <CardContent>
           {ageVerified === null ? (
@@ -286,9 +280,6 @@ export const GDPRSettings = () => {
             <FileJson className="h-5 w-5" />
             Export Your Data
           </CardTitle>
-          <CardDescription>
-            Download a complete copy of your personal data in JSON format.
-          </CardDescription>
         </CardHeader>
         <CardContent>
           <Alert className="mb-4">
@@ -323,9 +314,6 @@ export const GDPRSettings = () => {
             <Trash2 className="h-5 w-5" />
             Delete Your Account
           </CardTitle>
-          <CardDescription>
-            Permanently delete your account and all associated data.
-          </CardDescription>
         </CardHeader>
         <CardContent>
           {deletionRequested ? (

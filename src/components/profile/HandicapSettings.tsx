@@ -179,9 +179,6 @@ export function HandicapSettings() {
             </div>
             <div>
               <CardTitle>Golf Handicap Index</CardTitle>
-              <CardDescription>
-                Update your official USGA Handicap Index
-              </CardDescription>
             </div>
           </div>
         </CardHeader>

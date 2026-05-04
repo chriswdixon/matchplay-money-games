@@ -88,9 +88,6 @@ export function ChangePassword() {
           <KeyRound className="w-5 h-5 text-primary" aria-hidden="true" />
           Change Password
         </CardTitle>
-        <CardDescription>
-          Enter your current password, then choose a new one
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <form onSubmit={handleSubmit} className="space-y-4" noValidate>

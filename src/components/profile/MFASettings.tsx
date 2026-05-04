@@ -88,9 +88,6 @@ export function MFASettings() {
               <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
               Two-Factor Authentication
             </CardTitle>
-            <CardDescription>
-              Add an extra layer of security to your account
-            </CardDescription>
           </div>
           {mfaEnabled ? (
             <Badge variant="default">Enabled</Badge>

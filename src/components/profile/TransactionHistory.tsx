@@ -69,15 +69,12 @@ export function TransactionHistory() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <History className="w-5 h-5 text-primary-foreground" />
-          </div>
-          Transaction History
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1.5">Your recent account activity</p>
-      </div>
+      <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
+        <div className="p-2 bg-gradient-primary rounded-lg">
+          <History className="w-5 h-5 text-primary-foreground" />
+        </div>
+        Transaction History
+      </h2>
       <div>
         {transactions.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">

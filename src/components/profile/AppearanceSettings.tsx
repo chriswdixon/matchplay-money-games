@@ -7,13 +7,10 @@ export function AppearanceSettings() {
 
   return (
     <div className="space-y-4">
-      <div>
-        <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-          <Sun className="w-5 h-5 text-primary" aria-hidden="true" />
-          Appearance
-        </h2>
-        <p className="text-sm text-muted-foreground mt-1.5">Choose how Tyche looks on this device.</p>
-      </div>
+      <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+        <Sun className="w-5 h-5 text-primary" aria-hidden="true" />
+        Appearance
+      </h2>
       <ToggleGroup
         type="single"
         value={theme}
