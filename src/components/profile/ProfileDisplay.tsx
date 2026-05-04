@@ -110,17 +110,6 @@ export function ProfileDisplay() {
               {profile?.handicap !== null && profile?.handicap !== undefined ? profile.handicap : '—'}
             </div>
           </div>
-          <Button
-            type="button"
-            variant="secondary"
-            size="sm"
-            onClick={openCalculators}
-            className="gap-2 shrink-0"
-            aria-label="Open handicap calculators"
-          >
-            <Calculator className="w-4 h-4" aria-hidden="true" />
-            <span className="hidden sm:inline">Calculators</span>
-          </Button>
         </div>
 
         {/* Profile Details */}
