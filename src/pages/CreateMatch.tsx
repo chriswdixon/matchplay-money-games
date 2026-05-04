@@ -157,30 +157,6 @@ const CreateMatch = () => {
     return () => clearTimeout(timeoutId);
   }, [formData]);
 
-  const handleZipcodeSearch = async () => {
-    if (!zipcode || zipcode.length < 5) {
-      toast.error('Please enter a valid 5-digit zipcode');
-      return;
-    }
-
-    try {
-      setLoadingZipcode(true);
-      const coords = await geocodeAddress(zipcode);
-      
-      if (coords) {
-        setLocationCoords(coords);
-        await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
-        toast.success(`Found courses within ${searchRadius} miles`);
-      } else {
-        toast.error('Could not find location for this zipcode');
-      }
-    } catch (error) {
-      toast.error('Failed to search by zipcode');
-    } finally {
-      setLoadingZipcode(false);
-    }
-  };
-
   const handleGPSSearch = async () => {
     if (!navigator.geolocation) {
       toast.error('Geolocation is not supported by your browser');
