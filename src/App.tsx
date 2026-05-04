@@ -22,6 +22,7 @@ const Profile = lazy(() => import("./pages/Profile"));
 const NotFound = lazy(() => import("./pages/NotFound"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole"));
+import { AdminRoute } from "./components/auth/AdminRoute";
 const CreateMatch = lazy(() => import("./pages/CreateMatch"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const VerifyAge = lazy(() => import("./pages/VerifyAge"));
