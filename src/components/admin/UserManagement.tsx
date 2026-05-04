@@ -411,6 +411,20 @@ const UserManagement = () => {
           </DialogFooter>
         </DialogContent>
       </Dialog>
+
+      <Dialog open={accountDialog.open} onOpenChange={(open) => setAccountDialog({ open, user: open ? accountDialog.user : null })}>
+        <DialogContent className="max-w-3xl max-h-[85vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle>Account Details</DialogTitle>
+            <DialogDescription>
+              {accountDialog.user ? `${accountDialog.user.display_name} (${accountDialog.user.email})` : ''}
+            </DialogDescription>
+          </DialogHeader>
+          {accountDialog.user && (
+            <UserAccountDetails initialUserId={accountDialog.user.user_id} hideLookup />
+          )}
+        </DialogContent>
+      </Dialog>
     </TooltipProvider>
   );
 };
