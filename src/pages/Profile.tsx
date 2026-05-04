@@ -8,7 +8,7 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell, LifeBuoy } from 'lucide-react';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell, LifeBuoy, LogOut } from 'lucide-react';
 import { SupportRequestDialog } from '@/components/profile/SupportRequestDialog';
 import { InstallPWAButton } from '@/components/InstallPWAButton';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -44,7 +44,7 @@ const HandicapSettings = lazy(() =>
 type TabId = 'profile' | 'account' | 'notifications' | 'settings' | 'security' | 'privacy';
 
 export default function Profile() {
-  const { user, loading } = useAuth();
+  const { user, loading, signOut } = useAuth();
   const { hasActiveMatch } = useActiveMatch();
   const navigate = useNavigate();
   const isMobile = useIsMobile();
@@ -277,6 +277,26 @@ export default function Profile() {
               description="Manage your Tyche profile and preferences"
             />
           </div>
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={async () => {
+                    await signOut();
+                    navigate('/');
+                  }}
+                  aria-label="Log out"
+                  className="gap-2 shrink-0 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                >
+                  <LogOut className="h-4 w-4" />
+                  <span className="hidden sm:inline">Log out</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Log out</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
         </div>
       </header>
 
