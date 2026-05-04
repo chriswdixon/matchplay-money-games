@@ -58,9 +58,8 @@ export default function Profile() {
   if (!user) return null;
 
   const handleTabChange = (value: TabId) => {
-    if (value === 'account' && !isVerified) {
-      setPendingTab(value);
-      setShowPasswordDialog(true);
+    if (value === 'account') {
+      navigate('/wallet');
       return;
     }
     setActiveTab(value);
