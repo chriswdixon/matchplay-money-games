@@ -19,6 +19,7 @@ import HomeProfileCard from "@/components/home/HomeProfileCard";
 import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import GamesNearYou from "@/components/home/GamesNearYou";
+import RecentWins from "@/components/home/RecentWins";
 
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 
@@ -197,23 +198,7 @@ const TycheLanding = () => {
                 onOpenFilters={() => setCurrentTab("matches")}
               />
 
-              <button
-                type="button"
-                onClick={() => navigate("/wins")}
-                className="w-full flex items-center justify-between bg-card rounded-2xl p-4 shadow-card hover:shadow-elegant transition-all border border-border"
-                aria-label="Open Wins Feed"
-              >
-                <span className="flex items-center gap-3">
-                  <span className="p-2 bg-gradient-primary rounded-lg">
-                    <Trophy className="w-5 h-5 text-primary-foreground" />
-                  </span>
-                  <span className="text-left">
-                    <span className="block font-semibold">Wins Feed</span>
-                    <span className="block text-xs text-muted-foreground">See who's winning around the community</span>
-                  </span>
-                </span>
-                <ArrowUp className="w-4 h-4 rotate-45 text-muted-foreground" />
-              </button>
+              <RecentWins />
 
             </div>
           )}
