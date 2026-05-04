@@ -769,7 +769,7 @@ export function AuthForm() {
                               inviteStatus.kind === 'format' ||
                               !!validationErrors.inviteCode
                             }
-                            aria-describedby="invite-code-status invite-code-hint"
+                            aria-describedby="invite-code-status"
                             autoComplete="off"
                             spellCheck={false}
                             className={`pr-10 ${
