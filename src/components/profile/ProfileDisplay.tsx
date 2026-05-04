@@ -172,6 +172,24 @@ export function ProfileDisplay() {
           </div>
         )}
       </CardContent>
+
+      {/* Mobile: handicap calculators in a popup */}
+      <Dialog open={calcOpen} onOpenChange={setCalcOpen}>
+        <DialogContent className="w-screen h-[100dvh] max-w-none rounded-none p-0 gap-0 overflow-hidden">
+          <DialogTitle className="sr-only">Handicap Calculators</DialogTitle>
+          <button
+            type="button"
+            onClick={() => setCalcOpen(false)}
+            aria-label="Close"
+            className="absolute top-3 right-3 z-50 inline-flex h-9 w-9 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
+          >
+            <X className="h-5 w-5" />
+          </button>
+          <div className="h-[100dvh] overflow-y-auto pt-12">
+            <HandicapCalculators />
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 }
