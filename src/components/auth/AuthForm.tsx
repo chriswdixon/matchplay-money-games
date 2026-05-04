@@ -714,6 +714,36 @@ export function AuthForm() {
                         You must be 18+ to participate in skill-based competitions
                       </p>
                     </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="signup-password" className="flex items-center gap-2">
+                        Password
+                        <Shield className="w-4 h-4 text-muted-foreground" />
+                      </Label>
+                      <Input
+                        id="signup-password"
+                        type="password"
+                        placeholder="Create a strong password"
+                        value={password}
+                        onChange={(e) => handlePasswordChange(e.target.value)}
+                        required
+                        className={validationErrors.password ? "border-destructive" : ""}
+                      />
+                      {validationErrors.password && (
+                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.password}</p>
+                      )}
+                      {passwordWarnings.length > 0 && (
+                        <Alert className="mt-2">
+                          <AlertCircle className="h-4 w-4" />
+                          <AlertDescription>
+                            <div className="space-y-1">
+                              {passwordWarnings.map((warning, index) => (
+                                <div key={index} className="text-sm">• {warning}</div>
+                              ))}
+                            </div>
+                          </AlertDescription>
+                        </Alert>
+                      )}
+                    </div>
                     {!email.endsWith('@match-play.co') && (
                       <div className="space-y-2">
                         <Label htmlFor="invite-code">Invite Code</Label>
@@ -809,36 +839,6 @@ export function AuthForm() {
                         </p>
                       </div>
                     )}
-                    <div className="space-y-2">
-                      <Label htmlFor="signup-password" className="flex items-center gap-2">
-                        Password
-                        <Shield className="w-4 h-4 text-muted-foreground" />
-                      </Label>
-                      <Input
-                        id="signup-password"
-                        type="password"
-                        placeholder="Create a strong password"
-                        value={password}
-                        onChange={(e) => handlePasswordChange(e.target.value)}
-                        required
-                        className={validationErrors.password ? "border-destructive" : ""}
-                      />
-                      {validationErrors.password && (
-                        <p className="text-sm text-destructive" role="alert" aria-live="polite">{validationErrors.password}</p>
-                      )}
-                      {passwordWarnings.length > 0 && (
-                        <Alert className="mt-2">
-                          <AlertCircle className="h-4 w-4" />
-                          <AlertDescription>
-                            <div className="space-y-1">
-                              {passwordWarnings.map((warning, index) => (
-                                <div key={index} className="text-sm">• {warning}</div>
-                              ))}
-                            </div>
-                          </AlertDescription>
-                        </Alert>
-                      )}
-                    </div>
                     <Button type="submit" className="w-full" disabled={loading}>
                       {loading ? "Creating account..." : "Sign Up"}
                     </Button>
