@@ -76,7 +76,7 @@ export default function Profile() {
     setPendingTab(null);
   };
 
-  const tabs: { id: TabId; label: string; Icon: typeof User; show: boolean }[] = [
+  const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean }[] = [
     { id: 'profile', label: 'Profile', Icon: User, show: true },
     { id: 'handicap', label: 'Handicap', Icon: Trophy, show: true },
     { id: 'account', label: 'Account', Icon: DollarSign, show: showAccountTab },
@@ -84,7 +84,8 @@ export default function Profile() {
     { id: 'security', label: 'Security', Icon: Shield, show: true },
     { id: 'subscription', label: 'Subscription', Icon: CreditCard, show: true },
     { id: 'privacy', label: 'Privacy', Icon: FileText, show: true },
-  ].filter(t => t.show);
+  ];
+  const tabs = allTabs.filter(t => t.show);
 
   const Toolbar = () => (
     <nav
