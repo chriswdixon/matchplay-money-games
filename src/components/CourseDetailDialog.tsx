@@ -78,10 +78,25 @@ const CourseDetailDialog = ({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="max-w-lg max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="pr-6">{detail?.name || course.name}</DialogTitle>
-          {detail?.clubName && detail.clubName !== detail.name && (
-            <DialogDescription>{detail.clubName}</DialogDescription>
-          )}
+          <div className="flex gap-3 items-start">
+            {(detail?.latitude || course.latitude) && (detail?.longitude || course.longitude) && (
+              <img
+                src={`https://staticmap.openstreetmap.de/staticmap.php?center=${detail?.latitude || course.latitude},${detail?.longitude || course.longitude}&zoom=15&size=120x120&maptype=mapnik&markers=${detail?.latitude || course.latitude},${detail?.longitude || course.longitude},red-pushpin`}
+                alt={`Map of ${detail?.name || course.name}`}
+                width={80}
+                height={80}
+                loading="lazy"
+                className="w-20 h-20 rounded-lg object-cover border border-border shrink-0"
+                onError={(e) => { (e.currentTarget as HTMLImageElement).style.display = 'none'; }}
+              />
+            )}
+            <div className="min-w-0 flex-1">
+              <DialogTitle className="pr-6">{detail?.name || course.name}</DialogTitle>
+              {detail?.clubName && detail.clubName !== detail.name && (
+                <DialogDescription>{detail.clubName}</DialogDescription>
+              )}
+            </div>
+          </div>
         </DialogHeader>
 
         <div className="space-y-4">
