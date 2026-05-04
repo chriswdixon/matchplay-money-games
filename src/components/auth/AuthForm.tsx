@@ -6,7 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useAuth } from '@/hooks/useAuth';
-import { ArrowLeft, Shield, AlertCircle, CheckCircle2, Loader2 } from 'lucide-react';
+import { ArrowLeft, Shield, AlertCircle, CheckCircle2, Loader2, Check, X } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { signUpSchema, signInSchema, passwordResetSchema, RateLimiter, inviteCodeSchema } from '@/lib/validation';
