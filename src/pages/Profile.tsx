@@ -8,7 +8,8 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell } from 'lucide-react';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell, LifeBuoy } from 'lucide-react';
+import { SupportRequestDialog } from '@/components/profile/SupportRequestDialog';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
@@ -40,6 +41,7 @@ export default function Profile() {
   const { unreadCount } = useNotifications();
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
+  const [showSupportDialog, setShowSupportDialog] = useState(false);
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
   const [pendingTab, setPendingTab] = useState<TabId | null>(null);
   const [isVerified, setIsVerified] = useState(false);
@@ -180,6 +182,21 @@ export default function Profile() {
               </Tooltip>
             </TooltipProvider>
           )}
+          <TooltipProvider delayDuration={200}>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setShowSupportDialog(true)}
+                  aria-label="Contact Support"
+                >
+                  <LifeBuoy className="h-4 w-4" />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Contact Support</TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           <div className="flex-1">
             <PageTitleCard
               icon={<User className="w-5 h-5" aria-hidden="true" />}
@@ -273,6 +290,8 @@ export default function Profile() {
         }}
         hasActiveMatch={hasActiveMatch}
       />
+
+      <SupportRequestDialog open={showSupportDialog} onOpenChange={setShowSupportDialog} />
 
       <PasswordVerificationDialog
         open={showPasswordDialog}
