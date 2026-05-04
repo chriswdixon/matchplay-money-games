@@ -33,9 +33,21 @@ const detectIOS = () =>
 const detectAndroid = () =>
   typeof navigator !== "undefined" && /Android/i.test(navigator.userAgent);
 
+// True when the page is launched as an installed PWA (added to Home Screen)
+// rather than inside the regular mobile browser. iOS and Android each store
+// the location permission against the installed app, not the browser.
+const isStandalonePWA = (): boolean => {
+  if (typeof window === "undefined") return false;
+  const displayMode = window.matchMedia?.("(display-mode: standalone)").matches;
+  // iOS Safari exposes navigator.standalone for home-screen apps
+  const iosStandalone = (window.navigator as any).standalone === true;
+  return Boolean(displayMode || iosStandalone);
+};
+
 function getDetail(error: LocationError): Detail {
   const ios = detectIOS();
   const android = detectAndroid();
+  const pwa = isStandalonePWA();
 
   // Insecure context overrides everything — no permission prompt is even possible.
   if (isInsecureContext()) {
