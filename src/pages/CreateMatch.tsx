@@ -1241,28 +1241,15 @@ const CreateMatch = () => {
 
   return (
     <div className="min-h-screen bg-muted/40">
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-background border-b pt-[env(safe-area-inset-top)]">
-        <div className="container mx-auto px-4 py-3 flex items-center gap-3">
-          <Button variant="ghost" size="icon" onClick={handleCancel}>
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-xl font-bold">Create Match</h1>
-          {isMobile && (
-            <span className="ml-auto text-sm text-muted-foreground">
-              Step {currentStep + 1} of 4
-            </span>
-          )}
-        </div>
-      </header>
+      {/* Header removed per request */}
 
       {/* Form */}
       <form onSubmit={(e) => e.preventDefault()} className="container mx-auto px-4 py-6 max-w-2xl">
         {isMobile ? (
           <div className="space-y-6">
             <div className={cn(
-              "rounded-3xl p-4 shadow-card min-h-[60vh] text-foreground",
-              currentStep === 0 ? "bg-success/10 border border-success/30" : "bg-card"
+              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground",
+              currentStep === 0 ? "bg-primary/10 border border-primary/30" : "bg-card"
             )}>
               {currentStep === 0 && renderCourseStep()}
               {currentStep === 1 && renderDateTimeStep()}
@@ -1319,10 +1306,10 @@ const CreateMatch = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-success/10 border border-success/30 text-foreground rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
-            <div className="bg-card rounded-3xl p-6 shadow-card">{renderDateTimeStep()}</div>
-            <div className="bg-card rounded-3xl p-6 shadow-card">{renderFormatTeesStep()}</div>
-            <div className="bg-card rounded-3xl p-6 shadow-card">{renderDetailsStep()}</div>
+            <div className="bg-primary/10 border border-primary/30 text-foreground text-base rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderDateTimeStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderFormatTeesStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderDetailsStep()}</div>
 
             <div className="flex gap-3 pt-2">
               <Button
