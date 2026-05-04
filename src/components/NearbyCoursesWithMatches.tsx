@@ -227,38 +227,59 @@ const NearbyCoursesWithMatches = () => {
       )}
 
       {location && (
-        <p className="text-xs text-muted-foreground px-1 flex items-center gap-1" aria-live="polite">
-          <MapPin className="w-3 h-3 inline" aria-hidden="true" />
-          Showing courses within
-          <Popover>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
-                aria-label={`Adjust search radius, currently ${radius} miles`}
-              >
-                {radius}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent className="w-64" align="start">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm font-medium">Search radius</span>
-                  <span className="text-sm text-muted-foreground">{radius} mi</span>
+        <div className="flex items-center justify-between gap-2 px-1">
+          <p className="text-xs text-muted-foreground flex items-center gap-1 flex-1 min-w-0" aria-live="polite">
+            <MapPin className="w-3 h-3 inline shrink-0" aria-hidden="true" />
+            Showing courses within
+            <Popover>
+              <PopoverTrigger asChild>
+                <button
+                  type="button"
+                  className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
+                  aria-label={`Adjust search radius, currently ${radius} miles`}
+                >
+                  {radius}
+                </button>
+              </PopoverTrigger>
+              <PopoverContent className="w-64" align="start">
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium">Search radius</span>
+                    <span className="text-sm text-muted-foreground">{radius} mi</span>
+                  </div>
+                  <Slider
+                    value={[radius]}
+                    onValueChange={(v) => setRadius(v[0])}
+                    min={1}
+                    max={100}
+                    step={1}
+                    aria-label="Search radius in miles"
+                  />
                 </div>
-                <Slider
-                  value={[radius]}
-                  onValueChange={(v) => setRadius(v[0])}
-                  min={1}
-                  max={100}
-                  step={1}
-                  aria-label="Search radius in miles"
-                />
-              </div>
-            </PopoverContent>
-          </Popover>
-          miles
-        </p>
+              </PopoverContent>
+            </Popover>
+            miles
+          </p>
+          <Button
+            type="button"
+            size="sm"
+            variant="outline"
+            className="shrink-0 h-8 px-3 rounded-full"
+            onClick={async () => {
+              await requestLocation();
+              await runSearch(query);
+            }}
+            disabled={locationLoading}
+            aria-label="Use my current location and refresh nearby courses"
+          >
+            {locationLoading ? (
+              <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
+            ) : (
+              <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
+            )}
+            <span className="ml-1.5 text-xs font-medium">Use my location</span>
+          </Button>
+        </div>
       )}
 
       <div className="space-y-2">
