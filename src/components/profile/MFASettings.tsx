@@ -84,7 +84,10 @@ export function MFASettings() {
       <CardHeader>
         <div className="flex items-center justify-between">
           <div>
-            <CardTitle>Two-Factor Authentication</CardTitle>
+            <CardTitle className="flex items-center gap-2">
+              <Shield className="w-5 h-5 text-primary" aria-hidden="true" />
+              Two-Factor Authentication
+            </CardTitle>
             <CardDescription>
               Add an extra layer of security to your account
             </CardDescription>

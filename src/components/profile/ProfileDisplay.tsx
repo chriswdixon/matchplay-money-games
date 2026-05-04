@@ -68,7 +68,10 @@ export function ProfileDisplay() {
   return (
     <Card className="shadow-card border-0">
       <CardHeader className="pb-4">
-        <CardTitle>Profile Overview</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <User className="w-5 h-5 text-primary" aria-hidden="true" />
+          Profile Overview
+        </CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Profile Header */}
