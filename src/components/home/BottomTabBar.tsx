@@ -43,7 +43,7 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
   return (
     <nav
       aria-label="Primary"
-      className="fixed bottom-0 left-0 right-0 z-40 px-2 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 pointer-events-none"
+      className="fixed left-0 right-0 z-40 px-2 pointer-events-none bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 md:bottom-auto md:top-0 md:pt-[max(env(safe-area-inset-top),0.75rem)] md:pb-3"
     >
       <div className="mx-auto max-w-2xl pointer-events-auto">
         <div className="flex items-center justify-between gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium">

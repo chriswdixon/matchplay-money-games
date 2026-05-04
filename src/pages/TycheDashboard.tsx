@@ -104,7 +104,7 @@ const TycheDashboard = () => {
         hideReturnButton={currentTab === "active-match"}
       />
 
-      <main id="main-content" className="flex-1 pb-32 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4" role="main">
+      <main id="main-content" className="flex-1 pb-32 md:pb-8 md:pt-24 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4" role="main">
         {currentTab === "active-match" && hasActiveMatch && (
           <Suspense fallback={<TabLoader />}>
             <MatchScorecard matchId={activeMatchId!} matchName={activeMatchName || "Active Match"} />
