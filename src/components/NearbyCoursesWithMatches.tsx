@@ -39,7 +39,7 @@ const NearbyCoursesWithMatches = () => {
     if (!location) return;
     const handle = setTimeout(() => {
       runSearch(query);
-    }, query.trim().length === 0 ? 0 : 300);
+    }, query.trim().length === 0 ? 0 : 120);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, location]);
