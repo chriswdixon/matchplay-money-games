@@ -350,8 +350,8 @@ serve(async (req) => {
       }
     }
     
-    return new Response(JSON.stringify({ 
-      error: error.message,
+    return new Response(JSON.stringify({
+      error: 'Unable to process request.',
       rolledBack: processedPayments.length
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

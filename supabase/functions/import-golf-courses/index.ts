@@ -142,10 +142,10 @@ serve(async (req) => {
   } catch (error: any) {
     console.error('[IMPORT-GOLF-COURSES] Error:', error);
     return new Response(
-      JSON.stringify({ error: error.message }),
-      { 
+      JSON.stringify({ error: 'Unable to import golf courses.' }),
+      {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500 
+        status: 500
       }
     );
   }

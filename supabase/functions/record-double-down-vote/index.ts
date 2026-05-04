@@ -183,7 +183,7 @@ serve(async (req) => {
 
   } catch (error: any) {
     logStep('ERROR', { message: error.message });
-    return new Response(JSON.stringify({ error: error.message }), {
+    return new Response(JSON.stringify({ error: 'Unable to process request.' }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
       status: 400,
     });
