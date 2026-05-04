@@ -10,7 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Search, Crown, ArrowUp, History, Trophy, Target } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
-import { useSearchParams, useNavigate } from "react-router-dom";
+import { useSearchParams, useNavigate, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
@@ -285,10 +285,11 @@ const TycheLanding = () => {
           
           <div className="flex justify-center items-center mb-12">
             <Button
+              asChild
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent-glow shadow-accent transition-all duration-300 px-8 py-4 text-lg font-semibold"
             >
-              Schedule Demo
+              <Link to="/auth">Join Tyche</Link>
             </Button>
           </div>
           
