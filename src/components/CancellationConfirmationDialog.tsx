@@ -62,10 +62,10 @@ export function CancellationConfirmationDialog({
 
   return (
     <AlertDialog open={open} onOpenChange={onOpenChange}>
-      <AlertDialogContent className="max-w-lg">
+      <AlertDialogContent className="max-w-lg rounded-3xl">
         <AlertDialogHeader>
           <AlertDialogTitle className="flex items-center gap-2">
-            <AlertTriangle className="w-5 h-5 text-amber-500" />
+            <AlertTriangle className="w-5 h-5 text-warning" />
             Confirm Player Cancellation
           </AlertDialogTitle>
           <AlertDialogDescription className="space-y-4 pt-2">
@@ -78,7 +78,7 @@ export function CancellationConfirmationDialog({
                 <p className="text-sm">{reasonLabel}</p>
               </div>
               {isRefundEligible && (
-                <div className="flex items-start gap-2 text-sm text-blue-600 dark:text-blue-400 bg-blue-500/10 p-2 rounded">
+                <div className="flex items-start gap-2 text-sm text-primary bg-primary/10 p-2 rounded-lg">
                   <CheckCircle className="w-4 h-4 mt-0.5 flex-shrink-0" />
                   <span>This reason qualifies for buy-in refund (minus $2 cancellation fee)</span>
                 </div>
@@ -129,10 +129,11 @@ export function CancellationConfirmationDialog({
         </AlertDialogHeader>
 
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={submitting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={submitting} className="rounded-full">Cancel</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleSubmit}
             disabled={!agreement || (agreement === 'disagree' && !alternateReason.trim()) || submitting}
+            className="rounded-full"
           >
             {submitting ? 'Submitting...' : 'Submit Confirmation'}
           </AlertDialogAction>
