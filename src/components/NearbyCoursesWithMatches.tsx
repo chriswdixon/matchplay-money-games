@@ -10,8 +10,10 @@ import { useMatches } from "@/hooks/useMatches";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import CourseDetailDialog from "./CourseDetailDialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
 
-const RADIUS_MI = 30;
+const DEFAULT_RADIUS_MI = 30;
 
 const distanceMi = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 3959;
@@ -38,6 +40,7 @@ const NearbyCoursesWithMatches = () => {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS_MI);
 
   // Load 10 at a time on both mobile and desktop
   const getStep = () => 10;
@@ -50,7 +53,7 @@ const NearbyCoursesWithMatches = () => {
     }, 80);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [query, location]);
+  }, [query, location, radius]);
 
   // Reset pagination when results change
   useEffect(() => {
@@ -92,7 +95,7 @@ const NearbyCoursesWithMatches = () => {
     const term = q.trim().toLowerCase();
 
     // Always start from nearby courses within radius
-    const nearby = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
+    const nearby = await searchNearbyCourses(location.latitude, location.longitude, radius);
     let results = nearby
       .map((c) => ({
         ...c,
@@ -102,7 +105,7 @@ const NearbyCoursesWithMatches = () => {
             ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
             : undefined),
       }))
-      .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
+      .filter((c) => c.distance !== undefined && c.distance <= radius);
 
     if (term.length >= 1) {
       // Prefix match against name or any word in the name
@@ -131,7 +134,7 @@ const NearbyCoursesWithMatches = () => {
             (c) =>
               matchesPrefix(c.name) &&
               c.distance !== undefined &&
-              c.distance <= RADIUS_MI,
+              c.distance <= radius,
           );
       }
       results = matched;
@@ -219,9 +222,37 @@ const NearbyCoursesWithMatches = () => {
       )}
 
       {location && (
-        <p className="text-xs text-muted-foreground px-1" aria-live="polite">
-          <MapPin className="w-3 h-3 inline mr-1" aria-hidden="true" />
-          Showing courses within {RADIUS_MI} miles
+        <p className="text-xs text-muted-foreground px-1 flex items-center gap-1" aria-live="polite">
+          <MapPin className="w-3 h-3 inline" aria-hidden="true" />
+          Showing courses within
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
+                aria-label={`Adjust search radius, currently ${radius} miles`}
+              >
+                {radius}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent className="w-64" align="start">
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <span className="text-sm font-medium">Search radius</span>
+                  <span className="text-sm text-muted-foreground">{radius} mi</span>
+                </div>
+                <Slider
+                  value={[radius]}
+                  onValueChange={(v) => setRadius(v[0])}
+                  min={1}
+                  max={100}
+                  step={1}
+                  aria-label="Search radius in miles"
+                />
+              </div>
+            </PopoverContent>
+          </Popover>
+          miles
         </p>
       )}
 
