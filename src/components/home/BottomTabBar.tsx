@@ -54,24 +54,33 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
         <div className="flex items-center justify-between gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium">
           {items.map(({ id, label, Icon }) => {
             const active = id === activeTab;
+            const badge = id === "profile" ? unreadCount : 0;
             return (
               <button
                 key={id}
                 type="button"
                 onClick={() => handleClick(id)}
-                aria-label={label}
+                aria-label={badge > 0 ? `${label} (${badge} unread notifications)` : label}
                 aria-current={active ? "page" : undefined}
                 className="relative flex flex-col items-center justify-center flex-1 min-w-0 h-12"
               >
                 <span
                   className={cn(
-                    "flex items-center justify-center rounded-full transition-all w-10 h-10",
+                    "relative flex items-center justify-center rounded-full transition-all w-10 h-10",
                     active
                       ? "bg-primary text-primary-foreground shadow-accent"
                       : "text-background/90 hover:text-background",
                   )}
                 >
                   <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                  {badge > 0 && (
+                    <span
+                      aria-hidden="true"
+                      className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center border-2 border-foreground"
+                    >
+                      {badge > 99 ? "99+" : badge}
+                    </span>
+                  )}
                 </span>
                 {active && (
                   <span
