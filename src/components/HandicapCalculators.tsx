@@ -4,7 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Calculator, Flag, Trophy } from 'lucide-react';
 import { toast } from 'sonner';
 
@@ -160,65 +160,51 @@ function PlayingHandicapForm({ onClose }: { onClose?: () => void }) {
 }
 
 export function HandicapCalculators() {
-  const [openCourse, setOpenCourse] = useState(false);
-  const [openPlaying, setOpenPlaying] = useState(false);
-
   return (
-    <div className="space-y-4">
-      <div className="flex items-center gap-3">
-        <div className="p-2 bg-gradient-primary rounded-lg">
-          <Calculator className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
-        </div>
-        <div>
-          <h2 className="text-lg font-semibold leading-none tracking-tight">Handicap Calculators</h2>
-          <p className="text-sm text-muted-foreground">
-            Open a calculator to compute your Course or Playing Handicap
-          </p>
-        </div>
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-          <Dialog open={openCourse} onOpenChange={setOpenCourse}>
-            <DialogTrigger asChild>
-              <Button type="button" variant="outline" className="h-auto py-4 justify-start gap-3">
-                <Flag className="w-5 h-5 text-primary" aria-hidden="true" />
-                <div className="text-left">
-                  <div className="font-semibold">Course Handicap</div>
-                  <div className="text-xs text-muted-foreground">For a specific course</div>
-                </div>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Course Handicap™ Calculator</DialogTitle>
-                <DialogDescription>
-                  Calculate your course handicap for a specific golf course
-                </DialogDescription>
-              </DialogHeader>
-              <CourseHandicapForm onClose={() => setOpenCourse(false)} />
-            </DialogContent>
-          </Dialog>
+    <section className="py-20 px-6 bg-background" aria-labelledby="handicap-calculators-heading">
+      <div className="max-w-6xl mx-auto">
+        <aside className="bg-gradient-hero text-primary-foreground rounded-2xl p-8 md:p-12 shadow-card" aria-labelledby="handicap-calculators-heading">
+          <div className="text-center mb-8">
+            <div className="w-12 h-12 mx-auto mb-4 bg-accent text-accent-foreground rounded-xl flex items-center justify-center" aria-hidden="true">
+              <Calculator className="w-6 h-6" />
+            </div>
+            <h2 id="handicap-calculators-heading" className="text-3xl md:text-4xl font-bold mb-4">
+              Handicap Calculators
+            </h2>
+            <p className="text-primary-foreground/90 max-w-2xl mx-auto">
+              Compute your Course Handicap and Playing Handicap before choosing your game level.
+            </p>
+          </div>
 
-          <Dialog open={openPlaying} onOpenChange={setOpenPlaying}>
-            <DialogTrigger asChild>
-              <Button type="button" variant="outline" className="h-auto py-4 justify-start gap-3">
-                <Trophy className="w-5 h-5 text-primary" aria-hidden="true" />
-                <div className="text-left">
-                  <div className="font-semibold">Playing Handicap</div>
-                  <div className="text-xs text-muted-foreground">Adjusted for match format</div>
-                </div>
-              </Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-md max-h-[90vh] overflow-y-auto">
-              <DialogHeader>
-                <DialogTitle>Playing Handicap Calculator</DialogTitle>
-                <DialogDescription>
-                  Calculate your playing handicap based on match format
-                </DialogDescription>
-              </DialogHeader>
-              <PlayingHandicapForm onClose={() => setOpenPlaying(false)} />
-            </DialogContent>
-          </Dialog>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
+            <Card className="bg-card text-card-foreground border-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Flag className="w-5 h-5 text-primary" aria-hidden="true" />
+                  Course Handicap™
+                </CardTitle>
+                <CardDescription>For a specific course</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <CourseHandicapForm />
+              </CardContent>
+            </Card>
+
+            <Card className="bg-card text-card-foreground border-border shadow-card">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2 text-xl">
+                  <Trophy className="w-5 h-5 text-primary" aria-hidden="true" />
+                  Playing Handicap
+                </CardTitle>
+                <CardDescription>Adjusted for match format</CardDescription>
+              </CardHeader>
+              <CardContent>
+                <PlayingHandicapForm />
+              </CardContent>
+            </Card>
+          </div>
+        </aside>
       </div>
-    </div>
+    </section>
   );
 }
