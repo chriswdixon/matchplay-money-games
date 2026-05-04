@@ -210,6 +210,29 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     return filtered;
   }, [matches, filters, showPastMatches]);
 
+  // Mobile pagination: 10 at a time, infinite scroll
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [filters, showPastMatches, matches.length]);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((c) => Math.min(c + 10, filteredMatches.length));
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [isMobile, filteredMatches.length]);
+
+  const visibleMatches = isMobile ? filteredMatches.slice(0, visibleCount) : filteredMatches;
+
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
     const now = new Date();
@@ -514,7 +537,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                   )}
                 </div>
               ) : (
-                filteredMatches.map((match, index) => {
+                visibleMatches.map((match, index) => {
                   const isFull = isMatchFull(match);
                   const isCreatedRecently = new Date(match.created_at) > new Date(Date.now() - 5 * 60 * 1000); // Within 5 minutes
                   const buyInDollars = match.buy_in_amount / 100;
