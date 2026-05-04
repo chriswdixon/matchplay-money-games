@@ -174,6 +174,7 @@ export default function Profile() {
                     size="icon"
                     onClick={() => navigate('/admin')}
                     aria-label="Admin Portal"
+                    className="bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
                   >
                     <ShieldCheck className="h-4 w-4" />
                   </Button>
