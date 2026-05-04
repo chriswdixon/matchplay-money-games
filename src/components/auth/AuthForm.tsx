@@ -513,7 +513,7 @@ export function AuthForm() {
       <Card className="w-full max-w-md rounded-3xl shadow-card border-border/60">
         <CardHeader className="text-center space-y-2">
           <CardTitle className="text-2xl font-bold tracking-tight">
-            {showResetForm ? 'Reset Password' : 'Welcome to Tyche'}
+            {showResetForm ? 'Reset Password' : (<>Welcome to <span className="text-accent">Tyche</span></>)}
           </CardTitle>
           <CardDescription>
             {showResetForm 
