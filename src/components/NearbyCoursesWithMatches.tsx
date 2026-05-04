@@ -60,28 +60,20 @@ const NearbyCoursesWithMatches = () => {
     setVisibleCount(10);
   }, [courses]);
 
-  // Infinite scroll: expand only after the user actually scrolls
+  // Infinite scroll: expand as the sentinel becomes visible
   useEffect(() => {
     const node = sentinelRef.current;
     if (!node) return;
-    let hasScrolled = false;
-    const onScroll = () => {
-      hasScrolled = true;
-    };
-    window.addEventListener("scroll", onScroll, { passive: true });
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && hasScrolled) {
+        if (entries[0].isIntersecting) {
           setVisibleCount((c) => Math.min(c + getStep(), courses.length));
         }
       },
       { rootMargin: "200px" },
     );
     observer.observe(node);
-    return () => {
-      observer.disconnect();
-      window.removeEventListener("scroll", onScroll);
-    };
+    return () => observer.disconnect();
   }, [courses.length, visibleCount]);
 
   const visibleCourses = courses.slice(0, visibleCount);
@@ -343,9 +335,14 @@ const NearbyCoursesWithMatches = () => {
           );
         })}
         {visibleCount < courses.length && (
-          <div ref={sentinelRef} className="py-3 text-center" aria-live="polite">
-            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground inline" />
-            <span className="sr-only">Loading more courses</span>
+          <div ref={sentinelRef} className="py-3 flex flex-col items-center gap-2" aria-live="polite">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), courses.length))}
+            >
+              Load more ({courses.length - visibleCount} remaining)
+            </Button>
           </div>
         )}
       </div>
