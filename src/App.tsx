@@ -62,7 +62,7 @@ const App = () => (
             <Route path="/verify" element={<VerifyEmail />} />
             <Route path="/verify-age" element={<VerifyAge />} />
             <Route path="/profile" element={<Profile />} />
-            <Route path="/admin" element={<AdminConsole />} />
+            <Route path="/admin" element={<AdminRoute><AdminConsole /></AdminRoute>} />
             <Route path="/create-match" element={<CreateMatch />} />
             
             <Route path="/terms" element={<Terms />} />
