@@ -9,7 +9,10 @@ export function AppearanceSettings() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Appearance</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <Sun className="w-5 h-5 text-primary" aria-hidden="true" />
+          Appearance
+        </CardTitle>
         <CardDescription>Choose how Tyche looks on this device.</CardDescription>
       </CardHeader>
       <CardContent>

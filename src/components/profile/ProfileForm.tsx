@@ -101,7 +101,10 @@ export function ProfileForm() {
   return (
     <div className="space-y-4">
       <div>
-        <h3 className="text-lg font-semibold">Profile Information</h3>
+        <h3 className="text-lg font-semibold flex items-center gap-2">
+          <User className="w-5 h-5 text-primary" aria-hidden="true" />
+          Profile Information
+        </h3>
         <p className="text-sm text-muted-foreground">Update your profile details</p>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">

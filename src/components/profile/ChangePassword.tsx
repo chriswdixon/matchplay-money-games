@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-
+import { KeyRound } from 'lucide-react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
@@ -84,7 +84,10 @@ export function ChangePassword() {
   return (
     <Card className="shadow-card border-0">
       <CardHeader className="pb-4">
-        <CardTitle>Change Password</CardTitle>
+        <CardTitle className="flex items-center gap-2">
+          <KeyRound className="w-5 h-5 text-primary" aria-hidden="true" />
+          Change Password
+        </CardTitle>
         <CardDescription>
           Enter your current password, then choose a new one
         </CardDescription>
