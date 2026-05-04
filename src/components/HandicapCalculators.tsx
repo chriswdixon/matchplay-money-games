@@ -225,7 +225,7 @@ export function HandicapCalculators() {
                 <div className="space-y-2">
                   <Label htmlFor="handicapAllowance">Handicap Allowance</Label>
                   <Select value={handicapAllowance} onValueChange={setHandicapAllowance}>
-                    <SelectTrigger>
+                    <SelectTrigger id="handicapAllowance" aria-label="Handicap Allowance">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
