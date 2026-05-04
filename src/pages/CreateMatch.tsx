@@ -1279,110 +1279,79 @@ const CreateMatch = () => {
   );
 
   return (
-    <div className="min-h-screen bg-muted/40 md:pb-0 relative">
-      {/* Form */}
-      <form
-        onSubmit={(e) => e.preventDefault()}
+    <Dialog open onOpenChange={(open) => { if (!open) handleCancel(); }}>
+      <DialogContent
         className={cn(
-          "container mx-auto max-w-2xl",
+          "p-0 gap-0 overflow-hidden border-border bg-muted/40",
           isMobile
-            ? "px-0 pt-0 pb-24 min-h-screen flex flex-col"
-            : "px-4 py-6"
+            ? "w-screen h-[100dvh] max-w-none rounded-none sm:rounded-none"
+            : "max-w-2xl w-full max-h-[90vh] rounded-3xl"
         )}
       >
-        {isMobile ? (
-          <>
-            <div className="flex-1 flex flex-col px-3 pt-3">
-              <div className={cn(
-                "rounded-3xl shadow-card text-base text-foreground bg-card transition-colors hover:bg-success/10 flex-1 flex flex-col overflow-hidden",
-              )}>
-                {/* In-card header with close button so it never overlaps other cards */}
-                <div className="flex items-center justify-end px-3 pt-3">
-                  <button
-                    type="button"
-                    onClick={handleCancel}
-                    aria-label="Cancel and close"
-                    className="inline-flex h-9 w-9 items-center justify-center rounded-full text-foreground hover:bg-accent transition-colors"
-                  >
-                    <X className="h-5 w-5" />
-                  </button>
-                </div>
-                <div className="flex-1 px-4 pb-4 space-y-6 overflow-y-auto">
-                  {currentStep === 1 && (
-                    <>
-                      {renderDateTimeStep()}
-                      {renderFormatTeesStep()}
-                    </>
-                  )}
-                  {currentStep === 2 && renderDetailsStep()}
+        <DialogTitle className="sr-only">Create Match</DialogTitle>
+        <button
+          type="button"
+          onClick={handleCancel}
+          aria-label="Cancel and close"
+          className="absolute top-3 right-3 z-50 inline-flex h-9 w-9 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
+        >
+          <X className="h-5 w-5" />
+        </button>
+
+        <form
+          onSubmit={(e) => e.preventDefault()}
+          className={cn(
+            "flex flex-col",
+            isMobile ? "h-[100dvh]" : "max-h-[90vh]"
+          )}
+        >
+          {isMobile ? (
+            <>
+              <div className="flex-1 flex flex-col px-3 pt-12 pb-24 overflow-hidden">
+                <div className="rounded-3xl shadow-card text-base text-foreground bg-card transition-colors hover:bg-success/10 flex-1 flex flex-col overflow-hidden">
+                  <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
+                    {currentStep === 1 && (
+                      <>
+                        {renderDateTimeStep()}
+                        {renderFormatTeesStep()}
+                      </>
+                    )}
+                    {currentStep === 2 && renderDetailsStep()}
+                  </div>
                 </div>
               </div>
-            </div>
 
-            <div className="fixed bottom-0 left-0 right-0 z-40 flex gap-3 px-3 py-3 bg-muted/95 backdrop-blur border-t border-border">
-              {currentStep > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleBack}
-                  className="flex-1"
-                >
-                  Back
-                </Button>
-              )}
-              {currentStep < 2 ? (
-                <Button
-                  type="button"
-                  onClick={handleNext}
-                  disabled={!canGoNext()}
-                  className="flex-1"
-                >
-                  Next
-                </Button>
-              ) : (
-                <Button
-                  type="button"
-                  onClick={handleSubmit}
-                  disabled={!isFormValid || submitting}
-                  className="flex-1"
-                >
-                  {submitting ? 'Creating...' : 'Create'}
-                </Button>
-              )}
-            </div>
-          </>
-        ) : (
-          <div className="space-y-6">
-            <div className="flex justify-end">
-              <button
-                type="button"
-                onClick={handleCancel}
-                aria-label="Cancel and close"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground shadow-lg hover:bg-accent transition-colors"
-              >
-                <X className="h-5 w-5" />
-              </button>
-            </div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10 space-y-6">
-              {renderDateTimeStep()}
-              {renderFormatTeesStep()}
-            </div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDetailsStep()}</div>
+              <div className="absolute bottom-0 left-0 right-0 z-40 flex gap-3 px-3 py-3 bg-muted/95 backdrop-blur border-t border-border">
+                {currentStep > 1 && (
+                  <Button type="button" variant="outline" onClick={handleBack} className="flex-1">Back</Button>
+                )}
+                {currentStep < 2 ? (
+                  <Button type="button" onClick={handleNext} disabled={!canGoNext()} className="flex-1">Next</Button>
+                ) : (
+                  <Button type="button" onClick={handleSubmit} disabled={!isFormValid || submitting} className="flex-1">
+                    {submitting ? 'Creating...' : 'Create'}
+                  </Button>
+                )}
+              </div>
+            </>
+          ) : (
+            <div className="overflow-y-auto p-6 space-y-6">
+              <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10 space-y-6">
+                {renderDateTimeStep()}
+                {renderFormatTeesStep()}
+              </div>
+              <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDetailsStep()}</div>
 
-            <div className="flex gap-3 pt-2">
-              <Button
-                type="button"
-                onClick={handleSubmit}
-                disabled={!isFormValid || submitting}
-                className="flex-1"
-              >
-                {submitting ? 'Creating...' : 'Create Match'}
-              </Button>
+              <div className="flex gap-3 pt-2">
+                <Button type="button" onClick={handleSubmit} disabled={!isFormValid || submitting} className="flex-1">
+                  {submitting ? 'Creating...' : 'Create Match'}
+                </Button>
+              </div>
             </div>
-          </div>
-        )}
-      </form>
-    </div>
+          )}
+        </form>
+      </DialogContent>
+    </Dialog>
   );
 };
 
