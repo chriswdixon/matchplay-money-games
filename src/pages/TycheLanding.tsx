@@ -117,6 +117,14 @@ const TycheLanding = () => {
     }
   }, [searchParams, user]);
 
+  // Allow navigation from other pages via ?tab=...
+  useEffect(() => {
+    const t = searchParams.get('tab');
+    if (t && ['home', 'matches', 'active-match', 'past'].includes(t)) {
+      setCurrentTab(t);
+    }
+  }, [searchParams]);
+
   // Navigation items for hamburger menu (dynamically includes active match)
   const navItems = useMemo(() => {
     const items = [
