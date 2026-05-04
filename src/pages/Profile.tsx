@@ -166,7 +166,7 @@ export default function Profile() {
     <div className="min-h-screen bg-muted/40 flex flex-col">
       <a href="#profile-main" className="skip-link">Skip to main content</a>
 
-      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-24" role="banner">
+      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
         <div className="flex items-center gap-3">
           {hasActiveMatch && (
             <Button
