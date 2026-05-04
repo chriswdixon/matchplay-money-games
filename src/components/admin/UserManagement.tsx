@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { useToast } from "@/hooks/use-toast";
-import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy, Wallet } from "lucide-react";
+import { Mail, Lock, Ban, CheckCircle, Search, Loader2, Copy, Wallet, ShieldOff } from "lucide-react";
 import { UserAccountDetails } from "./UserAccountDetails";
 import {
   Dialog,
@@ -138,14 +138,14 @@ const UserManagement = () => {
     }
   };
 
-  const handleDisableUser = async (user: UserData) => {
+  const handleDisableUser = async (user: UserData, action: 'ban' | 'unban' = 'ban') => {
     setActionLoading(true);
     try {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) throw new Error('Not authenticated');
 
       const { error } = await supabase.functions.invoke('admin-disable-user', {
-        body: { userId: user.user_id },
+        body: { userId: user.user_id, action },
         headers: {
           Authorization: `Bearer ${session.access_token}`,
         },
@@ -155,14 +155,16 @@ const UserManagement = () => {
 
       toast({
         title: "Success",
-        description: `User ${user.display_name} has been disabled`,
+        description: action === 'ban'
+          ? `${user.display_name} has been banned and signed out`
+          : `${user.display_name} has been unbanned`,
       });
       fetchUsers();
     } catch (error) {
-      console.error('Error disabling user:', error);
+      console.error('Error updating user ban state:', error);
       toast({
         title: "Error",
-        description: error instanceof Error ? error.message : "Failed to disable user",
+        description: error instanceof Error ? error.message : "Failed to update user",
         variant: "destructive",
       });
     } finally {
@@ -185,9 +187,13 @@ const UserManagement = () => {
         title = 'Send Magic Link?';
         description = `This will send a magic login link to ${user.email}`;
         break;
-      case 'disable':
-        title = 'Disable User?';
-        description = `This will suspend subscription access for ${user.display_name}`;
+      case 'ban':
+        title = 'Ban User?';
+        description = `This will disable ${user.display_name}'s account, sign them out everywhere, and prevent them from logging back in.`;
+        break;
+      case 'unban':
+        title = 'Unban User?';
+        description = `This will restore login access for ${user.display_name}.`;
         break;
     }
 
@@ -204,8 +210,11 @@ const UserManagement = () => {
       case 'magic-link':
         handleMagicLink(selectedUser);
         break;
-      case 'disable':
-        handleDisableUser(selectedUser);
+      case 'ban':
+        handleDisableUser(selectedUser, 'ban');
+        break;
+      case 'unban':
+        handleDisableUser(selectedUser, 'unban');
         break;
     }
   };
@@ -291,7 +300,7 @@ const UserManagement = () => {
                       <div className="flex items-center gap-2">
                         {user.display_name}
                         {user.is_disabled && (
-                          <Badge variant="outline" className="bg-muted">Disabled</Badge>
+                          <Badge variant="destructive">Banned</Badge>
                         )}
                       </div>
                     </TableCell>
@@ -355,14 +364,25 @@ const UserManagement = () => {
                           <TooltipTrigger asChild>
                             <Button
                               size="sm"
-                              variant="outline"
-                              onClick={() => openConfirmDialog('disable', user)}
+                              variant={user.is_disabled ? 'outline' : 'destructive'}
+                              onClick={() => openConfirmDialog(user.is_disabled ? 'unban' : 'ban', user)}
+                              disabled={user.is_admin}
                             >
-                              <Ban className="h-4 w-4" />
+                              {user.is_disabled ? (
+                                <ShieldOff className="h-4 w-4" />
+                              ) : (
+                                <Ban className="h-4 w-4" />
+                              )}
                             </Button>
                           </TooltipTrigger>
                           <TooltipContent>
-                            <p>Disable user account</p>
+                            <p>
+                              {user.is_admin
+                                ? 'Cannot ban an admin'
+                                : user.is_disabled
+                                  ? 'Unban user (restore login)'
+                                  : 'Ban user (block login)'}
+                            </p>
                           </TooltipContent>
                         </Tooltip>
 
