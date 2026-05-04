@@ -211,11 +211,7 @@ const TycheLanding = () => {
             </Suspense>
           )}
 
-          {currentTab === "handicap" && (
-            <Suspense fallback={<TabLoader />}>
-              <HandicapSettings />
-            </Suspense>
-          )}
+
 
         </main>
 
