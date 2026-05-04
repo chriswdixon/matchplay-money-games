@@ -257,17 +257,17 @@ const TycheLanding = () => {
         <AppFeatures />
       </Suspense>
       
-      {/* Handicap Calculators Section */}
-      <Suspense fallback={<SectionLoader />}>
-        <HandicapCalculators />
-      </Suspense>
-      
       {/* Membership Tiers Section */}
       <div id="membership">
         <Suspense fallback={<SectionLoader />}>
           <MembershipTiers />
         </Suspense>
       </div>
+
+      {/* Handicap Calculators Section */}
+      <Suspense fallback={<SectionLoader />}>
+        <HandicapCalculators />
+      </Suspense>
       
       {/* Footer CTA */}
       <section className="py-20 px-6 bg-gradient-hero text-white" aria-labelledby="cta-heading">
