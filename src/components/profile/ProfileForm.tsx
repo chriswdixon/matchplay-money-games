@@ -99,66 +99,46 @@ export function ProfileForm() {
   }
 
   return (
-    <Card className="shadow-card">
-      <CardHeader className="pb-4">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <User className="w-5 h-5 text-primary-foreground" />
-          </div>
-          <div>
-            <CardTitle>Profile Information</CardTitle>
-            <CardDescription>
-              Update your profile details and golf information
-            </CardDescription>
-          </div>
-        </div>
-      </CardHeader>
-      <CardContent>
-        <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Profile Picture Upload */}
-          <div className="flex justify-center">
-            <AvatarUpload
-              currentImageUrl={formData.profile_picture_url}
-              onImageUpdate={(imageUrl) => setFormData(prev => ({ ...prev, profile_picture_url: imageUrl || '' }))}
-              disabled={saving}
+    <div className="space-y-4">
+      <div>
+        <h3 className="text-lg font-semibold">Profile Information</h3>
+        <p className="text-sm text-muted-foreground">Update your profile details</p>
+      </div>
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div className="space-y-2">
+            <Label htmlFor="display_name">Display Name</Label>
+            <Input
+              id="display_name"
+              type="text"
+              placeholder="Your golf name"
+              value={formData.display_name}
+              onChange={(e) => handleInputChange('display_name', e.target.value)}
             />
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div className="space-y-2">
-              <Label htmlFor="display_name">Display Name</Label>
-              <Input
-                id="display_name"
-                type="text"
-                placeholder="Your golf name"
-                value={formData.display_name}
-                onChange={(e) => handleInputChange('display_name', e.target.value)}
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="phone">Phone Number</Label>
-              <Input
-                id="phone"
-                type="tel"
-                placeholder="+1 (555) 123-4567"
-                value={formData.phone}
-                onChange={(e) => handleInputChange('phone', e.target.value)}
-              />
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">Phone Number</Label>
+            <Input
+              id="phone"
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              value={formData.phone}
+              onChange={(e) => handleInputChange('phone', e.target.value)}
+            />
           </div>
+        </div>
 
-          <div className="flex justify-end pt-4">
-            <Button 
-              type="submit" 
-              disabled={saving}
-              className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-smooth"
-            >
-              {saving ? "Saving..." : "Save Changes"}
-            </Button>
-          </div>
-        </form>
-      </CardContent>
-    </Card>
+        <div className="flex justify-end pt-2">
+          <Button
+            type="submit"
+            disabled={saving}
+            className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-smooth"
+          >
+            {saving ? "Saving..." : "Save Changes"}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 }
