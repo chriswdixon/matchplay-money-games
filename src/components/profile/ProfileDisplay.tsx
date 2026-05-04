@@ -1,12 +1,18 @@
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
+import { Button } from '@/components/ui/button';
+import { Dialog, DialogContent, DialogTitle } from '@/components/ui/dialog';
 import { useProfile } from '@/hooks/useProfile';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
 import { useAuth } from '@/hooks/useAuth';
 import { useSubscription } from '@/hooks/useSubscription';
-import { User, Phone, Trophy, Calendar, Mail, Star, Crown, Zap } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { User, Phone, Trophy, Calendar, Mail, Star, Crown, Zap, Calculator, X } from 'lucide-react';
 import StarRating from '@/components/StarRating';
+import { HandicapCalculators } from '@/components/HandicapCalculators';
 
 export function ProfileDisplay() {
   const { profile, loading } = useProfile();
