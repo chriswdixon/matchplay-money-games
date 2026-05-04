@@ -8,6 +8,7 @@ import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import LocationStatusBanner from "./LocationStatusBanner";
 
 type SearchMode = "matches" | "courses";
 
@@ -22,7 +23,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
   const [courseResults, setCourseResults] = useState<GolfCourse[]>([]);
   const [searched, setSearched] = useState(false);
   const { searchCoursesByName, searchNearbyCourses, loading } = useGolfCourses();
-  const { location, requestLocation } = useLocation();
+  const { location, requestLocation, error: locationError, loading: locationLoading } = useLocation();
   const navigate = useNavigate();
   const { user } = useAuth();
 
@@ -179,9 +180,21 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
             </Card>
           ))}
           {!location && courseResults.length === 0 && !loading && (
-            <Button variant="outline" className="w-full" onClick={() => requestLocation()}>
-              Enable location for nearby courses
-            </Button>
+            <>
+              <Button
+                variant="outline"
+                className="w-full"
+                onClick={() => requestLocation()}
+                disabled={locationLoading}
+              >
+                {locationLoading ? "Locating…" : "Enable location for nearby courses"}
+              </Button>
+              <LocationStatusBanner
+                error={locationError}
+                loading={locationLoading}
+                onRetry={() => requestLocation()}
+              />
+            </>
           )}
         </div>
       )}
