@@ -29,23 +29,13 @@ const WinsFeed = () => {
   }, [authLoading, user, navigate]);
 
   return (
-    <main className="min-h-screen bg-background">
-      <header className="sticky top-0 z-30 bg-background/95 backdrop-blur border-b border-border">
-        <div className="max-w-2xl mx-auto px-4 py-3 flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigate(-1)}
-            aria-label="Go back"
-          >
-            <ArrowLeft className="w-5 h-5" />
-          </Button>
-          <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-primary" />
-            <h1 className="text-xl font-semibold">Wins Feed</h1>
-          </div>
+    <main className="min-h-screen bg-muted/40 pb-32 md:pb-12 md:pt-24">
+      <div className="max-w-2xl mx-auto px-4 pt-4">
+        <div className="flex items-center gap-2 mb-4">
+          <Trophy className="w-5 h-5 text-primary" />
+          <h1 className="text-2xl font-bold">Wins Feed</h1>
         </div>
-      </header>
+      </div>
 
       <section className="max-w-2xl mx-auto px-4 py-6 space-y-3">
         {loading ? (
