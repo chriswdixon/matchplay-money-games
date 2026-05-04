@@ -1319,7 +1319,7 @@ const CreateMatch = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-success text-success-foreground rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
+            <div className="bg-success/10 border border-success/30 text-foreground rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
             <div className="bg-card rounded-3xl p-6 shadow-card">{renderDateTimeStep()}</div>
             <div className="bg-card rounded-3xl p-6 shadow-card">{renderFormatTeesStep()}</div>
             <div className="bg-card rounded-3xl p-6 shadow-card">{renderDetailsStep()}</div>
