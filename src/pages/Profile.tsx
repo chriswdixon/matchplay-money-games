@@ -7,7 +7,8 @@ import { useFreeTier } from '@/hooks/useFreeTier';
 import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
@@ -15,6 +16,7 @@ import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
+import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
 
 const HandicapSettings = lazy(() =>
