@@ -883,6 +883,8 @@ const CreateMatch = () => {
               }
             }
             setFormData({ ...formData, format: value, max_participants: newMaxParticipants });
+            // Advance focus to holes select
+            setTimeout(() => document.getElementById('holes')?.focus(), 50);
           }}>
             <SelectTrigger id="format">
               <SelectValue placeholder="Select format" />
