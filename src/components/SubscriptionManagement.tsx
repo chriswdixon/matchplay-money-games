@@ -1,6 +1,8 @@
 import { Badge } from "@/components/ui/badge";
-import { Crown, CheckCircle, Star, Zap, Wallet } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Crown, CheckCircle, Star, Zap, Wallet, ArrowUpCircle } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
+import { useNavigate } from "react-router-dom";
 
 interface SubscriptionManagementProps {
   isVerified?: boolean;
@@ -9,6 +11,7 @@ interface SubscriptionManagementProps {
 
 const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementProps) => {
   const { tierName, loading } = useSubscription();
+  const navigate = useNavigate();
 
   if (loading) {
     return (
@@ -58,31 +61,35 @@ const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementPr
     <div className="space-y-8">
       {/* Current Subscription */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div>
-            <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-              Current Subscription
-              {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
-              {isLocalTier && <Star className="w-5 h-5 text-primary" />}
-              {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
-            </h2>
-            <p className="text-sm text-muted-foreground mt-1.5">Your membership details</p>
-          </div>
-          <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
-            {tierName}
-          </Badge>
+        <div className="flex items-center justify-between gap-3">
+          <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+            Current Subscription
+            {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
+            {isLocalTier && <Star className="w-5 h-5 text-primary" />}
+            {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
+            <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
+              {tierName}
+            </Badge>
+          </h2>
+          {!isTournamentTier && (
+            <Button
+              size="sm"
+              onClick={() => navigate('/#membership')}
+              className="gap-2"
+            >
+              <ArrowUpCircle className="w-4 h-4" aria-hidden="true" />
+              Upgrade
+            </Button>
+          )}
         </div>
-        <div className="space-y-2">
-          <h4 className="font-medium">Your Features</h4>
-          <ul className="space-y-2">
-            {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
-              <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                <CheckCircle className="w-4 h-4 text-accent" />
-                {feature}
-              </li>
-            ))}
-          </ul>
-        </div>
+        <ul className="space-y-2">
+          {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
+            <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+              <CheckCircle className="w-4 h-4 text-accent" />
+              {feature}
+            </li>
+          ))}
+        </ul>
       </div>
 
       {/* Play Money Info */}
