@@ -320,6 +320,32 @@ const NearbyCoursesWithMatches = () => {
           </div>
         )}
       </div>
+
+      <CourseDetailDialog
+        course={selectedCourse}
+        open={dialogOpen}
+        onOpenChange={setDialogOpen}
+        openMatches={
+          selectedCourse
+            ? (openMatchesByCourse.get(selectedCourse.name.toLowerCase().trim()) || []).map((m) => ({
+                id: m.id,
+                participant_count: m.participant_count,
+                max_participants: m.max_participants,
+                buy_in_amount: m.buy_in_amount,
+                scheduled_time: m.scheduled_time,
+                format: m.format,
+              }))
+            : []
+        }
+        onJoinMatch={(id) => {
+          setDialogOpen(false);
+          handleViewMatch(id);
+        }}
+        onCreateMatch={(c) => {
+          setDialogOpen(false);
+          handleCreateAtCourse(c);
+        }}
+      />
     </div>
   );
 };
