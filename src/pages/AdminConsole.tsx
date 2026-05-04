@@ -13,7 +13,7 @@ import { AuditAlerts } from "@/components/admin/AuditAlerts";
 import UserManagement from "@/components/admin/UserManagement";
 import CouponManagement from "@/components/admin/CouponManagement";
 import AdminReporting from "@/components/admin/AdminReporting";
-import { UserAccountDetails } from "@/components/admin/UserAccountDetails";
+
 import { CancellationReviews } from "@/components/admin/CancellationReviews";
 import { IncompleteMatchReviews } from "@/components/admin/IncompleteMatchReviews";
 import { InviteManagement } from "@/components/admin/InviteManagement";
