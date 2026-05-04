@@ -900,7 +900,10 @@ const CreateMatch = () => {
 
         <div className="space-y-2">
           <Label htmlFor="holes">Number of Holes *</Label>
-          <Select value={formData.holes} onValueChange={(value) => setFormData({ ...formData, holes: value })}>
+          <Select value={formData.holes} onValueChange={(value) => {
+            setFormData({ ...formData, holes: value });
+            setTimeout(() => document.getElementById('tees')?.focus(), 50);
+          }}>
             <SelectTrigger id="holes">
               <SelectValue placeholder="Select holes" />
             </SelectTrigger>
@@ -925,7 +928,9 @@ const CreateMatch = () => {
               Loading course tees...
             </div>
           )}
-          <Select value={formData.default_tees} onValueChange={(value) => setFormData({ ...formData, default_tees: value })}>
+          <Select value={formData.default_tees} onValueChange={(value) => {
+            setFormData({ ...formData, default_tees: value });
+          }}>
             <SelectTrigger id="tees">
               <SelectValue placeholder="Select tees" />
             </SelectTrigger>
