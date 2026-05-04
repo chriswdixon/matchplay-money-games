@@ -68,7 +68,7 @@ const NearbyCoursesWithMatches = () => {
       }))
       .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
 
-    if (term.length >= 2) {
+    if (term.length >= 3) {
       // Substring match against nearby first (so "tera" → "Teravista")
       let matched = results.filter((c) => c.name.toLowerCase().includes(term));
 
