@@ -172,7 +172,7 @@ const TycheLanding = () => {
 
         <main
           id="main-content"
-          className="flex-1 pb-32 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4"
+          className="flex-1 pb-32 md:pb-8 md:pt-24 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4"
           role="main"
         >
           {/* Active match banner takes priority */}
