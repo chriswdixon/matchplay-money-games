@@ -78,7 +78,6 @@ const TycheDashboard = () => {
       { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
       { value: "past", label: "Past Matches", icon: <History className="w-4 h-4" /> },
       { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
-      { value: "subscription", label: "Subscription", icon: <Crown className="w-4 h-4" /> },
     ];
     if (hasActiveMatch) {
       items.unshift({ value: "active-match", label: "Active Match", icon: <Target className="w-4 h-4" /> });
@@ -86,7 +85,7 @@ const TycheDashboard = () => {
     return items;
   }, [hasActiveMatch]);
 
-  const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap", "subscription"];
+  const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap"];
   const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
     ? (currentTab as BottomTab)
     : "home";
@@ -148,9 +147,6 @@ const TycheDashboard = () => {
         )}
         {currentTab === "handicap" && (
           <Suspense fallback={<TabLoader />}><HandicapSettings /></Suspense>
-        )}
-        {currentTab === "subscription" && (
-          <Suspense fallback={<TabLoader />}><SubscriptionManagement /></Suspense>
         )}
       </main>
 
