@@ -868,7 +868,7 @@ export function AuthForm() {
                         </div>
                       </div>
                     )}
-                    <Button type="submit" className="w-full" disabled={loading}>
+                    <Button type="submit" className="w-full font-bold transition-all hover:shadow-[0_0_20px_hsl(var(--accent)/0.6)] hover:bg-accent hover:text-accent-foreground" disabled={loading}>
                       {loading ? "Creating account..." : "Sign Up"}
                     </Button>
                     {!email.endsWith('@match-play.co') && (
