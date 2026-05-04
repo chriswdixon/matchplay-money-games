@@ -1248,8 +1248,8 @@ const CreateMatch = () => {
         {isMobile ? (
           <div className="space-y-6">
             <div className={cn(
-              "rounded-3xl p-4 shadow-card min-h-[60vh] text-foreground",
-              currentStep === 0 ? "bg-success/10 border border-success/30" : "bg-card"
+              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground",
+              currentStep === 0 ? "bg-primary/10 border border-primary/30" : "bg-card"
             )}>
               {currentStep === 0 && renderCourseStep()}
               {currentStep === 1 && renderDateTimeStep()}
