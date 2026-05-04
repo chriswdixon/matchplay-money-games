@@ -12,6 +12,7 @@ import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 import GamesNearYou from "@/components/home/GamesNearYou";
 import RecentWins from "@/components/home/RecentWins";
+import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 
 
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
@@ -125,7 +126,10 @@ const TycheDashboard = () => {
         )}
 
         {currentTab === "matches" && (
-          <Suspense fallback={<TabLoader />}><MatchFinder hideHowItWorks /></Suspense>
+          <div className="py-4">
+            <h2 className="text-2xl font-bold mb-4">Find Matches & Courses</h2>
+            <NearbyCoursesWithMatches />
+          </div>
         )}
         {currentTab === "past" && (
           <Suspense fallback={<TabLoader />}><MatchFinder hideHowItWorks showPastMatches /></Suspense>
