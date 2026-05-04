@@ -126,17 +126,18 @@ const TycheHero = () => {
         
       </div>
 
-      {/* Scroll Down Arrow */}
-      <button
-        onClick={handleScrollDown}
-        className="absolute bottom-6 sm:bottom-8 left-1/2 transform -translate-x-1/2 z-10 text-white/80 hover:text-white transition-colors duration-300 animate-bounce-10 cursor-pointer group flex flex-col items-center"
-        aria-label="Scroll down to see more"
-      >
-        <span className="text-xs sm:text-sm font-medium group-hover:text-accent transition-colors text-center">
-          Scroll Down
-        </span>
-        <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 mt-1 sm:mt-2" />
-      </button>
+      {/* Scroll Down Indicator */}
+      <div className="absolute inset-x-0 bottom-6 sm:bottom-8 z-10 flex justify-center pointer-events-none">
+        <button
+          type="button"
+          onClick={handleScrollDown}
+          aria-label="Scroll down to see more"
+          className="pointer-events-auto group flex flex-col items-center gap-1 px-4 py-2 rounded-full bg-black/30 backdrop-blur-sm text-white/90 hover:text-white hover:bg-black/40 focus-visible:ring-2 focus-visible:ring-accent focus-visible:outline-none transition-colors"
+        >
+          <span className="text-xs sm:text-sm font-medium">Scroll Down</span>
+          <ChevronDown className="w-5 h-5 sm:w-6 sm:h-6 animate-bounce-10" aria-hidden="true" />
+        </button>
+      </div>
     </section>
   );
 };
