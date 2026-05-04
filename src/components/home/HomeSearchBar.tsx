@@ -1,5 +1,6 @@
 import { Search } from "lucide-react";
-import { useId, useRef } from "react";
+import { useId } from "react";
+import { Input } from "@/components/ui/input";
 
 interface HomeSearchBarProps {
   value: string;
@@ -9,30 +10,23 @@ interface HomeSearchBarProps {
 
 const HomeSearchBar = ({ value, onChange, placeholder }: HomeSearchBarProps) => {
   const id = useId();
-  const inputRef = useRef<HTMLInputElement>(null);
   return (
-    <div className="relative">
+    <div className="relative flex-1">
       <label htmlFor={id} className="sr-only">
         Search
       </label>
-      <div
-        onClick={() => inputRef.current?.focus()}
-        className="relative bg-primary text-primary-foreground rounded-full h-14 shadow-premium cursor-text"
-      >
-        <Search
-          className="w-5 h-5 absolute left-5 top-1/2 -translate-y-1/2 pointer-events-none"
-          aria-hidden="true"
-        />
-        <input
-          id={id}
-          ref={inputRef}
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={placeholder || "Search for a course, city, or zip code"}
-          className="absolute inset-0 w-full h-full bg-transparent border-0 outline-none pl-14 pr-5 rounded-full placeholder:text-primary-foreground/80 text-base"
-        />
-      </div>
+      <Search
+        className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground"
+        aria-hidden="true"
+      />
+      <Input
+        id={id}
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        placeholder={placeholder || "Search courses near you"}
+        className="pl-10 h-11"
+        aria-label="Search courses near you"
+      />
     </div>
   );
 };
