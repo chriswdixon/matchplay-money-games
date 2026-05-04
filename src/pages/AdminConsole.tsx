@@ -6,7 +6,7 @@ import AppHeader from "@/components/AppHeader";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Users, Ticket, BarChart3, DollarSign, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
+import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck } from "lucide-react";
 import { AuditLog } from "@/components/admin/AuditLog";
 import { PageTitleCard } from "@/components/ui/page-title-card";
 import { AuditAlerts } from "@/components/admin/AuditAlerts";
