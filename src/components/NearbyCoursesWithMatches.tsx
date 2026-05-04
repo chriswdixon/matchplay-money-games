@@ -95,7 +95,7 @@ const NearbyCoursesWithMatches = () => {
     const term = q.trim().toLowerCase();
 
     // Always start from nearby courses within radius
-    const nearby = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
+    const nearby = await searchNearbyCourses(location.latitude, location.longitude, radius);
     let results = nearby
       .map((c) => ({
         ...c,
@@ -105,7 +105,7 @@ const NearbyCoursesWithMatches = () => {
             ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
             : undefined),
       }))
-      .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
+      .filter((c) => c.distance !== undefined && c.distance <= radius);
 
     if (term.length >= 1) {
       // Prefix match against name or any word in the name
@@ -134,7 +134,7 @@ const NearbyCoursesWithMatches = () => {
             (c) =>
               matchesPrefix(c.name) &&
               c.distance !== undefined &&
-              c.distance <= RADIUS_MI,
+              c.distance <= radius,
           );
       }
       results = matched;
@@ -224,7 +224,7 @@ const NearbyCoursesWithMatches = () => {
       {location && (
         <p className="text-xs text-muted-foreground px-1" aria-live="polite">
           <MapPin className="w-3 h-3 inline mr-1" aria-hidden="true" />
-          Showing courses within {RADIUS_MI} miles
+          Showing courses within {radius} miles
         </p>
       )}
 
