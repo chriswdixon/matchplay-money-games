@@ -13,6 +13,7 @@ import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 import GamesNearYou from "@/components/home/GamesNearYou";
 import RecentWins from "@/components/home/RecentWins";
+import MyCurrentMatches from "@/components/home/MyCurrentMatches";
 import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 
 
@@ -118,6 +119,7 @@ const TycheDashboard = () => {
             <div className="bg-card rounded-3xl p-4 shadow-card">
               <NearbyCoursesWithMatches />
             </div>
+            <MyCurrentMatches />
             <RecentWins />
           </div>
         )}
