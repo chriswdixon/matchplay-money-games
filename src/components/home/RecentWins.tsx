@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, MapPin, Users, ArrowRight } from "lucide-react";
+import { Trophy, MapPin, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useWinsFeed } from "@/hooks/useWinsFeed";
 import { formatDistanceToNow } from "date-fns";
