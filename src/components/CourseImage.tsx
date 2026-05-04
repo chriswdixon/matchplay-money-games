@@ -1,7 +1,7 @@
 import { useState, type ImgHTMLAttributes } from "react";
 import { ImageOff } from "lucide-react";
 import { cn } from "@/lib/utils";
-import defaultThumb from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
+import defaultThumb from "@/assets/hero-golf-course.jpg?format=webp&quality=55&w=1280";
 
 interface CourseImageProps extends Omit<ImgHTMLAttributes<HTMLImageElement>, "src"> {
   src?: string | null;

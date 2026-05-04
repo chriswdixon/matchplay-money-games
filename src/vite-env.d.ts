@@ -7,6 +7,11 @@ declare module '*?format=webp&quality=80' {
   export default src;
 }
 
+declare module '*?format=webp&quality=55&w=1280' {
+  const src: string;
+  export default src;
+}
+
 declare module '*?format=webp' {
   const src: string;
   export default src;
