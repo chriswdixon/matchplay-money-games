@@ -265,9 +265,10 @@ serve(async (req) => {
             : undefined,
         }))
         .filter(course => course.distance !== undefined && course.distance <= maxDistance)
+        .filter(course => !isBlockedCourse(course))
         .sort((a, b) => (a.distance || 999) - (b.distance || 999));
 
-      console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'nearby courses');
+      console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'nearby courses (geo-block filtered)');
 
       return new Response(
         JSON.stringify({ courses }),
