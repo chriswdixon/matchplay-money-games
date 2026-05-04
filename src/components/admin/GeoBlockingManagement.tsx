@@ -10,6 +10,7 @@ import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { MapPin, Plus, Trash2, Globe } from "lucide-react";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 // US States list for dropdown
 const US_STATES = [
@@ -46,6 +47,7 @@ export const GeoBlockingManagement = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newStateCode, setNewStateCode] = useState('');
   const [newReason, setNewReason] = useState('');
+  const [filter, setFilter] = useState<'active' | 'restricted'>('restricted');
 
   const { data: blockedStates, isLoading } = useQuery({
     queryKey: ['admin-blocked-states'],
@@ -220,66 +222,92 @@ export const GeoBlockingManagement = () => {
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-center gap-4 text-sm text-muted-foreground">
-          <span>{blockedStates?.length || 0} states in list</span>
-          <span>•</span>
-          <span className="text-destructive">{activeCount} actively blocked</span>
-        </div>
+        <ToggleGroup
+          type="single"
+          value={filter}
+          onValueChange={(v) => v && setFilter(v as 'active' | 'restricted')}
+          className="justify-start"
+        >
+          <ToggleGroupItem value="active" aria-label="Active areas">
+            Active Areas ({(blockedStates?.length || 0) - activeCount})
+          </ToggleGroupItem>
+          <ToggleGroupItem value="restricted" aria-label="Restricted areas">
+            Restricted Areas ({activeCount})
+          </ToggleGroupItem>
+        </ToggleGroup>
 
-        {blockedStates?.length === 0 ? (
-          <p className="text-center py-8 text-muted-foreground">
-            No states are currently blocked. The platform is accessible from all US states.
-          </p>
-        ) : (
-          <div className="space-y-2">
-            {blockedStates?.map((state) => (
-              <div
-                key={state.id}
-                className={`flex items-center justify-between p-3 rounded-lg border ${
-                  state.is_active ? 'bg-destructive/5 border-destructive/20' : 'bg-muted/50'
-                }`}
-              >
-                <div className="flex items-center gap-3">
-                  <MapPin className={`h-4 w-4 ${state.is_active ? 'text-destructive' : 'text-muted-foreground'}`} />
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-medium">{state.state_name}</span>
-                      <Badge variant="outline" className="text-xs">{state.state_code}</Badge>
-                      {!state.is_active && (
-                        <Badge variant="secondary" className="text-xs">Inactive</Badge>
+        {(() => {
+          const filtered = blockedStates?.filter(s =>
+            filter === 'restricted' ? s.is_active : !s.is_active
+          ) || [];
+
+          if (!blockedStates || blockedStates.length === 0) {
+            return (
+              <p className="text-center py-8 text-muted-foreground">
+                No states are currently blocked. The platform is accessible from all US states.
+              </p>
+            );
+          }
+
+          if (filtered.length === 0) {
+            return (
+              <p className="text-center py-8 text-muted-foreground">
+                No {filter === 'restricted' ? 'restricted' : 'active'} areas.
+              </p>
+            );
+          }
+
+          return (
+            <div className="space-y-2">
+              {filtered.map((state) => (
+                <div
+                  key={state.id}
+                  className={`flex items-center justify-between p-3 rounded-lg border ${
+                    state.is_active ? 'bg-destructive/5 border-destructive/20' : 'bg-muted/50'
+                  }`}
+                >
+                  <div className="flex items-center gap-3">
+                    <MapPin className={`h-4 w-4 ${state.is_active ? 'text-destructive' : 'text-muted-foreground'}`} />
+                    <div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-medium">{state.state_name}</span>
+                        <Badge variant="outline" className="text-xs">{state.state_code}</Badge>
+                        {!state.is_active && (
+                          <Badge variant="secondary" className="text-xs">Inactive</Badge>
+                        )}
+                      </div>
+                      {state.reason && (
+                        <p className="text-xs text-muted-foreground">{state.reason}</p>
                       )}
                     </div>
-                    {state.reason && (
-                      <p className="text-xs text-muted-foreground">{state.reason}</p>
-                    )}
+                  </div>
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2">
+                      <Label htmlFor={`toggle-${state.id}`} className="text-xs text-muted-foreground">
+                        {state.is_active ? 'Blocking' : 'Disabled'}
+                      </Label>
+                      <Switch
+                        id={`toggle-${state.id}`}
+                        checked={state.is_active}
+                        onCheckedChange={(checked) =>
+                          toggleStateMutation.mutate({ id: state.id, isActive: checked })
+                        }
+                      />
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => deleteStateMutation.mutate(state.id)}
+                      disabled={deleteStateMutation.isPending}
+                    >
+                      <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
+                    </Button>
                   </div>
                 </div>
-                <div className="flex items-center gap-3">
-                  <div className="flex items-center gap-2">
-                    <Label htmlFor={`toggle-${state.id}`} className="text-xs text-muted-foreground">
-                      {state.is_active ? 'Blocking' : 'Disabled'}
-                    </Label>
-                    <Switch
-                      id={`toggle-${state.id}`}
-                      checked={state.is_active}
-                      onCheckedChange={(checked) => 
-                        toggleStateMutation.mutate({ id: state.id, isActive: checked })
-                      }
-                    />
-                  </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => deleteStateMutation.mutate(state.id)}
-                    disabled={deleteStateMutation.isPending}
-                  >
-                    <Trash2 className="h-4 w-4 text-muted-foreground hover:text-destructive" />
-                  </Button>
-                </div>
-              </div>
-            ))}
-          </div>
-        )}
+              ))}
+            </div>
+          );
+        })()}
 
         <div className="bg-muted/50 rounded-lg p-4 space-y-2">
           <h4 className="font-medium text-sm">How Geo-Blocking Works</h4>
