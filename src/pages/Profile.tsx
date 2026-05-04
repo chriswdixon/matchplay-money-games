@@ -231,6 +231,12 @@ export default function Profile() {
             </div>
           )}
 
+          {activeTab === 'notifications' && (
+            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <NotificationsPanel />
+            </div>
+          )}
+
           {activeTab === 'settings' && (
             <div className="space-y-6">
               <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
