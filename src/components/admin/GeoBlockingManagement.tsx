@@ -47,6 +47,7 @@ export const GeoBlockingManagement = () => {
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [newStateCode, setNewStateCode] = useState('');
   const [newReason, setNewReason] = useState('');
+  const [filter, setFilter] = useState<'active' | 'restricted'>('restricted');
 
   const { data: blockedStates, isLoading } = useQuery({
     queryKey: ['admin-blocked-states'],
