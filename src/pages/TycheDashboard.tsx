@@ -85,8 +85,8 @@ const TycheDashboard = () => {
     return items;
   }, [hasActiveMatch]);
 
-  const homeTabs: BottomTab[] = ["home", "past", "subscription"];
-  const activeBottomTab: BottomTab = homeTabs.includes(currentTab as BottomTab)
+  const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap", "subscription"];
+  const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
     ? (currentTab as BottomTab)
     : "home";
 
