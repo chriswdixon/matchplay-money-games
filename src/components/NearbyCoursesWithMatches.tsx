@@ -63,11 +63,9 @@ const NearbyCoursesWithMatches = () => {
             ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
             : undefined),
       }))
-      .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
-
-    if (term.length >= 3) {
+    if (term.length >= 1) {
       // Prefix match against name or any word in the name
-      // (so "ter" → "Teravista", "Terra Verde", "Lake Terrace")
+      // (so "t" → "Teravista", "ter" → "Terra Verde", etc.)
       const matchesPrefix = (name: string) => {
         const lower = name.toLowerCase();
         if (lower.startsWith(term)) return true;
@@ -76,9 +74,8 @@ const NearbyCoursesWithMatches = () => {
 
       let matched = results.filter((c) => matchesPrefix(c.name));
 
-      // If nothing matched nearby, fall back to name search across all courses,
-      // still constrained to the radius
-      if (matched.length === 0) {
+      // For 3+ chars, fall back to name search across all courses if nothing nearby matched
+      if (matched.length === 0 && term.length >= 3) {
         const named = await searchCoursesByName(term);
         matched = named
           .map((c) => ({
