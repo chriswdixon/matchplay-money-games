@@ -33,6 +33,7 @@ const Privacy = lazy(() => import("./pages/Privacy"));
 const WinsFeed = lazy(() => import("./pages/WinsFeed"));
 const HandicapCalculatorsPage = lazy(() => import("./pages/HandicapCalculatorsPage"));
 const WalletPage = lazy(() => import("./pages/Wallet"));
+const FAQ = lazy(() => import("./pages/FAQ"));
 
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
@@ -71,6 +72,7 @@ const App = () => (
             <Route path="/wins" element={<WinsFeed />} />
             <Route path="/handicap-calculators" element={<HandicapCalculatorsPage />} />
             <Route path="/wallet" element={<WalletPage />} />
+            <Route path="/faq" element={<FAQ />} />
             {/* PWA install flow has been removed — always send /install (and any sub-paths) to NotFound */}
             <Route path="/install" element={<Navigate to="/404" replace />} />
             <Route path="/install/*" element={<Navigate to="/404" replace />} />
