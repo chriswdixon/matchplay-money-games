@@ -16,13 +16,19 @@ interface AccountInfo {
   transaction_count: number;
 }
 
-export function UserAccountDetails() {
-  const [userId, setUserId] = useState('');
+interface UserAccountDetailsProps {
+  initialUserId?: string;
+  hideLookup?: boolean;
+}
+
+export function UserAccountDetails({ initialUserId, hideLookup }: UserAccountDetailsProps = {}) {
+  const [userId, setUserId] = useState(initialUserId ?? '');
   const [accountInfo, setAccountInfo] = useState<AccountInfo | null>(null);
   const [loading, setLoading] = useState(false);
 
-  const fetchAccountInfo = async () => {
-    if (!userId.trim()) {
+  const fetchAccountInfo = async (idOverride?: string) => {
+    const targetId = (idOverride ?? userId).trim();
+    if (!targetId) {
       toast.error('Please enter a user ID');
       return;
     }
@@ -30,7 +36,7 @@ export function UserAccountDetails() {
     setLoading(true);
     try {
       const { data, error } = await supabase
-        .rpc('get_user_account_info', { target_user_id: userId });
+        .rpc('get_user_account_info', { target_user_id: targetId });
 
       if (error) throw error;
 
@@ -48,6 +54,13 @@ export function UserAccountDetails() {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    if (initialUserId) {
+      fetchAccountInfo(initialUserId);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [initialUserId]);
 
   return (
     <div className="space-y-6">
