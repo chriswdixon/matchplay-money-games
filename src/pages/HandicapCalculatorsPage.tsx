@@ -1,26 +1,25 @@
 import { useNavigate } from 'react-router-dom';
-import { Button } from '@/components/ui/button';
-import { ArrowLeft } from 'lucide-react';
+import BottomTabBar from '@/components/home/BottomTabBar';
+import { useActiveMatch } from '@/hooks/useActiveMatch';
 import { HandicapCalculators } from '@/components/HandicapCalculators';
 
 export default function HandicapCalculatorsPage() {
   const navigate = useNavigate();
+  const { hasActiveMatch } = useActiveMatch();
   return (
-    <div className="min-h-screen bg-muted/40">
-      <header className="max-w-4xl mx-auto px-4 md:px-6 pt-4">
-        <Button
-          variant="ghost"
-          size="sm"
-          onClick={() => navigate(-1)}
-          className="text-muted-foreground hover:text-foreground gap-2"
-        >
-          <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-          Back
-        </Button>
-      </header>
+    <div className="min-h-screen bg-muted/40 pb-32 md:pb-12 md:pt-24">
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6">
         <HandicapCalculators />
       </main>
+      <BottomTabBar
+        activeTab={"profile" as any}
+        onChange={(tab) => {
+          if (tab === 'profile') navigate('/profile');
+          else if (tab === 'home') navigate('/');
+          else navigate(`/?tab=${tab}`);
+        }}
+        hasActiveMatch={hasActiveMatch}
+      />
     </div>
   );
 }
