@@ -95,7 +95,6 @@ const NearbyCoursesWithMatches = () => {
     results.sort((a, b) => (a.distance || 0) - (b.distance || 0));
     setCourses(results.slice(0, 50));
   };
-  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
