@@ -45,18 +45,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         if (event === 'SIGNED_IN') {
           // Log successful authentication securely (no sensitive data)
           console.log('User authenticated successfully');
-          toast({
-            title: "Welcome to Tyche!",
-            description: "You've successfully signed in.",
-          });
         } else if (event === 'SIGNED_OUT') {
           // Clear any cached data on logout
           setSession(null);
           setUser(null);
-          toast({
-            title: "Signed out",
-            description: "You've been signed out successfully.",
-          });
         } else if (event === 'PASSWORD_RECOVERY') {
           toast({
             title: "Password reset",
