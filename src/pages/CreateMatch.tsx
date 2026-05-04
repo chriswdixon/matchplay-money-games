@@ -187,6 +187,15 @@ const CreateMatch = () => {
     }
   };
 
+  // Auto-request GPS on mount so courses are populated immediately
+  useEffect(() => {
+    if (!locationCoords) {
+      handleGPSSearch();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+
   const handleCourseSelect = async (course: any) => {
     setSelectedCourse(course);
     setFormData({ 
