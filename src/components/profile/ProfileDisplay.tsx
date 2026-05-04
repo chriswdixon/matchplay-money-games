@@ -66,31 +66,26 @@ export function ProfileDisplay() {
   };
 
   return (
-    <Card className="shadow-card">
+    <Card className="shadow-card border-0">
       <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-3">
-          <div className="p-2 bg-gradient-primary rounded-lg">
-            <User className="w-5 h-5 text-primary-foreground" />
-          </div>
-          Profile Overview
-        </CardTitle>
+        <CardTitle>Profile Overview</CardTitle>
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Profile Header */}
-        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+        <div className="flex flex-row items-center gap-4">
           <AvatarUpload
             currentImageUrl={profile?.profile_picture_url || undefined}
             onImageUpdate={(imageUrl) =>
               updateProfile({ profile_picture_url: imageUrl })
             }
           />
-          <div className="flex-1 text-center sm:text-left">
-            <h3 className="text-xl font-semibold">
+          <div className="flex-1 min-w-0 text-left">
+            <h3 className="text-xl font-semibold truncate">
               {profile?.display_name || 'Anonymous Golfer'}
             </h3>
-            <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
-              <Mail className="w-4 h-4 text-muted-foreground" />
-              <span className="text-muted-foreground">{user?.email}</span>
+            <div className="flex items-center gap-2 mt-1 min-w-0">
+              <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
+              <span className="text-muted-foreground truncate">{user?.email}</span>
             </div>
             <div className="mt-2">
               <Badge className={`${getMembershipColor(tierName)} inline-flex items-center gap-1 text-xs px-2 py-0.5`}>
