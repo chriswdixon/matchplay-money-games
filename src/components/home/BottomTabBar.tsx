@@ -23,7 +23,6 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
 
   const items: { id: BottomTab; label: string; Icon: typeof Home }[] = [
     { id: "home", label: "Home", Icon: Home },
-    { id: "matches", label: "Find Matches", Icon: Search },
     ...(hasActiveMatch
       ? [{ id: "active-match" as BottomTab, label: "Active Match", Icon: Target }]
       : []),
