@@ -20,6 +20,7 @@ import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import GamesNearYou from "@/components/home/GamesNearYou";
 import RecentWins from "@/components/home/RecentWins";
+import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 
@@ -204,9 +205,10 @@ const TycheLanding = () => {
           )}
 
           {currentTab === "matches" && (
-            <Suspense fallback={<TabLoader />}>
-              <MatchFinder hideHowItWorks />
-            </Suspense>
+            <div className="py-4">
+              <h2 className="text-2xl font-bold mb-4">Find Matches & Courses</h2>
+              <NearbyCoursesWithMatches />
+            </div>
           )}
 
           {currentTab === "past" && (
