@@ -27,7 +27,48 @@ interface GolfCourse {
   externalId?: number;
   clubName?: string;
   tees?: any;
+  state?: string;
 }
+
+// US state name <-> code map for filtering OSM results that only return state names
+const US_STATE_CODES: Record<string, string> = {
+  'alabama':'AL','alaska':'AK','arizona':'AZ','arkansas':'AR','california':'CA','colorado':'CO',
+  'connecticut':'CT','delaware':'DE','florida':'FL','georgia':'GA','hawaii':'HI','idaho':'ID',
+  'illinois':'IL','indiana':'IN','iowa':'IA','kansas':'KS','kentucky':'KY','louisiana':'LA',
+  'maine':'ME','maryland':'MD','massachusetts':'MA','michigan':'MI','minnesota':'MN',
+  'mississippi':'MS','missouri':'MO','montana':'MT','nebraska':'NE','nevada':'NV',
+  'new hampshire':'NH','new jersey':'NJ','new mexico':'NM','new york':'NY','north carolina':'NC',
+  'north dakota':'ND','ohio':'OH','oklahoma':'OK','oregon':'OR','pennsylvania':'PA',
+  'rhode island':'RI','south carolina':'SC','south dakota':'SD','tennessee':'TN','texas':'TX',
+  'utah':'UT','vermont':'VT','virginia':'VA','washington':'WA','west virginia':'WV',
+  'wisconsin':'WI','wyoming':'WY','district of columbia':'DC',
+};
+
+function normalizeStateToCode(stateRaw?: string | null): string | null {
+  if (!stateRaw) return null;
+  const s = stateRaw.trim();
+  if (s.length === 2) return s.toUpperCase();
+  return US_STATE_CODES[s.toLowerCase()] || null;
+}
+
+async function getBlockedStateCodes(): Promise<Set<string>> {
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    const { data, error } = await supabase
+      .from('blocked_states')
+      .select('state_code')
+      .eq('is_active', true);
+    if (error) throw error;
+    return new Set((data || []).map((r: any) => String(r.state_code).toUpperCase()));
+  } catch (e) {
+    console.warn('[SEARCH-GOLF-COURSES] Failed to fetch blocked states:', (e as any)?.message);
+    return new Set();
+  }
+}
+
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
