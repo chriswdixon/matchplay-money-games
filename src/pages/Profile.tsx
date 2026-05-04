@@ -286,7 +286,7 @@ export default function Profile() {
                     navigate('/');
                   }}
                   aria-label="Log out"
-                  className="shrink-0 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                  className="shrink-0 bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
                 >
                   <LogOut className="h-4 w-4" />
                 </Button>
