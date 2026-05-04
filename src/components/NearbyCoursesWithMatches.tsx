@@ -63,6 +63,8 @@ const NearbyCoursesWithMatches = () => {
             ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
             : undefined),
       }))
+      .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI);
+
     if (term.length >= 1) {
       // Prefix match against name or any word in the name
       // (so "t" → "Teravista", "ter" → "Terra Verde", etc.)
