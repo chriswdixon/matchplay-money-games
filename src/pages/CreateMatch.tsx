@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { CreateCourseDialog } from '@/components/CreateCourseDialog';
+
 
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -62,7 +62,6 @@ const CreateMatch = () => {
   const [loadingGPS, setLoadingGPS] = useState(false);
   const [gpsError, setGpsError] = useState<'denied' | 'unavailable' | 'timeout' | 'unsupported' | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [customSearchTerm, setCustomSearchTerm] = useState('');
   const [loadingCourseDetail, setLoadingCourseDetail] = useState(false);
   const [courseTees, setCourseTees] = useState<any[]>([]);
@@ -654,24 +653,12 @@ const CreateMatch = () => {
                       <span>Searching all sources...</span>
                     </div>
                   ) : (
-                    <div className="py-6 px-4 text-center space-y-3">
+                    <div className="py-6 px-4 text-center">
                       <p className="text-sm text-muted-foreground">
-                        {customSearchTerm.length < 3 
+                        {customSearchTerm.length < 3
                           ? "Type at least 3 characters to search"
-                          : "No courses found"
-                        }
+                          : "No courses found"}
                       </p>
-                      {user && customSearchTerm.length >= 3 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCreateCourseOpen(true)}
-                          className="w-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create New Course
-                        </Button>
-                      )}
                     </div>
                   )}
                 </CommandEmpty>
