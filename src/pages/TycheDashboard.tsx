@@ -85,8 +85,8 @@ const TycheDashboard = () => {
     return items;
   }, [hasActiveMatch]);
 
-  const homeTabs: BottomTab[] = ["home", "past", "subscription"];
-  const activeBottomTab: BottomTab = homeTabs.includes(currentTab as BottomTab)
+  const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap", "subscription"];
+  const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
     ? (currentTab as BottomTab)
     : "home";
 
@@ -99,10 +99,6 @@ const TycheDashboard = () => {
     <div className="min-h-screen bg-muted/40 flex flex-col">
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <AppHeader
-        showNavMenu
-        onNavSelect={(v) => setCurrentTab(v)}
-        currentTab={currentTab}
-        navItems={navItems}
         onReturnToMatch={handleReturnToMatch}
         hideReturnButton={currentTab === "active-match"}
       />
@@ -155,7 +151,7 @@ const TycheDashboard = () => {
         )}
       </main>
 
-      <BottomTabBar activeTab={activeBottomTab} onChange={(tab) => setCurrentTab(tab)} />
+      <BottomTabBar activeTab={activeBottomTab} onChange={(tab) => setCurrentTab(tab)} hasActiveMatch={hasActiveMatch} />
       
     </div>
   );
