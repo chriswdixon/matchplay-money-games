@@ -37,6 +37,7 @@ export default function Profile() {
   const isMobile = useIsMobile();
   const { hasAccess } = useFreeTier();
   const { isAdmin } = useAdminRole();
+  const { unreadCount } = useNotifications();
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
