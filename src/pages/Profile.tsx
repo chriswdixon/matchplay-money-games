@@ -12,6 +12,7 @@ import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Troph
 import { SupportRequestDialog } from '@/components/profile/SupportRequestDialog';
 import { InstallPWAButton } from '@/components/InstallPWAButton';
 import { useAdminRole } from '@/hooks/useAdminRole';
+import { useOpenSupportRequestsCount } from '@/hooks/useOpenSupportRequestsCount';
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
