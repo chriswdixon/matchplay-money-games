@@ -281,8 +281,6 @@ const NearbyCoursesWithMatches = () => {
           </Button>
         </div>
       )}
-        </p>
-      )}
 
       <div className="space-y-2">
         {loading && courses.length === 0 && (
