@@ -36,7 +36,7 @@ const CreateMatch = () => {
   const { courses, loading: coursesLoading, searchNearbyCourses, searchCoursesByName, fetchCourseDetail, formatDistance } = useGolfCourses();
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
 
-  const [currentStep, setCurrentStep] = useState(0);
+  const [currentStep, setCurrentStep] = useState(1);
   const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
   const [checkingIncomplete, setCheckingIncomplete] = useState(true);
   const [formData, setFormData] = useState({
@@ -800,6 +800,8 @@ const CreateMatch = () => {
               onSelect={(date) => {
                 setFormData({ ...formData, scheduled_date: date || null });
                 setDateOpen(false);
+                // Auto-focus time field next
+                setTimeout(() => document.getElementById('time')?.focus(), 50);
               }}
               disabled={(date) => date < new Date()}
               initialFocus
@@ -815,6 +817,12 @@ const CreateMatch = () => {
           type="time"
           value={formData.scheduled_time}
           onChange={(e) => setFormData({ ...formData, scheduled_time: e.target.value })}
+          onBlur={() => {
+            // When time has a value and step can advance, jump to next step
+            if (formData.scheduled_time && isMobile && currentStep === 1) {
+              // do nothing here — Next button handles advance
+            }
+          }}
         />
       </div>
     </div>
@@ -875,6 +883,8 @@ const CreateMatch = () => {
               }
             }
             setFormData({ ...formData, format: value, max_participants: newMaxParticipants });
+            // Advance focus to holes select
+            setTimeout(() => document.getElementById('holes')?.focus(), 50);
           }}>
             <SelectTrigger id="format">
               <SelectValue placeholder="Select format" />
@@ -890,7 +900,10 @@ const CreateMatch = () => {
 
         <div className="space-y-2">
           <Label htmlFor="holes">Number of Holes *</Label>
-          <Select value={formData.holes} onValueChange={(value) => setFormData({ ...formData, holes: value })}>
+          <Select value={formData.holes} onValueChange={(value) => {
+            setFormData({ ...formData, holes: value });
+            setTimeout(() => document.getElementById('tees')?.focus(), 50);
+          }}>
             <SelectTrigger id="holes">
               <SelectValue placeholder="Select holes" />
             </SelectTrigger>
@@ -915,7 +928,9 @@ const CreateMatch = () => {
               Loading course tees...
             </div>
           )}
-          <Select value={formData.default_tees} onValueChange={(value) => setFormData({ ...formData, default_tees: value })}>
+          <Select value={formData.default_tees} onValueChange={(value) => {
+            setFormData({ ...formData, default_tees: value });
+          }}>
             <SelectTrigger id="tees">
               <SelectValue placeholder="Select tees" />
             </SelectTrigger>
@@ -1272,10 +1287,8 @@ const CreateMatch = () => {
         {isMobile ? (
           <div className="space-y-6">
             <div className={cn(
-              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground",
-              currentStep === 0 ? "bg-primary/10 border border-primary/30" : "bg-card"
+              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground bg-card transition-colors hover:bg-success/10",
             )}>
-              {currentStep === 0 && renderCourseStep()}
               {currentStep === 1 && renderDateTimeStep()}
               {currentStep === 2 && renderFormatTeesStep()}
               {currentStep === 3 && renderDetailsStep()}
@@ -1290,7 +1303,7 @@ const CreateMatch = () => {
               >
                 Cancel
               </Button>
-              {currentStep > 0 && (
+              {currentStep > 1 && (
                 <Button
                   type="button"
                   variant="outline"
@@ -1329,10 +1342,9 @@ const CreateMatch = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-primary/10 border border-primary/30 text-foreground text-base rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderDateTimeStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderFormatTeesStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderDetailsStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDateTimeStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderFormatTeesStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDetailsStep()}</div>
 
             <div className="flex gap-3 pt-2">
               <Button
