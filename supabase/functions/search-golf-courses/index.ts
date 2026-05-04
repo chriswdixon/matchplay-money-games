@@ -160,7 +160,15 @@ serve(async (req) => {
         website: courseData.website,
         externalId: courseData.id,
         tees: courseData.tees,
+        state: courseData.location?.state,
       };
+
+      if (isBlockedCourse(course)) {
+        return new Response(
+          JSON.stringify({ error: 'This course is in a region that is currently unavailable.' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 451 }
+        );
+      }
 
       return new Response(
         JSON.stringify({ course }),
