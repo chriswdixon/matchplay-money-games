@@ -51,7 +51,7 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
       className="fixed left-0 right-0 z-40 px-2 pointer-events-none bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 md:bottom-auto md:top-0 md:pt-[max(env(safe-area-inset-top),0.75rem)] md:pb-3"
     >
       <div className="mx-auto w-3/4 max-w-md pointer-events-auto">
-        <div className="flex items-center justify-around gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium border border-border dark:border-white/15">
+        <div className="flex items-center justify-around gap-1 bg-foreground text-background dark:bg-success dark:text-white rounded-full px-2 py-2 shadow-premium border border-border dark:border-white/20">
           {items.map(({ id, label, Icon }) => {
             const active = id === activeTab;
             const badge = id === "profile" ? unreadCount : 0;
@@ -68,15 +68,15 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
                   className={cn(
                     "relative flex items-center justify-center rounded-full transition-all w-10 h-10",
                     active
-                      ? "bg-primary text-primary-foreground shadow-accent"
-                      : "text-background/90 hover:text-background",
+                      ? "bg-primary text-primary-foreground shadow-accent dark:bg-white dark:text-success"
+                      : "text-background/90 hover:text-background dark:text-white/90 dark:hover:text-white",
                   )}
                 >
                   <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
                   {badge > 0 && (
                     <span
                       aria-hidden="true"
-                      className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center border-2 border-foreground"
+                      className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center border-2 border-foreground dark:border-success"
                     >
                       {badge > 99 ? "99+" : badge}
                     </span>
@@ -85,7 +85,7 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
                 {active && (
                   <span
                     aria-hidden="true"
-                    className="absolute -bottom-1 h-1 w-5 rounded-full bg-primary"
+                    className="absolute -bottom-1 h-1 w-5 rounded-full bg-primary dark:bg-white"
                   />
                 )}
               </button>
