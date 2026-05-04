@@ -176,13 +176,27 @@ export default function Profile() {
                     variant="outline"
                     size="icon"
                     onClick={() => navigate('/admin')}
-                    aria-label="Admin Portal"
-                    className="bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
+                    aria-label={
+                      openSupportCount > 0
+                        ? `Admin Portal, ${openSupportCount} open support request${openSupportCount === 1 ? '' : 's'}`
+                        : 'Admin Portal'
+                    }
+                    className="relative bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
                   >
                     <ShieldCheck className="h-4 w-4" />
+                    {openSupportCount > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-background text-destructive border border-destructive text-[10px] font-bold leading-none flex items-center justify-center"
+                      >
+                        {openSupportCount > 99 ? '99+' : openSupportCount}
+                      </span>
+                    )}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">Admin Portal</TooltipContent>
+                <TooltipContent side="bottom">
+                  Admin Portal{openSupportCount > 0 ? ` — ${openSupportCount} open support` : ''}
+                </TooltipContent>
               </Tooltip>
             </TooltipProvider>
           )}
