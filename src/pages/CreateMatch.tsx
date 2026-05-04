@@ -359,7 +359,9 @@ const CreateMatch = () => {
   };
 
   const canGoNext = () => {
-    if (currentStep === 0) return formData.course_name;
+    // Course is prefilled when arriving from a course card and is no longer
+    // a hard requirement to advance past step 0.
+    if (currentStep === 0) return true;
     if (currentStep === 1) return formData.scheduled_date && formData.scheduled_time;
     if (currentStep === 2) return formData.format && formData.default_tees;
     return true;
@@ -403,10 +405,8 @@ const CreateMatch = () => {
       return;
     }
 
-    if (!formData.course_name) {
-      toast.error('Please select a golf course');
-      return;
-    }
+    // Course no longer required for submission — it's prefilled from the
+    // course card click flow.
 
     if (!formData.scheduled_date) {
       toast.error('Please select a date');
@@ -532,7 +532,7 @@ const CreateMatch = () => {
     }
   };
 
-  const isFormValid = formData.course_name && formData.scheduled_date && formData.format && formData.default_tees;
+  const isFormValid = formData.scheduled_date && formData.format && formData.default_tees;
 
   const renderCourseStep = () => (
     <div className="space-y-3 max-h-[calc(100vh-200px)] overflow-y-auto">
