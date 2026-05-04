@@ -62,11 +62,11 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
   const getPositionIcon = (index: number) => {
     switch (index) {
       case 0:
-        return <Crown className="w-5 h-5 text-yellow-500" />;
+        return <Crown className="w-5 h-5 text-warning" />;
       case 1:
         return <Medal className="w-5 h-5 text-gray-400" />;
       case 2:
-        return <Medal className="w-5 h-5 text-amber-600" />;
+        return <Medal className="w-5 h-5 text-warning" />;
       default:
         return <Users className="w-5 h-5 text-muted-foreground" />;
     }
@@ -165,12 +165,12 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
 
       {/* Winner Announcement */}
       {winner && winner.net_total > 0 && (
-        <Card className="border-yellow-200 bg-gradient-to-r from-yellow-50 to-amber-50">
+        <Card className="border-warning/30 bg-warning/10">
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-4">
-              <Crown className="w-8 h-8 text-yellow-500" />
+              <Crown className="w-8 h-8 text-warning" />
               <div className="text-center">
-                <h2 className="text-2xl font-bold text-yellow-700">🏆 Winner!</h2>
+                <h2 className="text-2xl font-bold text-warning">🏆 Winner!</h2>
                 <p className="text-xl font-semibold">{winner.player_name}</p>
                 <p className="text-lg text-muted-foreground">
                   Net Score: {winner.net_total} (Gross: {winner.total})
@@ -179,7 +179,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                   Handicap: {winner.handicap_index.toFixed(1)} (Course: {winner.course_handicap})
                 </p>
               </div>
-              <Crown className="w-8 h-8 text-yellow-500" />
+              <Crown className="w-8 h-8 text-warning" />
             </div>
           </CardContent>
         </Card>
@@ -199,7 +199,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
               <div
                 key={player.player_id}
                 className={`flex items-center justify-between p-4 rounded-lg border ${
-                  index === 0 ? 'border-yellow-200 bg-yellow-50' : 'border-border bg-background'
+                  index === 0 ? 'border-warning/30 bg-warning/10' : 'border-border bg-background'
                 } ${
                   player.player_id === user?.id ? 'ring-2 ring-primary' : ''
                 }`}
@@ -265,7 +265,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                   <tr 
                     key={player.player_id} 
                     className={`border-b ${
-                      index === 0 ? 'bg-yellow-50' : ''
+                      index === 0 ? 'bg-warning/10' : ''
                     } ${
                       player.player_id === user?.id ? 'bg-muted/20' : ''
                     }`}
@@ -323,7 +323,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                 {saving ? "Confirming..." : "Confirm Results"}
               </Button>
             ) : (
-              <div className="flex items-center gap-2 text-green-600">
+              <div className="flex items-center gap-2 text-success">
                 <CheckCircle className="w-5 h-5" />
                 <span className="font-medium">Results Confirmed!</span>
               </div>

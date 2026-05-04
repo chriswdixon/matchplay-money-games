@@ -339,13 +339,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   return (
-    <section className="py-4 md:py-20 px-3 md:px-6 bg-background" aria-labelledby="match-finder-heading">
+    <section className="py-4 md:py-12 px-3 md:px-6" aria-labelledby="match-finder-heading">
       <div className="w-full md:max-w-[1400px] md:mx-auto">
-        <div className="text-center mb-16 animate-fade-in px-0 md:px-0">
+        <div className="text-center mb-10 animate-fade-in px-0 md:px-0">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
             <span aria-hidden="true">{showPastMatches ? '📜' : '🎯'}</span> {showPastMatches ? 'Match History' : 'Live Match Finder'}
           </Badge>
-          <h2 id="match-finder-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 id="match-finder-heading" className="text-3xl md:text-4xl font-bold mb-4 text-foreground tracking-tight">
             {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
           </h2>
           {showPastMatches && (
@@ -417,7 +417,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                     
                     return (
                       <Card key={match.id} className="border-2 border-destructive/30 bg-card relative overflow-hidden">
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive via-orange-500 to-destructive animate-pulse" />
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-destructive via-warning to-destructive animate-pulse" />
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
@@ -522,7 +522,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       key={match.id} 
                       className={cn(
                         "relative border transition-all duration-300 hover:shadow-lg animate-slide-up",
-                        isHighStakes ? "bg-gradient-to-br from-amber-500/5 to-yellow-500/5 border-amber-500/30 hover:border-amber-500/50" :
+                        isHighStakes ? "bg-gradient-to-br from-warning/5 to-warning/10 border-warning/30 hover:border-warning/50" :
                         isMediumStakes ? "bg-gradient-to-br from-primary/5 to-primary/10 border-primary/30 hover:border-primary/50" :
                         "bg-card border-border hover:border-accent"
                       )}
@@ -534,13 +534,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         </Badge>
                       )}
                       {match.status === 'completed' && match.winner_id === user?.id && (
-                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-amber-500 to-yellow-500 text-white border border-amber-400">
+                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-warning to-warning/70 text-primary-foreground border border-warning/40">
                           <Trophy className="w-3 h-3 mr-1" />
                           WINNER
                         </Badge>
                       )}
                       {isCreatedRecently && match.status !== 'cancelled' && match.status !== 'completed' && (
-                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-green-500 to-emerald-500 text-white animate-pulse border border-green-400">
+                        <Badge className="absolute -top-2 -right-2 bg-gradient-to-r from-success to-success/70 text-primary-foreground animate-pulse border border-success/40">
                           <Zap className="w-3 h-3 mr-1" />
                           NEW
                         </Badge>
@@ -576,11 +576,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           <div className="flex items-center gap-2">
                             <DollarSign className={cn(
                               "w-4 h-4",
-                              isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-muted-foreground"
+                              isHighStakes ? "text-warning" : isMediumStakes ? "text-primary" : "text-muted-foreground"
                             )} />
                             <span className={cn(
                               "font-medium",
-                              isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-foreground"
+                              isHighStakes ? "text-warning" : isMediumStakes ? "text-primary" : "text-foreground"
                             )}>
                               {(match.buy_in_amount / 100).toFixed(0)} buy-in
                             </span>
@@ -598,14 +598,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               "text-xs font-medium",
                               match.format === 'stroke-play' && "border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/10",
                               match.format === 'match-play' && "border-purple-500/50 text-purple-600 dark:text-purple-400 bg-purple-500/10",
-                              match.format === 'best-ball' && "border-green-500/50 text-green-600 dark:text-green-400 bg-green-500/10",
+                              match.format === 'best-ball' && "border-success/50 text-success bg-success/10",
                               match.format === 'scramble' && "border-pink-500/50 text-pink-600 dark:text-pink-400 bg-pink-500/10"
                             )}
                           >
                             {formatMatchFormat(match.format)}
                           </Badge>
                           {match.pin && (
-                            <Badge variant="outline" className="text-xs font-medium border-amber-500/50 text-amber-600 dark:text-amber-400 bg-amber-500/10">
+                            <Badge variant="outline" className="text-xs font-medium border-warning/50 text-warning bg-warning/10">
                               <Lock className="w-3 h-3 mr-1" />
                               PIN Required
                             </Badge>

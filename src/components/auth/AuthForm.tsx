@@ -420,7 +420,7 @@ export function AuthForm() {
   // Show subscription selection after signup
   if (showSubscriptionSelection) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+      <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">
         <SubscriptionSelection 
           onComplete={() => {
             setShowSubscriptionSelection(false);
@@ -438,7 +438,7 @@ export function AuthForm() {
   // Show payment setup after subscription
   if (showPaymentSetup) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+      <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">
         <PaymentMethodSetup 
           onComplete={() => {
             setShowPaymentSetup(false);
@@ -461,7 +461,7 @@ export function AuthForm() {
 
   if (showMFAEnrollment) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4 py-8">
+      <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">
         <MFAEnrollment
           onComplete={() => {
             setShowMFAEnrollment(false);
@@ -488,7 +488,7 @@ export function AuthForm() {
   // Show MFA verification during sign-in
   if (showMFAVerification) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">
+      <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
         <MFAVerification
           onVerified={() => {
             setShowMFAVerification(false);
@@ -507,7 +507,7 @@ export function AuthForm() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-subtle px-4">
+    <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center">
           <CardTitle className="text-2xl font-bold">
