@@ -122,27 +122,6 @@ const TycheHero = () => {
           )}
         </div>
         
-        {/* Trust Indicators */}
-        <aside className="mt-8 sm:mt-12 pt-6 sm:pt-8 border-t border-white/20" aria-label="Platform statistics">
-          <p className="text-xs sm:text-sm text-gray-200 mb-3 sm:mb-4">Trusted by competitive golfers nationwide</p>
-          <dl className="flex justify-center items-center gap-4 sm:gap-6 md:gap-8 text-accent/80">
-            <div className="text-center">
-              <dt className="sr-only">Active Members</dt>
-              <dd className="text-xl sm:text-2xl font-bold">1,000+</dd>
-              <dt className="text-xs">Active Members</dt>
-            </div>
-            <div className="text-center">
-              <dt className="sr-only">Matches Played Value</dt>
-              <dd className="text-xl sm:text-2xl font-bold">$500K+</dd>
-              <dt className="text-xs">Matches Played</dt>
-            </div>
-            <div className="text-center">
-              <dt className="sr-only">Rounds Scored</dt>
-              <dd className="text-xl sm:text-2xl font-bold">5,000+</dd>
-              <dt className="text-xs">Rounds Scored</dt>
-            </div>
-          </dl>
-        </aside>
       </div>
 
       {/* Scroll Down Arrow */}
