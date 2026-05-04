@@ -39,9 +39,8 @@ const NearbyCoursesWithMatches = () => {
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
 
-  // md breakpoint = 768px. Desktop loads 10 at a time, mobile loads 5.
-  const getStep = () =>
-    typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches ? 10 : 5;
+  // Load 10 at a time on both mobile and desktop
+  const getStep = () => 10;
 
   // Realtime auto-search: filter on every keystroke once we have GPS.
   useEffect(() => {
@@ -195,14 +194,14 @@ const NearbyCoursesWithMatches = () => {
       <form onSubmit={handleSubmit} className="flex gap-2">
         <div className="relative flex-1">
           <Search
-            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-success-foreground/80"
+            className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-foreground/70"
             aria-hidden="true"
           />
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="Search courses near you (or leave blank)"
-            className="pl-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
+            className="pl-10 h-11 bg-success text-foreground placeholder:text-foreground/60 border-success focus-visible:ring-success"
             aria-label="Search courses and matches near you"
           />
         </div>
@@ -313,14 +312,9 @@ const NearbyCoursesWithMatches = () => {
           );
         })}
         {visibleCount < courses.length && (
-          <div ref={sentinelRef} className="py-2 text-center">
-            <Button
-              size="sm"
-              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), courses.length))}
-              className="bg-success text-success-foreground hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
-            >
-              Load more ({courses.length - visibleCount} remaining)
-            </Button>
+          <div ref={sentinelRef} className="py-3 text-center" aria-live="polite">
+            <Loader2 className="h-4 w-4 animate-spin text-muted-foreground inline" />
+            <span className="sr-only">Loading more courses</span>
           </div>
         )}
       </div>
