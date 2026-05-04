@@ -747,7 +747,7 @@ export function AuthForm() {
                               validationErrors.inviteCode
                                 ? 'border-destructive'
                                 : inviteStatus.kind === 'valid'
-                                  ? 'border-green-500 focus-visible:ring-green-500'
+                                  ? 'border-primary/30 focus-visible:ring-primary'
                                   : ''
                             }`}
                           />
@@ -760,7 +760,7 @@ export function AuthForm() {
                               <Loader2 className="w-4 h-4 text-muted-foreground animate-spin" />
                             )}
                             {inviteStatus.kind === 'valid' && (
-                              <CheckCircle2 className="w-4 h-4 text-green-600" />
+                              <CheckCircle2 className="w-4 h-4 text-primary" />
                             )}
                             {(inviteStatus.kind === 'invalid' ||
                               inviteStatus.kind === 'format') && (
@@ -780,7 +780,7 @@ export function AuthForm() {
                             <span className="text-muted-foreground">Checking your code…</span>
                           )}
                           {inviteStatus.kind === 'valid' && (
-                            <span className="text-green-600">Looks good — your invite is valid.</span>
+                            <span className="text-primary">Looks good — your invite is valid.</span>
                           )}
                           {inviteStatus.kind === 'format' && (
                             <span className="text-destructive">{inviteStatus.message}</span>

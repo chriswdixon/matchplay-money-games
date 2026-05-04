@@ -58,7 +58,7 @@ export default function VerifyEmail() {
         <CardHeader className="text-center">
           <div className="flex justify-center mb-4">
             {status === 'verifying' && <Loader2 className="h-12 w-12 animate-spin text-primary" />}
-            {status === 'success' && <CheckCircle2 className="h-12 w-12 text-green-500" />}
+            {status === 'success' && <CheckCircle2 className="h-12 w-12 text-primary" />}
             {status === 'error' && <XCircle className="h-12 w-12 text-destructive" />}
           </div>
           <CardTitle className="text-2xl font-bold">

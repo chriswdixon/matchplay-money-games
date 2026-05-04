@@ -59,10 +59,10 @@ const VerifyAge = () => {
           
           {(status === 'success' || status === 'already_verified') && (
             <>
-              <div className="mx-auto w-16 h-16 rounded-full bg-green-500/10 flex items-center justify-center mb-4">
-                <CheckCircle className="h-8 w-8 text-green-500" />
+              <div className="mx-auto w-16 h-16 rounded-full bg-primary/100/10 flex items-center justify-center mb-4">
+                <CheckCircle className="h-8 w-8 text-primary" />
               </div>
-              <CardTitle className="text-green-600">
+              <CardTitle className="text-primary">
                 {status === 'already_verified' ? 'Already Verified' : 'Age Verified!'}
               </CardTitle>
             </>
@@ -82,11 +82,11 @@ const VerifyAge = () => {
           <p className="text-muted-foreground">{message}</p>
           
           {status === 'success' && (
-            <div className="bg-green-50 dark:bg-green-900/20 rounded-lg p-4 space-y-2">
-              <p className="text-sm font-medium text-green-800 dark:text-green-200">
+            <div className="bg-primary/10 rounded-lg p-4 space-y-2">
+              <p className="text-sm font-medium text-primary dark:text-primary">
                 What's next?
               </p>
-              <p className="text-sm text-green-700 dark:text-green-300">
+              <p className="text-sm text-primary dark:text-primary">
                 You now have You now have full access to Tyche. Find matches, compete with other golfers,. Find matches, compete with other golfers, 
                 and earn prizes based on your skills!
               </p>

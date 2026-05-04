@@ -47,7 +47,7 @@ export const InviteManagement = () => {
 
   const getStatusBadge = (invite: any) => {
     if (invite.used_by) {
-      return <Badge variant="outline" className="bg-green-50"><CheckCircle2 className="h-3 w-3 mr-1" />Used</Badge>;
+      return <Badge variant="outline" className="bg-primary/10"><CheckCircle2 className="h-3 w-3 mr-1" />Used</Badge>;
     }
     if (new Date(invite.expires_at) < new Date()) {
       return <Badge variant="outline" className="bg-red-50"><XCircle className="h-3 w-3 mr-1" />Expired</Badge>;
