@@ -380,7 +380,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
               Review your completed matches, see final results, and track your competitive history.
             </p>
           )}
-          {!showPastMatches && (
+          {!showPastMatches && user && (
             <div className="mt-4 flex flex-col items-center justify-center gap-2">
               <CreateMatchButton onMatchCreated={refetch} />
             </div>
