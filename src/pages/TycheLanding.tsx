@@ -278,9 +278,11 @@ const TycheLanding = () => {
       </Suspense>
       
       {/* Membership Tiers Section */}
-      <Suspense fallback={<SectionLoader />}>
-        <MembershipTiers />
-      </Suspense>
+      <div id="membership">
+        <Suspense fallback={<SectionLoader />}>
+          <MembershipTiers />
+        </Suspense>
+      </div>
       
       {/* Footer CTA */}
       <section className="py-20 px-6 bg-gradient-hero text-white" aria-labelledby="cta-heading">
