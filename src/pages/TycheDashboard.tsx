@@ -10,7 +10,7 @@ import HomeProfileCard from "@/components/home/HomeProfileCard";
 import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
-import HeroThemeSwitcher, { applyHeroTheme, getStoredHeroTheme } from "@/components/HeroThemeSwitcher";
+
 
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
 const SubscriptionManagement = lazy(() => import("@/components/SubscriptionManagement"));
@@ -31,9 +31,6 @@ const TycheDashboard = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  useEffect(() => {
-    applyHeroTheme(getStoredHeroTheme());
-  }, []);
 
   useEffect(() => {
     const handleTokenJoin = async (token: string) => {
@@ -159,7 +156,7 @@ const TycheDashboard = () => {
       </main>
 
       <BottomTabBar activeTab={activeBottomTab} onChange={(tab) => setCurrentTab(tab)} />
-      <HeroThemeSwitcher />
+      
     </div>
   );
 };

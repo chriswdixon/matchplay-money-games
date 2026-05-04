@@ -13,7 +13,7 @@ const MembershipTiers = lazy(() => import("@/components/MembershipTiers"));
 const HandicapCalculators = lazy(() =>
   import("@/components/HandicapCalculators").then(m => ({ default: m.HandicapCalculators }))
 );
-const HeroThemeSwitcher = lazy(() => import("@/components/HeroThemeSwitcher"));
+
 
 const SectionLoader = () => (
   <div className="flex items-center justify-center py-16">
@@ -135,9 +135,6 @@ const TychePublicLanding = () => {
       )}
 
       <AppFooter />
-      {hydrateBelowFold && (
-        <Suspense fallback={null}><HeroThemeSwitcher /></Suspense>
-      )}
     </div>
   );
 };
