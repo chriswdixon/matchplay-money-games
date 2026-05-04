@@ -60,6 +60,7 @@ const CreateMatch = () => {
   const [searchRadius] = useState(30);
   
   const [loadingGPS, setLoadingGPS] = useState(false);
+  const [gpsError, setGpsError] = useState<'denied' | 'unavailable' | 'timeout' | 'unsupported' | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [customSearchTerm, setCustomSearchTerm] = useState('');
@@ -152,12 +153,14 @@ const CreateMatch = () => {
 
   const handleGPSSearch = async () => {
     if (!navigator.geolocation) {
+      setGpsError('unsupported');
       toast.error('Geolocation is not supported by your browser');
       return;
     }
 
     try {
       setLoadingGPS(true);
+      setGpsError(null);
       navigator.geolocation.getCurrentPosition(
         async (position) => {
           const coords = {
@@ -165,17 +168,32 @@ const CreateMatch = () => {
             longitude: position.coords.longitude
           };
           setLocationCoords(coords);
+          setGpsError(null);
           await searchNearbyCourses(coords.latitude, coords.longitude, searchRadius);
           toast.success(`Found courses within ${searchRadius} miles`);
           setLoadingGPS(false);
         },
-        () => {
+        (err) => {
           setLoadingGPS(false);
-          toast.error('Location access denied. Please enable location permissions.');
-        }
+          if (err.code === err.PERMISSION_DENIED) {
+            setGpsError('denied');
+            toast.error('Location access denied. Enable it in your browser settings to find nearby courses.');
+          } else if (err.code === err.POSITION_UNAVAILABLE) {
+            setGpsError('unavailable');
+            toast.error('Location unavailable. Check that location services are turned on.');
+          } else if (err.code === err.TIMEOUT) {
+            setGpsError('timeout');
+            toast.error('Location request timed out. Please try again.');
+          } else {
+            setGpsError('unavailable');
+            toast.error('Could not get your location.');
+          }
+        },
+        { enableHighAccuracy: true, timeout: 10000, maximumAge: 300000 }
       );
     } catch (error) {
       setLoadingGPS(false);
+      setGpsError('unavailable');
       toast.error('Failed to access GPS');
     }
   };
@@ -469,7 +487,7 @@ const CreateMatch = () => {
           )}
           {locationCoords ? 'Refresh nearby courses' : 'Use my location to find courses'}
         </Button>
-        {!locationCoords && (
+        {!locationCoords && !gpsError && (
           <p className="text-xs text-muted-foreground">
             Location access is required to find courses near you.
           </p>
@@ -478,6 +496,81 @@ const CreateMatch = () => {
           <p className="text-xs text-muted-foreground">
             Showing courses within {searchRadius} miles
           </p>
+        )}
+        {gpsError && (
+          <div
+            role="alert"
+            aria-live="polite"
+            className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm space-y-2"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 mt-0.5 text-destructive shrink-0" aria-hidden="true" />
+              <div className="space-y-1">
+                <p className="font-semibold text-destructive">
+                  {gpsError === 'denied' && 'Location access blocked'}
+                  {gpsError === 'unavailable' && 'Location unavailable'}
+                  {gpsError === 'timeout' && 'Location request timed out'}
+                  {gpsError === 'unsupported' && 'Geolocation not supported'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {gpsError === 'denied' &&
+                    'Tyche needs your location to show nearby courses. Enable location access in your browser, then tap "Try again". You can also pick a course manually below.'}
+                  {gpsError === 'unavailable' &&
+                    'Your device could not determine its position. Make sure system location services are turned on, then tap "Try again". You can also pick a course manually below.'}
+                  {gpsError === 'timeout' &&
+                    'Getting your location took too long. Move to a spot with a better signal and try again.'}
+                  {gpsError === 'unsupported' &&
+                    'This browser does not support geolocation. Please pick a course manually below.'}
+                </p>
+                {gpsError === 'denied' && (
+                  <details className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer underline-offset-2 hover:underline">
+                      How to enable location access
+                    </summary>
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>
+                        <strong>Chrome / Edge:</strong> Click the lock icon in the address bar →
+                        Site settings → Location → Allow.
+                      </li>
+                      <li>
+                        <strong>Safari (Mac):</strong> Safari → Settings → Websites → Location →
+                        set this site to "Allow".
+                      </li>
+                      <li>
+                        <strong>Safari (iOS):</strong> Settings → Safari → Location → "Ask" or
+                        "Allow", then reload this page.
+                      </li>
+                      <li>
+                        <strong>Firefox:</strong> Click the lock icon → Clear permission, then
+                        reload and allow when prompted.
+                      </li>
+                      <li>
+                        <strong>Android:</strong> Settings → Apps → your browser → Permissions →
+                        Location → Allow.
+                      </li>
+                    </ul>
+                  </details>
+                )}
+                {gpsError !== 'unsupported' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGPSSearch}
+                    disabled={loadingGPS}
+                    className="mt-2"
+                  >
+                    {loadingGPS ? (
+                      <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                    ) : (
+                      <MapPin className="w-3 h-3 mr-1.5" />
+                    )}
+                    Try again
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
