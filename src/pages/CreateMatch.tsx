@@ -349,18 +349,6 @@ const CreateMatch = () => {
     }
   };
 
-  const handleCourseCreated = (newCourse: any) => {
-    const course = {
-      name: newCourse.name,
-      address: newCourse.address,
-      latitude: newCourse.latitude,
-      longitude: newCourse.longitude,
-      website: newCourse.website,
-    };
-    handleCourseSelect(course);
-    toast.success('Course created and selected!');
-  };
-
   const handleSubmit = async () => {
     // Prevent form submission if not on the final step
     if (currentStep !== 3) {
@@ -1362,12 +1350,6 @@ const CreateMatch = () => {
         )}
       </form>
 
-      <CreateCourseDialog
-        open={createCourseOpen}
-        onOpenChange={setCreateCourseOpen}
-        onCourseCreated={handleCourseCreated}
-        initialName={customSearchTerm}
-      />
     </div>
   );
 };
