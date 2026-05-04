@@ -264,12 +264,10 @@ export const GDPRSettings = () => {
               >
                 {resendLoading ? (
                   <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Sending...
                   </>
                 ) : (
                   <>
-                    <Mail className="mr-2 h-4 w-4" />
                     Resend Verification Email
                   </>
                 )}
@@ -303,12 +301,10 @@ export const GDPRSettings = () => {
           >
             {exportLoading ? (
               <>
-                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                 Preparing Export...
               </>
             ) : (
               <>
-                <Download className="mr-2 h-4 w-4" />
                 Download My Data
               </>
             )}
@@ -369,12 +365,10 @@ export const GDPRSettings = () => {
                     >
                       {deleteLoading ? (
                         <>
-                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                           Submitting...
                         </>
                       ) : (
                         <>
-                          <Trash2 className="mr-2 h-4 w-4" />
                           Request Account Deletion
                         </>
                       )}

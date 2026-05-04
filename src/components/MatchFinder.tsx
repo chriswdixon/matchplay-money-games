@@ -438,7 +438,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             className="w-full bg-destructive hover:bg-destructive/90"
                             size="lg"
                           >
-                            <AlertTriangle className="w-4 h-4 mr-2" />
                             Finalize Match Now
                           </Button>
                         </CardContent>
@@ -668,7 +667,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               className="w-full border-primary text-primary hover:bg-primary hover:text-primary-foreground"
                               onClick={() => window.open(match.booking_url, '_blank')}
                             >
-                              <Calendar className="w-4 h-4 mr-2" />
                               Book Tee Time
                             </Button>
                           )}
@@ -679,7 +677,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
                                 onClick={() => handleViewScorecard(match)}
                               >
-                                <Trophy className="w-4 h-4 mr-2" />
                                 {expandedMatchId === match.id ? 'Hide Results' : 'View Results'}
                               </Button>
                               <Button 
@@ -687,7 +684,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 className="w-full border-accent text-accent hover:bg-accent hover:text-accent-foreground"
                                 onClick={() => handleRatePlayersClick(match)}
                               >
-                                <Star className="w-4 h-4 mr-2" />
                                 Rate Players
                               </Button>
                             </>
@@ -696,7 +692,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               className="w-full bg-muted text-muted-foreground hover:bg-muted/80"
                               onClick={() => handleViewScorecard(match)}
                             >
-                              <Target className="w-4 h-4 mr-2" />
                               {expandedMatchId === match.id ? 'Hide Scorecard' : 'View Scorecard'}
                             </Button>
                           ) : match.status === 'started' && match.user_joined ? (
@@ -704,7 +699,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
                               onClick={() => handleViewScorecard(match)}
                             >
-                              <Target className="w-4 h-4 mr-2" />
                               Open Scorecard to Complete Match
                             </Button>
                           ) : match.status === 'open' && match.user_joined && isFull ? (
@@ -713,7 +707,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               onClick={() => handleStartMatch(match)}
                               disabled={!user || startingMatch === match.id}
                             >
-                              <Trophy className="w-4 h-4 mr-2" />
                               {startingMatch === match.id ? "Starting..." : "Start Match"}
                             </Button>
                           ) : (
@@ -732,7 +725,6 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                match.user_joined ? "Leave Match" : 
                                match.pin ? (
                                 <>
-                                  <Lock className="w-4 h-4 mr-2" />
                                   Join with PIN
                                 </>
                                ) : "Join Match"}

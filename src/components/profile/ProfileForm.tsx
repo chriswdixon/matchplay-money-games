@@ -154,7 +154,6 @@ export function ProfileForm() {
               disabled={saving}
               className="bg-gradient-primary text-primary-foreground shadow-premium hover:shadow-accent transition-smooth"
             >
-              <Save className="w-4 h-4 mr-2" />
               {saving ? "Saving..." : "Save Changes"}
             </Button>
           </div>

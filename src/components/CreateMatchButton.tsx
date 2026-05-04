@@ -18,7 +18,6 @@ const CreateMatchButton = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
         }
       }}
     >
-      <Plus className="w-4 h-4 mr-2" />
       {user ? 'Create Match' : 'Sign In to Create Match'}
     </Button>
   );

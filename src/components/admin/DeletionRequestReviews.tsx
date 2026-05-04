@@ -186,7 +186,6 @@ export const DeletionRequestReviews = () => {
                       onClick={() => processRequestMutation.mutate({ requestId: request.id, action: 'approve' })}
                       disabled={processRequestMutation.isPending}
                     >
-                      <CheckCircle className="h-4 w-4 mr-1" />
                       Approve Deletion
                     </Button>
                     <Button
@@ -195,7 +194,6 @@ export const DeletionRequestReviews = () => {
                       onClick={() => processRequestMutation.mutate({ requestId: request.id, action: 'reject' })}
                       disabled={processRequestMutation.isPending}
                     >
-                      <XCircle className="h-4 w-4 mr-1" />
                       Reject
                     </Button>
                   </div>

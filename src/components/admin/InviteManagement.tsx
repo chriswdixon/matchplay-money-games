@@ -85,7 +85,6 @@ export const InviteManagement = () => {
             </div>
             <div className="flex items-end">
               <Button onClick={handleGenerate} disabled={generating}>
-                <Plus className="h-4 w-4 mr-2" />
                 Generate Invite
               </Button>
             </div>

@@ -227,7 +227,6 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
           size="sm"
           className="border-accent text-accent hover:bg-accent hover:text-accent-foreground"
         >
-          <Edit className="w-4 h-4 mr-2" />
           Edit Match
         </Button>
       </DialogTrigger>
@@ -295,10 +294,8 @@ const EditMatchDialog = ({ match, onMatchUpdated }: EditMatchDialogProps) => {
                   className="w-full justify-between hover:border-primary"
                 >
                   <div className="flex items-center">
-                    <MapPin className="w-4 h-4 mr-2 text-muted-foreground" />
                     {formData.course_name || "Search golf courses..."}
                   </div>
-                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="w-[--radix-popover-trigger-width] max-w-none p-0 border shadow-lg z-[9999]" align="start" sideOffset={5}>

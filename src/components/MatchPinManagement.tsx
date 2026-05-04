@@ -125,7 +125,6 @@ export const MatchPinManagement = ({
       <Dialog open={open} onOpenChange={setOpen}>
         <DialogTrigger asChild>
           <Button variant="outline" size="sm">
-            <Lock className="w-4 h-4 mr-2" />
             Manage PINs
           </Button>
         </DialogTrigger>

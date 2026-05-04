@@ -136,7 +136,6 @@ const CouponManagement = () => {
             <div className="flex items-end">
               <Button onClick={handleCreateCoupon} disabled={creating} className="w-full">
                 {creating && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                <Plus className="mr-2 h-4 w-4" />
                 Create Coupon
               </Button>
             </div>

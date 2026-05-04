@@ -328,12 +328,10 @@ export const SocialLinksManagement = () => {
                   >
                     {uploading ? (
                       <>
-                        <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                         Uploading...
                       </>
                     ) : (
                       <>
-                        <Upload className="mr-2 h-4 w-4" />
                         Upload Media
                       </>
                     )}
@@ -502,12 +500,10 @@ export const SocialLinksManagement = () => {
             >
               {posting ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Publishing...
                 </>
               ) : (
                 <>
-                  <Send className="mr-2 h-4 w-4" />
                   Publish to {selectedPlatforms.length} Platform{selectedPlatforms.length !== 1 ? 's' : ''}
                 </>
               )}

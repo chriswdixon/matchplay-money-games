@@ -133,12 +133,10 @@ export const SocialPlatformUrls = () => {
             <Button onClick={handleSave} disabled={saving} className="w-full">
               {saving ? (
                 <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                   Saving...
                 </>
               ) : (
                 <>
-                  <Save className="mr-2 h-4 w-4" />
                   Save URLs
                 </>
               )}

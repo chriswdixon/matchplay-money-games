@@ -118,14 +118,11 @@ export function AuditAlerts() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={load} disabled={loading}>
-            <RefreshCw className={`h-4 w-4 mr-2 ${loading ? "animate-spin" : ""}`} />
             Refresh
           </Button>
           <Button size="sm" onClick={runReconciliation} disabled={running}>
             {running ? (
-              <Loader2 className="h-4 w-4 mr-2 animate-spin" />
             ) : (
-              <ShieldAlert className="h-4 w-4 mr-2" />
             )}
             Run now
           </Button>
