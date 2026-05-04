@@ -367,7 +367,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
 
   return (
     <section className="py-4 md:py-12 px-3 md:px-6" aria-labelledby="match-finder-heading">
-      <div className="w-full md:max-w-[1400px] md:mx-auto">
+      <div className="w-full max-w-7xl mx-auto">
         <div className="text-center animate-fade-in px-0 md:px-0">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
             <span aria-hidden="true">{showPastMatches ? '📜' : '🎯'}</span> {showPastMatches ? 'Match History' : 'Live Match Finder'}
