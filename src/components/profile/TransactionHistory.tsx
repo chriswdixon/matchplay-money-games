@@ -1,4 +1,4 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Badge } from '@/components/ui/badge';
 import { useAccountTransactions } from '@/hooks/useAccountTransactions';
 import { History, TrendingUp, TrendingDown, CreditCard, Trophy, XCircle, Ticket, Loader2, LogOut, Zap } from 'lucide-react';
@@ -61,30 +61,24 @@ export function TransactionHistory() {
 
   if (loading) {
     return (
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex items-center justify-center py-8">
-            <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex items-center justify-center py-8">
+        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      </div>
     );
   }
 
   return (
-    <Card className="shadow-card">
-      <CardHeader className="pb-4">
-        <CardTitle className="flex items-center gap-3">
+    <div className="space-y-4">
+      <div>
+        <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
           <div className="p-2 bg-gradient-primary rounded-lg">
             <History className="w-5 h-5 text-primary-foreground" />
           </div>
           Transaction History
-        </CardTitle>
-        <CardDescription>
-          Your recent account activity
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+        </h2>
+        <p className="text-sm text-muted-foreground mt-1.5">Your recent account activity</p>
+      </div>
+      <div>
         {transactions.length === 0 ? (
           <div className="text-center py-8 text-muted-foreground">
             <History className="w-12 h-12 mx-auto mb-3 opacity-50" />
@@ -127,7 +121,7 @@ export function TransactionHistory() {
             })}
           </div>
         )}
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

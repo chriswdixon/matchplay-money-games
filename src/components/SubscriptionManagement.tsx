@@ -1,4 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Crown, CheckCircle, Star, Zap, Wallet } from "lucide-react";
 import { useSubscription } from "@/hooks/useSubscription";
@@ -25,7 +24,7 @@ const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementPr
   const tierFeatures = {
     'Free': [
       "Basic match booking",
-      "Local player matching", 
+      "Local player matching",
       "Simple handicap tracking",
       "Live scoring",
       "Match history",
@@ -56,62 +55,56 @@ const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementPr
   const isTournamentTier = tierName === 'Tournament Pro';
 
   return (
-    <div className="max-w-[1400px] mx-auto space-y-6">
+    <div className="space-y-8">
       {/* Current Subscription */}
-      <Card>
-        <CardHeader>
-          <div className="flex items-center justify-between">
-            <div>
-              <CardTitle className="flex items-center gap-2">
-                Current Subscription
-                {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
-                {isLocalTier && <Star className="w-5 h-5 text-primary" />}
-                {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
-              </CardTitle>
-              <CardDescription>Your membership details</CardDescription>
-            </div>
-            <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
-              {tierName}
-            </Badge>
+      <div className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div>
+            <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+              Current Subscription
+              {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
+              {isLocalTier && <Star className="w-5 h-5 text-primary" />}
+              {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
+            </h2>
+            <p className="text-sm text-muted-foreground mt-1.5">Your membership details</p>
           </div>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="space-y-2">
-            <h4 className="font-medium">Your Features</h4>
-            <ul className="space-y-2">
-              {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
-                <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-                  <CheckCircle className="w-4 h-4 text-accent" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+          <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
+            {tierName}
+          </Badge>
+        </div>
+        <div className="space-y-2">
+          <h4 className="font-medium">Your Features</h4>
+          <ul className="space-y-2">
+            {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
+              <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
+                <CheckCircle className="w-4 h-4 text-accent" />
+                {feature}
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
 
       {/* Play Money Info */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2">
+      <div className="space-y-4">
+        <div>
+          <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
             <Wallet className="w-5 h-5 text-primary" />
             Play Money System
-          </CardTitle>
-          <CardDescription>How the play money system works</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          <div className="p-4 bg-muted/50 rounded-lg space-y-3">
-            <p className="text-sm text-muted-foreground">
-              All matches use <strong>play money</strong> instead of real currency. New accounts start with $500 in play money.
-            </p>
-            <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-              <li>Match buy-ins are deducted from your balance</li>
-              <li>Win matches to earn more play money</li>
-              <li>Climb the leaderboard by accumulating winnings</li>
-            </ul>
-          </div>
-        </CardContent>
-      </Card>
+          </h2>
+          <p className="text-sm text-muted-foreground mt-1.5">How the play money system works</p>
+        </div>
+        <div className="p-4 bg-muted/50 rounded-lg space-y-3">
+          <p className="text-sm text-muted-foreground">
+            All matches use <strong>play money</strong> instead of real currency. New accounts start with $500 in play money.
+          </p>
+          <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
+            <li>Match buy-ins are deducted from your balance</li>
+            <li>Win matches to earn more play money</li>
+            <li>Climb the leaderboard by accumulating winnings</li>
+          </ul>
+        </div>
+      </div>
     </div>
   );
 };
