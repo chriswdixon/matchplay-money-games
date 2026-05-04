@@ -255,7 +255,7 @@ export function MFAEnrollment({ onComplete, isRequired = false }: MFAEnrollmentP
                   onClick={copySecret}
                 >
                   {copied ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    <CheckCircle2 className="w-4 h-4 text-primary" />
                   ) : (
                     <Copy className="w-4 h-4" />
                   )}

@@ -148,7 +148,7 @@ export function AuditAlerts() {
           </div>
         ) : alerts.length === 0 ? (
           <div className="flex items-center gap-2 rounded-md border border-dashed p-6 text-sm text-muted-foreground justify-center">
-            <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <CheckCircle2 className="h-4 w-4 text-primary" />
             No alerts to show.
           </div>
         ) : (
@@ -198,7 +198,7 @@ export function AuditAlerts() {
                       </Button>
                     ) : (
                       <Badge variant="outline" className="gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                        <CheckCircle2 className="h-3 w-3 text-primary" />
                         resolved
                       </Badge>
                     )}

@@ -22,13 +22,13 @@ export function PaymentMethodSetup({ onComplete, onSkip }: PaymentMethodSetupPro
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
-        <div className="flex items-start gap-3 p-4 bg-green-50 dark:bg-green-950/20 rounded-lg border border-green-200 dark:border-green-800">
-          <CheckCircle className="w-5 h-5 text-green-600 mt-0.5 shrink-0" />
+        <div className="flex items-start gap-3 p-4 bg-primary/10 rounded-lg border border-primary/30 dark:border-primary/30">
+          <CheckCircle className="w-5 h-5 text-primary mt-0.5 shrink-0" />
           <div className="space-y-1">
-            <p className="text-sm font-medium text-green-800 dark:text-green-200">
+            <p className="text-sm font-medium text-primary dark:text-primary">
               You're all set!
             </p>
-            <p className="text-sm text-green-700 dark:text-green-300">
+            <p className="text-sm text-primary dark:text-primary">
               Your account has been credited with $500 in play money. Use it to join matches and win more!
             </p>
           </div>

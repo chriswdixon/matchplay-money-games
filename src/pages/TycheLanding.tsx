@@ -18,6 +18,7 @@ import heroImage from "@/assets/hero-golf-course.jpg?format=webp&quality=80";
 import HomeProfileCard from "@/components/home/HomeProfileCard";
 import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
+import GamesNearYou from "@/components/home/GamesNearYou";
 
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 
@@ -193,6 +194,13 @@ const TycheLanding = () => {
               </div>
 
               <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
+
+              <GamesNearYou
+                searchQuery={searchQuery}
+                onClearSearch={() => setSearchQuery("")}
+                onPickSuggestion={(v) => setSearchQuery(v)}
+                onOpenFilters={() => setCurrentTab("matches")}
+              />
 
               <button
                 type="button"

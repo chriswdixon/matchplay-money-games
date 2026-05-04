@@ -33,7 +33,7 @@ interface AuditLogProps {
 
 const categoryColor: Record<Category, string> = {
   score: "bg-blue-500/15 text-blue-600 border-blue-500/30",
-  transaction: "bg-green-500/15 text-green-600 border-green-500/30",
+  transaction: "bg-primary/15 text-primary border-primary/30",
   payout: "bg-purple-500/15 text-purple-600 border-purple-500/30",
   dispute: "bg-orange-500/15 text-orange-600 border-orange-500/30",
   admin_override: "bg-red-500/15 text-red-600 border-red-500/30",

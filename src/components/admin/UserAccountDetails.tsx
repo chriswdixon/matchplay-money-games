@@ -109,12 +109,12 @@ export function UserAccountDetails() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-sm font-medium flex items-center gap-2">
-                <TrendingUp className="w-4 h-4 text-green-500" />
+                <TrendingUp className="w-4 h-4 text-primary" />
                 Total Winnings
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-3xl font-bold text-green-600">
+              <p className="text-3xl font-bold text-primary">
                 ${parseFloat(accountInfo.total_winnings.toString()).toFixed(2)}
               </p>
             </CardContent>
@@ -171,7 +171,7 @@ export function UserAccountDetails() {
             <CardContent>
               <p className={`text-3xl font-bold ${
                 (parseFloat(accountInfo.total_winnings.toString()) - parseFloat(accountInfo.total_buyins.toString())) >= 0 
-                  ? 'text-green-600' 
+                  ? 'text-primary' 
                   : 'text-red-600'
               }`}>
                 ${(parseFloat(accountInfo.total_winnings.toString()) - parseFloat(accountInfo.total_buyins.toString())).toFixed(2)}

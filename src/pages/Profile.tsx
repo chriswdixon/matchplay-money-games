@@ -16,6 +16,7 @@ import { TransactionHistory } from '@/components/profile/TransactionHistory';
 
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
+import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -153,7 +154,8 @@ export default function Profile() {
             </TabsContent>
           )}
 
-          <TabsContent value="settings">
+          <TabsContent value="settings" className="space-y-6">
+            <AppearanceSettings />
             <ProfileForm />
           </TabsContent>
 
