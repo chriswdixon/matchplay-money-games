@@ -99,10 +99,6 @@ const TycheDashboard = () => {
     <div className="min-h-screen bg-muted/40 flex flex-col">
       <a href="#main-content" className="skip-link">Skip to main content</a>
       <AppHeader
-        showNavMenu
-        onNavSelect={(v) => setCurrentTab(v)}
-        currentTab={currentTab}
-        navItems={navItems}
         onReturnToMatch={handleReturnToMatch}
         hideReturnButton={currentTab === "active-match"}
       />
