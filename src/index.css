@@ -18,10 +18,10 @@
     --popover: 0 0% 100%;
     --popover-foreground: 220 15% 15%;
     
-    /* Primary - Tyche Brand Green (matches logo) */
-    --primary: 142 76% 36%;
+    /* Primary - Tyche Brand Green (matches logo: rgb(0,209,88)) */
+    --primary: 145 100% 41%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 142 80% 45%;
+    --primary-glow: 145 100% 50%;
     
     /* Secondary - Pewter */
     --secondary: 220 10% 90%;
@@ -32,22 +32,22 @@
     --muted-foreground: 220 10% 35%;
     
     /* Accent - Tyche Brand Green */
-    --accent: 142 76% 36%;
+    --accent: 145 100% 41%;
     --accent-foreground: 0 0% 100%;
-    --accent-glow: 142 80% 45%;
+    --accent-glow: 145 100% 50%;
     
     /* Status Colors */
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 98%;
-    --success: 142 70% 38%;
-    --success-foreground: 0 0% 98%;
+    --success: 145 100% 35%;
+    --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
     
     /* Form Elements */
     --border: 220 10% 85%;
     --input: 220 10% 92%;
-    --ring: 142 76% 36%;
+    --ring: 145 100% 41%;
     
     /* Premium Gradients */
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
