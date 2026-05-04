@@ -126,16 +126,22 @@ const TycheDashboard = () => {
         )}
 
         {currentTab === "matches" && (
-          <div className="py-4">
+          <div className="bg-card rounded-3xl p-4 shadow-card">
             <h2 className="text-2xl font-bold mb-4">Find Matches & Courses</h2>
             <NearbyCoursesWithMatches />
           </div>
         )}
         {currentTab === "past" && (
-          <Suspense fallback={<TabLoader />}><MatchFinder hideHowItWorks showPastMatches /></Suspense>
+          <div className="bg-card rounded-3xl p-4 shadow-card">
+            <h2 className="text-2xl font-bold mb-4">Past Matches</h2>
+            <Suspense fallback={<TabLoader />}><MatchFinder hideHowItWorks showPastMatches /></Suspense>
+          </div>
         )}
         {currentTab === "handicap" && (
-          <Suspense fallback={<TabLoader />}><HandicapSettings /></Suspense>
+          <div className="bg-card rounded-3xl p-4 shadow-card">
+            <h2 className="text-2xl font-bold mb-4">Handicap</h2>
+            <Suspense fallback={<TabLoader />}><HandicapSettings /></Suspense>
+          </div>
         )}
       </main>
 
