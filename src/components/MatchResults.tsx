@@ -66,7 +66,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
       case 1:
         return <Medal className="w-5 h-5 text-gray-400" />;
       case 2:
-        return <Medal className="w-5 h-5 text-amber-600" />;
+        return <Medal className="w-5 h-5 text-warning" />;
       default:
         return <Users className="w-5 h-5 text-muted-foreground" />;
     }

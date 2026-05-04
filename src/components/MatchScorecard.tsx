@@ -1856,7 +1856,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 </div>
 
                 <div className="bg-warning/10 border border-warning/30 p-3 rounded-lg">
-                  <p className="text-sm text-amber-800 dark:text-amber-200">
+                  <p className="text-sm text-warning">
                     ⚠️ Payment will only be processed if <strong>ALL</strong> players agree
                   </p>
                 </div>

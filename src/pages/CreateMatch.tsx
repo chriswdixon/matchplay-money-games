@@ -1243,7 +1243,7 @@ const CreateMatch = () => {
           </SelectContent>
         </Select>
         {formData.max_participants === '1' && (
-          <p className="text-xs text-amber-600 dark:text-amber-400">Testing mode: All format restrictions disabled, no payouts</p>
+          <p className="text-xs text-warning">Testing mode: All format restrictions disabled, no payouts</p>
         )}
         {formData.max_participants !== '1' && formData.format === 'Match Play' && (
           <p className="text-xs text-muted-foreground">Match Play requires exactly 2 players</p>

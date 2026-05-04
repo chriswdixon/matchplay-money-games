@@ -41,12 +41,12 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   const getPositionIcon = (index: number) => {
     if (index === 0) return <Trophy className="w-6 h-6 text-warning" />;
     if (index === 1) return <Medal className="w-6 h-6 text-gray-400" />;
-    if (index === 2) return <Medal className="w-6 h-6 text-amber-700" />;
+    if (index === 2) return <Medal className="w-6 h-6 text-warning" />;
     return null;
   };
 
   const getPositionBadge = (index: number) => {
-    if (index === 0) return <Badge className="bg-warning/100 hover:bg-yellow-600">1st Place</Badge>;
+    if (index === 0) return <Badge className="bg-warning hover:bg-warning/90">1st Place</Badge>;
     if (index === 1) return <Badge className="bg-gray-400 hover:bg-gray-500">2nd Place</Badge>;
     if (index === 2) return <Badge className="bg-warning/80 hover:bg-warning/90">3rd Place</Badge>;
     return <Badge variant="outline">{index + 1}th Place</Badge>;
@@ -179,11 +179,11 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           !inline && "max-w-4xl mx-auto"
         )}>
           <CardContent className="p-6">
-            <div className="flex items-center justify-center gap-2 text-amber-600 dark:text-amber-400">
+            <div className="flex items-center justify-center gap-2 text-warning">
               <Trophy className="w-6 h-6" />
               <span className="text-lg font-semibold">Testing Mode - No Payouts Processed</span>
             </div>
-            <div className="mt-2 text-center text-sm text-amber-600/80 dark:text-amber-400/80">
+            <div className="mt-2 text-center text-sm text-warning/80">
               This match was created in testing mode (1 player). Results are recorded but no money transactions occurred.
             </div>
           </CardContent>

@@ -576,11 +576,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           <div className="flex items-center gap-2">
                             <DollarSign className={cn(
                               "w-4 h-4",
-                              isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-muted-foreground"
+                              isHighStakes ? "text-warning" : isMediumStakes ? "text-primary" : "text-muted-foreground"
                             )} />
                             <span className={cn(
                               "font-medium",
-                              isHighStakes ? "text-amber-500" : isMediumStakes ? "text-primary" : "text-foreground"
+                              isHighStakes ? "text-warning" : isMediumStakes ? "text-primary" : "text-foreground"
                             )}>
                               {(match.buy_in_amount / 100).toFixed(0)} buy-in
                             </span>
@@ -598,7 +598,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                               "text-xs font-medium",
                               match.format === 'stroke-play' && "border-blue-500/50 text-blue-600 dark:text-blue-400 bg-blue-500/10",
                               match.format === 'match-play' && "border-purple-500/50 text-purple-600 dark:text-purple-400 bg-purple-500/10",
-                              match.format === 'best-ball' && "border-green-500/50 text-success bg-green-500/10",
+                              match.format === 'best-ball' && "border-success/50 text-success bg-success/10",
                               match.format === 'scramble' && "border-pink-500/50 text-pink-600 dark:text-pink-400 bg-pink-500/10"
                             )}
                           >
