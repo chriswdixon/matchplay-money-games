@@ -487,7 +487,7 @@ const CreateMatch = () => {
           )}
           {locationCoords ? 'Refresh nearby courses' : 'Use my location to find courses'}
         </Button>
-        {!locationCoords && (
+        {!locationCoords && !gpsError && (
           <p className="text-xs text-muted-foreground">
             Location access is required to find courses near you.
           </p>
@@ -496,6 +496,81 @@ const CreateMatch = () => {
           <p className="text-xs text-muted-foreground">
             Showing courses within {searchRadius} miles
           </p>
+        )}
+        {gpsError && (
+          <div
+            role="alert"
+            aria-live="polite"
+            className="rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm space-y-2"
+          >
+            <div className="flex items-start gap-2">
+              <AlertCircle className="w-4 h-4 mt-0.5 text-destructive shrink-0" aria-hidden="true" />
+              <div className="space-y-1">
+                <p className="font-semibold text-destructive">
+                  {gpsError === 'denied' && 'Location access blocked'}
+                  {gpsError === 'unavailable' && 'Location unavailable'}
+                  {gpsError === 'timeout' && 'Location request timed out'}
+                  {gpsError === 'unsupported' && 'Geolocation not supported'}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  {gpsError === 'denied' &&
+                    'Tyche needs your location to show nearby courses. Enable location access in your browser, then tap "Try again". You can also pick a course manually below.'}
+                  {gpsError === 'unavailable' &&
+                    'Your device could not determine its position. Make sure system location services are turned on, then tap "Try again". You can also pick a course manually below.'}
+                  {gpsError === 'timeout' &&
+                    'Getting your location took too long. Move to a spot with a better signal and try again.'}
+                  {gpsError === 'unsupported' &&
+                    'This browser does not support geolocation. Please pick a course manually below.'}
+                </p>
+                {gpsError === 'denied' && (
+                  <details className="text-xs text-muted-foreground">
+                    <summary className="cursor-pointer underline-offset-2 hover:underline">
+                      How to enable location access
+                    </summary>
+                    <ul className="mt-2 ml-4 list-disc space-y-1">
+                      <li>
+                        <strong>Chrome / Edge:</strong> Click the lock icon in the address bar →
+                        Site settings → Location → Allow.
+                      </li>
+                      <li>
+                        <strong>Safari (Mac):</strong> Safari → Settings → Websites → Location →
+                        set this site to "Allow".
+                      </li>
+                      <li>
+                        <strong>Safari (iOS):</strong> Settings → Safari → Location → "Ask" or
+                        "Allow", then reload this page.
+                      </li>
+                      <li>
+                        <strong>Firefox:</strong> Click the lock icon → Clear permission, then
+                        reload and allow when prompted.
+                      </li>
+                      <li>
+                        <strong>Android:</strong> Settings → Apps → your browser → Permissions →
+                        Location → Allow.
+                      </li>
+                    </ul>
+                  </details>
+                )}
+                {gpsError !== 'unsupported' && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={handleGPSSearch}
+                    disabled={loadingGPS}
+                    className="mt-2"
+                  >
+                    {loadingGPS ? (
+                      <Loader2 className="w-3 h-3 animate-spin mr-1.5" />
+                    ) : (
+                      <MapPin className="w-3 h-3 mr-1.5" />
+                    )}
+                    Try again
+                  </Button>
+                )}
+              </div>
+            </div>
+          </div>
         )}
       </div>
 
