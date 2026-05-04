@@ -89,7 +89,6 @@ const AdminConsole = () => {
                     { id: 'reports', label: 'Reports', Icon: BarChart3 },
                     { id: 'matches', label: 'Matches', Icon: TrendingUp },
                     { id: 'users', label: 'Users', Icon: Users },
-                    { id: 'accounts', label: 'Accounts', Icon: DollarSign },
                     { id: 'invites', label: 'Invites', Icon: Mail },
                     { id: 'coupons', label: 'Coupons', Icon: Ticket },
                     { id: 'reviews', label: 'Reviews', Icon: AlertCircle },
