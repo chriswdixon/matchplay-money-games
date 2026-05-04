@@ -39,7 +39,8 @@ import { GeoBlockingManagement } from "@/components/admin/GeoBlockingManagement"
 const AdminConsole = () => {
   const { isAdmin, loading } = useAdminRole();
   const navigate = useNavigate();
-
+  const isMobile = useIsMobile();
+  const [activeTab, setActiveTab] = useState("reports");
   useEffect(() => {
     if (!loading && !isAdmin) {
       navigate('/');
