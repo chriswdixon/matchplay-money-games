@@ -170,16 +170,28 @@ export default function Profile() {
           )}
           {isAdmin && (
             <TooltipProvider delayDuration={200}>
-              <Tooltip>
+              <Tooltip open={adminTooltipOpen} onOpenChange={setAdminTooltipOpen}>
                 <TooltipTrigger asChild>
                   <Button
                     variant="outline"
                     size="icon"
-                    onClick={() => navigate('/admin')}
+                    onClick={(e) => {
+                      // On touch devices, first tap reveals the tooltip; second tap navigates.
+                      const isTouch =
+                        typeof window !== 'undefined' &&
+                        window.matchMedia('(hover: none)').matches;
+                      if (isTouch && !adminTooltipOpen) {
+                        e.preventDefault();
+                        setAdminTooltipOpen(true);
+                        return;
+                      }
+                      setAdminTooltipOpen(false);
+                      navigate('/admin');
+                    }}
                     aria-label={
                       openSupportCount > 0
-                        ? `Admin Portal, ${openSupportCount} open support request${openSupportCount === 1 ? '' : 's'}`
-                        : 'Admin Portal'
+                        ? `Admin Portal — manage users, matches, and support. ${openSupportCount} open support request${openSupportCount === 1 ? '' : 's'}.`
+                        : 'Admin Portal — manage users, matches, and support.'
                     }
                     className="relative bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
                   >
@@ -194,8 +206,14 @@ export default function Profile() {
                     )}
                   </Button>
                 </TooltipTrigger>
-                <TooltipContent side="bottom">
-                  Admin Portal{openSupportCount > 0 ? ` — ${openSupportCount} open support` : ''}
+                <TooltipContent side="bottom" className="max-w-[240px] text-center">
+                  <div className="font-semibold">Admin Portal</div>
+                  <div className="text-xs opacity-90">
+                    Manage users, matches, coupons, and support requests.
+                    {openSupportCount > 0 && (
+                      <> {openSupportCount} open support request{openSupportCount === 1 ? '' : 's'}.</>
+                    )}
+                  </div>
                 </TooltipContent>
               </Tooltip>
             </TooltipProvider>
