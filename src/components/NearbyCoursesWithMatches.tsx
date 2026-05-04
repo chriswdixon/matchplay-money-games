@@ -52,19 +52,28 @@ const NearbyCoursesWithMatches = () => {
   }, [courses]);
 
   // Infinite scroll: expand by 5 when sentinel scrolls into view
+  // Infinite scroll: expand by 5 only after the user actually scrolls
   useEffect(() => {
     const node = sentinelRef.current;
     if (!node) return;
+    let hasScrolled = false;
+    const onScroll = () => {
+      hasScrolled = true;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting) {
+        if (entries[0].isIntersecting && hasScrolled) {
           setVisibleCount((c) => Math.min(c + 5, courses.length));
         }
       },
       { rootMargin: "200px" },
     );
     observer.observe(node);
-    return () => observer.disconnect();
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("scroll", onScroll);
+    };
   }, [courses.length, visibleCount]);
 
   const visibleCourses = courses.slice(0, visibleCount);
