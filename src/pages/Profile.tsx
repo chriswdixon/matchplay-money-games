@@ -199,6 +199,7 @@ export default function Profile() {
               <TooltipContent side="bottom">Contact Support</TooltipContent>
             </Tooltip>
           </TooltipProvider>
+          <InstallPWAButton />
           <div className="flex-1">
             <PageTitleCard
               icon={<User className="w-5 h-5" aria-hidden="true" />}
