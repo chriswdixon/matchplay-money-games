@@ -18,7 +18,7 @@ import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
 const SubscriptionManagement = lazy(() => import("@/components/SubscriptionManagement"));
-const HandicapSettings = lazy(() => import("@/components/profile/HandicapSettings").then(m => ({ default: m.HandicapSettings })));
+const HandicapCalculatorsInline = lazy(() => import("@/components/home/HandicapCalculatorsInline").then(m => ({ default: m.HandicapCalculatorsInline })));
 const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m => ({ default: m.MatchScorecard })));
 
 const TabLoader = () => (
