@@ -1,7 +1,13 @@
 import { useState, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarImage, AvatarFallback } from '@/components/ui/avatar';
-import { Camera, Upload, X } from 'lucide-react';
+import { Pencil, Upload, Trash2, Loader2 } from 'lucide-react';
+import {
+  DropdownMenu,
+  DropdownMenuTrigger,
+  DropdownMenuContent,
+  DropdownMenuItem,
+} from '@/components/ui/dropdown-menu';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
@@ -139,40 +145,46 @@ export function AvatarUpload({ currentImageUrl, onImageUpdate, disabled }: Avata
             {user?.email?.charAt(0).toUpperCase() || '?'}
           </AvatarFallback>
         </Avatar>
-        
-        {displayImageUrl && !disabled && (
-          <Button
-            size="sm"
-            variant="destructive"
-            className="absolute -top-2 -right-2 h-6 w-6 rounded-full p-0"
-            onClick={handleRemoveImage}
-            disabled={uploading}
-          >
-            <X className="w-3 h-3" />
-          </Button>
-        )}
-      </div>
 
-      <div className="flex gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          onClick={() => fileInputRef.current?.click()}
-          disabled={disabled || uploading}
-          className="gap-2"
-        >
-          {uploading ? (
-            <>
-              <div className="w-4 h-4 animate-spin rounded-full border-2 border-primary border-t-transparent" />
-              Uploading...
-            </>
-          ) : (
-            <>
-              {displayImageUrl ? <Camera className="w-4 h-4" /> : <Upload className="w-4 h-4" />}
-              {displayImageUrl ? 'Change' : 'Upload'}
-            </>
-          )}
-        </Button>
+        {!disabled && (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button
+                type="button"
+                size="icon"
+                variant="default"
+                disabled={uploading}
+                aria-label={displayImageUrl ? 'Edit profile picture' : 'Upload profile picture'}
+                className="absolute bottom-0 right-0 h-7 w-7 rounded-full p-0 shadow-md border-2 border-background"
+              >
+                {uploading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <Pencil className="w-3.5 h-3.5" />
+                )}
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end" side="bottom">
+              <DropdownMenuItem
+                onClick={() => fileInputRef.current?.click()}
+                disabled={uploading}
+              >
+                <Upload className="w-4 h-4 mr-2" />
+                {displayImageUrl ? 'Change photo' : 'Upload photo'}
+              </DropdownMenuItem>
+              {displayImageUrl && (
+                <DropdownMenuItem
+                  onClick={handleRemoveImage}
+                  disabled={uploading}
+                  className="text-destructive focus:text-destructive"
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Remove photo
+                </DropdownMenuItem>
+              )}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        )}
       </div>
 
       <input
