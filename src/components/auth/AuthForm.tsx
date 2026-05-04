@@ -42,6 +42,7 @@ export function AuthForm() {
   const [showPaymentSetup, setShowPaymentSetup] = useState(false);
   
   const [inviteCode, setInviteCode] = useState('');
+  const [passwordFocused, setPasswordFocused] = useState(false);
   const [showRequestInvite, setShowRequestInvite] = useState(false);
   const [requestInviteLoading, setRequestInviteLoading] = useState(false);
 
