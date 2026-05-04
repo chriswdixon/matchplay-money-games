@@ -12,6 +12,7 @@ import { useAuth } from "@/hooks/useAuth";
 import CourseDetailDialog from "./CourseDetailDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
+import LocationStatusBanner from "./LocationStatusBanner";
 
 const DEFAULT_RADIUS_MI = 30;
 
@@ -32,7 +33,7 @@ const NearbyCoursesWithMatches = () => {
   const [courses, setCourses] = useState<GolfCourse[]>([]);
   const [searched, setSearched] = useState(false);
   const { searchCoursesByName, searchNearbyCourses, loading } = useGolfCourses();
-  const { location, requestLocation } = useLocation();
+  const { location, requestLocation, error: locationError, loading: locationLoading } = useLocation();
   const { matches } = useMatches();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -208,9 +209,21 @@ const NearbyCoursesWithMatches = () => {
       </form>
 
       {!location && (
-        <Button variant="outline" className="w-full" onClick={() => requestLocation()}>
-          Enable location to see nearby courses
-        </Button>
+        <>
+          <Button
+            variant="outline"
+            className="w-full"
+            onClick={() => requestLocation()}
+            disabled={locationLoading}
+          >
+            {locationLoading ? "Locating…" : "Enable location to see nearby courses"}
+          </Button>
+          <LocationStatusBanner
+            error={locationError}
+            loading={locationLoading}
+            onRetry={() => requestLocation()}
+          />
+        </>
       )}
 
       {location && (
