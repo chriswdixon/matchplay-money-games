@@ -3,7 +3,7 @@ import { Shield, Users, Trophy, Scale } from "lucide-react";
 
 const Terms = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/40">
 
       <main className="container py-12 px-4 max-w-4xl">
         {/* Hero Section */}
@@ -16,7 +16,7 @@ const Terms = () => {
 
         {/* Key Points Cards */}
         <div className="grid md:grid-cols-2 gap-4 mb-12">
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="rounded-3xl border-border/60 bg-card shadow-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Trophy className="w-5 h-5 text-primary" />
@@ -30,7 +30,7 @@ const Terms = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="rounded-3xl border-border/60 bg-card shadow-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Shield className="w-5 h-5 text-primary" />
@@ -44,7 +44,7 @@ const Terms = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="rounded-3xl border-border/60 bg-card shadow-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
@@ -58,7 +58,7 @@ const Terms = () => {
             </CardContent>
           </Card>
 
-          <Card className="border-primary/20 bg-primary/5">
+          <Card className="rounded-3xl border-border/60 bg-card shadow-card">
             <CardHeader className="pb-2">
               <CardTitle className="text-lg flex items-center gap-2">
                 <Scale className="w-5 h-5 text-primary" />
