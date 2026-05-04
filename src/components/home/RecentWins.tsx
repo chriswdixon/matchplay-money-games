@@ -1,6 +1,6 @@
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Trophy, MapPin, Users, ArrowRight } from "lucide-react";
+import { Trophy, MapPin, Users } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useWinsFeed } from "@/hooks/useWinsFeed";
 import { formatDistanceToNow } from "date-fns";
@@ -32,7 +32,7 @@ const RecentWins = () => {
           className="text-sm text-background/90 hover:text-background flex items-center gap-1"
           aria-label="View all wins"
         >
-          View all <ArrowRight className="w-3.5 h-3.5" />
+          View all
         </button>
       </div>
 
