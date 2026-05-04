@@ -101,7 +101,7 @@ const MembershipTiers = () => {
           </p>
         </div>
         
-        <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-6xl mx-auto">
           {tiers.map((tier, index) => (
             <Card 
               key={tier.name} 
