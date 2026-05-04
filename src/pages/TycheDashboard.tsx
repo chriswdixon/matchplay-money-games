@@ -99,10 +99,6 @@ const TycheDashboard = () => {
   return (
     <div className="min-h-screen bg-muted/40 flex flex-col">
       <a href="#main-content" className="skip-link">Skip to main content</a>
-      <AppHeader
-        onReturnToMatch={handleReturnToMatch}
-        hideReturnButton={currentTab === "active-match"}
-      />
 
       <main id="main-content" className="flex-1 pb-32 md:pb-8 md:pt-24 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4" role="main">
         {currentTab === "active-match" && hasActiveMatch && (

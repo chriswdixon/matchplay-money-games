@@ -165,10 +165,6 @@ const TycheLanding = () => {
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
-        <AppHeader
-          onReturnToMatch={handleReturnToMatch}
-          hideReturnButton={currentTab === "active-match"}
-        />
 
         <main
           id="main-content"
