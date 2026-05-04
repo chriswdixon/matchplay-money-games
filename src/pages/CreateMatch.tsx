@@ -1272,10 +1272,8 @@ const CreateMatch = () => {
         {isMobile ? (
           <div className="space-y-6">
             <div className={cn(
-              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground",
-              currentStep === 0 ? "bg-primary/10 border border-primary/30" : "bg-card"
+              "rounded-3xl p-4 shadow-card min-h-[60vh] text-base text-foreground bg-card transition-colors hover:bg-success/10",
             )}>
-              {currentStep === 0 && renderCourseStep()}
               {currentStep === 1 && renderDateTimeStep()}
               {currentStep === 2 && renderFormatTeesStep()}
               {currentStep === 3 && renderDetailsStep()}
@@ -1290,7 +1288,7 @@ const CreateMatch = () => {
               >
                 Cancel
               </Button>
-              {currentStep > 0 && (
+              {currentStep > 1 && (
                 <Button
                   type="button"
                   variant="outline"
@@ -1329,10 +1327,9 @@ const CreateMatch = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            <div className="bg-primary/10 border border-primary/30 text-foreground text-base rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderDateTimeStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderFormatTeesStep()}</div>
-            <div className="bg-card text-base rounded-3xl p-6 shadow-card">{renderDetailsStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDateTimeStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderFormatTeesStep()}</div>
+            <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10">{renderDetailsStep()}</div>
 
             <div className="flex gap-3 pt-2">
               <Button
