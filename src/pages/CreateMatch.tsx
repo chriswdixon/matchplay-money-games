@@ -1240,7 +1240,7 @@ const CreateMatch = () => {
   );
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-muted/40">
       {/* Header */}
       <header className="sticky top-0 z-50 bg-background border-b pt-[env(safe-area-inset-top)]">
         <div className="container mx-auto px-4 py-3 flex items-center gap-3">
@@ -1260,14 +1260,14 @@ const CreateMatch = () => {
       <form onSubmit={(e) => e.preventDefault()} className="container mx-auto px-4 py-6 max-w-2xl">
         {isMobile ? (
           <div className="space-y-6">
-            <div className="min-h-[60vh]">
+            <div className="bg-card rounded-3xl p-4 shadow-card min-h-[60vh]">
               {currentStep === 0 && renderCourseStep()}
               {currentStep === 1 && renderDateTimeStep()}
               {currentStep === 2 && renderFormatTeesStep()}
               {currentStep === 3 && renderDetailsStep()}
             </div>
 
-            <div className="flex gap-3 pt-4 border-t sticky bottom-0 bg-background pb-4">
+            <div className="flex gap-3 pt-4 sticky bottom-0 bg-muted/40 pb-4">
               <Button
                 type="button"
                 variant="outline"
@@ -1316,12 +1316,12 @@ const CreateMatch = () => {
           </div>
         ) : (
           <div className="space-y-6">
-            {renderCourseStep()}
-            {renderDateTimeStep()}
-            {renderFormatTeesStep()}
-            {renderDetailsStep()}
+            <div className="bg-card rounded-3xl p-6 shadow-card">{renderCourseStep()}</div>
+            <div className="bg-card rounded-3xl p-6 shadow-card">{renderDateTimeStep()}</div>
+            <div className="bg-card rounded-3xl p-6 shadow-card">{renderFormatTeesStep()}</div>
+            <div className="bg-card rounded-3xl p-6 shadow-card">{renderDetailsStep()}</div>
 
-            <div className="flex gap-3 pt-6">
+            <div className="flex gap-3 pt-2">
               <Button
                 type="button"
                 variant="outline"
