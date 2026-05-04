@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell, LifeBuoy } from 'lucide-react';
 import { SupportRequestDialog } from '@/components/profile/SupportRequestDialog';
+import { InstallPWAButton } from '@/components/InstallPWAButton';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
