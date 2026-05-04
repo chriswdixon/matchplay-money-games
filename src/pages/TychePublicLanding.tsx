@@ -70,11 +70,11 @@ const TychePublicLanding = () => {
         aria-label="Sign up or sign in"
       >
         <div className="flex items-center justify-end gap-2 px-4 py-2 max-w-7xl mx-auto">
-          <Button asChild size="sm" variant="outline">
+          <Button asChild size="sm" variant="outline" className="font-bold">
             <Link to="/auth">Sign In</Link>
           </Button>
-          <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground border-0">
-            <Link to="/auth">Join Tyche</Link>
+          <Button asChild size="sm" className="bg-gradient-primary text-primary-foreground border-0 font-bold">
+            <Link to="/auth?tab=signup">Join Tyche</Link>
           </Button>
         </div>
       </div>
@@ -119,7 +119,7 @@ const TychePublicLanding = () => {
               size="lg"
               className="bg-accent text-accent-foreground hover:bg-accent-glow shadow-accent transition-all duration-300 px-8 py-4 text-lg font-semibold"
             >
-              <Link to="/auth">Join Tyche</Link>
+              <Link to="/auth?tab=signup">Join Tyche</Link>
             </Button>
           </div>
           <div className="text-center text-sm text-white/70">
