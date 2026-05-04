@@ -261,6 +261,7 @@ export default function Profile() {
                   size="icon"
                   onClick={() => setShowSupportDialog(true)}
                   aria-label="Contact Support"
+                  className="bg-success text-success-foreground border-success hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
                 >
                   <LifeBuoy className="h-4 w-4" />
                 </Button>
