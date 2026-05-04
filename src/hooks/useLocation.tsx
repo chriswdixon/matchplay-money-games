@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { toast } from 'sonner';
 
 export interface Location {
@@ -81,6 +81,32 @@ export const useLocation = () => {
       const locationError = error as LocationError;
       toast.error(locationError.message);
     }
+  }, []);
+
+  // Auto-request location on mount if permission is already granted (or prompt-able silently).
+  useEffect(() => {
+    if (location || loading) return;
+    if (!navigator.geolocation) return;
+
+    const start = () => {
+      getCurrentLocation().catch(() => {
+        // Silent — user can manually enable later
+      });
+    };
+
+    if ((navigator as any).permissions?.query) {
+      (navigator as any).permissions
+        .query({ name: 'geolocation' })
+        .then((status: PermissionStatus) => {
+          if (status.state === 'granted' || status.state === 'prompt') {
+            start();
+          }
+        })
+        .catch(() => start());
+    } else {
+      start();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // Convert address to coordinates using a geocoding service
