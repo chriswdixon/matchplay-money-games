@@ -833,10 +833,6 @@ export function AuthForm() {
                             <span className="text-destructive">{validationErrors.inviteCode}</span>
                           )}
                         </div>
-
-                        <p id="invite-code-hint" className="text-xs text-muted-foreground">
-                          6–32 letters or numbers. Beta invites are required to sign up.
-                        </p>
                       </div>
                     )}
                     <Button type="submit" className="w-full" disabled={loading}>
