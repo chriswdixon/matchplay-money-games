@@ -34,12 +34,15 @@ const NearbyCoursesWithMatches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  // Auto-search as the user types (debounced) once we have GPS
+  // Auto-search as the user types (debounced) once we have GPS.
+  // Empty input loads nearby; otherwise wait for at least 3 characters.
   useEffect(() => {
     if (!location) return;
+    const trimmed = query.trim();
+    if (trimmed.length > 0 && trimmed.length < 3) return;
     const handle = setTimeout(() => {
       runSearch(query);
-    }, query.trim().length === 0 ? 0 : 120);
+    }, trimmed.length === 0 ? 0 : 120);
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, location]);
