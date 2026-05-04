@@ -27,7 +27,48 @@ interface GolfCourse {
   externalId?: number;
   clubName?: string;
   tees?: any;
+  state?: string;
 }
+
+// US state name <-> code map for filtering OSM results that only return state names
+const US_STATE_CODES: Record<string, string> = {
+  'alabama':'AL','alaska':'AK','arizona':'AZ','arkansas':'AR','california':'CA','colorado':'CO',
+  'connecticut':'CT','delaware':'DE','florida':'FL','georgia':'GA','hawaii':'HI','idaho':'ID',
+  'illinois':'IL','indiana':'IN','iowa':'IA','kansas':'KS','kentucky':'KY','louisiana':'LA',
+  'maine':'ME','maryland':'MD','massachusetts':'MA','michigan':'MI','minnesota':'MN',
+  'mississippi':'MS','missouri':'MO','montana':'MT','nebraska':'NE','nevada':'NV',
+  'new hampshire':'NH','new jersey':'NJ','new mexico':'NM','new york':'NY','north carolina':'NC',
+  'north dakota':'ND','ohio':'OH','oklahoma':'OK','oregon':'OR','pennsylvania':'PA',
+  'rhode island':'RI','south carolina':'SC','south dakota':'SD','tennessee':'TN','texas':'TX',
+  'utah':'UT','vermont':'VT','virginia':'VA','washington':'WA','west virginia':'WV',
+  'wisconsin':'WI','wyoming':'WY','district of columbia':'DC',
+};
+
+function normalizeStateToCode(stateRaw?: string | null): string | null {
+  if (!stateRaw) return null;
+  const s = stateRaw.trim();
+  if (s.length === 2) return s.toUpperCase();
+  return US_STATE_CODES[s.toLowerCase()] || null;
+}
+
+async function getBlockedStateCodes(): Promise<Set<string>> {
+  try {
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_SERVICE_ROLE_KEY') ?? ''
+    );
+    const { data, error } = await supabase
+      .from('blocked_states')
+      .select('state_code')
+      .eq('is_active', true);
+    if (error) throw error;
+    return new Set((data || []).map((r: any) => String(r.state_code).toUpperCase()));
+  } catch (e) {
+    console.warn('[SEARCH-GOLF-COURSES] Failed to fetch blocked states:', (e as any)?.message);
+    return new Set();
+  }
+}
+
 
 serve(async (req) => {
   if (req.method === 'OPTIONS') {
@@ -73,6 +114,24 @@ serve(async (req) => {
     }
 
     const { type, lat, lon, radius, name, courseId } = await req.json();
+    const blockedStateCodes = await getBlockedStateCodes();
+    const isBlockedCourse = (c: GolfCourse): boolean => {
+      const code = normalizeStateToCode(c.state);
+      if (code && blockedStateCodes.has(code)) return true;
+      // Fallback: check address text for blocked state name or " XX " token
+      if (!c.address) return false;
+      const addr = c.address.toLowerCase();
+      for (const blocked of blockedStateCodes) {
+        // Match standalone state code preceded by comma/space and followed by space/comma/zip
+        const re = new RegExp(`(?:^|,\\s|\\s)${blocked.toLowerCase()}(?=$|,|\\s)`, 'i');
+        if (re.test(c.address)) return true;
+        // Match state name
+        const stateName = Object.entries(US_STATE_CODES).find(([, code]) => code === blocked)?.[0];
+        if (stateName && addr.includes(stateName)) return true;
+      }
+      return false;
+    };
+
 
     // --- Get course detail by ID ---
     if (type === 'detail' && courseId) {
@@ -101,7 +160,15 @@ serve(async (req) => {
         website: courseData.website,
         externalId: courseData.id,
         tees: courseData.tees,
+        state: courseData.location?.state,
       };
+
+      if (isBlockedCourse(course)) {
+        return new Response(
+          JSON.stringify({ error: 'This course is in a region that is currently unavailable.' }),
+          { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 451 }
+        );
+      }
 
       return new Response(
         JSON.stringify({ course }),
@@ -145,6 +212,7 @@ serve(async (req) => {
         latitude: c.location?.latitude,
         longitude: c.location?.longitude,
         externalId: c.id,
+        state: c.location?.state,
       }));
 
       // Also query OpenStreetMap for supplemental results
@@ -163,8 +231,11 @@ serve(async (req) => {
         console.log('[SEARCH-GOLF-COURSES] OSM query failed:', osmError.message);
       }
 
+      const filtered = courses.filter(c => !isBlockedCourse(c));
+      console.log('[SEARCH-GOLF-COURSES] Filtered out', courses.length - filtered.length, 'geo-blocked courses');
+
       return new Response(
-        JSON.stringify({ courses }),
+        JSON.stringify({ courses: filtered }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 200 }
       );
     }
@@ -194,9 +265,10 @@ serve(async (req) => {
             : undefined,
         }))
         .filter(course => course.distance !== undefined && course.distance <= maxDistance)
+        .filter(course => !isBlockedCourse(course))
         .sort((a, b) => (a.distance || 999) - (b.distance || 999));
 
-      console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'nearby courses');
+      console.log('[SEARCH-GOLF-COURSES] Returning', courses.length, 'nearby courses (geo-block filtered)');
 
       return new Response(
         JSON.stringify({ courses }),
@@ -279,6 +351,11 @@ async function queryOpenStreetMap(
     return [];
   }
 
+  // Add addressdetails=1 so we can read the state from the structured address
+  if (!osmUrl.includes('addressdetails=')) {
+    osmUrl += '&addressdetails=1';
+  }
+
   const response = await fetch(osmUrl, {
     headers: { 'User-Agent': 'Tyche-Golf-App/1.0' }
   });
@@ -291,11 +368,14 @@ async function queryOpenStreetMap(
 
   return data.map((place: any) => {
     const displayName = place.display_name || '';
+    const addr = place.address || {};
+    const stateRaw = addr.state || addr['ISO3166-2-lvl4'] || null;
     return {
       name: displayName.split(',')[0] || place.name || 'Golf Course',
       address: displayName || 'Address not available',
       latitude: parseFloat(place.lat),
       longitude: parseFloat(place.lon),
+      state: stateRaw,
       searchText: `${displayName} ${place.type || ''} ${place.category || ''}`.toLowerCase(),
     };
   }).filter((course: GolfCourse & { searchText: string }) =>
