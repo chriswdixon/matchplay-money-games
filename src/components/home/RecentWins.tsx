@@ -32,7 +32,7 @@ const RecentWins = () => {
           className="text-sm text-background/90 hover:text-background flex items-center gap-1"
           aria-label="View all wins"
         >
-          View all <ArrowRight className="w-3.5 h-3.5" />
+          View all
         </button>
       </div>
 
