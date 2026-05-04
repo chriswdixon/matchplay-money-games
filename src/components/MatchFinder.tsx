@@ -368,7 +368,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   return (
     <section className="py-4 md:py-12 px-3 md:px-6" aria-labelledby="match-finder-heading">
       <div className="w-full md:max-w-[1400px] md:mx-auto">
-        <div className="text-center mb-10 animate-fade-in px-0 md:px-0">
+        <div className="text-center animate-fade-in px-0 md:px-0">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
             <span aria-hidden="true">{showPastMatches ? '📜' : '🎯'}</span> {showPastMatches ? 'Match History' : 'Live Match Finder'}
           </Badge>
@@ -381,7 +381,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             </p>
           )}
           {!showPastMatches && (
-            <div className="mt-8 flex flex-col items-center justify-center gap-2">
+            <div className="mt-4 flex flex-col items-center justify-center gap-2">
               <CreateMatchButton onMatchCreated={refetch} />
             </div>
           )}
