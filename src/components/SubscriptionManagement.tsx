@@ -99,7 +99,7 @@ const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementPr
             <Wallet className="w-5 h-5 text-primary" />
             Play Money System
           </h2>
-          <p className="text-sm text-muted-foreground mt-1.5">How the play money system works</p>
+          
         </div>
         <div className="p-4 bg-muted/50 rounded-lg space-y-3">
           <p className="text-sm text-muted-foreground">
