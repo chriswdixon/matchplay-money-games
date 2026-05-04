@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -33,6 +33,8 @@ const NearbyCoursesWithMatches = () => {
   const { matches } = useMatches();
   const navigate = useNavigate();
   const { user } = useAuth();
+  const [visibleCount, setVisibleCount] = useState(10);
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
 
   // Realtime auto-search: filter on every keystroke once we have GPS.
   useEffect(() => {
@@ -43,6 +45,29 @@ const NearbyCoursesWithMatches = () => {
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, location]);
+
+  // Reset pagination when results change
+  useEffect(() => {
+    setVisibleCount(10);
+  }, [courses]);
+
+  // Infinite scroll: expand by 5 when sentinel scrolls into view
+  useEffect(() => {
+    const node = sentinelRef.current;
+    if (!node) return;
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setVisibleCount((c) => Math.min(c + 5, courses.length));
+        }
+      },
+      { rootMargin: "200px" },
+    );
+    observer.observe(node);
+    return () => observer.disconnect();
+  }, [courses.length, visibleCount]);
+
+  const visibleCourses = courses.slice(0, visibleCount);
 
   const runSearch = async (q: string) => {
     if (!location) {
@@ -191,7 +216,7 @@ const NearbyCoursesWithMatches = () => {
             No courses found nearby. Try a different search.
           </p>
         )}
-        {courses.map((course, i) => {
+        {visibleCourses.map((course, i) => {
           const openMatches =
             openMatchesByCourse.get(course.name.toLowerCase().trim()) || [];
           const hasOpenMatch = openMatches.length > 0;
@@ -247,6 +272,17 @@ const NearbyCoursesWithMatches = () => {
             </Card>
           );
         })}
+        {visibleCount < courses.length && (
+          <div ref={sentinelRef} className="py-2 text-center">
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setVisibleCount((c) => Math.min(c + 5, courses.length))}
+            >
+              Load more ({courses.length - visibleCount} remaining)
+            </Button>
+          </div>
+        )}
       </div>
     </div>
   );
