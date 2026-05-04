@@ -1,14 +1,28 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Shield, Users, Trophy, Scale, ScrollText } from "lucide-react";
+import { Shield, Users, Trophy, Scale, ScrollText, X } from "lucide-react";
 import { PageTitleCard } from "@/components/ui/page-title-card";
+import { useNavigate } from "react-router-dom";
 
 const Terms = () => {
+  const navigate = useNavigate();
+  const handleClose = () => {
+    if (window.history.length > 1) navigate(-1);
+    else navigate('/');
+  };
   return (
     <div className="min-h-screen bg-muted/40">
 
       <main className="container py-12 px-4 max-w-4xl">
         {/* Hero Section */}
-        <div className="mb-12">
+        <div className="mb-12 relative">
+          <button
+            type="button"
+            onClick={handleClose}
+            aria-label="Close"
+            className="absolute top-2 right-2 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-card text-foreground shadow-card hover:bg-accent transition-colors"
+          >
+            <X className="h-5 w-5" aria-hidden="true" />
+          </button>
           <PageTitleCard
             icon={<ScrollText className="w-5 h-5" aria-hidden="true" />}
             title="Terms of Service"
