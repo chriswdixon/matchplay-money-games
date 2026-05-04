@@ -8,7 +8,8 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy } from 'lucide-react';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck } from 'lucide-react';
+import { useAdminRole } from '@/hooks/useAdminRole';
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
@@ -33,6 +34,7 @@ export default function Profile() {
   const navigate = useNavigate();
   const isMobile = useIsMobile();
   const { hasAccess } = useFreeTier();
+  const { isAdmin } = useAdminRole();
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -147,6 +149,18 @@ export default function Profile() {
               <Target className="h-4 w-4" />
               <span className="hidden sm:inline">Return to Active Match</span>
               <span className="sm:hidden">Active Match</span>
+            </Button>
+          )}
+          {isAdmin && (
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => navigate('/admin')}
+              className="gap-2"
+            >
+              <ShieldCheck className="h-4 w-4" />
+              <span className="hidden sm:inline">Admin Portal</span>
+              <span className="sm:hidden">Admin</span>
             </Button>
           )}
           <div className="flex-1">
