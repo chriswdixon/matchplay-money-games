@@ -10,8 +10,10 @@ import { useMatches } from "@/hooks/useMatches";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import CourseDetailDialog from "./CourseDetailDialog";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Slider } from "@/components/ui/slider";
 
-const RADIUS_MI = 30;
+const DEFAULT_RADIUS_MI = 30;
 
 const distanceMi = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 3959;
@@ -38,6 +40,7 @@ const NearbyCoursesWithMatches = () => {
   const sentinelRef = useRef<HTMLDivElement | null>(null);
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
+  const [radius, setRadius] = useState<number>(DEFAULT_RADIUS_MI);
 
   // Load 10 at a time on both mobile and desktop
   const getStep = () => 10;
