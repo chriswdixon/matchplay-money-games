@@ -7,7 +7,7 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { Calendar } from '@/components/ui/calendar';
-import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Plus, Info, AlertCircle } from 'lucide-react';
+import { ArrowLeft, Loader2, Check, ChevronsUpDown, Clock, MapPin, ExternalLink, Star, Info, AlertCircle } from 'lucide-react';
 import { useMatches } from '@/hooks/useMatches';
 import { useAuth } from '@/hooks/useAuth';
 import { useLocation } from '@/hooks/useLocation';
@@ -19,7 +19,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
 import { useNavigate } from 'react-router-dom';
-import { CreateCourseDialog } from '@/components/CreateCourseDialog';
+
 
 
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
@@ -62,7 +62,6 @@ const CreateMatch = () => {
   const [loadingGPS, setLoadingGPS] = useState(false);
   const [gpsError, setGpsError] = useState<'denied' | 'unavailable' | 'timeout' | 'unsupported' | null>(null);
   const [submitting, setSubmitting] = useState(false);
-  const [createCourseOpen, setCreateCourseOpen] = useState(false);
   const [customSearchTerm, setCustomSearchTerm] = useState('');
   const [loadingCourseDetail, setLoadingCourseDetail] = useState(false);
   const [courseTees, setCourseTees] = useState<any[]>([]);
@@ -348,18 +347,6 @@ const CreateMatch = () => {
     if (courseName.length >= 2) {
       searchCoursesByName(courseName);
     }
-  };
-
-  const handleCourseCreated = (newCourse: any) => {
-    const course = {
-      name: newCourse.name,
-      address: newCourse.address,
-      latitude: newCourse.latitude,
-      longitude: newCourse.longitude,
-      website: newCourse.website,
-    };
-    handleCourseSelect(course);
-    toast.success('Course created and selected!');
   };
 
   const handleSubmit = async () => {
@@ -654,24 +641,12 @@ const CreateMatch = () => {
                       <span>Searching all sources...</span>
                     </div>
                   ) : (
-                    <div className="py-6 px-4 text-center space-y-3">
+                    <div className="py-6 px-4 text-center">
                       <p className="text-sm text-muted-foreground">
-                        {customSearchTerm.length < 3 
+                        {customSearchTerm.length < 3
                           ? "Type at least 3 characters to search"
-                          : "No courses found"
-                        }
+                          : "No courses found"}
                       </p>
-                      {user && customSearchTerm.length >= 3 && (
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setCreateCourseOpen(true)}
-                          className="w-full"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Create New Course
-                        </Button>
-                      )}
                     </div>
                   )}
                 </CommandEmpty>
@@ -1375,12 +1350,6 @@ const CreateMatch = () => {
         )}
       </form>
 
-      <CreateCourseDialog
-        open={createCourseOpen}
-        onOpenChange={setCreateCourseOpen}
-        onCourseCreated={handleCourseCreated}
-        initialName={customSearchTerm}
-      />
     </div>
   );
 };
