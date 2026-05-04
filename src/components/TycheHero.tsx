@@ -31,13 +31,16 @@ const TycheHero = () => {
       
       {/* Hero Background */}
       <div className="absolute inset-0 z-0">
-        <img 
-          src={heroImage} 
-          alt="Lush green golf course on a bright sunny day"
+        <video
+          src={heroVideo.url}
+          poster={heroImage}
+          autoPlay
+          muted
+          loop
+          playsInline
+          preload="auto"
+          aria-label="Golf ball bouncing and rolling on a lush green golf course"
           className="w-full h-full object-cover"
-          fetchPriority="high"
-          loading="eager"
-          decoding="async"
         />
         <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
       </div>
