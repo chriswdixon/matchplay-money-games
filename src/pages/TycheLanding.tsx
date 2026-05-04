@@ -31,7 +31,7 @@ const AppFeatures = lazy(() => import("@/components/AppFeatures"));
 const MembershipTiers = lazy(() => import("@/components/MembershipTiers"));
 const HandicapCalculators = lazy(() => import("@/components/HandicapCalculators").then(m => ({ default: m.HandicapCalculators })));
 const SubscriptionManagement = lazy(() => import("@/components/SubscriptionManagement"));
-const HandicapSettings = lazy(() => import("@/components/profile/HandicapSettings").then(m => ({ default: m.HandicapSettings })));
+
 const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m => ({ default: m.MatchScorecard })));
 
 // Minimal loading fallback for lazy components
@@ -211,11 +211,7 @@ const TycheLanding = () => {
             </Suspense>
           )}
 
-          {currentTab === "handicap" && (
-            <Suspense fallback={<TabLoader />}>
-              <HandicapSettings />
-            </Suspense>
-          )}
+
 
         </main>
 
