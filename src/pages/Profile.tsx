@@ -8,7 +8,7 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck } from 'lucide-react';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell } from 'lucide-react';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
@@ -19,6 +19,8 @@ import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
+import { NotificationsPanel } from '@/components/profile/NotificationsPanel';
+import { useNotifications } from '@/hooks/useNotifications';
 import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
 
