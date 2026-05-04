@@ -851,41 +851,39 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (
-          <div className="px-3 md:px-0">
-            <div className="bg-muted rounded-2xl p-8 md:p-12">
-              <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
-              <div className="grid md:grid-cols-4 gap-6">
-                {[
-                  {
-                    step: "1",
-                    title: "Find Match",
-                    description: "Browse nearby matches or create your own based on location and skill level"
-                  },
-                  {
-                    step: "2", 
-                    title: "Secure Buy-In",
-                    description: "Deposit your match buy-in securely through our platform"
-                  },
-                  {
-                    step: "3",
-                    title: "Play & Score",
-                    description: "Use our live scoring system - no cheating, every stroke tracked"
-                  },
-                  {
-                    step: "4",
-                    title: "Get Paid",
-                    description: "Winners receive instant payout as soon as the round is complete"
-                  }
-                ].map((step, index) => (
-                  <div key={step.step} className="text-center animate-fade-in" style={{ animationDelay: `${index * 0.2}s` }}>
-                    <div className="w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">
-                      {step.step}
-                    </div>
-                    <h4 className="font-semibold mb-2 text-foreground">{step.title}</h4>
-                    <p className="text-sm text-muted-foreground">{step.description}</p>
+          <div className="bg-muted rounded-2xl p-8 md:p-12">
+            <h3 className="text-3xl font-bold text-center mb-8 text-foreground">How It Works</h3>
+            <div className="grid md:grid-cols-4 gap-6">
+              {[
+                {
+                  step: "1",
+                  title: "Find Match",
+                  description: "Browse nearby matches or create your own based on location and skill level"
+                },
+                {
+                  step: "2", 
+                  title: "Secure Buy-In",
+                  description: "Deposit your match buy-in securely through our platform"
+                },
+                {
+                  step: "3",
+                  title: "Play & Score",
+                  description: "Use our live scoring system - no cheating, every stroke tracked"
+                },
+                {
+                  step: "4",
+                  title: "Get Paid",
+                  description: "Winners receive instant payout as soon as the round is complete"
+                }
+              ].map((step, index) => (
+                <div key={step.step} className="text-center animate-fade-in" style={{ animationDelay: `${index * 0.2}s` }}>
+                  <div className="w-12 h-12 bg-gradient-primary text-primary-foreground rounded-full flex items-center justify-center font-bold text-lg mx-auto mb-4">
+                    {step.step}
                   </div>
-                ))}
-              </div>
+                  <h4 className="font-semibold mb-2 text-foreground">{step.title}</h4>
+                  <p className="text-sm text-muted-foreground">{step.description}</p>
+                </div>
+              ))}
             </div>
           </div>
         )}
