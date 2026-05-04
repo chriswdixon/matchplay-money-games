@@ -99,13 +99,8 @@ export const useGolfCourses = () => {
 
       console.log(`🏌️ Found ${coursesWithDistance.length} courses in database within ${radius} miles`);
 
-      // If we have enough database results, use them
-      if (coursesWithDistance.length >= 10) {
-        setCourses(coursesWithDistance);
-        setAllCourses(coursesWithDistance);
-        showToastOnce(`Found ${coursesWithDistance.length} golf courses nearby`, 'success');
-        return coursesWithDistance;
-      }
+      // Always supplement with API results so we don't miss courses that
+      // aren't yet cached in the database (e.g. Teravista).
 
       // Check circuit breaker before making API call
       const now = Date.now();
