@@ -369,7 +369,7 @@ const CreateMatch = () => {
       const isTeamFormat = maxParticipants !== 1 && (formData.format === 'Best Ball' || formData.format === 'Scramble');
 
       // Parse numeric values safely
-      const parsedBuyIn = !hasAccess('buy_in') ? 0 : Math.max(0, parseInt(formData.buy_in_amount) || 0);
+      const parsedBuyIn = Math.max(0, parseInt(formData.buy_in_amount) || 0);
       const parsedHandicapMin = formData.handicap_min && formData.handicap_min.trim() !== '' 
         ? parseInt(formData.handicap_min) 
         : undefined;
