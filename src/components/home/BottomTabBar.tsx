@@ -50,8 +50,8 @@ const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps
       aria-label="Primary"
       className="fixed left-0 right-0 z-40 px-2 pointer-events-none bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 md:bottom-auto md:top-0 md:pt-[max(env(safe-area-inset-top),0.75rem)] md:pb-3"
     >
-      <div className="mx-auto max-w-2xl pointer-events-auto">
-        <div className="flex items-center justify-between gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium">
+      <div className="mx-auto w-3/4 max-w-md pointer-events-auto">
+        <div className="flex items-center justify-around gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium">
           {items.map(({ id, label, Icon }) => {
             const active = id === activeTab;
             const badge = id === "profile" ? unreadCount : 0;
