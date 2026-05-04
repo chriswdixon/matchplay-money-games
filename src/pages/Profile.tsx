@@ -7,7 +7,8 @@ import { useFreeTier } from '@/hooks/useFreeTier';
 import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
-import { ArrowLeft, User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy } from 'lucide-react';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy } from 'lucide-react';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
 import { MFASettings } from '@/components/profile/MFASettings';
 import { AccountBalance } from '@/components/profile/AccountBalance';
@@ -15,6 +16,7 @@ import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
+import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
 
 const HandicapSettings = lazy(() =>
@@ -87,66 +89,55 @@ export default function Profile() {
   ];
   const tabs = allTabs.filter(t => t.show);
 
-  const Toolbar = () => (
-    <nav
-      aria-label="Profile sections"
-      className={cn(
-        'z-40 px-2 pointer-events-none',
-        isMobile
-          ? 'fixed left-0 right-0 bottom-0 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3'
-          : 'sticky top-4 mb-6'
-      )}
-    >
-      <div className="mx-auto max-w-3xl pointer-events-auto">
-        <div
-          className={cn(
-            'flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide',
-            isMobile ? 'justify-between' : 'justify-start'
-          )}
-        >
-          {tabs.map(({ id, label, Icon }) => {
-            const active = id === activeTab;
-            return (
-              <button
-                key={id}
-                type="button"
-                onClick={() => handleTabChange(id)}
-                aria-label={label}
-                aria-current={active ? 'page' : undefined}
-                className={cn(
-                  'relative flex items-center gap-2 rounded-full transition-all px-3 h-10 shrink-0',
-                  active
-                    ? 'bg-primary text-primary-foreground shadow-accent'
-                    : 'text-background/90 hover:text-background hover:bg-background/10'
-                )}
-              >
-                <Icon className="w-4 h-4" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
-                {!isMobile && <span className="text-sm font-medium">{label}</span>}
-              </button>
-            );
-          })}
+  const SectionTabs = () => (
+    <TooltipProvider delayDuration={200}>
+      <nav
+        aria-label="Profile sections"
+        className={cn(
+          'z-30 px-2 pointer-events-none',
+          isMobile
+            ? 'sticky top-2 mb-4'
+            : 'sticky top-4 mb-6'
+        )}
+      >
+        <div className="mx-auto max-w-3xl pointer-events-auto">
+          <div className="flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide justify-between">
+            {tabs.map(({ id, label, Icon }) => {
+              const active = id === activeTab;
+              return (
+                <Tooltip key={id}>
+                  <TooltipTrigger asChild>
+                    <button
+                      type="button"
+                      onClick={() => handleTabChange(id)}
+                      aria-label={label}
+                      aria-current={active ? 'page' : undefined}
+                      className={cn(
+                        'relative flex items-center justify-center rounded-full transition-all w-10 h-10 shrink-0',
+                        active
+                          ? 'bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.6)]'
+                          : 'text-background/90 hover:text-background hover:bg-background/10 hover:shadow-[0_0_20px_hsl(var(--primary)/0.5)]'
+                      )}
+                    >
+                      <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                    </button>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">{label}</TooltipContent>
+                </Tooltip>
+              );
+            })}
+          </div>
         </div>
-      </div>
-    </nav>
+      </nav>
+    </TooltipProvider>
   );
 
   return (
     <div className="min-h-screen bg-muted/40 flex flex-col">
       <a href="#profile-main" className="skip-link">Skip to main content</a>
 
-      {/* Top utility bar */}
-      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto" role="banner">
+      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-24" role="banner">
         <div className="flex items-center gap-3">
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => navigate('/')}
-            className="text-muted-foreground hover:text-foreground gap-2"
-          >
-            <ArrowLeft className="w-4 h-4" aria-hidden="true" />
-            {!isMobile && 'Back to Home'}
-          </Button>
-
           {hasActiveMatch && (
             <Button
               variant="default"
@@ -159,7 +150,6 @@ export default function Profile() {
               <span className="sm:hidden">Active Match</span>
             </Button>
           )}
-
           <div className="flex-1">
             <h1 className="text-2xl font-bold">Profile</h1>
             <p className="text-sm text-muted-foreground">Manage your Tyche profile and preferences</p>
@@ -172,7 +162,7 @@ export default function Profile() {
         role="main"
         className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4 pb-32 md:pb-12"
       >
-        {!isMobile && <Toolbar />}
+        <SectionTabs />
 
         <div className="space-y-6">
           {activeTab === 'profile' && (
@@ -234,7 +224,15 @@ export default function Profile() {
         </div>
       </main>
 
-      {isMobile && <Toolbar />}
+      <BottomTabBar
+        activeTab="profile"
+        onChange={(tab) => {
+          if (tab === 'profile') return;
+          if (tab === 'home') navigate('/');
+          else navigate(`/?tab=${tab}`);
+        }}
+        hasActiveMatch={hasActiveMatch}
+      />
 
       <PasswordVerificationDialog
         open={showPasswordDialog}
