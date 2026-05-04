@@ -26,6 +26,16 @@ import { NotificationsPanel } from '@/components/profile/NotificationsPanel';
 import { useNotifications } from '@/hooks/useNotifications';
 import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog';
 
 const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
