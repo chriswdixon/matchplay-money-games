@@ -121,9 +121,6 @@ export function AuditAlerts() {
             Refresh
           </Button>
           <Button size="sm" onClick={runReconciliation} disabled={running}>
-            {running ? (
-            ) : (
-            )}
             Run now
           </Button>
         </div>
