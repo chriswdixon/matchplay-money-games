@@ -38,14 +38,12 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
       setCourseResults(results.slice(0, 12));
     } else {
       // No query — find nearby
-      let loc = location;
-      if (!loc) {
-        loc = await requestLocation();
+      if (!location) {
+        await requestLocation();
+        return;
       }
-      if (loc) {
-        const results = await searchNearbyCourses(loc.latitude, loc.longitude, 30);
-        setCourseResults(results.slice(0, 12));
-      }
+      const results = await searchNearbyCourses(location.latitude, location.longitude, 30);
+      setCourseResults(results.slice(0, 12));
     }
   };
 
