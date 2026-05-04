@@ -20,7 +20,7 @@ import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
-import HeroThemeSwitcher, { applyHeroTheme, getStoredHeroTheme } from "@/components/HeroThemeSwitcher";
+
 
 // Lazy load components for better initial load performance
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
@@ -54,10 +54,6 @@ const TycheLanding = () => {
   const navigate = useNavigate();
   const { theme, setTheme } = useTheme();
 
-  // Apply stored hero theme on mount (defaults to gold)
-  useEffect(() => {
-    applyHeroTheme(getStoredHeroTheme());
-  }, []);
 
   // Handle shared PIN links and secure token links
   useEffect(() => {
@@ -252,7 +248,6 @@ const TycheLanding = () => {
           activeTab={activeBottomTab}
           onChange={(tab) => setCurrentTab(tab)}
         />
-        <HeroThemeSwitcher />
       </div>
     );
   }
@@ -350,7 +345,7 @@ const TycheLanding = () => {
       
       {/* Footer */}
       <AppFooter />
-      <HeroThemeSwitcher />
+      
     </div>
   );
 };
