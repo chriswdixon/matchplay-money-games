@@ -8,7 +8,7 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck } from 'lucide-react';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell } from 'lucide-react';
 import { useAdminRole } from '@/hooks/useAdminRole';
 import { PageTitleCard } from '@/components/ui/page-title-card';
 import SubscriptionManagement from '@/components/SubscriptionManagement';
@@ -19,6 +19,8 @@ import { TransactionHistory } from '@/components/profile/TransactionHistory';
 import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificationDialog';
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
+import { NotificationsPanel } from '@/components/profile/NotificationsPanel';
+import { useNotifications } from '@/hooks/useNotifications';
 import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
 
@@ -26,7 +28,7 @@ const HandicapSettings = lazy(() =>
   import('@/components/profile/HandicapSettings').then(m => ({ default: m.HandicapSettings }))
 );
 
-type TabId = 'profile' | 'account' | 'settings' | 'security' | 'privacy';
+type TabId = 'profile' | 'account' | 'notifications' | 'settings' | 'security' | 'privacy';
 
 export default function Profile() {
   const { user, loading } = useAuth();
@@ -35,6 +37,7 @@ export default function Profile() {
   const isMobile = useIsMobile();
   const { hasAccess } = useFreeTier();
   const { isAdmin } = useAdminRole();
+  const { unreadCount } = useNotifications();
 
   const [activeTab, setActiveTab] = useState<TabId>('profile');
   const [showPasswordDialog, setShowPasswordDialog] = useState(false);
@@ -81,9 +84,10 @@ export default function Profile() {
     setPendingTab(null);
   };
 
-  const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean }[] = [
+  const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean; badge?: number }[] = [
     { id: 'profile', label: 'Profile & Handicap', Icon: User, show: true },
     { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: showAccountTab },
+    { id: 'notifications', label: 'Notifications', Icon: Bell, show: true, badge: unreadCount },
     { id: 'settings', label: 'Settings', Icon: Settings, show: true },
     { id: 'security', label: 'Security', Icon: Shield, show: true },
     { id: 'privacy', label: 'Privacy', Icon: FileText, show: true },
@@ -103,7 +107,7 @@ export default function Profile() {
       >
         <div className="mx-auto max-w-3xl pointer-events-auto">
           <div className="flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide justify-between">
-            {tabs.map(({ id, label, Icon }) => {
+            {tabs.map(({ id, label, Icon, badge }) => {
               const active = id === activeTab;
               return (
                 <Tooltip key={id}>
@@ -111,7 +115,7 @@ export default function Profile() {
                     <button
                       type="button"
                       onClick={() => handleTabChange(id)}
-                      aria-label={label}
+                      aria-label={badge ? `${label} (${badge} unread)` : label}
                       aria-current={active ? 'page' : undefined}
                       className={cn(
                         'relative flex items-center justify-center rounded-full transition-all w-10 h-10 shrink-0',
@@ -121,6 +125,14 @@ export default function Profile() {
                       )}
                     >
                       <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
+                      {badge && badge > 0 ? (
+                        <span
+                          aria-hidden="true"
+                          className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-destructive text-destructive-foreground text-[10px] font-semibold flex items-center justify-center border-2 border-foreground"
+                        >
+                          {badge > 99 ? '99+' : badge}
+                        </span>
+                      ) : null}
                     </button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">{label}</TooltipContent>
@@ -216,6 +228,12 @@ export default function Profile() {
                   onRequestVerification={() => setShowPasswordDialog(true)}
                 />
               </div>
+            </div>
+          )}
+
+          {activeTab === 'notifications' && (
+            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <NotificationsPanel />
             </div>
           )}
 
