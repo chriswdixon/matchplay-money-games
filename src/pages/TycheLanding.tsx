@@ -129,7 +129,7 @@ const TycheLanding = () => {
   const navItems = useMemo(() => {
     const items = [
       { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
-      { value: "past", label: "Past Matches", icon: <History className="w-4 h-4" /> },
+      { value: "past", label: "Past Matches", icon: <Trophy className="w-4 h-4" /> },
       { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
     ];
     
