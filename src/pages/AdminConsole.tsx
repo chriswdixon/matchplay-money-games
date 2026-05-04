@@ -162,10 +162,7 @@ const AdminConsole = () => {
             </TabsContent>
 
             <TabsContent value="golf-data">
-              <div className="space-y-6">
-                <GolfDataImport />
-                <GolfCourseManagement />
-              </div>
+              <GolfDataImport />
             </TabsContent>
 
             <TabsContent value="social">
