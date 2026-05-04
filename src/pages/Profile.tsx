@@ -198,7 +198,7 @@ export default function Profile() {
                         return;
                       }
                       setAdminTooltipOpen(false);
-                      navigate('/admin');
+                      setAdminConfirmOpen(true);
                     }}
                     aria-label={
                       openSupportCount > 0
