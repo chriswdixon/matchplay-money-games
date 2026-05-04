@@ -56,6 +56,7 @@ const App = () => (
         <Suspense fallback={null}>
           <OfflineIndicator />
           <CookieConsent />
+          <PWAInstallOnLogin />
         </Suspense>
         <Suspense fallback={<PageLoader />}>
           <Routes>
