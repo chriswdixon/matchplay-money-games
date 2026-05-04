@@ -1,23 +1,36 @@
-import { Home, Trophy, Landmark, UserCircle2 } from "lucide-react";
+import { Home, Search, History, Trophy, Crown, UserCircle2, Target } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useNavigate } from "react-router-dom";
 
-export type BottomTab = "home" | "past" | "subscription" | "profile";
+export type BottomTab =
+  | "home"
+  | "matches"
+  | "active-match"
+  | "past"
+  | "handicap"
+  | "subscription"
+  | "profile";
 
 interface BottomTabBarProps {
   activeTab: BottomTab;
   onChange: (tab: BottomTab) => void;
+  hasActiveMatch?: boolean;
 }
 
-const items: { id: BottomTab; label: string; Icon: typeof Home }[] = [
-  { id: "home", label: "Home", Icon: Home },
-  { id: "past", label: "Past Matches", Icon: Trophy },
-  { id: "subscription", label: "Membership", Icon: Landmark },
-  { id: "profile", label: "Profile", Icon: UserCircle2 },
-];
-
-const BottomTabBar = ({ activeTab, onChange }: BottomTabBarProps) => {
+const BottomTabBar = ({ activeTab, onChange, hasActiveMatch }: BottomTabBarProps) => {
   const navigate = useNavigate();
+
+  const items: { id: BottomTab; label: string; Icon: typeof Home }[] = [
+    { id: "home", label: "Home", Icon: Home },
+    { id: "matches", label: "Find Matches", Icon: Search },
+    ...(hasActiveMatch
+      ? [{ id: "active-match" as BottomTab, label: "Active Match", Icon: Target }]
+      : []),
+    { id: "past", label: "Past Matches", Icon: History },
+    { id: "handicap", label: "Handicap", Icon: Trophy },
+    { id: "subscription", label: "Membership", Icon: Crown },
+    { id: "profile", label: "Profile", Icon: UserCircle2 },
+  ];
 
   const handleClick = (id: BottomTab) => {
     if (id === "profile") {
@@ -30,10 +43,10 @@ const BottomTabBar = ({ activeTab, onChange }: BottomTabBarProps) => {
   return (
     <nav
       aria-label="Primary"
-      className="fixed bottom-0 left-0 right-0 z-40 px-4 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 pointer-events-none"
+      className="fixed bottom-0 left-0 right-0 z-40 px-2 pb-[max(env(safe-area-inset-bottom),0.75rem)] pt-3 pointer-events-none"
     >
-      <div className="mx-auto max-w-md pointer-events-auto">
-        <div className="flex items-center justify-between gap-2 bg-foreground text-background rounded-full px-4 py-3 shadow-premium">
+      <div className="mx-auto max-w-2xl pointer-events-auto">
+        <div className="flex items-center justify-between gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium">
           {items.map(({ id, label, Icon }) => {
             const active = id === activeTab;
             return (
@@ -43,22 +56,22 @@ const BottomTabBar = ({ activeTab, onChange }: BottomTabBarProps) => {
                 onClick={() => handleClick(id)}
                 aria-label={label}
                 aria-current={active ? "page" : undefined}
-                className="relative flex flex-col items-center justify-center w-12 h-12"
+                className="relative flex flex-col items-center justify-center flex-1 min-w-0 h-12"
               >
                 <span
                   className={cn(
-                    "flex items-center justify-center rounded-full transition-all",
+                    "flex items-center justify-center rounded-full transition-all w-10 h-10",
                     active
-                      ? "bg-primary text-primary-foreground w-11 h-11 shadow-accent"
-                      : "text-background/90 hover:text-background w-11 h-11",
+                      ? "bg-primary text-primary-foreground shadow-accent"
+                      : "text-background/90 hover:text-background",
                   )}
                 >
-                  <Icon className="w-6 h-6" strokeWidth={active ? 2.5 : 2} />
+                  <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
                 </span>
                 {active && (
                   <span
                     aria-hidden="true"
-                    className="absolute -bottom-1.5 h-1 w-6 rounded-full bg-primary"
+                    className="absolute -bottom-1 h-1 w-5 rounded-full bg-primary"
                   />
                 )}
               </button>
