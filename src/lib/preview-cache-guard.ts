@@ -6,7 +6,7 @@
  *
  * Constraints:
  *  - No service worker is registered here (No-PWA CI guard).
- *  - No vite-plugin-pwa, no Workbox, no manifest.
+ *  - No PWA plugin, no Workbox runtime, no web manifest.
  *  - Only uses standard browser APIs to *clean up* legacy state.
  *
  * Behaviour:
@@ -33,7 +33,7 @@ export function runPreviewCacheGuard(): void {
   }
 
   // Unregister any service worker left over from a previous PWA build.
-  // We intentionally do NOT call navigator.serviceWorker.register anywhere.
+  // This module only unregisters; it never installs a worker.
   const sw = navigator.serviceWorker;
   if (!sw) return;
 
