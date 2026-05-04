@@ -36,6 +36,10 @@ const NearbyCoursesWithMatches = () => {
   const [visibleCount, setVisibleCount] = useState(10);
   const sentinelRef = useRef<HTMLDivElement | null>(null);
 
+  // md breakpoint = 768px. Desktop loads 10 at a time, mobile loads 5.
+  const getStep = () =>
+    typeof window !== "undefined" && window.matchMedia("(min-width: 768px)").matches ? 10 : 5;
+
   // Realtime auto-search: filter on every keystroke once we have GPS.
   useEffect(() => {
     if (!location) return;
@@ -51,8 +55,7 @@ const NearbyCoursesWithMatches = () => {
     setVisibleCount(10);
   }, [courses]);
 
-  // Infinite scroll: expand by 5 when sentinel scrolls into view
-  // Infinite scroll: expand by 5 only after the user actually scrolls
+  // Infinite scroll: expand only after the user actually scrolls
   useEffect(() => {
     const node = sentinelRef.current;
     if (!node) return;
@@ -64,7 +67,7 @@ const NearbyCoursesWithMatches = () => {
     const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasScrolled) {
-          setVisibleCount((c) => Math.min(c + 5, courses.length));
+          setVisibleCount((c) => Math.min(c + getStep(), courses.length));
         }
       },
       { rootMargin: "200px" },
