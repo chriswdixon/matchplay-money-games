@@ -13,9 +13,10 @@ import { useIsMobile } from '@/hooks/use-mobile';
 import { User, Phone, Trophy, Calendar, Mail, Star, Crown, Zap, Calculator, X } from 'lucide-react';
 import StarRating from '@/components/StarRating';
 import { HandicapCalculators } from '@/components/HandicapCalculators';
+import { AvatarUpload } from '@/components/profile/AvatarUpload';
 
 export function ProfileDisplay() {
-  const { profile, loading } = useProfile();
+  const { profile, loading, updateProfile } = useProfile();
   const { privateData, loading: privateLoading } = usePrivateProfile();
   const { user } = useAuth();
   const { tierName, loading: subscriptionLoading } = useSubscription();
@@ -76,18 +77,18 @@ export function ProfileDisplay() {
       </CardHeader>
       <CardContent className="space-y-6">
         {/* Profile Header */}
-        <div className="flex items-start gap-4">
-          <Avatar className="w-16 h-16 border-2 border-border">
-            <AvatarImage src={profile?.profile_picture_url || undefined} alt="Profile picture" />
-            <AvatarFallback className="bg-gradient-primary text-primary-foreground text-lg">
-              {profile?.display_name?.charAt(0).toUpperCase() || user?.email?.charAt(0).toUpperCase() || '?'}
-            </AvatarFallback>
-          </Avatar>
-          <div className="flex-1">
+        <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+          <AvatarUpload
+            currentImageUrl={profile?.profile_picture_url || undefined}
+            onImageUpdate={(imageUrl) =>
+              updateProfile({ profile_picture_url: imageUrl })
+            }
+          />
+          <div className="flex-1 text-center sm:text-left">
             <h3 className="text-xl font-semibold">
               {profile?.display_name || 'Anonymous Golfer'}
             </h3>
-            <div className="flex items-center gap-2 mt-1">
+            <div className="flex items-center justify-center sm:justify-start gap-2 mt-1">
               <Mail className="w-4 h-4 text-muted-foreground" />
               <span className="text-muted-foreground">{user?.email}</span>
             </div>
