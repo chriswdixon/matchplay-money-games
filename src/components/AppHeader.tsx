@@ -105,17 +105,6 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
             </Sheet>
           )}
           
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
-            className="relative z-50 min-w-[44px] min-h-[44px] touch-manipulation text-accent hover:text-accent hover:bg-accent/10"
-            style={{ WebkitTapHighlightColor: 'transparent' }}
-          >
-            <Sun className="h-[1.2rem] w-[1.2rem] rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-[1.2rem] w-[1.2rem] rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
-          </Button>
           
           <UserMenu />
         </div>
