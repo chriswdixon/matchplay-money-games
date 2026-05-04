@@ -10,6 +10,7 @@ import HomeProfileCard from "@/components/home/HomeProfileCard";
 import HomeSearchBar from "@/components/home/HomeSearchBar";
 import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
+import GamesNearYou from "@/components/home/GamesNearYou";
 
 
 const MatchFinder = lazy(() => import("@/components/MatchFinder"));
