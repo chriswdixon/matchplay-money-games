@@ -512,9 +512,6 @@ const CreateMatch = () => {
           disabled={loadingGPS}
           className="w-full"
         >
-          {loadingGPS ? (
-          ) : (
-          )}
           {locationCoords ? 'Refresh nearby courses' : 'Use my location to find courses'}
         </Button>
         {!locationCoords && !gpsError && (
@@ -590,9 +587,6 @@ const CreateMatch = () => {
                     disabled={loadingGPS}
                     className="mt-2"
                   >
-                    {loadingGPS ? (
-                    ) : (
-                    )}
                     Try again
                   </Button>
                 )}
