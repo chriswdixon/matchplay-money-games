@@ -339,13 +339,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   };
 
   return (
-    <section className="py-4 md:py-20 px-3 md:px-6 bg-background" aria-labelledby="match-finder-heading">
+    <section className="py-4 md:py-12 px-3 md:px-6" aria-labelledby="match-finder-heading">
       <div className="w-full md:max-w-[1400px] md:mx-auto">
-        <div className="text-center mb-16 animate-fade-in px-0 md:px-0">
+        <div className="text-center mb-10 animate-fade-in px-0 md:px-0">
           <Badge className="mb-4 bg-success/10 text-success border-success/20">
             <span aria-hidden="true">{showPastMatches ? '📜' : '🎯'}</span> {showPastMatches ? 'Match History' : 'Live Match Finder'}
           </Badge>
-          <h2 id="match-finder-heading" className="text-4xl md:text-5xl font-bold mb-6 text-foreground">
+          <h2 id="match-finder-heading" className="text-3xl md:text-4xl font-bold mb-4 text-foreground tracking-tight">
             {showPastMatches ? 'Your Past Matches' : 'Find Your Perfect Match'}
           </h2>
           {showPastMatches && (
