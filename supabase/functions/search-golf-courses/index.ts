@@ -368,11 +368,14 @@ async function queryOpenStreetMap(
 
   return data.map((place: any) => {
     const displayName = place.display_name || '';
+    const addr = place.address || {};
+    const stateRaw = addr.state || addr['ISO3166-2-lvl4'] || null;
     return {
       name: displayName.split(',')[0] || place.name || 'Golf Course',
       address: displayName || 'Address not available',
       latitude: parseFloat(place.lat),
       longitude: parseFloat(place.lon),
+      state: stateRaw,
       searchText: `${displayName} ${place.type || ''} ${place.category || ''}`.toLowerCase(),
     };
   }).filter((course: GolfCourse & { searchText: string }) =>
