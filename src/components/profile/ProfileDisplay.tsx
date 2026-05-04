@@ -88,9 +88,8 @@ export function ProfileDisplay() {
             <h3 className="text-xl font-semibold truncate">
               {profile?.display_name || 'Anonymous Golfer'}
             </h3>
-            <div className="flex items-center gap-2 mt-1 min-w-0">
-              <Mail className="w-4 h-4 text-muted-foreground shrink-0" />
-              <span className="text-muted-foreground truncate">{user?.email}</span>
+            <div className="mt-1 min-w-0">
+              <span className="text-muted-foreground truncate block">{user?.email}</span>
             </div>
             <div className="mt-2">
               <Badge className={`${getMembershipColor(tierName)} inline-flex items-center gap-1 text-xs px-2 py-0.5`}>

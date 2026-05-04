@@ -282,16 +282,15 @@ export default function Profile() {
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
-                  size="sm"
+                  size="icon"
                   onClick={async () => {
                     await signOut();
                     navigate('/');
                   }}
                   aria-label="Log out"
-                  className="gap-2 shrink-0 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
+                  className="shrink-0 border-destructive text-destructive hover:bg-destructive hover:text-destructive-foreground"
                 >
                   <LogOut className="h-4 w-4" />
-                  <span className="hidden sm:inline">Log out</span>
                 </Button>
               </TooltipTrigger>
               <TooltipContent side="bottom">Log out</TooltipContent>
