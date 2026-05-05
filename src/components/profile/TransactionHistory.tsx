@@ -331,7 +331,7 @@ export function TransactionHistory() {
               );
             })}
 
-            {transactions.length > PAGE_SIZE && (
+            {filteredTransactions.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-3 pt-2">
                 <Button
                   type="button"
