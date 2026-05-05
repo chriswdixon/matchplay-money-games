@@ -37,7 +37,8 @@ export function ScrollProgress() {
 
   return (
     <div
-      className="fixed top-0 left-0 right-0 h-1 z-[60] pointer-events-none"
+      className="fixed left-0 right-0 h-1 z-[100] pointer-events-none"
+      style={{ top: "calc(env(safe-area-inset-top) * -1)" }}
       aria-hidden="true"
     >
       <div
