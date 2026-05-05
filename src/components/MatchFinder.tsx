@@ -1067,6 +1067,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           />
         </Suspense>
         
+        {/* Match Info Dialog (tee time, scorecard, payouts) */}
+        <Suspense fallback={null}>
+          <MatchInfoDialog
+            matchId={infoMatchId}
+            open={!!infoMatchId}
+            onOpenChange={(o) => !o && setInfoMatchId(null)}
+          />
+        </Suspense>
+
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (
           <div className="bg-muted rounded-2xl p-8 md:p-12">
