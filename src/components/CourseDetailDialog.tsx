@@ -198,22 +198,26 @@ const CourseDetailDialog = ({
             </div>
           )}
 
-          <div className="flex gap-2 pt-2">
-            {hasOpenMatch ? (
+          <div className="flex flex-col sm:flex-row gap-2 pt-2">
+            {hasOpenMatch && (
               <Button
                 className="flex-1 bg-success text-white font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
                 onClick={() => onJoinMatch(openMatches[0].id)}
               >
                 Join Match
               </Button>
-            ) : (
-              <Button
-                className="flex-1 bg-success text-success-foreground hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
-                onClick={() => onCreateMatch(detail || course)}
-              >
-                Create Match Here
-              </Button>
             )}
+            <Button
+              variant={hasOpenMatch ? "outline" : "default"}
+              className={
+                hasOpenMatch
+                  ? "flex-1"
+                  : "flex-1 bg-success text-success-foreground hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
+              }
+              onClick={() => onCreateMatch(detail || course)}
+            >
+              Create New Match
+            </Button>
           </div>
         </div>
       </DialogContent>
