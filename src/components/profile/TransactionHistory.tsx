@@ -176,6 +176,72 @@ export function TransactionHistory() {
   return (
     <div className="space-y-4">
       <TransactionHistoryHeader />
+
+      {transactions.length > 0 && (
+        <div className="rounded-xl border bg-muted/30 p-3 space-y-3">
+          <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger aria-label="Filter by type" className="h-9 text-sm">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {TYPE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={directionFilter} onValueChange={(v) => setDirectionFilter(v as typeof directionFilter)}>
+              <SelectTrigger aria-label="Filter by direction" className="h-9 text-sm">
+                <SelectValue placeholder="Direction" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Money in & out</SelectItem>
+                <SelectItem value="in">Money in (credits)</SelectItem>
+                <SelectItem value="out">Money out (debits)</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger aria-label="Filter by date range" className="h-9 text-sm">
+                <SelectValue placeholder="Date" />
+              </SelectTrigger>
+              <SelectContent>
+                {DATE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger aria-label="Sort by" className="h-9 text-sm">
+                <ArrowUpDown className="w-3.5 h-3.5 mr-1.5 opacity-60" aria-hidden="true" />
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span>
+              {filteredTransactions.length} of {transactions.length} transaction{transactions.length === 1 ? '' : 's'}
+            </span>
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-7 px-2 text-xs"
+              >
+                <X className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div>
         {transactions.length === 0 ? (
           <div className="text-center py-10 px-4 rounded-xl border border-dashed bg-muted/30">
