@@ -145,6 +145,7 @@ serve(async (req) => {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
     });
+  } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR in check-subscription", { message: errorMessage });
     const isAuth = errorMessage === "Authentication failed" || errorMessage === "No authorization header provided" || errorMessage === "User not authenticated";
