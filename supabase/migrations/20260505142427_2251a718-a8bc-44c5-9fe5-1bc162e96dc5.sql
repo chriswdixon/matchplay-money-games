@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.admin_resolve_incomplete_match(uuid, text, text) TO authenticated;
