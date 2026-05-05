@@ -65,6 +65,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
   const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
   const [pastFilters, setPastFilters] = useState({
     course: '',
     format: 'all',
