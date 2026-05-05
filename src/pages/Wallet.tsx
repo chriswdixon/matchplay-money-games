@@ -98,6 +98,9 @@ export default function Wallet() {
         onVerified={() => {
           setIsVerified(true);
           setShowPasswordDialog(false);
+          if (user) {
+            sessionStorage.setItem(`tyche-wallet-verified-${user.id}`, String(Date.now()));
+          }
         }}
         onCancel={() => {
           setShowPasswordDialog(false);
