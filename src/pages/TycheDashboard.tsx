@@ -74,27 +74,10 @@ const TycheDashboard = () => {
     }
   }, [searchParams, user]);
 
-  const navItems = useMemo(() => {
-    const items = [
-      { value: "matches", label: "Find Matches", icon: <Search className="w-4 h-4" /> },
-      { value: "past", label: "Past Matches", icon: <Trophy className="w-4 h-4" /> },
-      { value: "handicap", label: "Handicap", icon: <Trophy className="w-4 h-4" /> },
-    ];
-    if (hasActiveMatch) {
-      items.unshift({ value: "active-match", label: "Active Match", icon: <Target className="w-4 h-4" /> });
-    }
-    return items;
-  }, [hasActiveMatch]);
-
   const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap"];
   const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
     ? (currentTab as BottomTab)
     : "home";
-
-  const handleReturnToMatch = () => {
-    setCurrentTab("active-match");
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  };
 
   return (
     <div className="min-h-screen bg-muted/40 flex flex-col">
@@ -112,11 +95,30 @@ const TycheDashboard = () => {
             <div className="bg-card rounded-3xl p-4 shadow-card">
               <HomeProfileCard />
             </div>
-            <MyCurrentMatches />
-            <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
-            <div className="bg-card rounded-3xl p-4 shadow-card">
-              <NearbyCoursesWithMatches />
+
+            {/* Primary CTAs — orient new users with a single clear next action */}
+            <div className="grid grid-cols-2 gap-3">
+              <Button
+                size="lg"
+                onClick={() => navigate('/create-match')}
+                className="h-14 bg-gradient-primary text-primary-foreground hover:shadow-premium font-semibold"
+              >
+                <Plus className="w-5 h-5 mr-1" aria-hidden="true" />
+                Create Match
+              </Button>
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={() => setCurrentTab('matches')}
+                className="h-14 font-semibold border-2"
+              >
+                <Search className="w-5 h-5 mr-1" aria-hidden="true" />
+                Find Matches
+              </Button>
             </div>
+
+            <MyCurrentMatches />
+            <RecentlyPlayedCourses onSelect={() => setCurrentTab('matches')} />
             <RecentWins />
           </div>
         )}
