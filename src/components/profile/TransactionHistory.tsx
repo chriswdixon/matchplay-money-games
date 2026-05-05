@@ -13,6 +13,7 @@ export function TransactionHistory() {
   const { transactions, loading } = useAccountTransactions();
   const isMobile = useIsMobile();
   const [page, setPage] = useState(0);
+  const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
   const PAGE_SIZE = 3;
 
   const totalPages = isMobile
