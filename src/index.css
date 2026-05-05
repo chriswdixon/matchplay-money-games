@@ -215,7 +215,7 @@
 @layer utilities {
   /* Universal page card shell - matches Current/Past Matches card */
   .page-card-shell {
-    @apply rounded-3xl bg-card text-card-foreground p-4 md:p-6 shadow-card;
+    @apply rounded-3xl bg-white text-slate-900 p-4 md:p-6 shadow-card;
     /* Scope semantic tokens to light values so child components using
        text-muted-foreground / bg-muted / text-foreground stay legible
        on the white card regardless of the surrounding dark theme. */
