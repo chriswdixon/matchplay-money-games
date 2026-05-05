@@ -147,6 +147,11 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
         subscriptionEnd,
         loading,
         tierName,
+        status,
+        cancelAtPeriodEnd,
+        latestInvoiceStatus,
+        latestInvoiceAmountDue,
+        latestInvoiceHostedUrl,
         refreshSubscription: checkSubscription,
       }}
     >
