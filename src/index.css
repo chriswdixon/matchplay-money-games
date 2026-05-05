@@ -367,13 +367,24 @@
   [role="button"][class*="bg-success"]:not([aria-disabled="true"]):hover {
     box-shadow: 0 0 18px hsl(var(--success) / 0.6), 0 0 32px hsl(var(--success) / 0.3);
   }
-  /* Bottom tab bar: suppress rectangular glow on the button itself; glow the inner circle */
-  nav[aria-label="Primary"] button:hover {
+  /* Bottom tab bar: never apply rectangular glow to the button; always glow the inner circle */
+  nav[aria-label="Primary"] button,
+  nav[aria-label="Primary"] button:hover,
+  nav[aria-label="Primary"] button:focus,
+  nav[aria-label="Primary"] button:focus-visible,
+  nav[aria-label="Primary"] button:active,
+  nav[aria-label="Primary"] button[aria-current="page"] {
     box-shadow: none !important;
+    background-color: transparent !important;
   }
-  nav[aria-label="Primary"] button:hover > span:first-child {
-    box-shadow: 0 0 14px hsl(var(--primary) / 0.6), 0 0 26px hsl(var(--primary) / 0.3);
+  nav[aria-label="Primary"] button > span:first-child {
+    transition: box-shadow 0.25s ease, transform 0.15s ease;
     border-radius: 9999px;
+  }
+  nav[aria-label="Primary"] button:hover > span:first-child,
+  nav[aria-label="Primary"] button:focus-visible > span:first-child,
+  nav[aria-label="Primary"] button[aria-current="page"] > span:first-child {
+    box-shadow: 0 0 14px hsl(var(--primary) / 0.6), 0 0 26px hsl(var(--primary) / 0.3);
   }
 
   button[class*="bg-destructive"]:not(:disabled):hover,
