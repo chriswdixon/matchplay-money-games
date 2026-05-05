@@ -70,6 +70,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminRoute><AdminConsole /></AdminRoute>} />
             <Route path="/create-match" element={<CreateMatch />} />
+            <Route path="/match/:id" element={<MatchRedirect />} />
             
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
