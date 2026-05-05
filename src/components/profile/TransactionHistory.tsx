@@ -73,26 +73,54 @@ export function TransactionHistory() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-8">
-        <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="space-y-4" aria-busy="true" aria-live="polite">
+        <TransactionHistoryHeader />
+        <div className="space-y-3">
+          {Array.from({ length: 3 }).map((_, i) => (
+            <div
+              key={i}
+              className="flex items-center justify-between p-3 rounded-lg bg-muted/50"
+            >
+              <div className="flex items-center gap-3 flex-1">
+                <Skeleton className="w-9 h-9 rounded-lg" />
+                <div className="space-y-2 flex-1">
+                  <Skeleton className="h-3 w-32" />
+                  <Skeleton className="h-3 w-20" />
+                </div>
+              </div>
+              <Skeleton className="h-4 w-14" />
+            </div>
+          ))}
+        </div>
+        <span className="sr-only">Loading transactions…</span>
       </div>
     );
   }
 
   return (
     <div className="space-y-4">
-      <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
-        <div className="p-2 bg-gradient-primary rounded-lg">
-          <History className="w-5 h-5 text-primary-foreground" />
-        </div>
-        Transaction History
-      </h2>
+      <TransactionHistoryHeader />
       <div>
         {transactions.length === 0 ? (
-          <div className="text-center py-8 text-muted-foreground">
-            <History className="w-12 h-12 mx-auto mb-3 opacity-50" />
-            <p>No transactions yet</p>
-            <p className="text-sm mt-1">Your transaction history will appear here</p>
+          <div className="text-center py-10 px-4 rounded-xl border border-dashed bg-muted/30">
+            <div className="mx-auto w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mb-3">
+              <History className="w-6 h-6 text-primary" aria-hidden="true" />
+            </div>
+            <p className="font-semibold text-sm">No transactions yet</p>
+            <p className="text-xs text-muted-foreground mt-1 max-w-xs mx-auto">
+              Join or create a match to start tracking your entry fees, prizes, and refunds here.
+            </p>
+            <div className="flex flex-wrap justify-center gap-2 mt-4">
+              <Button asChild size="sm" className="rounded-full">
+                <Link to="/?tab=find">
+                  <Search className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                  Find a match
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="sm" className="rounded-full">
+                <Link to="/create-match">Create a match</Link>
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="space-y-3">
