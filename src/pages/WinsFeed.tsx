@@ -31,14 +31,6 @@ const WinsFeed = () => {
 
   return (
     <main className="app-page-bg pb-32 md:pb-12 md:pt-20">
-      <div className="max-w-2xl mx-auto px-4 pt-4">
-        <PageTitleCard
-          icon={<Trophy className="w-5 h-5" aria-hidden="true" />}
-          title="Wins Feed"
-          description="Recent victories from across the Tyche community"
-        />
-      </div>
-
       <section className="max-w-2xl mx-auto px-4 py-6 page-card-shell space-y-3 mt-4">
         {loading ? (
           <div className="space-y-3" aria-live="polite">

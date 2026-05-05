@@ -1,61 +1,57 @@
-
-import { Badge } from '@/components/ui/badge';
+import { useMemo, useState } from 'react';
+import { Button } from '@/components/ui/button';
 import { useAccountTransactions } from '@/hooks/useAccountTransactions';
-import { History, TrendingUp, TrendingDown, CreditCard, Trophy, XCircle, Ticket, Loader2, LogOut, Zap } from 'lucide-react';
+import { useIsMobile } from '@/hooks/use-mobile';
+import { History, TrendingDown, CreditCard, Trophy, Ticket, Loader2, LogOut, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 
 export function TransactionHistory() {
   const { transactions, loading } = useAccountTransactions();
+  const isMobile = useIsMobile();
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 3;
+
+  const totalPages = isMobile
+    ? Math.max(1, Math.ceil(transactions.length / PAGE_SIZE))
+    : 1;
+  const safePage = Math.min(page, totalPages - 1);
+  const visibleTransactions = useMemo(
+    () =>
+      isMobile
+        ? transactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
+        : transactions,
+    [transactions, isMobile, safePage],
+  );
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
-      case 'winning':
-        return <Trophy className="w-4 h-4" />;
-      case 'match_buyin':
-        return <CreditCard className="w-4 h-4" />;
-      case 'payout':
-        return <TrendingDown className="w-4 h-4" />;
-      case 'match_cancellation':
-        return <LogOut className="w-4 h-4" />;
-      case 'coupon':
-        return <Ticket className="w-4 h-4" />;
-      case 'double_down':
-        return <Zap className="w-4 h-4" />;
-      case 'subscription_charge':
-        return <CreditCard className="w-4 h-4" />;
-      default:
-        return <History className="w-4 h-4" />;
+      case 'winning': return <Trophy className="w-4 h-4" />;
+      case 'match_buyin': return <CreditCard className="w-4 h-4" />;
+      case 'payout': return <TrendingDown className="w-4 h-4" />;
+      case 'match_cancellation': return <LogOut className="w-4 h-4" />;
+      case 'coupon': return <Ticket className="w-4 h-4" />;
+      case 'double_down': return <Zap className="w-4 h-4" />;
+      case 'subscription_charge': return <CreditCard className="w-4 h-4" />;
+      default: return <History className="w-4 h-4" />;
     }
   };
 
-  const getTransactionColor = (type: string, amount: number) => {
-    // Color based on whether money was gained or lost
-    if (amount > 0) {
-      return 'text-success';
-    } else if (amount < 0) {
-      return 'text-destructive';
-    }
+  const getTransactionColor = (_type: string, amount: number) => {
+    if (amount > 0) return 'text-success';
+    if (amount < 0) return 'text-destructive';
     return 'text-muted-foreground';
   };
 
   const getTransactionLabel = (type: string) => {
     switch (type) {
-      case 'winning':
-        return 'Match Winnings';
-      case 'match_buyin':
-        return 'Match Buy-in';
-      case 'payout':
-        return 'Payout';
-      case 'match_cancellation':
-        return 'Left Match / Cancellation';
-      case 'subscription_charge':
-        return 'Subscription Fee';
-      case 'coupon':
-        return 'Coupon Credit';
-      case 'double_down':
-        return 'Double Down';
-      default:
-        return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+      case 'winning': return 'Match Winnings';
+      case 'match_buyin': return 'Match Buy-in';
+      case 'payout': return 'Payout';
+      case 'match_cancellation': return 'Left Match / Cancellation';
+      case 'subscription_charge': return 'Subscription Fee';
+      case 'coupon': return 'Coupon Credit';
+      case 'double_down': return 'Double Down';
+      default: return type.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
     }
   };
 
@@ -84,8 +80,7 @@ export function TransactionHistory() {
           </div>
         ) : (
           <div className="space-y-3">
-            {transactions.map((transaction) => {
-              // Amount is stored in cents, convert to dollars for display
+            {visibleTransactions.map((transaction) => {
               const amountInCents = parseFloat(transaction.amount.toString());
               const amountInDollars = amountInCents / 100;
               const isPositive = amountInCents > 0;
@@ -116,6 +111,45 @@ export function TransactionHistory() {
                 </div>
               );
             })}
+
+            {isMobile && transactions.length > PAGE_SIZE && (
+              <div className="flex items-center justify-center gap-3 pt-2">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={safePage === 0}
+                  aria-label="Previous page"
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                </Button>
+                <div className="flex items-center gap-1.5" aria-hidden="true">
+                  {Array.from({ length: totalPages }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={
+                        i === safePage
+                          ? 'w-2 h-2 rounded-full bg-primary'
+                          : 'w-2 h-2 rounded-full bg-muted-foreground/30'
+                      }
+                    />
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={safePage >= totalPages - 1}
+                  aria-label="Next page"
+                  className="h-8 w-8"
+                >
+                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                </Button>
+              </div>
+            )}
           </div>
         )}
       </div>
