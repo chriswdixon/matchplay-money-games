@@ -103,7 +103,7 @@ export default function Profile() {
 
   const allTabs: { id: TabId; label: string; Icon: typeof User; show: boolean; badge?: number }[] = [
     { id: 'profile', label: 'Profile & Handicap', Icon: User, show: true },
-    { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: showAccountTab },
+    { id: 'account', label: 'Account & Subscription', Icon: DollarSign, show: false },
     { id: 'notifications', label: 'Notifications', Icon: Bell, show: true, badge: unreadCount },
     { id: 'settings', label: 'Settings', Icon: Settings, show: true },
   ];
