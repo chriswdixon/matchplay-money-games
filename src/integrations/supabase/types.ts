@@ -1437,6 +1437,22 @@ export type Database = {
         }
         Returns: string
       }
+      credit_player_balance: {
+        Args: { _amount: number; _user_id: string }
+        Returns: {
+          balance: number
+          id: string
+          user_id: string
+        }[]
+      }
+      debit_player_balance: {
+        Args: { _amount: number; _user_id: string }
+        Returns: {
+          balance: number
+          id: string
+          user_id: string
+        }[]
+      }
       finalize_match_results: { Args: { p_match_id: string }; Returns: boolean }
       flag_incomplete_matches: { Args: never; Returns: number }
       get_match_creator_info: {
