@@ -207,7 +207,7 @@ serve(async (req) => {
             customerId = customer.id;
           }
 
-          // Create payment intent
+          // Create payment intent (idempotent per match+user to prevent double-charge on retries)
           const paymentIntent = await stripe.paymentIntents.create({
             amount: requiredAmount,
             currency: 'usd',
@@ -223,6 +223,8 @@ serve(async (req) => {
               enabled: true,
               allow_redirects: 'never'
             }
+          }, {
+            idempotencyKey: `double_down_${matchId}_${participant.user_id}`
           });
 
           if (paymentIntent.status !== 'succeeded') {
