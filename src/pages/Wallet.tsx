@@ -62,13 +62,13 @@ export default function Wallet() {
       >
         {isVerified ? (
           <div className="space-y-6">
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <AccountBalance />
             </div>
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <TransactionHistory />
             </div>
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <SubscriptionManagement
                 isVerified={isVerified}
                 onRequestVerification={() => setShowPasswordDialog(true)}
@@ -76,7 +76,7 @@ export default function Wallet() {
             </div>
           </div>
         ) : (
-          <div className="bg-card rounded-3xl p-6 md:p-8 shadow-card text-center text-muted-foreground">
+          <div className="page-card-shell text-center text-muted-foreground">
             Please verify your password to view your wallet and subscription.
           </div>
         )}

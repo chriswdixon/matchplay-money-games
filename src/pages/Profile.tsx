@@ -307,13 +307,13 @@ export default function Profile() {
         <div className="space-y-6">
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card space-y-6">
+              <div className="page-card-shell space-y-6">
                 <ProfileDisplay />
                 <div className="border-t pt-6">
                   <ProfileForm />
                 </div>
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
                   <HandicapSettings />
                 </Suspense>
@@ -323,13 +323,13 @@ export default function Profile() {
 
           {activeTab === 'account' && showAccountTab && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <AccountBalance />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <TransactionHistory />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <SubscriptionManagement
                   isVerified={isVerified}
                   onRequestVerification={() => setShowPasswordDialog(true)}
@@ -339,23 +339,23 @@ export default function Profile() {
           )}
 
           {activeTab === 'notifications' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <NotificationsPanel />
             </div>
           )}
 
           {activeTab === 'settings' && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <AppearanceSettings />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <ChangePassword />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <MFASettings />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <GDPRSettings />
               </div>
             </div>

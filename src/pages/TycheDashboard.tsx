@@ -92,7 +92,7 @@ const TycheDashboard = () => {
 
         {currentTab === "home" && (
           <div className="space-y-6">
-            <div className="bg-card rounded-3xl p-4 shadow-card">
+            <div className="page-card-shell">
               <HomeProfileCard />
             </div>
 
@@ -124,7 +124,7 @@ const TycheDashboard = () => {
         )}
 
         {currentTab === "matches" && (
-          <div className="bg-card rounded-3xl p-4 shadow-card">
+          <div className="page-card-shell">
             <h2 className="text-2xl font-bold mb-4">Find Matches & Courses</h2>
             <NearbyCoursesWithMatches />
           </div>
