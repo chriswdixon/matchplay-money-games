@@ -23,7 +23,9 @@ const RecentWins = () => {
     >
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-background/15">
         <h2 id="recent-wins-heading" className="text-lg font-bold flex items-center gap-2">
-          <Trophy className="w-5 h-5" aria-hidden="true" />
+          <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-success text-white shrink-0">
+            <Trophy className="w-5 h-5" aria-hidden="true" />
+          </span>
           Recent Wins
         </h2>
         <button
