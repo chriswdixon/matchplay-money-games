@@ -201,7 +201,7 @@ const CourseDetailDialog = ({
           <div className="flex gap-2 pt-2">
             {hasOpenMatch ? (
               <Button
-                className="flex-1 bg-gradient-primary text-primary-foreground hover:shadow-[0_0_20px_hsl(var(--primary)/0.7)] transition-shadow"
+                className="flex-1 bg-success text-white font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
                 onClick={() => onJoinMatch(openMatches[0].id)}
               >
                 Join Match

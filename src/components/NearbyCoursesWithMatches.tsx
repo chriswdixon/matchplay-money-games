@@ -394,7 +394,7 @@ const NearbyCoursesWithMatches = () => {
                       e.stopPropagation();
                       handleViewMatch(openMatches[0].id);
                     }}
-                    className="shrink-0 bg-gradient-primary text-primary-foreground hover:shadow-[0_0_20px_hsl(var(--primary)/0.7)] transition-shadow"
+                    className="shrink-0 bg-success text-white font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
                   >
                     Join Match
                   </Button>
