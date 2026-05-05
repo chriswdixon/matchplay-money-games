@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle, Search, X, Filter } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle, Search, X, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -42,8 +42,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { location, formatDistance } = useLocation();
   const { hasAccess } = useFreeTier();
   const isMobile = useIsMobile();
-  const [visibleCount, setVisibleCount] = useState(10);
-  const sentinelRef = useRef<HTMLDivElement | null>(null);
+  const MOBILE_PAGE_SIZE = 3;
+  const [page, setPage] = useState(0);
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
   const [ratingDialogOpen, setRatingDialogOpen] = useState(false);
@@ -278,28 +278,18 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
 
   const hasActivePastFilters = pastFilters.course !== '' || pastFilters.format !== 'all' || pastFilters.dateRange !== 'all';
 
-  // Mobile pagination: 10 at a time, infinite scroll
+  // Mobile pagination: 3 per page (matches Past Matches pattern)
   useEffect(() => {
-    setVisibleCount(10);
+    setPage(0);
   }, [filters, showPastMatches, matches.length]);
 
-  useEffect(() => {
-    if (!isMobile) return;
-    const node = sentinelRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount((c) => Math.min(c + 10, filteredMatches.length));
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [isMobile, filteredMatches.length]);
-
-  const visibleMatches = isMobile ? filteredMatches.slice(0, visibleCount) : filteredMatches;
+  const totalPages = isMobile
+    ? Math.max(1, Math.ceil(filteredMatches.length / MOBILE_PAGE_SIZE))
+    : 1;
+  const safePage = Math.min(page, totalPages - 1);
+  const visibleMatches = isMobile
+    ? filteredMatches.slice(safePage * MOBILE_PAGE_SIZE, safePage * MOBILE_PAGE_SIZE + MOBILE_PAGE_SIZE)
+    : filteredMatches;
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
@@ -953,9 +943,42 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 })
               )}
             </div>
-            {isMobile && visibleCount < filteredMatches.length && (
-              <div ref={sentinelRef} className="py-6 text-center text-sm text-muted-foreground">
-                Loading more...
+            {isMobile && filteredMatches.length > MOBILE_PAGE_SIZE && (
+              <div className="flex items-center justify-center gap-3 pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  disabled={safePage === 0}
+                  aria-label="Previous page"
+                  className="h-8 w-8"
+                >
+                  <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+                </Button>
+                <div className="flex items-center gap-1.5" aria-hidden="true">
+                  {Array.from({ length: Math.min(totalPages, 8) }).map((_, i) => (
+                    <span
+                      key={i}
+                      className={
+                        i === safePage
+                          ? 'w-2 h-2 rounded-full bg-primary'
+                          : 'w-2 h-2 rounded-full bg-muted-foreground/30'
+                      }
+                    />
+                  ))}
+                </div>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="icon"
+                  onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  disabled={safePage >= totalPages - 1}
+                  aria-label="Next page"
+                  className="h-8 w-8"
+                >
+                  <ChevronRight className="w-4 h-4" aria-hidden="true" />
+                </Button>
               </div>
             )}
 
