@@ -214,6 +214,8 @@
   /* Premium Gradient Backgrounds */
   .bg-gradient-primary {
     background: var(--gradient-primary);
+    color: hsl(0 0% 100%);
+    font-weight: 700;
   }
   
   .bg-gradient-accent {
