@@ -75,7 +75,7 @@ function CourseHandicapForm({ onClose }: { onClose?: () => void }) {
       )}
 
       <div className="flex gap-3 pt-2">
-        <Button type="button" onClick={calculate} className="flex-1 bg-gradient-primary text-primary-foreground">
+        <Button type="button" onClick={calculate} className="flex-1 bg-success text-success-foreground hover:bg-success/90">
           Calculate
         </Button>
         <Button type="button" variant="outline" onClick={reset}>Reset</Button>
@@ -149,7 +149,7 @@ function PlayingHandicapForm({ onClose }: { onClose?: () => void }) {
       )}
 
       <div className="flex gap-3 pt-2">
-        <Button type="button" onClick={calculate} className="flex-1 bg-gradient-primary text-primary-foreground">
+        <Button type="button" onClick={calculate} className="flex-1 bg-success text-success-foreground hover:bg-success/90">
           Calculate
         </Button>
         <Button type="button" variant="outline" onClick={reset}>Reset</Button>

@@ -67,7 +67,7 @@ export function ProfileDisplay() {
         <div className="p-2 bg-gradient-primary rounded-lg">
           <User className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
         </div>
-        <h2 className="text-lg font-semibold leading-none">Profile Overview</h2>
+        <h2 className="text-lg font-semibold leading-none">Profile</h2>
       </div>
       <div className="space-y-6">
         {/* Profile Header */}

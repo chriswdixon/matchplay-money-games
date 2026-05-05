@@ -164,13 +164,6 @@ export default function Profile() {
     <div className="app-page-bg flex flex-col">
       <a href="#profile-main" className="skip-link">Skip to main content</a>
 
-      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
-        <PageTitleCard
-          icon={<User className="w-5 h-5" aria-hidden="true" />}
-          title="Profile"
-        />
-      </header>
-
       <AlertDialog open={adminConfirmOpen} onOpenChange={setAdminConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
@@ -206,10 +199,8 @@ export default function Profile() {
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="page-card-shell space-y-6">
-                <ProfileDisplay />
-
-                {/* Action row — moved out of header into the Profile card */}
-                <div className="flex flex-wrap items-center gap-2 pt-4 border-t">
+                {/* Action row at top of Profile card */}
+                <div className="flex flex-wrap items-center gap-2 pb-4 border-b">
                   {hasActiveMatch && (
                     <Button
                       variant="default"
@@ -265,6 +256,8 @@ export default function Profile() {
                     </Button>
                   </div>
                 </div>
+
+                <ProfileDisplay />
 
                 <div className="border-t pt-6">
                   <ProfileForm />
