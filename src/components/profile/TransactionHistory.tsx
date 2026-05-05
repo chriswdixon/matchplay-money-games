@@ -90,10 +90,26 @@ export function TransactionHistory() {
               const amountInDollars = amountInCents / 100;
               const isPositive = amountInCents > 0;
 
+              const hasMatch = !!transaction.match_id;
+              const handleOpen = () => hasMatch && setInfoMatchId(transaction.match_id!);
               return (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className={`flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors ${hasMatch ? 'cursor-pointer' : ''}`}
+                  onClick={hasMatch ? handleOpen : undefined}
+                  role={hasMatch ? 'button' : undefined}
+                  tabIndex={hasMatch ? 0 : undefined}
+                  onKeyDown={
+                    hasMatch
+                      ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleOpen();
+                          }
+                        }
+                      : undefined
+                  }
+                  aria-label={hasMatch ? 'View match details' : undefined}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${isPositive ? 'bg-success/10' : 'bg-destructive/10'}`}>
