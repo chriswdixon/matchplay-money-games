@@ -58,7 +58,18 @@ const TIER_META: Record<
 type ConfirmAction = null | 'change' | 'cancel';
 
 export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
-  const { tierName, loading, subscriptionEnd, productId, refreshSubscription } = useSubscription();
+  const {
+    tierName,
+    loading,
+    subscriptionEnd,
+    productId,
+    refreshSubscription,
+    status,
+    cancelAtPeriodEnd,
+    latestInvoiceStatus,
+    latestInvoiceAmountDue,
+    latestInvoiceHostedUrl,
+  } = useSubscription();
   const { session } = useAuth();
   const [manageOpen, setManageOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
