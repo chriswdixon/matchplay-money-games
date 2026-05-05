@@ -1,14 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, Suspense, lazy } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAccountTransactions } from '@/hooks/useAccountTransactions';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { History, TrendingDown, CreditCard, Trophy, Ticket, Loader2, LogOut, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
 
+const MatchInfoDialog = lazy(() =>
+  import('@/components/MatchInfoDialog').then((m) => ({ default: m.MatchInfoDialog })),
+);
+
 export function TransactionHistory() {
   const { transactions, loading } = useAccountTransactions();
   const isMobile = useIsMobile();
   const [page, setPage] = useState(0);
+  const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
   const PAGE_SIZE = 3;
 
   const totalPages = isMobile
@@ -85,10 +90,26 @@ export function TransactionHistory() {
               const amountInDollars = amountInCents / 100;
               const isPositive = amountInCents > 0;
 
+              const hasMatch = !!transaction.match_id;
+              const handleOpen = () => hasMatch && setInfoMatchId(transaction.match_id!);
               return (
                 <div
                   key={transaction.id}
-                  className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className={`flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors ${hasMatch ? 'cursor-pointer' : ''}`}
+                  onClick={hasMatch ? handleOpen : undefined}
+                  role={hasMatch ? 'button' : undefined}
+                  tabIndex={hasMatch ? 0 : undefined}
+                  onKeyDown={
+                    hasMatch
+                      ? (e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            handleOpen();
+                          }
+                        }
+                      : undefined
+                  }
+                  aria-label={hasMatch ? 'View match details' : undefined}
                 >
                   <div className="flex items-center gap-3">
                     <div className={`p-2 rounded-lg ${isPositive ? 'bg-success/10' : 'bg-destructive/10'}`}>
@@ -153,6 +174,13 @@ export function TransactionHistory() {
           </div>
         )}
       </div>
+      <Suspense fallback={null}>
+        <MatchInfoDialog
+          matchId={infoMatchId}
+          open={!!infoMatchId}
+          onOpenChange={(o) => !o && setInfoMatchId(null)}
+        />
+      </Suspense>
     </div>
   );
 }

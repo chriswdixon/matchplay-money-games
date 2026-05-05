@@ -32,6 +32,7 @@ const PinEntryDialog = lazy(() => import("./PinEntryDialog").then(m => ({ defaul
 const TeamJoinDialog = lazy(() => import("./TeamJoinDialog").then(m => ({ default: m.TeamJoinDialog })));
 const MatchPinManagement = lazy(() => import("./MatchPinManagement").then(m => ({ default: m.MatchPinManagement })));
 const JoinMatchConfirmDialog = lazy(() => import("./JoinMatchConfirmDialog"));
+const MatchInfoDialog = lazy(() => import("./MatchInfoDialog").then(m => ({ default: m.MatchInfoDialog })));
 
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
@@ -64,6 +65,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
   const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
   const [pastFilters, setPastFilters] = useState({
     course: '',
     format: 'all',
@@ -741,7 +743,19 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         </Badge>
                       )}
                       
-                      <CardHeader className="pb-4">
+                      <CardHeader
+                        className="pb-4 cursor-pointer"
+                        onClick={() => setInfoMatchId(match.id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setInfoMatchId(match.id);
+                          }
+                        }}
+                        aria-label={`View details for ${match.course_name}`}
+                      >
                         <CardTitle className="text-lg font-semibold text-foreground line-clamp-1">
                           {match.course_name}
                         </CardTitle>
@@ -1053,6 +1067,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           />
         </Suspense>
         
+        {/* Match Info Dialog (tee time, scorecard, payouts) */}
+        <Suspense fallback={null}>
+          <MatchInfoDialog
+            matchId={infoMatchId}
+            open={!!infoMatchId}
+            onOpenChange={(o) => !o && setInfoMatchId(null)}
+          />
+        </Suspense>
+
         {/* How It Works - Only show when not hidden */}
         {!hideHowItWorks && (
           <div className="bg-muted rounded-2xl p-8 md:p-12">
