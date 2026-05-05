@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Loader2, Plus, Navigation } from "lucide-react";
+import { Search, MapPin, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import LocationStatusBanner from "./LocationStatusBanner";
 
 type SearchMode = "matches" | "courses";
+const COURSE_PAGE_SIZE = 5;
 
 interface CourseOrMatchSearchProps {
   matchSearch: string;
@@ -21,6 +22,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
   const [mode, setMode] = useState<SearchMode>("matches");
   const [query, setQuery] = useState(matchSearch);
   const [courseResults, setCourseResults] = useState<GolfCourse[]>([]);
+  const [coursePage, setCoursePage] = useState(1);
   const [searched, setSearched] = useState(false);
   const { searchCoursesByName, searchNearbyCourses, loading } = useGolfCourses();
   const { location, requestLocation, error: locationError, loading: locationLoading } = useLocation();
@@ -72,7 +74,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     } else {
       results = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
     }
-    setCourseResults(results.slice(0, 12));
+    setCourseResults(results);
+    setCoursePage(1);
   };
 
   const handleModeChange = (value: string) => {
@@ -80,6 +83,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     setMode(value as SearchMode);
     setSearched(false);
     setCourseResults([]);
+    setCoursePage(1);
   };
 
   const handleCreateAtCourse = (course: GolfCourse) => {
@@ -93,14 +97,21 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
       latitude: course.latitude,
       longitude: course.longitude,
       website: course.website,
-      externalId: (course as any).externalId,
+      externalId: course.externalId,
       booking_url: course.website,
     };
     try {
       sessionStorage.setItem("tyche-prefilled-course", JSON.stringify(prefilledCourse));
-    } catch {}
+    } catch {
+      // Continue without session storage; navigation state still carries the course.
+    }
     navigate("/create-match", { state: { prefilledCourse } });
   };
+
+  const totalCoursePages = Math.max(1, Math.ceil(courseResults.length / COURSE_PAGE_SIZE));
+  const currentCoursePage = Math.min(coursePage, totalCoursePages);
+  const courseStartIndex = (currentCoursePage - 1) * COURSE_PAGE_SIZE;
+  const paginatedCourseResults = courseResults.slice(courseStartIndex, courseStartIndex + COURSE_PAGE_SIZE);
 
   return (
     <div className="space-y-3">
@@ -126,6 +137,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
+              setCoursePage(1);
               if (mode === "matches") onMatchSearchChange(e.target.value);
             }}
             placeholder={
@@ -154,8 +166,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
               No courses found. Try a different search.
             </p>
           )}
-          {courseResults.map((course, i) => (
-            <Card key={`${course.name}-${i}`} className="bg-foreground text-background border-foreground/20 rounded-2xl">
+          {paginatedCourseResults.map((course, i) => (
+            <Card key={`${course.name}-${courseStartIndex + i}`} className="bg-foreground text-background border-foreground/20 rounded-2xl">
               <CardContent className="p-3 flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">{course.name}</p>
@@ -179,6 +191,35 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
               </CardContent>
             </Card>
           ))}
+          {courseResults.length > COURSE_PAGE_SIZE && (
+            <nav className="flex items-center justify-between gap-3 pt-1" aria-label="Golf course results pagination">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCoursePage((page) => Math.max(1, page - 1))}
+                disabled={currentCoursePage === 1}
+                aria-label="Previous golf course results page"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                Previous
+              </Button>
+              <p className="text-sm font-medium text-muted-foreground" aria-live="polite">
+                {courseStartIndex + 1}-{Math.min(courseStartIndex + COURSE_PAGE_SIZE, courseResults.length)} of {courseResults.length}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCoursePage((page) => Math.min(totalCoursePages, page + 1))}
+                disabled={currentCoursePage === totalCoursePages}
+                aria-label="Next golf course results page"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </nav>
+          )}
           {!location && courseResults.length === 0 && !loading && (
             <>
               <Button
