@@ -140,6 +140,8 @@ const NearbyCoursesWithMatches = () => {
       let matched = results.filter((c) => matchesPrefix(c.name));
 
       if (matched.length === 0 && lower.length >= 3) {
+        // Explicit course-name search: ignore the radius filter so we surface
+        // matching courses anywhere in the country (user can still narrow by ZIP).
         const named = await searchCoursesByName(lower);
         matched = named
           .map((c) => ({
@@ -150,12 +152,7 @@ const NearbyCoursesWithMatches = () => {
                 ? distanceMi(origin.latitude, origin.longitude, c.latitude, c.longitude)
                 : undefined),
           }))
-          .filter(
-            (c) =>
-              matchesPrefix(c.name) &&
-              c.distance !== undefined &&
-              c.distance <= r,
-          );
+          .filter((c) => matchesPrefix(c.name));
       }
       results = matched;
     }
