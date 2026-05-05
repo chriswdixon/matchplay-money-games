@@ -41,7 +41,7 @@ const FAQ = lazy(() => import("./pages/FAQ"));
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
   <div className="min-h-screen flex items-center justify-center bg-background">
-    <GolfBallLoader size={64} />
+    <GolfBallLoader size={64} showBrand />
   </div>
 );
 

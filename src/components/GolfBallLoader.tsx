@@ -11,7 +11,7 @@ const GolfBallLoader = ({
   label = "Loading...",
   size = 56,
   className = "",
-  showBrand = true,
+  showBrand = false,
 }: GolfBallLoaderProps) => {
   // Hex-packed dimple grid – realistic golf ball pattern
   const dimples: Array<[number, number, number]> = [];
