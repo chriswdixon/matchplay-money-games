@@ -32,6 +32,7 @@ const PinEntryDialog = lazy(() => import("./PinEntryDialog").then(m => ({ defaul
 const TeamJoinDialog = lazy(() => import("./TeamJoinDialog").then(m => ({ default: m.TeamJoinDialog })));
 const MatchPinManagement = lazy(() => import("./MatchPinManagement").then(m => ({ default: m.MatchPinManagement })));
 const JoinMatchConfirmDialog = lazy(() => import("./JoinMatchConfirmDialog"));
+const MatchInfoDialog = lazy(() => import("./MatchInfoDialog").then(m => ({ default: m.MatchInfoDialog })));
 
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
