@@ -218,12 +218,9 @@
     @apply rounded-3xl bg-white text-slate-900 p-4 md:p-6 shadow-card;
   }
   .app-page-bg {
-    @apply min-h-screen text-slate-100;
+    @apply min-h-screen;
     background-color: hsl(220 14% 10%);
-    --card: 0 0% 100%;
-    --card-foreground: 220 15% 15%;
-    --muted: 220 10% 92%;
-    --muted-foreground: 220 10% 35%;
+    color: hsl(0 0% 95%);
   }
 
   /* Premium Gradient Backgrounds */
