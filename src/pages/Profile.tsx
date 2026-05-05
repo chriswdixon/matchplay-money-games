@@ -303,11 +303,6 @@ export default function Profile() {
                 </div>
               </div>
               <div className="page-card-shell">
-                <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
-                  <HandicapSettings />
-                </Suspense>
-              </div>
-              <div className="page-card-shell">
                 <SubscriptionCard
                   onManage={() => {
                     if (showAccountTab) {
@@ -317,6 +312,11 @@ export default function Profile() {
                     }
                   }}
                 />
+              </div>
+              <div className="page-card-shell">
+                <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
+                  <HandicapSettings />
+                </Suspense>
               </div>
             </div>
           )}
