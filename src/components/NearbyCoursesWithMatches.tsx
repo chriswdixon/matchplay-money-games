@@ -15,6 +15,12 @@ import { Slider } from "@/components/ui/slider";
 import LocationStatusBanner from "./LocationStatusBanner";
 
 const DEFAULT_RADIUS_MI = 30;
+// Slider position past the max means "Unlimited" — search anywhere.
+const UNLIMITED_RADIUS_POS = 101;
+const UNLIMITED_RADIUS_MI = 25_000; // > Earth's diameter in miles
+const isUnlimited = (r: number) => r >= UNLIMITED_RADIUS_POS;
+const effectiveRadius = (r: number) => (isUnlimited(r) ? UNLIMITED_RADIUS_MI : r);
+const radiusLabel = (r: number) => (isUnlimited(r) ? "∞" : String(r));
 
 const distanceMi = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 3959;
