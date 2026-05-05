@@ -164,13 +164,6 @@ export default function Profile() {
     <div className="app-page-bg flex flex-col">
       <a href="#profile-main" className="skip-link">Skip to main content</a>
 
-      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
-        <PageTitleCard
-          icon={<User className="w-5 h-5" aria-hidden="true" />}
-          title="Profile"
-        />
-      </header>
-
       <AlertDialog open={adminConfirmOpen} onOpenChange={setAdminConfirmOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
