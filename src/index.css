@@ -376,15 +376,23 @@
   nav[aria-label="Primary"] button[aria-current="page"] {
     box-shadow: none !important;
     background-color: transparent !important;
+    outline: none !important;
   }
   nav[aria-label="Primary"] button > span:first-child {
     transition: box-shadow 0.25s ease, transform 0.15s ease;
     border-radius: 9999px;
   }
   nav[aria-label="Primary"] button:hover > span:first-child,
-  nav[aria-label="Primary"] button:focus-visible > span:first-child,
   nav[aria-label="Primary"] button[aria-current="page"] > span:first-child {
     box-shadow: 0 0 14px hsl(var(--primary) / 0.6), 0 0 26px hsl(var(--primary) / 0.3);
+  }
+  /* Accessible keyboard focus: circular ring around the icon circle, no rectangular artifact */
+  nav[aria-label="Primary"] button:focus-visible > span:first-child {
+    box-shadow:
+      0 0 0 2px hsl(var(--background)),
+      0 0 0 4px hsl(var(--ring)),
+      0 0 14px hsl(var(--primary) / 0.6),
+      0 0 26px hsl(var(--primary) / 0.3);
   }
 
   button[class*="bg-destructive"]:not(:disabled):hover,
