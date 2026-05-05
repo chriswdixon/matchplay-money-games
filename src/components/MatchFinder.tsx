@@ -4,7 +4,10 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle, Search, X } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
@@ -56,6 +59,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
   const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [pastFilters, setPastFilters] = useState({
+    course: '',
+    format: 'all',
+    dateRange: 'all' as 'all' | '30d' | '90d' | '1y',
+  });
 
   // Refetch matches when location changes (with debouncing)
   useEffect(() => {
@@ -193,15 +201,48 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       });
     }
 
-    // Sort by scheduled_time - descending (newest first) for past matches
+    // Past matches: apply past-specific filters
     if (showPastMatches) {
-      filtered.sort((a, b) => 
+      if (pastFilters.course) {
+        const c = pastFilters.course.toLowerCase();
+        filtered = filtered.filter(m => m.course_name.toLowerCase().includes(c));
+      }
+      if (pastFilters.format !== 'all') {
+        filtered = filtered.filter(m => m.format === pastFilters.format);
+      }
+      if (pastFilters.dateRange !== 'all') {
+        const days = pastFilters.dateRange === '30d' ? 30 : pastFilters.dateRange === '90d' ? 90 : 365;
+        const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter(m => new Date(m.scheduled_time) >= cutoff);
+      }
+      filtered.sort((a, b) =>
         new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime()
       );
     }
 
     return filtered;
-  }, [matches, filters, showPastMatches]);
+  }, [matches, filters, showPastMatches, pastFilters]);
+
+  // Unique past courses for filter suggestions
+  const pastCourseOptions = useMemo(() => {
+    if (!showPastMatches) return [] as string[];
+    const set = new Set<string>();
+    matches.forEach(m => {
+      if ((m.status === 'completed' || m.status === 'cancelled') && m.course_name) set.add(m.course_name);
+    });
+    return Array.from(set).sort();
+  }, [matches, showPastMatches]);
+
+  const pastFormatOptions = useMemo(() => {
+    if (!showPastMatches) return [] as string[];
+    const set = new Set<string>();
+    matches.forEach(m => {
+      if ((m.status === 'completed' || m.status === 'cancelled') && m.format) set.add(m.format);
+    });
+    return Array.from(set).sort();
+  }, [matches, showPastMatches]);
+
+  const hasActivePastFilters = pastFilters.course !== '' || pastFilters.format !== 'all' || pastFilters.dateRange !== 'all';
 
   // Mobile pagination: 10 at a time, infinite scroll
   useEffect(() => {
@@ -400,6 +441,76 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
             onToggleFilters={() => setShowFilters(!showFilters)}
             hideSearch
           />
+        )}
+
+        {/* Past Matches Filters */}
+        {showPastMatches && user && (
+          <Card className="bg-muted/30 mb-4">
+            <CardContent className="pt-4">
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm">
+                    <Search className="h-4 w-4" /> Course
+                  </Label>
+                  <Input
+                    list="past-course-options"
+                    placeholder="Any course"
+                    value={pastFilters.course}
+                    onChange={(e) => setPastFilters({ ...pastFilters, course: e.target.value })}
+                  />
+                  <datalist id="past-course-options">
+                    {pastCourseOptions.map(c => <option key={c} value={c} />)}
+                  </datalist>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm">
+                    <Users className="h-4 w-4" /> Match Type
+                  </Label>
+                  <Select
+                    value={pastFilters.format}
+                    onValueChange={(v) => setPastFilters({ ...pastFilters, format: v })}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Any format" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any Format</SelectItem>
+                      {pastFormatOptions.map(f => (
+                        <SelectItem key={f} value={f}>{f.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4" /> Date Range
+                  </Label>
+                  <Select
+                    value={pastFilters.dateRange}
+                    onValueChange={(v) => setPastFilters({ ...pastFilters, dateRange: v as typeof pastFilters.dateRange })}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Any time" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Time</SelectItem>
+                      <SelectItem value="30d">Last 30 days</SelectItem>
+                      <SelectItem value="90d">Last 90 days</SelectItem>
+                      <SelectItem value="1y">Last year</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-muted-foreground">{filteredMatches.length} match{filteredMatches.length === 1 ? '' : 'es'}</p>
+                {hasActivePastFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPastFilters({ course: '', format: 'all', dateRange: 'all' })}
+                  >
+                    <X className="h-4 w-4 mr-1" /> Clear
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         )}
 
         {/* Incomplete Matches Section */}
