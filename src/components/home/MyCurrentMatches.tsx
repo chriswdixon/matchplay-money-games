@@ -43,7 +43,7 @@ const MyCurrentMatches = () => {
   return (
     <section
       aria-labelledby="current-matches-heading"
-      className="rounded-3xl bg-card text-card-foreground p-4 md:p-6 shadow-card"
+      className="rounded-3xl bg-muted dark:bg-white text-foreground dark:text-slate-900 p-4 md:p-6 shadow-card"
     >
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
         <h2
