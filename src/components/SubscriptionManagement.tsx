@@ -61,16 +61,23 @@ const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementPr
     <div className="space-y-8">
       {/* Current Subscription */}
       <div className="space-y-4">
-        <div className="flex items-center justify-between gap-3">
-          <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-            Current Subscription
-            {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
-            {isLocalTier && <Star className="w-5 h-5 text-primary" />}
-            {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
-            <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
-              {tierName}
-            </Badge>
-          </h2>
+        <div className="flex flex-wrap items-start justify-between gap-3">
+          <div className="space-y-1">
+            <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+              Your Membership
+              {isFreeTier && <Zap className="w-5 h-5 text-muted-foreground" />}
+              {isLocalTier && <Star className="w-5 h-5 text-primary" />}
+              {isTournamentTier && <Crown className="w-5 h-5 text-accent" />}
+              <Badge className={isFreeTier ? "bg-muted-foreground/20 text-foreground" : (isLocalTier ? "bg-primary/10 text-foreground" : "bg-accent/10 text-foreground")}>
+                {tierName}
+              </Badge>
+            </h2>
+            <p className="text-sm text-muted-foreground">
+              {isFreeTier && "You're on the free plan. Upgrade to unlock GPS matching and more."}
+              {isLocalTier && "You have access to GPS matching, advanced handicaps, and instant payouts."}
+              {isTournamentTier && "You have full access — tournaments, leaderboards, and premium support."}
+            </p>
+          </div>
           {!isTournamentTier && (
             <Button
               size="sm"
@@ -78,37 +85,38 @@ const SubscriptionManagement = ({ isVerified = false }: SubscriptionManagementPr
               className="gap-2"
             >
               <ArrowUpCircle className="w-4 h-4" aria-hidden="true" />
-              Upgrade
+              {isFreeTier ? 'Upgrade Plan' : 'Upgrade to Pro'}
             </Button>
           )}
         </div>
-        <ul className="space-y-2">
-          {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
-            <li key={idx} className="flex items-center gap-2 text-sm text-muted-foreground">
-              <CheckCircle className="w-4 h-4 text-accent" />
-              {feature}
-            </li>
-          ))}
-        </ul>
+        <div>
+          <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">What's included</p>
+          <ul className="space-y-2">
+            {(tierFeatures[tierName as keyof typeof tierFeatures] || tierFeatures['Free']).map((feature, idx) => (
+              <li key={idx} className="flex items-start gap-2 text-sm text-foreground">
+                <CheckCircle className="w-4 h-4 text-accent mt-0.5 shrink-0" />
+                <span>{feature}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
 
       {/* Play Money Info */}
-      <div className="space-y-4">
-        <div>
-          <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
-            <Wallet className="w-5 h-5 text-primary" />
-            Play Money System
-          </h2>
-          
-        </div>
+      <div className="space-y-3">
+        <h2 className="flex items-center gap-2 text-lg font-semibold leading-none tracking-tight">
+          <Wallet className="w-5 h-5 text-primary" />
+          How Play Money Works
+        </h2>
         <div className="p-4 bg-muted/50 rounded-lg space-y-3">
           <p className="text-sm text-muted-foreground">
-            All matches use <strong>play money</strong> instead of real currency. New accounts start with $500 in play money.
+            Tyche is 100% play money — no real currency changes hands. Every new account starts with{' '}
+            <strong className="text-foreground">$500</strong> to enter matches.
           </p>
-          <ul className="space-y-1 text-sm text-muted-foreground list-disc list-inside">
-            <li>Match buy-ins are deducted from your balance</li>
-            <li>Win matches to earn more play money</li>
-            <li>Climb the leaderboard by accumulating winnings</li>
+          <ul className="space-y-1.5 text-sm text-muted-foreground list-disc list-inside marker:text-primary">
+            <li>Entry fees are held until the match finishes</li>
+            <li>Winners take the prize pool — losses come out of your balance</li>
+            <li>Climb the leaderboard by stacking wins over time</li>
           </ul>
         </div>
       </div>
