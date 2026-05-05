@@ -79,7 +79,7 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
     : null;
 
   return (
-    <div className={`rounded-3xl ${meta.bgClass} ${meta.fgClass} p-4 md:p-6 shadow-card space-y-4 transition-colors`}>
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 rounded-lg shrink-0 bg-success text-success-foreground">
@@ -91,33 +91,33 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-2 flex-wrap">
-              <h3 className={`text-base font-semibold leading-none ${meta.fgClass}`}>{currentTier}</h3>
+              <h3 className="text-base font-semibold leading-none text-foreground">{currentTier}</h3>
               <Badge variant="secondary" className="text-[10px]">
                 {meta.isPaid ? 'Active' : 'Current plan'}
               </Badge>
             </div>
-            <p className={`text-xs mt-1 ${meta.mutedFgClass}`}>{meta.tagline}</p>
+            <p className="text-xs mt-1 text-muted-foreground">{meta.tagline}</p>
           </div>
         </div>
 
         {tierEntry && (
           <div className="text-right shrink-0">
-            <p className={`text-sm font-semibold ${meta.fgClass}`}>
+            <p className="text-sm font-semibold text-foreground">
               ${tierEntry.price}
-              <span className={`text-xs font-normal ${meta.mutedFgClass}`}>/{tierEntry.interval}</span>
+              <span className="text-xs font-normal text-muted-foreground">/{tierEntry.interval}</span>
             </p>
             {renewLabel && (
-              <p className={`text-[11px] mt-0.5 ${meta.mutedFgClass}`}>{renewLabel}</p>
+              <p className="text-[11px] mt-0.5 text-muted-foreground">{renewLabel}</p>
             )}
           </div>
         )}
       </div>
 
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
-        <ul className={`text-xs space-y-1.5 flex-1 ${meta.mutedFgClass}`}>
+        <ul className="text-xs space-y-1.5 flex-1 text-muted-foreground">
           {meta.perks.map((perk) => (
             <li key={perk} className="flex items-center gap-2">
-              <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${meta.bulletClass}`} aria-hidden="true" />
+              <span className="w-1.5 h-1.5 rounded-full shrink-0 bg-success" aria-hidden="true" />
               {perk}
             </li>
           ))}
@@ -126,11 +126,7 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
         <Button
           onClick={onManage}
           size="sm"
-          className={
-            meta.isPaid
-              ? 'w-full sm:w-auto sm:ml-auto bg-background text-foreground hover:bg-background/90 transition-all duration-300'
-              : 'w-full sm:w-auto sm:ml-auto bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300'
-          }
+          className="w-full sm:w-auto sm:ml-auto bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
         >
           {meta.isPaid ? 'Manage subscription' : 'Upgrade plan'}
         </Button>

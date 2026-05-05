@@ -302,15 +302,17 @@ export default function Profile() {
                   <ProfileForm />
                 </div>
               </div>
-              <SubscriptionCard
-                onManage={() => {
-                  if (showAccountTab) {
-                    handleTabChange('account');
-                  } else {
-                    navigate('/?tab=subscription');
-                  }
-                }}
-              />
+              <div className="page-card-shell">
+                <SubscriptionCard
+                  onManage={() => {
+                    if (showAccountTab) {
+                      handleTabChange('account');
+                    } else {
+                      navigate('/?tab=subscription');
+                    }
+                  }}
+                />
+              </div>
               <div className="page-card-shell">
                 <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
                   <HandicapSettings />
