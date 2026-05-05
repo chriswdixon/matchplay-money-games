@@ -1,5 +1,5 @@
 import GolfBallLoader from "@/components/GolfBallLoader";
-import { lazy, Suspense, useEffect, useState, useMemo } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import { Search, Trophy, Target, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
