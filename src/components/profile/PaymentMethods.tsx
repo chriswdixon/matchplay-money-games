@@ -11,9 +11,6 @@ export function PaymentMethods() {
           </div>
           Play Money
         </CardTitle>
-        <CardDescription>
-          Your account uses play money for matches
-        </CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">

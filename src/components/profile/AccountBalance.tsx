@@ -24,9 +24,6 @@ export function AccountBalance() {
           </div>
           Play Money Balance
         </h2>
-        <p className="text-sm text-muted-foreground pl-12">
-          Your current spendable balance for entry fees and prizes.
-        </p>
       </div>
 
       {/* Balance Display */}
