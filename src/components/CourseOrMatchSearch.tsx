@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Loader2, Plus, Navigation } from "lucide-react";
+import { Search, MapPin, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
 import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import LocationStatusBanner from "./LocationStatusBanner";
 
 type SearchMode = "matches" | "courses";
+const COURSE_PAGE_SIZE = 5;
 
 interface CourseOrMatchSearchProps {
   matchSearch: string;
@@ -21,6 +22,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
   const [mode, setMode] = useState<SearchMode>("matches");
   const [query, setQuery] = useState(matchSearch);
   const [courseResults, setCourseResults] = useState<GolfCourse[]>([]);
+  const [coursePage, setCoursePage] = useState(1);
   const [searched, setSearched] = useState(false);
   const { searchCoursesByName, searchNearbyCourses, loading } = useGolfCourses();
   const { location, requestLocation, error: locationError, loading: locationLoading } = useLocation();
@@ -72,7 +74,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     } else {
       results = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
     }
-    setCourseResults(results.slice(0, 12));
+    setCourseResults(results);
+    setCoursePage(1);
   };
 
   const handleModeChange = (value: string) => {
@@ -80,6 +83,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     setMode(value as SearchMode);
     setSearched(false);
     setCourseResults([]);
+    setCoursePage(1);
   };
 
   const handleCreateAtCourse = (course: GolfCourse) => {
@@ -101,6 +105,11 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     } catch {}
     navigate("/create-match", { state: { prefilledCourse } });
   };
+
+  const totalCoursePages = Math.max(1, Math.ceil(courseResults.length / COURSE_PAGE_SIZE));
+  const currentCoursePage = Math.min(coursePage, totalCoursePages);
+  const courseStartIndex = (currentCoursePage - 1) * COURSE_PAGE_SIZE;
+  const paginatedCourseResults = courseResults.slice(courseStartIndex, courseStartIndex + COURSE_PAGE_SIZE);
 
   return (
     <div className="space-y-3">
