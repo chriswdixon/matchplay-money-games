@@ -39,6 +39,7 @@ const CreateMatch = () => {
 
   const [currentStep, setCurrentStep] = useState(1);
   const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
+  const [incompleteMatchId, setIncompleteMatchId] = useState<string | null>(null);
   const [checkingIncomplete, setCheckingIncomplete] = useState(true);
   const [formData, setFormData] = useState({
     course_name: '',
