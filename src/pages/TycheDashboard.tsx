@@ -115,11 +115,11 @@ const TycheDashboard = () => {
             <div className="bg-card rounded-3xl p-4 shadow-card">
               <HomeProfileCard />
             </div>
+            <MyCurrentMatches />
             <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
             <div className="bg-card rounded-3xl p-4 shadow-card">
               <NearbyCoursesWithMatches />
             </div>
-            <MyCurrentMatches />
             <RecentWins />
           </div>
         )}
