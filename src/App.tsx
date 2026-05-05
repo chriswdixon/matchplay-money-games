@@ -27,7 +27,7 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const AdminConsole = lazy(() => import("./pages/AdminConsole"));
 import { AdminRoute } from "./components/auth/AdminRoute";
 const CreateMatch = lazy(() => import("./pages/CreateMatch"));
-const MatchRedirect = lazy(() => import("./pages/MatchRedirect"));
+const MatchDetails = lazy(() => import("./pages/MatchDetails"));
 const VerifyEmail = lazy(() => import("./pages/VerifyEmail"));
 const VerifyAge = lazy(() => import("./pages/VerifyAge"));
 
@@ -71,7 +71,7 @@ const App = () => (
             <Route path="/profile" element={<Profile />} />
             <Route path="/admin" element={<AdminRoute><AdminConsole /></AdminRoute>} />
             <Route path="/create-match" element={<CreateMatch />} />
-            <Route path="/match/:id" element={<MatchRedirect />} />
+            <Route path="/match/:id" element={<MatchDetails />} />
             
             <Route path="/terms" element={<Terms />} />
             <Route path="/privacy" element={<Privacy />} />
