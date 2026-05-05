@@ -171,7 +171,7 @@ const TycheLanding = () => {
       : "home";
 
     return (
-      <div className="min-h-screen bg-muted/40 flex flex-col">
+      <div className="app-page-bg flex flex-col">
         {/* WCAG 2.1 AA - Skip to main content link */}
         <a href="#main-content" className="skip-link">
           Skip to main content

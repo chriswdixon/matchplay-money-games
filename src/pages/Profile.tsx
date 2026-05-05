@@ -71,7 +71,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/40">
+      <div className="app-page-bg flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -161,7 +161,7 @@ export default function Profile() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/40 flex flex-col">
+    <div className="app-page-bg flex flex-col">
       <a href="#profile-main" className="skip-link">Skip to main content</a>
 
       <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
