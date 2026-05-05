@@ -110,7 +110,7 @@ const TycheDashboard = () => {
                 size="lg"
                 variant="outline"
                 onClick={() => setCurrentTab('matches')}
-                className="h-14 font-semibold border-2"
+                className="h-14 font-semibold border-2 border-success text-success hover:bg-success hover:text-success-foreground"
               >
                 <Search className="w-5 h-5 mr-1" aria-hidden="true" />
                 Find Matches
