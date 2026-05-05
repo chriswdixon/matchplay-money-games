@@ -264,6 +264,23 @@ export function TransactionHistory() {
               </Button>
             </div>
           </div>
+        ) : filteredTransactions.length === 0 ? (
+          <div className="text-center py-8 px-4 rounded-xl border border-dashed bg-muted/30">
+            <p className="font-semibold text-sm">No transactions match your filters</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Try widening the date range or clearing the type filter.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="mt-3 rounded-full"
+            >
+              <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
+              Clear filters
+            </Button>
+          </div>
         ) : (
           <div className="space-y-3">
             {visibleTransactions.map((transaction) => {
