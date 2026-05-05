@@ -238,7 +238,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     }
 
     return filtered;
-  }, [matches, filters, showPastMatches, pastFilters]);
+  }, [matches, filters, showPastMatches, pastFilters, userHandicap, user?.id]);
 
   // Unique past courses for filter suggestions
   const pastCourseOptions = useMemo(() => {
