@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { toast } from "sonner";
 import { useLocation } from "@/hooks/useLocation";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import CreateMatchButton from "./CreateMatchButton";
@@ -34,6 +36,9 @@ const JoinMatchConfirmDialog = lazy(() => import("./JoinMatchConfirmDialog"));
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
+  const { profile } = useProfile();
+  const userHandicap = profile?.handicap !== null && profile?.handicap !== undefined ? Number(profile.handicap) : null;
+  const [requestedJoinIds, setRequestedJoinIds] = useState<Set<string>>(new Set());
   const { location, formatDistance } = useLocation();
   const { hasAccess } = useFreeTier();
   const isMobile = useIsMobile();
