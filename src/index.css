@@ -215,7 +215,12 @@
 @layer utilities {
   /* Universal page card shell - matches Current/Past Matches card */
   .page-card-shell {
-    @apply rounded-3xl bg-muted dark:bg-white text-foreground dark:text-slate-900 p-4 md:p-6 shadow-card;
+    @apply rounded-3xl bg-white text-slate-900 p-4 md:p-6 shadow-card;
+  }
+  .app-page-bg {
+    @apply min-h-screen;
+    background-color: hsl(220 14% 10%);
+    color: hsl(0 0% 95%);
   }
 
   /* Premium Gradient Backgrounds */

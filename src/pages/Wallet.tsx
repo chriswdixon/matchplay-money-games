@@ -35,7 +35,7 @@ export default function Wallet() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/40">
+      <div className="app-page-bg flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     );
@@ -44,7 +44,7 @@ export default function Wallet() {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-muted/40 flex flex-col">
+    <div className="app-page-bg flex flex-col">
       <a href="#wallet-main" className="skip-link">Skip to main content</a>
 
       <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
@@ -62,13 +62,13 @@ export default function Wallet() {
       >
         {isVerified ? (
           <div className="space-y-6">
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <AccountBalance />
             </div>
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <TransactionHistory />
             </div>
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <SubscriptionManagement
                 isVerified={isVerified}
                 onRequestVerification={() => setShowPasswordDialog(true)}
@@ -76,7 +76,7 @@ export default function Wallet() {
             </div>
           </div>
         ) : (
-          <div className="bg-card rounded-3xl p-6 md:p-8 shadow-card text-center text-muted-foreground">
+          <div className="page-card-shell text-center text-muted-foreground">
             Please verify your password to view your wallet and subscription.
           </div>
         )}

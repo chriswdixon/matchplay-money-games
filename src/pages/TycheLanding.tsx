@@ -171,7 +171,7 @@ const TycheLanding = () => {
       : "home";
 
     return (
-      <div className="min-h-screen bg-muted/40 flex flex-col">
+      <div className="app-page-bg flex flex-col">
         {/* WCAG 2.1 AA - Skip to main content link */}
         <a href="#main-content" className="skip-link">
           Skip to main content
@@ -194,13 +194,13 @@ const TycheLanding = () => {
 
           {currentTab === "home" && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 shadow-card">
+              <div className="page-card-shell">
                 <HomeProfileCard />
               </div>
 
               <RecentlyPlayedCourses onSelect={(name) => setSearchQuery(name)} />
 
-              <div className="bg-card rounded-3xl p-4 shadow-card">
+              <div className="page-card-shell">
                 <NearbyCoursesWithMatches />
               </div>
 
@@ -218,7 +218,7 @@ const TycheLanding = () => {
           {currentTab === "past" && (
             <div className="space-y-6">
               <MyCurrentMatches />
-              <div className="bg-card rounded-3xl p-4 shadow-card">
+              <div className="page-card-shell">
                 <h2 className="text-2xl font-bold mb-4 flex items-center gap-2">
                   <Trophy className="w-6 h-6 text-primary" aria-hidden="true" />
                   Past Matches

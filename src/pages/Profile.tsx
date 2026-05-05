@@ -71,7 +71,7 @@ export default function Profile() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-muted/40">
+      <div className="app-page-bg flex items-center justify-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
     );
@@ -120,8 +120,8 @@ export default function Profile() {
             : 'sticky top-4 mt-6 mb-8'
         )}
       >
-        <div className="mx-auto max-w-3xl pointer-events-auto">
-          <div className="flex items-center gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium overflow-x-auto scrollbar-hide justify-between">
+        <div className="mx-auto w-3/4 max-w-md pointer-events-auto">
+          <div className="flex items-center justify-around gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium border border-border">
             {tabs.map(({ id, label, Icon, badge }) => {
               const active = id === activeTab;
               return (
@@ -161,141 +161,39 @@ export default function Profile() {
   );
 
   return (
-    <div className="min-h-screen bg-muted/40 flex flex-col">
+    <div className="app-page-bg flex flex-col">
       <a href="#profile-main" className="skip-link">Skip to main content</a>
 
       <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
-        <div className="flex items-center gap-3">
-          {hasActiveMatch && (
-            <Button
-              variant="default"
-              size="sm"
-              onClick={() => navigate('/')}
-              className="gap-2"
-            >
-              <Target className="h-4 w-4" />
-              <span className="hidden sm:inline">Return to Active Match</span>
-              <span className="sm:hidden">Active Match</span>
-            </Button>
-          )}
-          {isAdmin && (
-            <TooltipProvider delayDuration={200}>
-              <Tooltip open={adminTooltipOpen} onOpenChange={setAdminTooltipOpen}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={(e) => {
-                      // On touch devices, first tap reveals the tooltip; second tap navigates.
-                      const isTouch =
-                        typeof window !== 'undefined' &&
-                        window.matchMedia('(hover: none)').matches;
-                      if (isTouch && !adminTooltipOpen) {
-                        e.preventDefault();
-                        setAdminTooltipOpen(true);
-                        return;
-                      }
-                      setAdminTooltipOpen(false);
-                      setAdminConfirmOpen(true);
-                    }}
-                    aria-label={
-                      openSupportCount > 0
-                        ? `Admin Portal — manage users, matches, and support. ${openSupportCount} open support request${openSupportCount === 1 ? '' : 's'}.`
-                        : 'Admin Portal — manage users, matches, and support.'
-                    }
-                    className="relative bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
-                  >
-                    <ShieldCheck className="h-4 w-4" />
-                    {openSupportCount > 0 && (
-                      <span
-                        aria-hidden="true"
-                        className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-background text-destructive border border-destructive text-[10px] font-bold leading-none flex items-center justify-center"
-                      >
-                        {openSupportCount > 99 ? '99+' : openSupportCount}
-                      </span>
-                    )}
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent side="bottom" className="max-w-[240px] text-center">
-                  <div className="font-semibold">Admin Portal</div>
-                  <div className="text-xs opacity-90">
-                    Manage users, matches, coupons, and support requests.
-                    {openSupportCount > 0 && (
-                      <> {openSupportCount} open support request{openSupportCount === 1 ? '' : 's'}.</>
-                    )}
-                  </div>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
-          )}
-          <AlertDialog open={adminConfirmOpen} onOpenChange={setAdminConfirmOpen}>
-            <AlertDialogContent>
-              <AlertDialogHeader>
-                <AlertDialogTitle>Enter Admin Console?</AlertDialogTitle>
-                <AlertDialogDescription>
-                  You're about to access the Admin Console, where you can manage users,
-                  matches, coupons, and support requests. All admin actions are logged.
-                </AlertDialogDescription>
-              </AlertDialogHeader>
-              <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
-                <AlertDialogAction
-                  onClick={() => {
-                    setAdminConfirmOpen(false);
-                    navigate('/admin');
-                  }}
-                  className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
-                >
-                  Continue to Admin
-                </AlertDialogAction>
-              </AlertDialogFooter>
-            </AlertDialogContent>
-          </AlertDialog>
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={() => setShowSupportDialog(true)}
-                  aria-label="Contact Support"
-                  className="bg-success text-success-foreground border-success hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-                >
-                  <LifeBuoy className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Contact Support</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-          <InstallPWAButton />
-          <div className="flex-1">
-            <PageTitleCard
-              icon={<User className="w-5 h-5" aria-hidden="true" />}
-              title="Profile"
-              
-            />
-          </div>
-          <TooltipProvider delayDuration={200}>
-            <Tooltip>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  onClick={async () => {
-                    await signOut();
-                    navigate('/');
-                  }}
-                  aria-label="Log out"
-                  className="shrink-0 bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90 hover:text-destructive-foreground"
-                >
-                  <LogOut className="h-4 w-4" />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent side="bottom">Log out</TooltipContent>
-            </Tooltip>
-          </TooltipProvider>
-        </div>
+        <PageTitleCard
+          icon={<User className="w-5 h-5" aria-hidden="true" />}
+          title="Profile"
+        />
       </header>
+
+      <AlertDialog open={adminConfirmOpen} onOpenChange={setAdminConfirmOpen}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Enter Admin Console?</AlertDialogTitle>
+            <AlertDialogDescription>
+              You're about to access the Admin Console, where you can manage users,
+              matches, coupons, and support requests. All admin actions are logged.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                setAdminConfirmOpen(false);
+                navigate('/admin');
+              }}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              Continue to Admin
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <main
         id="profile-main"
@@ -304,16 +202,75 @@ export default function Profile() {
       >
         <SectionTabs />
 
-        <div className="space-y-6">
+        <div className="space-y-6 mt-6">
           {activeTab === 'profile' && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card space-y-6">
+              <div className="page-card-shell space-y-6">
                 <ProfileDisplay />
+
+                {/* Action row — moved out of header into the Profile card */}
+                <div className="flex flex-wrap items-center gap-2 pt-4 border-t">
+                  {hasActiveMatch && (
+                    <Button
+                      variant="default"
+                      size="sm"
+                      onClick={() => navigate('/')}
+                      className="gap-2"
+                    >
+                      <Target className="h-4 w-4" />
+                      <span>Active Match</span>
+                    </Button>
+                  )}
+                  {isAdmin && (
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={() => setAdminConfirmOpen(true)}
+                      aria-label="Admin Portal"
+                      className="relative bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
+                    >
+                      <ShieldCheck className="h-4 w-4" />
+                      {openSupportCount > 0 && (
+                        <span
+                          aria-hidden="true"
+                          className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-background text-destructive border border-destructive text-[10px] font-bold leading-none flex items-center justify-center"
+                        >
+                          {openSupportCount > 99 ? '99+' : openSupportCount}
+                        </span>
+                      )}
+                    </Button>
+                  )}
+                  <Button
+                    variant="outline"
+                    size="icon"
+                    onClick={() => setShowSupportDialog(true)}
+                    aria-label="Contact Support"
+                    className="bg-success text-success-foreground border-success hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
+                  >
+                    <LifeBuoy className="h-4 w-4" />
+                  </Button>
+                  <InstallPWAButton />
+                  <div className="ml-auto">
+                    <Button
+                      variant="outline"
+                      size="icon"
+                      onClick={async () => {
+                        await signOut();
+                        navigate('/');
+                      }}
+                      aria-label="Log out"
+                      className="bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
+                    >
+                      <LogOut className="h-4 w-4" />
+                    </Button>
+                  </div>
+                </div>
+
                 <div className="border-t pt-6">
                   <ProfileForm />
                 </div>
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
                   <HandicapSettings />
                 </Suspense>
@@ -323,13 +280,13 @@ export default function Profile() {
 
           {activeTab === 'account' && showAccountTab && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <AccountBalance />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <TransactionHistory />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <SubscriptionManagement
                   isVerified={isVerified}
                   onRequestVerification={() => setShowPasswordDialog(true)}
@@ -339,23 +296,23 @@ export default function Profile() {
           )}
 
           {activeTab === 'notifications' && (
-            <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+            <div className="page-card-shell">
               <NotificationsPanel />
             </div>
           )}
 
           {activeTab === 'settings' && (
             <div className="space-y-6">
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <AppearanceSettings />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <ChangePassword />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <MFASettings />
               </div>
-              <div className="bg-card rounded-3xl p-4 md:p-6 shadow-card">
+              <div className="page-card-shell">
                 <GDPRSettings />
               </div>
             </div>

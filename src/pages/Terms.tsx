@@ -10,7 +10,7 @@ const Terms = () => {
     else navigate('/');
   };
   return (
-    <div className="min-h-screen bg-muted/40">
+    <div className="app-page-bg">
 
       <main className="container py-12 px-4 max-w-4xl">
         {/* Hero Section */}
