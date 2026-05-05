@@ -670,41 +670,77 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                   </Card>
                 ))
               ) : filteredMatches.length === 0 ? (
-                <div className="col-span-full text-center py-12">
-                  {matches.length === 0 ? (
-                    user ? (
-                      <div>
-                        <p className="text-muted-foreground text-lg mb-4">
-                          {showPastMatches ? 'No past matches yet.' : 'No matches found. Be the first to create one!'}
-                        </p>
-                        {!showPastMatches && <CreateMatchButton />}
-                      </div>
-                    ) : null
-                  ) : (
-                    <div>
-                      <p className="text-muted-foreground text-lg mb-4">
-                        {showPastMatches ? 'No past matches found.' : 'No matches match your filters.'}
-                      </p>
-                      {!showPastMatches && (
-                        <div className="inline-block shadow-lg rounded-lg border-2 border-primary/20 bg-card hover:border-primary/40 transition-all duration-300">
-                          <Button 
-                            variant="ghost" 
-                            onClick={() => setFilters({
-                              search: '',
-                              format: 'all', 
-                              maxDistance: 30,
-                              buyInRange: [0, 500],
-                              dateRange: 'all',
-                              spots: 'all'
-                            })}
-                            className="border-0"
-                          >
-                            Clear Filters
-                          </Button>
-                        </div>
+                <div className="col-span-full">
+                  <div className="text-center py-10 px-6 rounded-xl border border-dashed bg-muted/30">
+                    <div className="mx-auto w-14 h-14 rounded-full bg-primary/10 flex items-center justify-center mb-4">
+                      {showPastMatches ? (
+                        <Trophy className="w-7 h-7 text-primary" aria-hidden="true" />
+                      ) : matches.length === 0 ? (
+                        <Calendar className="w-7 h-7 text-primary" aria-hidden="true" />
+                      ) : (
+                        <Search className="w-7 h-7 text-primary" aria-hidden="true" />
                       )}
                     </div>
-                  )}
+                    {matches.length === 0 ? (
+                      user ? (
+                        <>
+                          <p className="font-semibold text-base">
+                            {showPastMatches ? 'No past matches yet' : 'No matches available right now'}
+                          </p>
+                          <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                            {showPastMatches
+                              ? 'Once you finish a match, your history and results will appear here.'
+                              : 'Be the first to set one up — pick a course, a format, and an entry amount.'}
+                          </p>
+                          {!showPastMatches && (
+                            <div className="mt-4 flex justify-center">
+                              <CreateMatchButton />
+                            </div>
+                          )}
+                        </>
+                      ) : null
+                    ) : (
+                      <>
+                        <p className="font-semibold text-base">
+                          {showPastMatches ? 'No past matches match your filters' : 'No matches match your filters'}
+                        </p>
+                        <p className="text-sm text-muted-foreground mt-1 max-w-md mx-auto">
+                          Try widening your search radius, clearing the format, or removing the date range.
+                        </p>
+                        <div className="mt-4 flex flex-wrap justify-center gap-2">
+                          {!showPastMatches ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                              onClick={() => setFilters({
+                                search: '',
+                                format: 'all',
+                                maxDistance: 30,
+                                buyInRange: [0, 500],
+                                dateRange: 'all',
+                                spots: 'all',
+                              })}
+                            >
+                              <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                              Clear filters
+                            </Button>
+                          ) : hasActivePastFilters ? (
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="rounded-full"
+                              onClick={() => setPastFilters({ course: '', format: 'all', dateRange: 'all' })}
+                            >
+                              <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
+                              Clear filters
+                            </Button>
+                          ) : null}
+                          {!showPastMatches && <CreateMatchButton />}
+                        </div>
+                      </>
+                    )}
+                  </div>
                 </div>
               ) : (
                 visibleMatches.map((match, index) => {
