@@ -174,6 +174,13 @@ export function TransactionHistory() {
           </div>
         )}
       </div>
+      <Suspense fallback={null}>
+        <MatchInfoDialog
+          matchId={infoMatchId}
+          open={!!infoMatchId}
+          onOpenChange={(o) => !o && setInfoMatchId(null)}
+        />
+      </Suspense>
     </div>
   );
 }
