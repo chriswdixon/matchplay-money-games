@@ -53,6 +53,11 @@ interface SubscriptionContextType {
   subscriptionEnd: string | null;
   loading: boolean;
   tierName: string | null;
+  status: string | null;
+  cancelAtPeriodEnd: boolean;
+  latestInvoiceStatus: string | null;
+  latestInvoiceAmountDue: number | null;
+  latestInvoiceHostedUrl: string | null;
   refreshSubscription: () => Promise<void>;
 }
 
@@ -64,12 +69,26 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
   const [productId, setProductId] = useState<string | null>(null);
   const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const [status, setStatus] = useState<string | null>(null);
+  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
+  const [latestInvoiceStatus, setLatestInvoiceStatus] = useState<string | null>(null);
+  const [latestInvoiceAmountDue, setLatestInvoiceAmountDue] = useState<number | null>(null);
+  const [latestInvoiceHostedUrl, setLatestInvoiceHostedUrl] = useState<string | null>(null);
+
+  const resetPaidFields = () => {
+    setProductId(null);
+    setSubscriptionEnd(null);
+    setStatus(null);
+    setCancelAtPeriodEnd(false);
+    setLatestInvoiceStatus(null);
+    setLatestInvoiceAmountDue(null);
+    setLatestInvoiceHostedUrl(null);
+  };
 
   const checkSubscription = async () => {
     if (!user || !session) {
       setSubscribed(true); // Default to subscribed (Free tier)
-      setProductId(null);
-      setSubscriptionEnd(null);
+      resetPaidFields();
       setLoading(false);
       return;
     }
@@ -85,19 +104,23 @@ export function SubscriptionProvider({ children }: { children: ReactNode }) {
       if (error) {
         console.error('Error checking subscription:', error);
         setSubscribed(true); // Default to Free tier on error
-        setProductId(null);
-        setSubscriptionEnd(null);
+        resetPaidFields();
       } else {
-        // If no paid subscription, user is on Free tier
         setSubscribed(true);
         setProductId(data.product_id || null);
         setSubscriptionEnd(data.subscription_end || null);
+        setStatus(data.status || null);
+        setCancelAtPeriodEnd(!!data.cancel_at_period_end);
+        setLatestInvoiceStatus(data.latest_invoice_status || null);
+        setLatestInvoiceAmountDue(
+          typeof data.latest_invoice_amount_due === 'number' ? data.latest_invoice_amount_due : null,
+        );
+        setLatestInvoiceHostedUrl(data.latest_invoice_hosted_url || null);
       }
     } catch (error) {
       console.error('Exception checking subscription:', error);
       setSubscribed(true); // Default to Free tier on error
-      setProductId(null);
-      setSubscriptionEnd(null);
+      resetPaidFields();
     } finally {
       setLoading(false);
     }
