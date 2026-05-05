@@ -39,7 +39,7 @@ const WinsFeed = () => {
         />
       </div>
 
-      <section className="max-w-2xl mx-auto px-4 py-6 space-y-3">
+      <section className="max-w-2xl mx-auto px-4 py-6 page-card-shell space-y-3 mt-4">
         {loading ? (
           <div className="space-y-3" aria-live="polite">
             {[1, 2, 3].map((i) => (
