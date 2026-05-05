@@ -27,6 +27,8 @@ const MyPastMatches = () => {
   const isMobile = useIsMobile();
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [rangeFilter, setRangeFilter] = useState<RangeFilter>("all");
+  const [page, setPage] = useState(0);
+  const PAGE_SIZE = 3;
 
   const pastMatches = useMemo(() => {
     if (!user) return [];
@@ -64,9 +66,14 @@ const MyPastMatches = () => {
       .slice(0, 20);
   }, [matches, user, statusFilter, rangeFilter]);
 
+  const totalPages = isMobile ? Math.max(1, Math.ceil(pastMatches.length / PAGE_SIZE)) : 1;
+  const safePage = Math.min(page, totalPages - 1);
   const visibleMatches = useMemo(
-    () => (isMobile ? pastMatches.slice(0, 3) : pastMatches),
-    [pastMatches, isMobile],
+    () =>
+      isMobile
+        ? pastMatches.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
+        : pastMatches,
+    [pastMatches, isMobile, safePage],
   );
 
   if (!user) return null;
@@ -197,10 +204,43 @@ const MyPastMatches = () => {
             );
           })
         )}
-        {!loading && isMobile && pastMatches.length > 3 && (
-          <p className="text-xs text-muted-foreground text-center pt-1">
-            Showing 3 of {pastMatches.length}
-          </p>
+        {!loading && isMobile && pastMatches.length > PAGE_SIZE && (
+          <div className="flex items-center justify-center gap-3 pt-2">
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setPage((p) => Math.max(0, p - 1))}
+              disabled={safePage === 0}
+              aria-label="Previous page"
+              className="h-8 w-8"
+            >
+              <ChevronLeft className="w-4 h-4" aria-hidden="true" />
+            </Button>
+            <div className="flex items-center gap-1.5" aria-hidden="true">
+              {Array.from({ length: totalPages }).map((_, i) => (
+                <span
+                  key={i}
+                  className={
+                    i === safePage
+                      ? "w-2 h-2 rounded-full bg-primary"
+                      : "w-2 h-2 rounded-full bg-muted-foreground/30"
+                  }
+                />
+              ))}
+            </div>
+            <Button
+              type="button"
+              variant="outline"
+              size="icon"
+              onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+              disabled={safePage >= totalPages - 1}
+              aria-label="Next page"
+              className="h-8 w-8"
+            >
+              <ChevronRight className="w-4 h-4" aria-hidden="true" />
+            </Button>
+          </div>
         )}
       </div>
     </section>
