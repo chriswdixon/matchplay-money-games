@@ -201,15 +201,48 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       });
     }
 
-    // Sort by scheduled_time - descending (newest first) for past matches
+    // Past matches: apply past-specific filters
     if (showPastMatches) {
-      filtered.sort((a, b) => 
+      if (pastFilters.course) {
+        const c = pastFilters.course.toLowerCase();
+        filtered = filtered.filter(m => m.course_name.toLowerCase().includes(c));
+      }
+      if (pastFilters.format !== 'all') {
+        filtered = filtered.filter(m => m.format === pastFilters.format);
+      }
+      if (pastFilters.dateRange !== 'all') {
+        const days = pastFilters.dateRange === '30d' ? 30 : pastFilters.dateRange === '90d' ? 90 : 365;
+        const cutoff = new Date(now.getTime() - days * 24 * 60 * 60 * 1000);
+        filtered = filtered.filter(m => new Date(m.scheduled_time) >= cutoff);
+      }
+      filtered.sort((a, b) =>
         new Date(b.scheduled_time).getTime() - new Date(a.scheduled_time).getTime()
       );
     }
 
     return filtered;
-  }, [matches, filters, showPastMatches]);
+  }, [matches, filters, showPastMatches, pastFilters]);
+
+  // Unique past courses for filter suggestions
+  const pastCourseOptions = useMemo(() => {
+    if (!showPastMatches) return [] as string[];
+    const set = new Set<string>();
+    matches.forEach(m => {
+      if ((m.status === 'completed' || m.status === 'cancelled') && m.course_name) set.add(m.course_name);
+    });
+    return Array.from(set).sort();
+  }, [matches, showPastMatches]);
+
+  const pastFormatOptions = useMemo(() => {
+    if (!showPastMatches) return [] as string[];
+    const set = new Set<string>();
+    matches.forEach(m => {
+      if ((m.status === 'completed' || m.status === 'cancelled') && m.format) set.add(m.format);
+    });
+    return Array.from(set).sort();
+  }, [matches, showPastMatches]);
+
+  const hasActivePastFilters = pastFilters.course !== '' || pastFilters.format !== 'all' || pastFilters.dateRange !== 'all';
 
   // Mobile pagination: 10 at a time, infinite scroll
   useEffect(() => {
