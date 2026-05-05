@@ -76,7 +76,7 @@ const Privacy = () => {
         </div>
 
         {/* Privacy Content */}
-        <div className="prose prose-neutral dark:prose-invert max-w-none space-y-8">
+        <div className="page-card-shell prose prose-neutral dark:prose-invert max-w-none space-y-8">
           <section>
             <h2 className="text-2xl font-semibold text-foreground border-b pb-2">1. Introduction</h2>
             <p className="text-muted-foreground mt-4">

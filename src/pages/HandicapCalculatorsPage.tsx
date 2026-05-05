@@ -9,7 +9,9 @@ export default function HandicapCalculatorsPage() {
   return (
     <div className="min-h-screen bg-muted/40 pb-32 md:pb-12 md:pt-24">
       <main className="max-w-4xl mx-auto px-4 md:px-6 py-6">
-        <HandicapCalculators />
+        <div className="page-card-shell">
+          <HandicapCalculators />
+        </div>
       </main>
       <BottomTabBar
         activeTab={"profile" as any}

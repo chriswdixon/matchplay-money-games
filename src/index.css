@@ -211,6 +211,11 @@
 }
 
 @layer utilities {
+  /* Universal page card shell - matches Current/Past Matches card */
+  .page-card-shell {
+    @apply rounded-3xl bg-muted dark:bg-white text-foreground dark:text-slate-900 p-4 md:p-6 shadow-card;
+  }
+
   /* Premium Gradient Backgrounds */
   .bg-gradient-primary,
   .bg-gradient-accent,
