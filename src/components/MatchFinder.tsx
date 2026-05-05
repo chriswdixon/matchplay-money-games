@@ -323,6 +323,27 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     return formatMap[format] || format;
   };
 
+  const handleRequestToJoin = async (match: any) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('match_join_requests')
+        .insert({ match_id: match.id, requester_id: user.id });
+      if (error) {
+        if (error.code === '23505') {
+          toast.info('You already requested to join this match.');
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success('Join request sent to the match creator.');
+      }
+      setRequestedJoinIds(prev => new Set(prev).add(match.id));
+    } catch (e: any) {
+      toast.error(e?.message || 'Could not send join request');
+    }
+  };
+
   const handleMatchAction = async (match: any) => {
     if (!user) return;
     
@@ -334,9 +355,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         setSelectedMatchForPin(match);
         setTeamJoinDialogOpen(true);
       } else if (match.pin) {
-        // Non-team match with PIN
-        setSelectedMatchForPin(match);
-        setPinDialogOpen(true);
+        // PIN-protected match: request to join instead of entering PIN
+        await handleRequestToJoin(match);
       } else {
         setConfirmJoinMatch(match);
       }
