@@ -244,14 +244,16 @@ export default function Profile() {
   );
 
   const SectionHeader = ({ title }: { title: string }) => (
-    <div className="flex flex-col lg:flex-row lg:items-start lg:justify-between gap-3 pb-4 border-b">
-      <div className="flex items-center gap-3 min-w-0">
+    <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3 pb-4 border-b">
+      <div className="flex items-center gap-3 shrink-0 lg:mr-auto">
         <div className="p-2 bg-gradient-primary rounded-lg shrink-0">
           <User className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
         </div>
-        <h2 className="text-lg font-semibold leading-none truncate">{title}</h2>
+        <h2 className="text-lg font-semibold leading-none whitespace-nowrap">{title}</h2>
       </div>
-      <ActionIcons />
+      <div className="lg:ml-auto w-full lg:w-auto">
+        <ActionIcons />
+      </div>
     </div>
   );
 
