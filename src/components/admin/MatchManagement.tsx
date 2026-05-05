@@ -226,7 +226,7 @@ export const MatchManagement = () => {
     },
     onError: (error) => {
       console.error('Error deleting match:', error);
-      toast.error('Failed to delete match');
+      toast.error(error instanceof Error ? error.message : 'Failed to delete match');
     }
   });
 
