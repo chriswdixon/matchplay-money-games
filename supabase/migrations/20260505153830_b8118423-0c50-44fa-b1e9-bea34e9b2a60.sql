@@ -1,0 +1,1 @@
+GRANT EXECUTE ON FUNCTION public.get_user_account_info(uuid) TO authenticated;
