@@ -215,29 +215,32 @@ export const useLocation = () => {
       
       console.log('🌍 Geocoding address:', address);
       
-      // Use geocode.xyz for zipcode lookups (CORS-friendly, free tier)
+      // Use Zippopotam.us for US ZIP code lookups — free, CORS-enabled, no key, very reliable
       if (isZipcode) {
-        const geocodeUrl = `https://geocode.xyz/${encodeURIComponent(address)}?json=1&region=US`;
-        console.log('📡 Using geocode.xyz API:', geocodeUrl);
-        
-        const response = await fetch(geocodeUrl);
-        console.log('📊 Response status:', response.status);
-        
-        if (!response.ok) {
-          console.error('❌ Geocode.xyz API failed:', response.status);
-          throw new Error(`Geocode.xyz API failed: ${response.status}`);
-        }
-        
-        const data = await response.json();
-        console.log('📦 Geocode.xyz response:', data);
-        
-        if (data?.latt && data?.longt && data.latt !== "0" && data.longt !== "0") {
-          const result = {
-            latitude: parseFloat(data.latt),
-            longitude: parseFloat(data.longt)
-          };
-          console.log('✅ Found coordinates:', result);
-          return result;
+        const zip5 = address.trim().slice(0, 5);
+        const zipUrl = `https://api.zippopotam.us/us/${zip5}`;
+        console.log('📡 Using Zippopotam.us API:', zipUrl);
+
+        try {
+          const response = await fetch(zipUrl);
+          console.log('📊 Response status:', response.status);
+
+          if (response.ok) {
+            const data = await response.json();
+            const place = data?.places?.[0];
+            if (place?.latitude && place?.longitude) {
+              const result = {
+                latitude: parseFloat(place.latitude),
+                longitude: parseFloat(place.longitude),
+              };
+              console.log('✅ Found coordinates:', result);
+              return result;
+            }
+          } else {
+            console.warn('⚠️ Zippopotam.us failed, falling back to Nominatim');
+          }
+        } catch (zipErr) {
+          console.warn('⚠️ Zippopotam.us error, falling back to Nominatim:', zipErr);
         }
       }
       
