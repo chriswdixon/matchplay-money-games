@@ -8,21 +8,30 @@ interface SubscriptionCardProps {
   onManage: () => void;
 }
 
-const TIER_META: Record<string, { tagline: string; perks: string[]; isPaid: boolean }> = {
+const TIER_META: Record<
+  string,
+  { tagline: string; perks: string[]; isPaid: boolean; borderClass: string; ringClass: string }
+> = {
   Free: {
     tagline: 'Casual play, no commitment.',
     perks: ['Match Play & Stroke Play', 'Play money wallet', 'Standard handicap tracking'],
     isPaid: false,
+    borderClass: 'border-border',
+    ringClass: '',
   },
   'Local Player': {
     tagline: 'For regulars at your home course.',
     perks: ['Priority match listings', 'Advanced course stats', 'No platform fees on entry'],
     isPaid: true,
+    borderClass: 'border-primary/60',
+    ringClass: 'ring-1 ring-primary/30',
   },
   'Tournament Pro': {
     tagline: 'Compete at the highest level.',
     perks: ['Tournament hosting', 'Pro analytics suite', 'Verified handicap badge'],
     isPaid: true,
+    borderClass: 'border-accent/70',
+    ringClass: 'ring-1 ring-accent/40',
   },
 };
 
