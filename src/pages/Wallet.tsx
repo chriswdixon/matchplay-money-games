@@ -50,8 +50,8 @@ export default function Wallet() {
       <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
         <PageTitleCard
           icon={<Landmark className="w-5 h-5" aria-hidden="true" />}
-          title="Wallet & Subscription"
-          description="Your play money history and subscription details"
+          title="Wallet & Membership"
+          description="Track your play money, see every transaction, and manage your membership tier."
         />
       </header>
 
