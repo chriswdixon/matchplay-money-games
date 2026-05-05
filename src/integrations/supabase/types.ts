@@ -682,6 +682,42 @@ export type Database = {
         }
         Relationships: []
       }
+      match_join_requests: {
+        Row: {
+          created_at: string
+          id: string
+          match_id: string
+          message: string | null
+          requester_id: string
+          responded_at: string | null
+          responded_by: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          match_id: string
+          message?: string | null
+          requester_id: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          match_id?: string
+          message?: string | null
+          requester_id?: string
+          responded_at?: string | null
+          responded_by?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       match_join_tokens: {
         Row: {
           created_at: string

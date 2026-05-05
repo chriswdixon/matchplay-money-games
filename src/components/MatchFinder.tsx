@@ -10,6 +10,8 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
+import { useProfile } from "@/hooks/useProfile";
+import { toast } from "sonner";
 import { useLocation } from "@/hooks/useLocation";
 import { useFreeTier } from "@/hooks/useFreeTier";
 import CreateMatchButton from "./CreateMatchButton";
@@ -34,6 +36,9 @@ const JoinMatchConfirmDialog = lazy(() => import("./JoinMatchConfirmDialog"));
 const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hideHowItWorks?: boolean; showPastMatches?: boolean }) => {
   const { matches, loading, joinMatch, leaveMatch, refetch } = useMatches();
   const { user } = useAuth();
+  const { profile } = useProfile();
+  const userHandicap = profile?.handicap !== null && profile?.handicap !== undefined ? Number(profile.handicap) : null;
+  const [requestedJoinIds, setRequestedJoinIds] = useState<Set<string>>(new Set());
   const { location, formatDistance } = useLocation();
   const { hasAccess } = useFreeTier();
   const isMobile = useIsMobile();
@@ -77,6 +82,22 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
 
     return () => clearTimeout(timer);
   }, [location, searchRadius]); // Removed refetch from dependencies to prevent loops
+
+  // Load my pending join requests so we can show "Requested" state
+  useEffect(() => {
+    if (!user) { setRequestedJoinIds(new Set()); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('match_join_requests')
+        .select('match_id, status')
+        .eq('requester_id', user.id)
+        .eq('status', 'pending');
+      if (cancelled || !data) return;
+      setRequestedJoinIds(new Set(data.map((r: any) => r.match_id)));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
 
   // Separate incomplete matches (started matches >4 hours old that user joined)
   const incompleteMatches = useMemo(() => {
@@ -201,6 +222,18 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       });
     }
 
+    // Handicap range filter (only for current matches; never hide matches the user already joined or created)
+    if (!showPastMatches && userHandicap !== null) {
+      filtered = filtered.filter(match => {
+        if (match.user_joined || match.created_by === user?.id) return true;
+        const min = match.handicap_min;
+        const max = match.handicap_max;
+        if (min != null && userHandicap < min) return false;
+        if (max != null && userHandicap > max) return false;
+        return true;
+      });
+    }
+
     // Past matches: apply past-specific filters
     if (showPastMatches) {
       if (pastFilters.course) {
@@ -221,7 +254,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     }
 
     return filtered;
-  }, [matches, filters, showPastMatches, pastFilters]);
+  }, [matches, filters, showPastMatches, pastFilters, userHandicap, user?.id]);
 
   // Unique past courses for filter suggestions
   const pastCourseOptions = useMemo(() => {
@@ -306,6 +339,27 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     return formatMap[format] || format;
   };
 
+  const handleRequestToJoin = async (match: any) => {
+    if (!user) return;
+    try {
+      const { error } = await supabase
+        .from('match_join_requests')
+        .insert({ match_id: match.id, requester_id: user.id });
+      if (error) {
+        if (error.code === '23505') {
+          toast.info('You already requested to join this match.');
+        } else {
+          throw error;
+        }
+      } else {
+        toast.success('Join request sent to the match creator.');
+      }
+      setRequestedJoinIds(prev => new Set(prev).add(match.id));
+    } catch (e: any) {
+      toast.error(e?.message || 'Could not send join request');
+    }
+  };
+
   const handleMatchAction = async (match: any) => {
     if (!user) return;
     
@@ -317,9 +371,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
         setSelectedMatchForPin(match);
         setTeamJoinDialogOpen(true);
       } else if (match.pin) {
-        // Non-team match with PIN
-        setSelectedMatchForPin(match);
-        setPinDialogOpen(true);
+        // PIN-protected match: request to join instead of entering PIN
+        await handleRequestToJoin(match);
       } else {
         setConfirmJoinMatch(match);
       }
@@ -843,17 +896,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                   ? "bg-gradient-accent text-accent-foreground"
                                   : "bg-gradient-primary text-primary-foreground"
                               )}
-                              disabled={isFull || !user}
+                              disabled={isFull || !user || (match.pin && !match.user_joined && requestedJoinIds.has(match.id))}
                               onClick={() => handleMatchAction(match)}
                             >
-                              {!user ? "Sign In to Join" : 
-                               isFull ? "Match Full" : 
-                               match.user_joined ? "Leave Match" : 
-                               match.pin ? (
-                                <>
-                                  Join with PIN
-                                </>
-                               ) : "Join Match"}
+                              {!user ? "Sign In to Join" :
+                               isFull ? "Match Full" :
+                               match.user_joined ? "Leave Match" :
+                               match.pin
+                                 ? (requestedJoinIds.has(match.id) ? "Request Sent" : "Request to Join")
+                                 : "Join Match"}
                             </Button>
                           )}
                         </div>
