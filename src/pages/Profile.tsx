@@ -268,64 +268,6 @@ export default function Profile() {
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="page-card-shell space-y-6">
-                {/* Action row at top of Profile card */}
-                <div className="flex flex-wrap items-center gap-2 pb-4 border-b">
-                  {hasActiveMatch && (
-                    <Button
-                      variant="default"
-                      size="sm"
-                      onClick={() => navigate('/')}
-                      className="gap-2"
-                    >
-                      <Target className="h-4 w-4" />
-                      <span>Active Match</span>
-                    </Button>
-                  )}
-                  {isAdmin && (
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={() => setAdminConfirmOpen(true)}
-                      aria-label="Admin Portal"
-                      className="relative bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
-                    >
-                      <ShieldCheck className="h-4 w-4" />
-                      {openSupportCount > 0 && (
-                        <span
-                          aria-hidden="true"
-                          className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-background text-destructive border border-destructive text-[10px] font-bold leading-none flex items-center justify-center"
-                        >
-                          {openSupportCount > 99 ? '99+' : openSupportCount}
-                        </span>
-                      )}
-                    </Button>
-                  )}
-                  <Button
-                    variant="outline"
-                    size="icon"
-                    onClick={() => setShowSupportDialog(true)}
-                    aria-label="Contact Support"
-                    className="bg-success text-success-foreground border-success hover:bg-destructive hover:text-destructive-foreground hover:border-destructive"
-                  >
-                    <LifeBuoy className="h-4 w-4" />
-                  </Button>
-                  <InstallPWAButton />
-                  <div className="ml-auto">
-                    <Button
-                      variant="outline"
-                      size="icon"
-                      onClick={async () => {
-                        await signOut();
-                        navigate('/');
-                      }}
-                      aria-label="Log out"
-                      className="bg-destructive text-destructive-foreground border-destructive hover:bg-destructive/90"
-                    >
-                      <LogOut className="h-4 w-4" />
-                    </Button>
-                  </div>
-                </div>
-
                 <ProfileDisplay />
 
                 <div className="border-t pt-6">
