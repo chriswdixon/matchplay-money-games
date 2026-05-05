@@ -33,7 +33,7 @@ const MyPastMatches = () => {
   return (
     <section
       aria-labelledby="past-matches-heading"
-      className="rounded-3xl bg-muted dark:bg-white text-foreground dark:text-slate-900 p-4 md:p-6 shadow-card"
+      className="page-card-shell"
     >
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
         <h2
