@@ -422,16 +422,31 @@ const NearbyCoursesWithMatches = () => {
                   )}
                 </div>
                 {hasOpenMatch ? (
-                  <Button
-                    size="sm"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleViewMatch(openMatches[0].id);
-                    }}
-                    className="shrink-0 bg-success text-white font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
-                  >
-                    Join Match
-                  </Button>
+                  <div className="flex flex-col gap-1.5 shrink-0">
+                    <Button
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleViewMatch(openMatches[0].id);
+                      }}
+                      className="bg-success text-white font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
+                    >
+                      Join Match
+                    </Button>
+                    <Button
+                      type="button"
+                      size="sm"
+                      variant="outline"
+                      onPointerDown={(e) => e.stopPropagation()}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleCreateAtCourse(course);
+                      }}
+                    >
+                      Create New
+                    </Button>
+                  </div>
                 ) : (
                   <Button
                     type="button"
