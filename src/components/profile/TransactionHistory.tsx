@@ -1,15 +1,43 @@
-import { useMemo, useState, Suspense, lazy } from 'react';
+import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAccountTransactions } from '@/hooks/useAccountTransactions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { useAccountTransactions, type AccountTransaction } from '@/hooks/useAccountTransactions';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { History, TrendingDown, CreditCard, Trophy, Ticket, LogOut, Zap, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { History, TrendingDown, CreditCard, Trophy, Ticket, LogOut, Zap, ChevronLeft, ChevronRight, Search, X, ArrowUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 
 const MatchInfoDialog = lazy(() =>
   import('@/components/MatchInfoDialog').then((m) => ({ default: m.MatchInfoDialog })),
 );
+
+const TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'all', label: 'All types' },
+  { value: 'winning', label: 'Winnings' },
+  { value: 'payout', label: 'Payouts' },
+  { value: 'match_buyin', label: 'Buy-ins' },
+  { value: 'match_cancellation', label: 'Cancellations' },
+  { value: 'coupon', label: 'Coupons' },
+  { value: 'double_down', label: 'Double Down' },
+  { value: 'subscription_charge', label: 'Subscription' },
+];
+
+const DATE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'all', label: 'All time' },
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last 90 days' },
+  { value: '1y', label: 'Last year' },
+];
+
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'amount_desc', label: 'Largest amount' },
+  { value: 'amount_asc', label: 'Smallest amount' },
+];
 
 const TransactionHistoryHeader = () => (
   <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
@@ -25,14 +53,67 @@ export function TransactionHistory() {
   const isMobile = useIsMobile();
   const [page, setPage] = useState(0);
   const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [directionFilter, setDirectionFilter] = useState<'all' | 'in' | 'out'>('all');
+  const [dateFilter, setDateFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('newest');
   const PAGE_SIZE = isMobile ? 3 : 10;
 
-  const totalPages = Math.max(1, Math.ceil(transactions.length / PAGE_SIZE));
+  const filteredTransactions = useMemo(() => {
+    let list: AccountTransaction[] = [...transactions];
+
+    if (typeFilter !== 'all') {
+      list = list.filter((t) => t.transaction_type === typeFilter);
+    }
+
+    if (directionFilter !== 'all') {
+      list = list.filter((t) => {
+        const amt = parseFloat(t.amount.toString());
+        return directionFilter === 'in' ? amt > 0 : amt < 0;
+      });
+    }
+
+    if (dateFilter !== 'all') {
+      const days = dateFilter === '7d' ? 7 : dateFilter === '30d' ? 30 : dateFilter === '90d' ? 90 : 365;
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+      list = list.filter((t) => new Date(t.created_at).getTime() >= cutoff);
+    }
+
+    list.sort((a, b) => {
+      const aAmt = Math.abs(parseFloat(a.amount.toString()));
+      const bAmt = Math.abs(parseFloat(b.amount.toString()));
+      const aTime = new Date(a.created_at).getTime();
+      const bTime = new Date(b.created_at).getTime();
+      switch (sortBy) {
+        case 'oldest': return aTime - bTime;
+        case 'amount_desc': return bAmt - aAmt;
+        case 'amount_asc': return aAmt - bAmt;
+        case 'newest':
+        default: return bTime - aTime;
+      }
+    });
+
+    return list;
+  }, [transactions, typeFilter, directionFilter, dateFilter, sortBy]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [typeFilter, directionFilter, dateFilter, sortBy]);
+
+  const hasActiveFilters = typeFilter !== 'all' || directionFilter !== 'all' || dateFilter !== 'all';
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const visibleTransactions = useMemo(
-    () => transactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
-    [transactions, safePage, PAGE_SIZE],
+    () => filteredTransactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
+    [filteredTransactions, safePage, PAGE_SIZE],
   );
+
+  const clearFilters = () => {
+    setTypeFilter('all');
+    setDirectionFilter('all');
+    setDateFilter('all');
+    setSortBy('newest');
+  };
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
@@ -95,6 +176,72 @@ export function TransactionHistory() {
   return (
     <div className="space-y-4">
       <TransactionHistoryHeader />
+
+      {transactions.length > 0 && (
+        <div className="rounded-xl border bg-muted/30 p-3 space-y-3">
+          <div className="grid gap-2 grid-cols-2 lg:grid-cols-4">
+            <Select value={typeFilter} onValueChange={setTypeFilter}>
+              <SelectTrigger aria-label="Filter by type" className="h-9 text-sm">
+                <SelectValue placeholder="Type" />
+              </SelectTrigger>
+              <SelectContent>
+                {TYPE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={directionFilter} onValueChange={(v) => setDirectionFilter(v as typeof directionFilter)}>
+              <SelectTrigger aria-label="Filter by direction" className="h-9 text-sm">
+                <SelectValue placeholder="Direction" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">Money in & out</SelectItem>
+                <SelectItem value="in">Money in (credits)</SelectItem>
+                <SelectItem value="out">Money out (debits)</SelectItem>
+              </SelectContent>
+            </Select>
+            <Select value={dateFilter} onValueChange={setDateFilter}>
+              <SelectTrigger aria-label="Filter by date range" className="h-9 text-sm">
+                <SelectValue placeholder="Date" />
+              </SelectTrigger>
+              <SelectContent>
+                {DATE_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <Select value={sortBy} onValueChange={setSortBy}>
+              <SelectTrigger aria-label="Sort by" className="h-9 text-sm">
+                <ArrowUpDown className="w-3.5 h-3.5 mr-1.5 opacity-60" aria-hidden="true" />
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent>
+                {SORT_OPTIONS.map((o) => (
+                  <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span>
+              {filteredTransactions.length} of {transactions.length} transaction{transactions.length === 1 ? '' : 's'}
+            </span>
+            {hasActiveFilters && (
+              <Button
+                type="button"
+                variant="ghost"
+                size="sm"
+                onClick={clearFilters}
+                className="h-7 px-2 text-xs"
+              >
+                <X className="w-3.5 h-3.5 mr-1" aria-hidden="true" />
+                Clear
+              </Button>
+            )}
+          </div>
+        </div>
+      )}
+
       <div>
         {transactions.length === 0 ? (
           <div className="text-center py-10 px-4 rounded-xl border border-dashed bg-muted/30">
@@ -116,6 +263,23 @@ export function TransactionHistory() {
                 <Link to="/create-match">Create a match</Link>
               </Button>
             </div>
+          </div>
+        ) : filteredTransactions.length === 0 ? (
+          <div className="text-center py-8 px-4 rounded-xl border border-dashed bg-muted/30">
+            <p className="font-semibold text-sm">No transactions match your filters</p>
+            <p className="text-xs text-muted-foreground mt-1">
+              Try widening the date range or clearing the type filter.
+            </p>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={clearFilters}
+              className="mt-3 rounded-full"
+            >
+              <X className="w-4 h-4 mr-1.5" aria-hidden="true" />
+              Clear filters
+            </Button>
           </div>
         ) : (
           <div className="space-y-3">
@@ -167,7 +331,7 @@ export function TransactionHistory() {
               );
             })}
 
-            {transactions.length > PAGE_SIZE && (
+            {filteredTransactions.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-3 pt-2">
                 <Button
                   type="button"
