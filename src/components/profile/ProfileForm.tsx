@@ -104,10 +104,7 @@ export function ProfileForm() {
         <div className="p-2 bg-gradient-primary rounded-lg">
           <User className="w-5 h-5 text-primary-foreground" aria-hidden="true" />
         </div>
-        <div>
-          <h3 className="text-lg font-semibold">Profile Information</h3>
-          <p className="text-sm text-muted-foreground">Update your profile details</p>
-        </div>
+        <h3 className="text-lg font-semibold">Profile Information</h3>
       </div>
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

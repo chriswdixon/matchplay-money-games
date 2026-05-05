@@ -14,12 +14,7 @@ export function NotificationsPanel() {
       <div className="flex items-center justify-between gap-2">
         <div className="flex items-center gap-2">
           <Bell className="w-5 h-5 text-muted-foreground" aria-hidden="true" />
-          <div>
-            <h2 className="text-lg font-semibold">Notifications</h2>
-            <p className="text-sm text-muted-foreground">
-              {unreadCount > 0 ? `${unreadCount} unread` : 'All caught up'}
-            </p>
-          </div>
+          <h2 className="text-lg font-semibold">Notifications</h2>
         </div>
         {unreadCount > 0 && (
           <Button variant="outline" size="sm" onClick={markAllRead} className="gap-2">
