@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Crown, Sparkles, Loader2 } from 'lucide-react';
+import { Crown, Sparkles, Loader2, CalendarClock, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription, SUBSCRIPTION_TIERS } from '@/hooks/useSubscription';
