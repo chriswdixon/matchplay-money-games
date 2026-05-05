@@ -80,6 +80,7 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
 
   return (
     <div className="space-y-4">
+      <h2 className="text-xl font-semibold text-foreground">Subscription</h2>
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 rounded-lg shrink-0 bg-success text-success-foreground">
