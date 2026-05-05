@@ -109,7 +109,7 @@ const NearbyCoursesWithMatches = () => {
           }))
           .filter((c) => c.distance !== undefined && c.distance <= radius)
           .sort((a, b) => (a.distance || 0) - (b.distance || 0));
-        setCourses(results.slice(0, 50));
+        setCourses(results);
         return;
       }
     }
@@ -166,7 +166,7 @@ const NearbyCoursesWithMatches = () => {
     }
 
     results.sort((a, b) => (a.distance || 0) - (b.distance || 0));
-    setCourses(results.slice(0, 50));
+    setCourses(results);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
