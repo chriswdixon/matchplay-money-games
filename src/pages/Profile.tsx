@@ -218,6 +218,7 @@ export default function Profile() {
           </TooltipTrigger>
           <TooltipContent side="bottom">Log out</TooltipContent>
         </Tooltip>
+        </div>
       </div>
     </TooltipProvider>
   );
