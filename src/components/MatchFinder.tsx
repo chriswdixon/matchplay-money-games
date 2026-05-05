@@ -4,7 +4,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle, Search, X } from "lucide-react";
+import { MapPin, Clock, Users, DollarSign, Trophy, Zap, Navigation, Star, Target, Calendar, Lock, AlertTriangle, Search, X, Filter } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -69,6 +69,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     format: 'all',
     dateRange: 'all' as 'all' | '30d' | '90d' | '1y',
   });
+  const [showPastFiltersPanel, setShowPastFiltersPanel] = useState(false);
 
   // Refetch matches when location changes (with debouncing)
   useEffect(() => {
@@ -496,62 +497,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           />
         )}
 
-        {/* Past Matches Filters */}
+        {/* Past Matches Filters (collapsible) */}
         {showPastMatches && user && (
-          <Card className="bg-muted/30 mb-4">
-            <CardContent className="pt-4">
-              <div className="grid gap-4 md:grid-cols-3">
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2 text-sm">
-                    <Search className="h-4 w-4" /> Course
-                  </Label>
-                  <Input
-                    list="past-course-options"
-                    placeholder="Any course"
-                    value={pastFilters.course}
-                    onChange={(e) => setPastFilters({ ...pastFilters, course: e.target.value })}
-                  />
-                  <datalist id="past-course-options">
-                    {pastCourseOptions.map(c => <option key={c} value={c} />)}
-                  </datalist>
-                </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2 text-sm">
-                    <Users className="h-4 w-4" /> Match Type
-                  </Label>
-                  <Select
-                    value={pastFilters.format}
-                    onValueChange={(v) => setPastFilters({ ...pastFilters, format: v })}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Any format" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">Any Format</SelectItem>
-                      {pastFormatOptions.map(f => (
-                        <SelectItem key={f} value={f}>{f.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                <div className="space-y-2">
-                  <Label className="flex items-center gap-2 text-sm">
-                    <Calendar className="h-4 w-4" /> Date Range
-                  </Label>
-                  <Select
-                    value={pastFilters.dateRange}
-                    onValueChange={(v) => setPastFilters({ ...pastFilters, dateRange: v as typeof pastFilters.dateRange })}
-                  >
-                    <SelectTrigger><SelectValue placeholder="Any time" /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all">All Time</SelectItem>
-                      <SelectItem value="30d">Last 30 days</SelectItem>
-                      <SelectItem value="90d">Last 90 days</SelectItem>
-                      <SelectItem value="1y">Last year</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-              </div>
-              <div className="flex items-center justify-between mt-4">
-                <p className="text-sm text-muted-foreground">{filteredMatches.length} match{filteredMatches.length === 1 ? '' : 'es'}</p>
+          <div className="mb-4 space-y-3">
+            <div className="flex items-center justify-between gap-2">
+              <p className="text-sm text-muted-foreground">
+                {filteredMatches.length} match{filteredMatches.length === 1 ? '' : 'es'}
+              </p>
+              <div className="flex items-center gap-2">
                 {hasActivePastFilters && (
                   <Button
                     variant="ghost"
@@ -561,9 +514,82 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                     <X className="h-4 w-4 mr-1" /> Clear
                   </Button>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setShowPastFiltersPanel(v => !v)}
+                  aria-expanded={showPastFiltersPanel}
+                  aria-controls="past-filters-panel"
+                  aria-label={showPastFiltersPanel ? 'Hide filters' : 'Show filters'}
+                >
+                  <Filter className="h-4 w-4 mr-1" />
+                  Filters
+                  {hasActivePastFilters && (
+                    <Badge variant="secondary" className="ml-2 px-1.5 py-0 text-xs">
+                      {[pastFilters.course && 1, pastFilters.format !== 'all' && 1, pastFilters.dateRange !== 'all' && 1].filter(Boolean).length}
+                    </Badge>
+                  )}
+                </Button>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {showPastFiltersPanel && (
+              <Card id="past-filters-panel" className="bg-muted/30">
+                <CardContent className="pt-4">
+                  <div className="grid gap-4 md:grid-cols-3">
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2 text-sm">
+                        <Search className="h-4 w-4" /> Course
+                      </Label>
+                      <Input
+                        list="past-course-options"
+                        placeholder="Any course"
+                        value={pastFilters.course}
+                        onChange={(e) => setPastFilters({ ...pastFilters, course: e.target.value })}
+                      />
+                      <datalist id="past-course-options">
+                        {pastCourseOptions.map(c => <option key={c} value={c} />)}
+                      </datalist>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2 text-sm">
+                        <Users className="h-4 w-4" /> Match Type
+                      </Label>
+                      <Select
+                        value={pastFilters.format}
+                        onValueChange={(v) => setPastFilters({ ...pastFilters, format: v })}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Any format" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Any Format</SelectItem>
+                          {pastFormatOptions.map(f => (
+                            <SelectItem key={f} value={f}>{f.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-2">
+                      <Label className="flex items-center gap-2 text-sm">
+                        <Calendar className="h-4 w-4" /> Date Range
+                      </Label>
+                      <Select
+                        value={pastFilters.dateRange}
+                        onValueChange={(v) => setPastFilters({ ...pastFilters, dateRange: v as typeof pastFilters.dateRange })}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Any time" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">All Time</SelectItem>
+                          <SelectItem value="30d">Last 30 days</SelectItem>
+                          <SelectItem value="90d">Last 90 days</SelectItem>
+                          <SelectItem value="1y">Last year</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+          </div>
         )}
 
         {/* Incomplete Matches Section */}
