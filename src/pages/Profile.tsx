@@ -266,12 +266,11 @@ export default function Profile() {
         role="main"
         className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-6 pt-8 md:pt-10 pb-32 md:pb-12"
       >
-        <SectionTabs />
-
-        <div className="space-y-6 mt-8 md:mt-10">
+        <div className="space-y-6">
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="page-card-shell space-y-6">
+                <SectionHeader title="Profile" />
                 <ProfileDisplay />
 
                 <div className="border-t pt-6">
@@ -288,7 +287,8 @@ export default function Profile() {
 
           {activeTab === 'account' && showAccountTab && (
             <div className="space-y-6">
-              <div className="page-card-shell">
+              <div className="page-card-shell space-y-6">
+                <SectionHeader title="Account & Subscription" />
                 <AccountBalance />
               </div>
               <div className="page-card-shell">
@@ -304,14 +304,16 @@ export default function Profile() {
           )}
 
           {activeTab === 'notifications' && (
-            <div className="page-card-shell">
+            <div className="page-card-shell space-y-6">
+              <SectionHeader title="Notifications" />
               <NotificationsPanel />
             </div>
           )}
 
           {activeTab === 'settings' && (
             <div className="space-y-6">
-              <div className="page-card-shell">
+              <div className="page-card-shell space-y-6">
+                <SectionHeader title="Settings" />
                 <AppearanceSettings />
               </div>
               <div className="page-card-shell">
