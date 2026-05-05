@@ -345,5 +345,26 @@
     color: hsl(0 0% 100%) !important;
     font-weight: 700 !important;
   }
+
+  /* Universal hover glow for all buttons and button-like elements */
+  button:not(:disabled),
+  a[role="button"]:not([aria-disabled="true"]),
+  [role="button"]:not([aria-disabled="true"]) {
+    transition: box-shadow 0.25s ease, transform 0.15s ease;
+  }
+  button:not(:disabled):hover,
+  a[role="button"]:not([aria-disabled="true"]):hover,
+  [role="button"]:not([aria-disabled="true"]):hover {
+    box-shadow: 0 0 18px hsl(var(--primary) / 0.55), 0 0 32px hsl(var(--primary) / 0.25);
+  }
+  button[class*="bg-success"]:not(:disabled):hover,
+  a[class*="bg-success"]:not([aria-disabled="true"]):hover,
+  [role="button"][class*="bg-success"]:not([aria-disabled="true"]):hover {
+    box-shadow: 0 0 18px hsl(var(--success) / 0.6), 0 0 32px hsl(var(--success) / 0.3);
+  }
+  button[class*="bg-destructive"]:not(:disabled):hover,
+  a[class*="bg-destructive"]:not([aria-disabled="true"]):hover {
+    box-shadow: 0 0 18px hsl(var(--destructive) / 0.6), 0 0 32px hsl(var(--destructive) / 0.3);
+  }
 }
 
