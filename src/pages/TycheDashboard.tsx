@@ -12,6 +12,7 @@ import RecentlyPlayedCourses from "@/components/home/RecentlyPlayedCourses";
 import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 import RecentWins from "@/components/home/RecentWins";
 import MyCurrentMatches from "@/components/home/MyCurrentMatches";
+import MyPastMatches from "@/components/home/MyPastMatches";
 import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 
 
