@@ -24,6 +24,7 @@ import { PasswordVerificationDialog } from '@/components/auth/PasswordVerificati
 import { GDPRSettings } from '@/components/profile/GDPRSettings';
 import { AppearanceSettings } from '@/components/profile/AppearanceSettings';
 import { NotificationsPanel } from '@/components/profile/NotificationsPanel';
+import { SubscriptionCard } from '@/components/profile/SubscriptionCard';
 import { useNotifications } from '@/hooks/useNotifications';
 import BottomTabBar from '@/components/home/BottomTabBar';
 import { cn } from '@/lib/utils';
@@ -305,6 +306,17 @@ export default function Profile() {
                 <Suspense fallback={<div className="py-12 text-center text-muted-foreground">Loading...</div>}>
                   <HandicapSettings />
                 </Suspense>
+              </div>
+              <div className="page-card-shell">
+                <SubscriptionCard
+                  onManage={() => {
+                    if (showAccountTab) {
+                      handleTabChange('account');
+                    } else {
+                      navigate('/?tab=subscription');
+                    }
+                  }}
+                />
               </div>
             </div>
           )}
