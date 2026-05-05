@@ -83,7 +83,7 @@ const MyCurrentMatches = () => {
                   key={m.id}
                   type="button"
                   onClick={() => navigate(`/match/${m.id}`)}
-                  className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 border-2 border-primary transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={`Open ${m.course_name} match`}
                 >
                   <div className="flex-1 min-w-0">
