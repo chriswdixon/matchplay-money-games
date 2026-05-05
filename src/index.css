@@ -212,23 +212,21 @@
 
 @layer utilities {
   /* Premium Gradient Backgrounds */
-  .bg-gradient-primary {
-    background: var(--gradient-primary);
-    color: hsl(0 0% 100%);
+  .bg-gradient-primary,
+  .bg-gradient-accent,
+  .bg-gradient-hero,
+  .bg-gradient-success,
+  [class*="bg-gradient-"][class*="success"],
+  button[class*="bg-gradient-"],
+  a[class*="bg-gradient-"],
+  [role="button"][class*="bg-gradient-"] {
+    color: hsl(0 0% 100%) !important;
     font-weight: 700;
   }
-  
-  .bg-gradient-accent {
-    background: var(--gradient-accent);
-  }
-  
-  .bg-gradient-hero {
-    background: var(--gradient-hero);
-  }
-  
-  .bg-gradient-card {
-    background: var(--gradient-card);
-  }
+  .bg-gradient-primary { background: var(--gradient-primary); }
+  .bg-gradient-accent  { background: var(--gradient-accent); }
+  .bg-gradient-hero    { background: var(--gradient-hero); }
+  .bg-gradient-card    { background: var(--gradient-card); }
   
   /* Premium Shadows */
   .shadow-premium {
