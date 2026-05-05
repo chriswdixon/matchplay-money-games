@@ -59,6 +59,11 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const [selectedMatchForPin, setSelectedMatchForPin] = useState<any>(null);
   const [confirmJoinMatch, setConfirmJoinMatch] = useState<any>(null);
   const [expandedMatchId, setExpandedMatchId] = useState<string | null>(null);
+  const [pastFilters, setPastFilters] = useState({
+    course: '',
+    format: 'all',
+    dateRange: 'all' as 'all' | '30d' | '90d' | '1y',
+  });
 
   // Refetch matches when location changes (with debouncing)
   useEffect(() => {
