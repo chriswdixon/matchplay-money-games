@@ -233,17 +233,6 @@
     --border: 214 32% 88%;
     --input: 214 32% 88%;
   }
-  .page-card-shell,
-  .page-card-shell p,
-  .page-card-shell span,
-  .page-card-shell li,
-  .page-card-shell h1,
-  .page-card-shell h2,
-  .page-card-shell h3,
-  .page-card-shell h4,
-  .page-card-shell label {
-    color: inherit;
-  }
   .app-page-bg {
     @apply min-h-screen;
     background-color: hsl(220 14% 10%);
