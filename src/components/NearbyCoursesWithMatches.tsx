@@ -470,7 +470,7 @@ const NearbyCoursesWithMatches = () => {
         onOpenChange={setDialogOpen}
         openMatches={
           selectedCourse
-            ? (openMatchesByCourse.get(selectedCourse.name.toLowerCase().trim()) || []).map((m) => ({
+            ? openMatchesForCourse(selectedCourse.name).map((m) => ({
                 id: m.id,
                 participant_count: m.participant_count,
                 max_participants: m.max_participants,
