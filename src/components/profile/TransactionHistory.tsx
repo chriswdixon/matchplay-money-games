@@ -1,9 +1,13 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useState, Suspense, lazy } from 'react';
 import { Button } from '@/components/ui/button';
 import { useAccountTransactions } from '@/hooks/useAccountTransactions';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { History, TrendingDown, CreditCard, Trophy, Ticket, Loader2, LogOut, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
 import { format } from 'date-fns';
+
+const MatchInfoDialog = lazy(() =>
+  import('@/components/MatchInfoDialog').then((m) => ({ default: m.MatchInfoDialog })),
+);
 
 export function TransactionHistory() {
   const { transactions, loading } = useAccountTransactions();
