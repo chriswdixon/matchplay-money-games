@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Crown, Sparkles, Loader2 } from 'lucide-react';
+import { Crown, Sparkles, Loader2, CalendarClock, CheckCircle2, AlertTriangle, XCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription, SUBSCRIPTION_TIERS } from '@/hooks/useSubscription';
@@ -58,7 +58,18 @@ const TIER_META: Record<
 type ConfirmAction = null | 'change' | 'cancel';
 
 export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
-  const { tierName, loading, subscriptionEnd, productId, refreshSubscription } = useSubscription();
+  const {
+    tierName,
+    loading,
+    subscriptionEnd,
+    productId,
+    refreshSubscription,
+    status,
+    cancelAtPeriodEnd,
+    latestInvoiceStatus,
+    latestInvoiceAmountDue,
+    latestInvoiceHostedUrl,
+  } = useSubscription();
   const { session } = useAuth();
   const [manageOpen, setManageOpen] = useState(false);
   const [confirmAction, setConfirmAction] = useState<ConfirmAction>(null);
@@ -81,12 +92,72 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
     ? Object.values(SUBSCRIPTION_TIERS).find((t) => t.product_id === productId)
     : null;
 
-  const renewLabel = subscriptionEnd
-    ? `Renews ${new Date(subscriptionEnd).toLocaleDateString()}`
-    : null;
-  const cancelEffectiveLabel = subscriptionEnd
-    ? new Date(subscriptionEnd).toLocaleDateString()
-    : 'the end of your billing period';
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const endDate = subscriptionEnd ? new Date(subscriptionEnd) : null;
+  const renewLabel = endDate ? `Renews ${dateFormatter.format(endDate)}` : null;
+  const cancelEffectiveLabel = endDate ? dateFormatter.format(endDate) : 'the end of your billing period';
+
+  // Determine payment status presentation
+  type PaymentTone = 'success' | 'warning' | 'danger' | 'muted';
+  let paymentLabel: string | null = null;
+  let paymentDetail: string | null = null;
+  let paymentTone: PaymentTone = 'muted';
+  let nextBillingLabel: string | null = null;
+
+  if (meta.isPaid && endDate) {
+    if (cancelAtPeriodEnd) {
+      paymentLabel = 'Canceling';
+      paymentDetail = `Access ends ${dateFormatter.format(endDate)}`;
+      paymentTone = 'warning';
+      nextBillingLabel = `Ends ${dateFormatter.format(endDate)}`;
+    } else if (status === 'past_due' || status === 'unpaid') {
+      paymentLabel = 'Payment failed';
+      paymentDetail =
+        latestInvoiceAmountDue && latestInvoiceAmountDue > 0
+          ? `$${(latestInvoiceAmountDue / 100).toFixed(2)} due — update your payment method`
+          : 'Update your payment method to keep access';
+      paymentTone = 'danger';
+      nextBillingLabel = `Retry by ${dateFormatter.format(endDate)}`;
+    } else if (status === 'trialing') {
+      paymentLabel = 'Trial';
+      paymentDetail = `First charge on ${dateFormatter.format(endDate)}`;
+      paymentTone = 'success';
+      nextBillingLabel = `Next charge ${dateFormatter.format(endDate)}`;
+    } else if (status === 'incomplete') {
+      paymentLabel = 'Action required';
+      paymentDetail = 'Finish payment confirmation to activate';
+      paymentTone = 'warning';
+      nextBillingLabel = null;
+    } else {
+      paymentLabel = latestInvoiceStatus === 'paid' ? 'Paid' : 'Active';
+      paymentDetail = `Last payment ${latestInvoiceStatus ?? 'on file'}`;
+      paymentTone = 'success';
+      nextBillingLabel = `Next charge ${dateFormatter.format(endDate)}`;
+    }
+  }
+
+  const toneStyles: Record<PaymentTone, { wrap: string; icon: React.ReactNode }> = {
+    success: {
+      wrap: 'bg-success/10 text-success border-success/20',
+      icon: <CheckCircle2 className="w-4 h-4" aria-hidden="true" />,
+    },
+    warning: {
+      wrap: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      icon: <AlertTriangle className="w-4 h-4" aria-hidden="true" />,
+    },
+    danger: {
+      wrap: 'bg-destructive/10 text-destructive border-destructive/20',
+      icon: <XCircle className="w-4 h-4" aria-hidden="true" />,
+    },
+    muted: {
+      wrap: 'bg-muted text-muted-foreground border-border',
+      icon: <CheckCircle2 className="w-4 h-4" aria-hidden="true" />,
+    },
+  };
 
   const openPortal = async (intent: 'change' | 'cancel') => {
     if (!session?.access_token) {
@@ -162,6 +233,46 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
           </div>
         )}
       </div>
+
+      {meta.isPaid && (paymentLabel || nextBillingLabel) && (
+        <div className="grid sm:grid-cols-2 gap-2">
+          {nextBillingLabel && (
+            <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2">
+              <CalendarClock className="w-4 h-4 mt-0.5 text-muted-foreground" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  {cancelAtPeriodEnd ? 'Access ends' : 'Next billing date'}
+                </p>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {endDate ? dateFormatter.format(endDate) : '—'}
+                </p>
+              </div>
+            </div>
+          )}
+          {paymentLabel && (
+            <div
+              className={`flex items-start gap-2 rounded-lg border px-3 py-2 ${toneStyles[paymentTone].wrap}`}
+            >
+              <span className="mt-0.5">{toneStyles[paymentTone].icon}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] uppercase tracking-wide opacity-80">Payment status</p>
+                <p className="text-sm font-medium truncate">{paymentLabel}</p>
+                {paymentDetail && <p className="text-xs opacity-90 truncate">{paymentDetail}</p>}
+                {paymentTone === 'danger' && latestInvoiceHostedUrl && (
+                  <a
+                    href={latestInvoiceHostedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs underline font-medium"
+                  >
+                    Pay invoice
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
 
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <ul className="text-xs space-y-1.5 flex-1 text-muted-foreground">

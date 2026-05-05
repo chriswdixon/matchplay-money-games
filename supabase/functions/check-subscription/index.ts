@@ -88,29 +88,59 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
+    // Look at all non-terminal subscriptions so we can surface past_due / unpaid / trialing too
     const subscriptions = await stripe.subscriptions.list({
       customer: customerId,
-      status: "active",
-      limit: 1,
+      status: "all",
+      limit: 5,
     });
-    const hasActiveSub = subscriptions.data.length > 0;
-    let productId = null;
-    let subscriptionEnd = null;
 
-    if (hasActiveSub) {
-      const subscription = subscriptions.data[0];
+    const liveStatuses = new Set(["active", "trialing", "past_due", "unpaid", "incomplete"]);
+    const subscription = subscriptions.data.find((s) => liveStatuses.has(s.status));
+    const hasActiveSub = !!subscription && (subscription.status === "active" || subscription.status === "trialing");
+
+    let productId: string | null = null;
+    let subscriptionEnd: string | null = null;
+    let status: string | null = null;
+    let cancelAtPeriodEnd = false;
+    let latestInvoiceStatus: string | null = null;
+    let latestInvoiceAmountDue: number | null = null;
+    let latestInvoiceHostedUrl: string | null = null;
+
+    if (subscription) {
       subscriptionEnd = new Date(subscription.current_period_end * 1000).toISOString();
-      logStep("Active subscription found", { subscriptionId: subscription.id, endDate: subscriptionEnd });
       productId = subscription.items.data[0].price.product as string;
-      logStep("Determined subscription product", { productId });
+      status = subscription.status;
+      cancelAtPeriodEnd = !!subscription.cancel_at_period_end;
+      logStep("Subscription found", { id: subscription.id, status, cancelAtPeriodEnd, end: subscriptionEnd });
+
+      // Pull latest invoice for payment status
+      if (subscription.latest_invoice) {
+        try {
+          const invoiceId = typeof subscription.latest_invoice === "string"
+            ? subscription.latest_invoice
+            : subscription.latest_invoice.id;
+          const invoice = await stripe.invoices.retrieve(invoiceId);
+          latestInvoiceStatus = invoice.status ?? null;
+          latestInvoiceAmountDue = invoice.amount_due ?? null;
+          latestInvoiceHostedUrl = invoice.hosted_invoice_url ?? null;
+        } catch (invErr) {
+          logStep("Could not fetch latest invoice", { error: String(invErr) });
+        }
+      }
     } else {
-      logStep("No active subscription found");
+      logStep("No live subscription found");
     }
 
     return new Response(JSON.stringify({
       subscribed: hasActiveSub,
       product_id: productId,
-      subscription_end: subscriptionEnd
+      subscription_end: subscriptionEnd,
+      status,
+      cancel_at_period_end: cancelAtPeriodEnd,
+      latest_invoice_status: latestInvoiceStatus,
+      latest_invoice_amount_due: latestInvoiceAmountDue,
+      latest_invoice_hosted_url: latestInvoiceHostedUrl,
     }), {
       headers: { ...corsHeaders, "Content-Type": "application/json" },
       status: 200,
