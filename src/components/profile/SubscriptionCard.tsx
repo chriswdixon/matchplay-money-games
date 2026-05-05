@@ -79,7 +79,7 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
     : null;
 
   return (
-    <div className={`rounded-3xl ${meta.bgClass} ${meta.fgClass} p-4 md:p-6 shadow-card space-y-4 transition-colors`}>
+    <div className="space-y-4">
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div className="p-2 rounded-lg shrink-0 bg-success text-success-foreground">
