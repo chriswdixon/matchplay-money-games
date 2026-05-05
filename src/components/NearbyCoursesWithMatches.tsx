@@ -373,8 +373,7 @@ const NearbyCoursesWithMatches = () => {
           </p>
         )}
         {visibleCourses.map((course, i) => {
-          const openMatches =
-            openMatchesByCourse.get(course.name.toLowerCase().trim()) || [];
+          const openMatches = openMatchesForCourse(course.name);
           const hasOpenMatch = openMatches.length > 0;
           const openCourse = () => {
             setSelectedCourse(course);
