@@ -61,7 +61,7 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
     : null;
 
   return (
-    <div className="rounded-xl border bg-card p-4 sm:p-5 space-y-4">
+    <div className={`rounded-xl border-2 ${meta.borderClass} ${meta.ringClass} bg-card p-4 sm:p-5 space-y-4 transition-colors`}>
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div
