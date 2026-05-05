@@ -83,6 +83,22 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     return () => clearTimeout(timer);
   }, [location, searchRadius]); // Removed refetch from dependencies to prevent loops
 
+  // Load my pending join requests so we can show "Requested" state
+  useEffect(() => {
+    if (!user) { setRequestedJoinIds(new Set()); return; }
+    let cancelled = false;
+    (async () => {
+      const { data } = await supabase
+        .from('match_join_requests')
+        .select('match_id, status')
+        .eq('requester_id', user.id)
+        .eq('status', 'pending');
+      if (cancelled || !data) return;
+      setRequestedJoinIds(new Set(data.map((r: any) => r.match_id)));
+    })();
+    return () => { cancelled = true; };
+  }, [user]);
+
   // Separate incomplete matches (started matches >4 hours old that user joined)
   const incompleteMatches = useMemo(() => {
     if (showPastMatches || !user) return [];
