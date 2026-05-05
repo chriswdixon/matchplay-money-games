@@ -743,7 +743,19 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         </Badge>
                       )}
                       
-                      <CardHeader className="pb-4">
+                      <CardHeader
+                        className="pb-4 cursor-pointer"
+                        onClick={() => setInfoMatchId(match.id)}
+                        role="button"
+                        tabIndex={0}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault();
+                            setInfoMatchId(match.id);
+                          }
+                        }}
+                        aria-label={`View details for ${match.course_name}`}
+                      >
                         <CardTitle className="text-lg font-semibold text-foreground line-clamp-1">
                           {match.course_name}
                         </CardTitle>
