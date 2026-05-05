@@ -97,12 +97,14 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
       latitude: course.latitude,
       longitude: course.longitude,
       website: course.website,
-      externalId: (course as any).externalId,
+      externalId: course.externalId,
       booking_url: course.website,
     };
     try {
       sessionStorage.setItem("tyche-prefilled-course", JSON.stringify(prefilledCourse));
-    } catch {}
+    } catch {
+      // Continue without session storage; navigation state still carries the course.
+    }
     navigate("/create-match", { state: { prefilledCourse } });
   };
 
