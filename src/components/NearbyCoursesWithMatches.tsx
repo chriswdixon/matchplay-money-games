@@ -83,17 +83,14 @@ const NearbyCoursesWithMatches = () => {
 
   const visibleCourses = courses.slice(0, visibleCount);
 
-  // Detect a ZIP code (US 5-digit, optional +4) or a "City, ST" / "City Name" pattern
-  // that the user can type into the same search to override GPS.
+  // Only allow ZIP code searches (US 5-digit, optional +4) — city searches are not supported.
   const isZip = (s: string) => /^\d{5}(-\d{4})?$/.test(s.trim());
-  const looksLikePlace = (s: string) =>
-    /^[A-Za-z][A-Za-z .'\-]{1,48},\s*[A-Za-z]{2,}$/.test(s.trim());
 
   const runSearch = async (q: string) => {
     const term = q.trim();
 
-    // If the query is a ZIP/city and we have no GPS, geocode it as the search origin.
-    if (term && (isZip(term) || looksLikePlace(term))) {
+    // If the query is a ZIP and we have no GPS, geocode it as the search origin.
+    if (term && isZip(term)) {
       const geo = await geocodeAddress(term);
       if (geo) {
         setManualLocation({ latitude: geo.latitude, longitude: geo.longitude, label: term });
@@ -229,9 +226,9 @@ const NearbyCoursesWithMatches = () => {
           <Input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search course, ZIP code, or city, ST"
+            placeholder="Search course or ZIP code"
             className="pl-10 h-11 rounded-full bg-success text-white font-bold placeholder:text-white/80 placeholder:font-bold border-success focus-visible:ring-success"
-            aria-label="Search courses, ZIP code, or city to find nearby matches"
+            aria-label="Search courses or ZIP code to find nearby matches"
             inputMode="search"
             maxLength={60}
           />
@@ -254,8 +251,7 @@ const NearbyCoursesWithMatches = () => {
             {locationLoading ? "Locating…" : "Enable location to see nearby courses"}
           </Button>
           <p className="text-xs text-muted-foreground text-center px-1">
-            Or type a <span className="font-semibold">ZIP code</span> or{" "}
-            <span className="font-semibold">City, ST</span> in the search above to find nearby matches without GPS.
+            Or type a <span className="font-semibold">ZIP code</span> in the search above to find nearby matches without GPS.
           </p>
           <LocationStatusBanner
             error={locationError}

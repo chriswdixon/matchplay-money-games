@@ -143,7 +143,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
             placeholder={
               mode === "matches"
                 ? "Search by course or location..."
-                : "Course name, city, or leave blank for nearby"
+                : "Course name or ZIP code"
             }
             className="pl-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
             aria-label={mode === "matches" ? "Search matches" : "Search courses"}
