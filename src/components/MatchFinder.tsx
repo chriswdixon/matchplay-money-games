@@ -44,6 +44,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { hasAccess } = useFreeTier();
   const isMobile = useIsMobile();
   const MOBILE_PAGE_SIZE = 3;
+  const DESKTOP_PAGE_SIZE = 9;
+  const PAGE_SIZE = isMobile ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE;
   const [page, setPage] = useState(0);
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
@@ -285,13 +287,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     setPage(0);
   }, [filters, showPastMatches, matches.length]);
 
-  const totalPages = isMobile
-    ? Math.max(1, Math.ceil(filteredMatches.length / MOBILE_PAGE_SIZE))
-    : 1;
+  const totalPages = Math.max(1, Math.ceil(filteredMatches.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
-  const visibleMatches = isMobile
-    ? filteredMatches.slice(safePage * MOBILE_PAGE_SIZE, safePage * MOBILE_PAGE_SIZE + MOBILE_PAGE_SIZE)
-    : filteredMatches;
+  const visibleMatches = filteredMatches.slice(
+    safePage * PAGE_SIZE,
+    safePage * PAGE_SIZE + PAGE_SIZE,
+  );
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
@@ -993,7 +994,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 })
               )}
             </div>
-            {isMobile && filteredMatches.length > MOBILE_PAGE_SIZE && (
+            {filteredMatches.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-3 pt-4">
                 <Button
                   type="button"

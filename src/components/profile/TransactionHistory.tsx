@@ -25,18 +25,13 @@ export function TransactionHistory() {
   const isMobile = useIsMobile();
   const [page, setPage] = useState(0);
   const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
-  const PAGE_SIZE = 3;
+  const PAGE_SIZE = isMobile ? 3 : 10;
 
-  const totalPages = isMobile
-    ? Math.max(1, Math.ceil(transactions.length / PAGE_SIZE))
-    : 1;
+  const totalPages = Math.max(1, Math.ceil(transactions.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const visibleTransactions = useMemo(
-    () =>
-      isMobile
-        ? transactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE)
-        : transactions,
-    [transactions, isMobile, safePage],
+    () => transactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
+    [transactions, safePage, PAGE_SIZE],
   );
 
   const getTransactionIcon = (type: string) => {
@@ -172,7 +167,7 @@ export function TransactionHistory() {
               );
             })}
 
-            {isMobile && transactions.length > PAGE_SIZE && (
+            {transactions.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-3 pt-2">
                 <Button
                   type="button"
