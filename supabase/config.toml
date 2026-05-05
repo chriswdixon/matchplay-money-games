@@ -32,3 +32,6 @@ verify_jwt = false
 [functions.send-age-verification]
 [functions.verify-age-token]
 verify_jwt = false
+
+[functions.og-image]
+verify_jwt = false
