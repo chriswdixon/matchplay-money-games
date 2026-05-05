@@ -50,7 +50,9 @@ const MyCurrentMatches = () => {
           id="current-matches-heading"
           className="text-lg font-bold flex items-center gap-2"
         >
-          <Target className="w-5 h-5 text-primary" aria-hidden="true" />
+          <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-success text-white shrink-0">
+            <Target className="w-5 h-5" aria-hidden="true" />
+          </span>
           Current Matches
         </h2>
         <button
