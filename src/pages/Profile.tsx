@@ -144,6 +144,7 @@ export default function Profile() {
               <TooltipContent side="bottom">{label}</TooltipContent>
             </Tooltip>
           );
+        })}
         </div>
 
         <div className="flex items-center flex-wrap gap-1.5">
