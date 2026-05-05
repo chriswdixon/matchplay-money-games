@@ -59,10 +59,11 @@ const NearbyCoursesWithMatches = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [query, effectiveLocation?.latitude, effectiveLocation?.longitude, radius]);
 
-  // Reset pagination when results change
+  // Reset pagination only when the result set size actually changes,
+  // not on every new array reference from re-running the debounced search.
   useEffect(() => {
-    setVisibleCount(10);
-  }, [courses]);
+    setVisibleCount((c) => Math.min(Math.max(c, 10), Math.max(courses.length, 10)));
+  }, [courses.length]);
 
   // Infinite scroll: expand as the sentinel becomes visible
   useEffect(() => {
