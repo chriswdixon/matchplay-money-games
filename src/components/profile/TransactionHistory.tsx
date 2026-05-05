@@ -31,9 +31,9 @@ export function TransactionHistory() {
   const getTransactionColor = (type: string, amount: number) => {
     // Color based on whether money was gained or lost
     if (amount > 0) {
-      return 'text-green-600 dark:text-green-400';
+      return 'text-success';
     } else if (amount < 0) {
-      return 'text-red-600 dark:text-red-400';
+      return 'text-destructive';
     }
     return 'text-muted-foreground';
   };
