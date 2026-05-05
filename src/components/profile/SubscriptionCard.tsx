@@ -1,4 +1,4 @@
-import { Crown, Sparkles, ArrowUpRight } from 'lucide-react';
+import { Crown, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useSubscription, SUBSCRIPTION_TIERS } from '@/hooks/useSubscription';
@@ -92,19 +92,24 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
         )}
       </div>
 
-      <ul className="text-xs text-muted-foreground space-y-1.5">
-        {meta.perks.map((perk) => (
-          <li key={perk} className="flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />
-            {perk}
-          </li>
-        ))}
-      </ul>
+      <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
+        <ul className="text-xs text-muted-foreground space-y-1.5 flex-1">
+          {meta.perks.map((perk) => (
+            <li key={perk} className="flex items-center gap-2">
+              <span className="w-1.5 h-1.5 rounded-full bg-success shrink-0" aria-hidden="true" />
+              {perk}
+            </li>
+          ))}
+        </ul>
 
-      <Button onClick={onManage} className="w-full sm:w-auto" size="sm">
-        {meta.isPaid ? 'Manage subscription' : 'Upgrade plan'}
-        <ArrowUpRight className="w-4 h-4 ml-1" aria-hidden="true" />
-      </Button>
+        <Button
+          onClick={onManage}
+          size="sm"
+          className="w-full sm:w-auto sm:ml-auto bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+        >
+          {meta.isPaid ? 'Manage subscription' : 'Upgrade plan'}
+        </Button>
+      </div>
     </div>
   );
 }
