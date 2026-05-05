@@ -14,6 +14,7 @@ import { useAuth } from '@/hooks/useAuth';
 import { useGolfCourses } from '@/hooks/useGolfCourses';
 import { useFavoriteCourses } from '@/hooks/useFavoriteCourses';
 import { useIsMobile } from '@/hooks/use-mobile';
+import SelectedCourseCard from '@/components/create-match/SelectedCourseCard';
 
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
