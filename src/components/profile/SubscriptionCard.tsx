@@ -8,21 +8,30 @@ interface SubscriptionCardProps {
   onManage: () => void;
 }
 
-const TIER_META: Record<string, { tagline: string; perks: string[]; isPaid: boolean }> = {
+const TIER_META: Record<
+  string,
+  { tagline: string; perks: string[]; isPaid: boolean; borderClass: string; ringClass: string }
+> = {
   Free: {
     tagline: 'Casual play, no commitment.',
     perks: ['Match Play & Stroke Play', 'Play money wallet', 'Standard handicap tracking'],
     isPaid: false,
+    borderClass: 'border-border',
+    ringClass: '',
   },
   'Local Player': {
     tagline: 'For regulars at your home course.',
     perks: ['Priority match listings', 'Advanced course stats', 'No platform fees on entry'],
     isPaid: true,
+    borderClass: 'border-primary/60',
+    ringClass: 'ring-1 ring-primary/30',
   },
   'Tournament Pro': {
     tagline: 'Compete at the highest level.',
     perks: ['Tournament hosting', 'Pro analytics suite', 'Verified handicap badge'],
     isPaid: true,
+    borderClass: 'border-accent/70',
+    ringClass: 'ring-1 ring-accent/40',
   },
 };
 
@@ -52,7 +61,7 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
     : null;
 
   return (
-    <div className="rounded-xl border bg-card p-4 sm:p-5 space-y-4">
+    <div className={`rounded-xl border-2 ${meta.borderClass} ${meta.ringClass} bg-card p-4 sm:p-5 space-y-4 transition-colors`}>
       <div className="flex items-start justify-between gap-3 flex-wrap">
         <div className="flex items-center gap-3 min-w-0">
           <div
