@@ -1,15 +1,43 @@
-import { useMemo, useState, Suspense, lazy } from 'react';
+import { useEffect, useMemo, useState, Suspense, lazy } from 'react';
 import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
-import { useAccountTransactions } from '@/hooks/useAccountTransactions';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Badge } from '@/components/ui/badge';
+import { useAccountTransactions, type AccountTransaction } from '@/hooks/useAccountTransactions';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { History, TrendingDown, CreditCard, Trophy, Ticket, LogOut, Zap, ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { History, TrendingDown, CreditCard, Trophy, Ticket, LogOut, Zap, ChevronLeft, ChevronRight, Search, X, ArrowUpDown } from 'lucide-react';
 import { format } from 'date-fns';
 
 const MatchInfoDialog = lazy(() =>
   import('@/components/MatchInfoDialog').then((m) => ({ default: m.MatchInfoDialog })),
 );
+
+const TYPE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'all', label: 'All types' },
+  { value: 'winning', label: 'Winnings' },
+  { value: 'payout', label: 'Payouts' },
+  { value: 'match_buyin', label: 'Buy-ins' },
+  { value: 'match_cancellation', label: 'Cancellations' },
+  { value: 'coupon', label: 'Coupons' },
+  { value: 'double_down', label: 'Double Down' },
+  { value: 'subscription_charge', label: 'Subscription' },
+];
+
+const DATE_OPTIONS: { value: string; label: string }[] = [
+  { value: 'all', label: 'All time' },
+  { value: '7d', label: 'Last 7 days' },
+  { value: '30d', label: 'Last 30 days' },
+  { value: '90d', label: 'Last 90 days' },
+  { value: '1y', label: 'Last year' },
+];
+
+const SORT_OPTIONS: { value: string; label: string }[] = [
+  { value: 'newest', label: 'Newest first' },
+  { value: 'oldest', label: 'Oldest first' },
+  { value: 'amount_desc', label: 'Largest amount' },
+  { value: 'amount_asc', label: 'Smallest amount' },
+];
 
 const TransactionHistoryHeader = () => (
   <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
@@ -25,14 +53,67 @@ export function TransactionHistory() {
   const isMobile = useIsMobile();
   const [page, setPage] = useState(0);
   const [infoMatchId, setInfoMatchId] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<string>('all');
+  const [directionFilter, setDirectionFilter] = useState<'all' | 'in' | 'out'>('all');
+  const [dateFilter, setDateFilter] = useState<string>('all');
+  const [sortBy, setSortBy] = useState<string>('newest');
   const PAGE_SIZE = isMobile ? 3 : 10;
 
-  const totalPages = Math.max(1, Math.ceil(transactions.length / PAGE_SIZE));
+  const filteredTransactions = useMemo(() => {
+    let list: AccountTransaction[] = [...transactions];
+
+    if (typeFilter !== 'all') {
+      list = list.filter((t) => t.transaction_type === typeFilter);
+    }
+
+    if (directionFilter !== 'all') {
+      list = list.filter((t) => {
+        const amt = parseFloat(t.amount.toString());
+        return directionFilter === 'in' ? amt > 0 : amt < 0;
+      });
+    }
+
+    if (dateFilter !== 'all') {
+      const days = dateFilter === '7d' ? 7 : dateFilter === '30d' ? 30 : dateFilter === '90d' ? 90 : 365;
+      const cutoff = Date.now() - days * 24 * 60 * 60 * 1000;
+      list = list.filter((t) => new Date(t.created_at).getTime() >= cutoff);
+    }
+
+    list.sort((a, b) => {
+      const aAmt = Math.abs(parseFloat(a.amount.toString()));
+      const bAmt = Math.abs(parseFloat(b.amount.toString()));
+      const aTime = new Date(a.created_at).getTime();
+      const bTime = new Date(b.created_at).getTime();
+      switch (sortBy) {
+        case 'oldest': return aTime - bTime;
+        case 'amount_desc': return bAmt - aAmt;
+        case 'amount_asc': return aAmt - bAmt;
+        case 'newest':
+        default: return bTime - aTime;
+      }
+    });
+
+    return list;
+  }, [transactions, typeFilter, directionFilter, dateFilter, sortBy]);
+
+  useEffect(() => {
+    setPage(0);
+  }, [typeFilter, directionFilter, dateFilter, sortBy]);
+
+  const hasActiveFilters = typeFilter !== 'all' || directionFilter !== 'all' || dateFilter !== 'all';
+  const totalPages = Math.max(1, Math.ceil(filteredTransactions.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
   const visibleTransactions = useMemo(
-    () => transactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
-    [transactions, safePage, PAGE_SIZE],
+    () => filteredTransactions.slice(safePage * PAGE_SIZE, safePage * PAGE_SIZE + PAGE_SIZE),
+    [filteredTransactions, safePage, PAGE_SIZE],
   );
+
+  const clearFilters = () => {
+    setTypeFilter('all');
+    setDirectionFilter('all');
+    setDateFilter('all');
+    setSortBy('newest');
+  };
 
   const getTransactionIcon = (type: string) => {
     switch (type) {
