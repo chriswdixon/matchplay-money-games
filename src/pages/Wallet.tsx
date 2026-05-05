@@ -47,14 +47,6 @@ export default function Wallet() {
     <div className="app-page-bg flex flex-col">
       <a href="#wallet-main" className="skip-link">Skip to main content</a>
 
-      <header className="px-4 md:px-6 pt-4 max-w-3xl w-full mx-auto md:pt-20" role="banner">
-        <PageTitleCard
-          icon={<Landmark className="w-5 h-5" aria-hidden="true" />}
-          title="Wallet & Membership"
-          description="Track your play money, see every transaction, and manage your membership tier."
-        />
-      </header>
-
       <main
         id="wallet-main"
         role="main"
