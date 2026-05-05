@@ -39,7 +39,7 @@
     /* Status Colors */
     --destructive: 0 75% 50%;
     --destructive-foreground: 0 0% 98%;
-    --success: 145 100% 35%;
+    --success: 145 100% 41%;
     --success-foreground: 0 0% 100%;
     --warning: 38 92% 50%;
     --warning-foreground: 0 0% 100%;
@@ -94,9 +94,9 @@
     --popover: 220 12% 13%;
     --popover-foreground: 220 10% 95%;
     
-    --primary: 145 100% 48%;
-    --primary-foreground: 220 12% 10%;
-    --primary-glow: 145 100% 58%;
+    --primary: 145 100% 41%;
+    --primary-foreground: 0 0% 100%;
+    --primary-glow: 145 100% 50%;
     
     --secondary: 220 10% 18%;
     --secondary-foreground: 220 10% 92%;
@@ -104,16 +104,18 @@
     --muted: 220 10% 16%;
     --muted-foreground: 220 8% 70%;
     
-    --accent: 145 100% 48%;
-    --accent-foreground: 220 12% 10%;
-    --accent-glow: 145 100% 58%;
+    --accent: 145 100% 41%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 145 100% 50%;
     
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 98%;
     
     --border: 220 10% 22%;
     --input: 220 10% 18%;
-    --ring: 145 100% 48%;
+    --ring: 145 100% 41%;
+    --success: 145 100% 41%;
+    --success-foreground: 0 0% 100%;
     
     --gradient-primary: linear-gradient(135deg, hsl(var(--primary)), hsl(var(--primary-glow)));
     --gradient-accent: linear-gradient(135deg, hsl(var(--accent)), hsl(var(--accent-glow)));

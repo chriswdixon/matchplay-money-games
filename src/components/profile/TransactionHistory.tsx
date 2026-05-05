@@ -31,9 +31,9 @@ export function TransactionHistory() {
   const getTransactionColor = (type: string, amount: number) => {
     // Color based on whether money was gained or lost
     if (amount > 0) {
-      return 'text-green-600 dark:text-green-400';
+      return 'text-success';
     } else if (amount < 0) {
-      return 'text-red-600 dark:text-red-400';
+      return 'text-destructive';
     }
     return 'text-muted-foreground';
   };
@@ -96,7 +96,7 @@ export function TransactionHistory() {
                   className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className={`p-2 rounded-lg ${isPositive ? 'bg-green-500/10' : 'bg-red-500/10'}`}>
+                    <div className={`p-2 rounded-lg ${isPositive ? 'bg-success/10' : 'bg-destructive/10'}`}>
                       {getTransactionIcon(transaction.transaction_type)}
                     </div>
                     <div>
