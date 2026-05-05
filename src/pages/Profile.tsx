@@ -113,15 +113,10 @@ export default function Profile() {
     <TooltipProvider delayDuration={200}>
       <nav
         aria-label="Profile sections"
-        className={cn(
-          'z-30 px-2 pointer-events-none',
-          isMobile
-            ? 'sticky top-2 mt-4 mb-6'
-            : 'sticky top-4 mt-6 mb-8'
-        )}
+        className="z-30 px-2 mb-6"
       >
-        <div className="mx-auto w-3/4 max-w-md pointer-events-auto">
-          <div className="flex items-center justify-around gap-1 bg-foreground text-background rounded-full px-2 py-2 shadow-premium border border-border">
+        <div className="mx-auto w-full max-w-2xl">
+          <div className="flex items-center justify-center flex-wrap gap-2 bg-foreground text-background rounded-full px-3 py-2 shadow-premium border border-border">
             {tabs.map(({ id, label, Icon, badge }) => {
               const active = id === activeTab;
               return (
@@ -136,7 +131,7 @@ export default function Profile() {
                         'relative flex items-center justify-center rounded-full transition-all w-10 h-10 shrink-0',
                         active
                           ? 'bg-primary text-primary-foreground shadow-[0_0_20px_hsl(var(--primary)/0.6)]'
-                          : 'text-background/90 hover:text-background hover:bg-background/10 hover:shadow-[0_0_20px_hsl(var(--primary)/0.5)]'
+                          : 'text-background/90 hover:text-background hover:bg-background/10'
                       )}
                     >
                       <Icon className="w-5 h-5" strokeWidth={active ? 2.5 : 2} aria-hidden="true" />
@@ -154,6 +149,80 @@ export default function Profile() {
                 </Tooltip>
               );
             })}
+
+            {/* Divider */}
+            <span aria-hidden="true" className="mx-1 h-6 w-px bg-background/30" />
+
+            {hasActiveMatch && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/')}
+                    aria-label="Active Match"
+                    className="flex items-center justify-center rounded-full w-10 h-10 shrink-0 bg-primary text-primary-foreground hover:bg-primary/90"
+                  >
+                    <Target className="w-5 h-5" aria-hidden="true" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Active Match</TooltipContent>
+              </Tooltip>
+            )}
+
+            {isAdmin && (
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    type="button"
+                    onClick={() => setAdminConfirmOpen(true)}
+                    aria-label="Admin Portal"
+                    className="relative flex items-center justify-center rounded-full w-10 h-10 shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                  >
+                    <ShieldCheck className="w-5 h-5" aria-hidden="true" />
+                    {openSupportCount > 0 && (
+                      <span
+                        aria-hidden="true"
+                        className="absolute -top-1 -right-1 min-w-[1.125rem] h-[1.125rem] px-1 rounded-full bg-background text-destructive text-[10px] font-bold leading-none flex items-center justify-center border-2 border-foreground"
+                      >
+                        {openSupportCount > 99 ? '99+' : openSupportCount}
+                      </span>
+                    )}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="bottom">Admin Portal</TooltipContent>
+              </Tooltip>
+            )}
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={() => setShowSupportDialog(true)}
+                  aria-label="Contact Support"
+                  className="flex items-center justify-center rounded-full w-10 h-10 shrink-0 bg-success text-success-foreground hover:bg-success/90"
+                >
+                  <LifeBuoy className="w-5 h-5" aria-hidden="true" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Contact Support</TooltipContent>
+            </Tooltip>
+
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await signOut();
+                    navigate('/');
+                  }}
+                  aria-label="Log out"
+                  className="flex items-center justify-center rounded-full w-10 h-10 shrink-0 bg-destructive text-destructive-foreground hover:bg-destructive/90"
+                >
+                  <LogOut className="w-5 h-5" aria-hidden="true" />
+                </button>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Log out</TooltipContent>
+            </Tooltip>
           </div>
         </div>
       </nav>
