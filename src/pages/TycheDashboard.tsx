@@ -131,10 +131,7 @@ const TycheDashboard = () => {
         {currentTab === "past" && (
           <div className="space-y-6">
             <MyCurrentMatches />
-            <div className="bg-card rounded-3xl p-4 shadow-card">
-              <h2 className="text-2xl font-bold mb-4 flex items-center gap-2"><Trophy className="w-6 h-6 text-primary" aria-hidden="true" />Past Matches</h2>
-              <Suspense fallback={<TabLoader />}><MatchFinder hideHowItWorks showPastMatches /></Suspense>
-            </div>
+            <MyPastMatches />
           </div>
         )}
         {currentTab === "handicap" && (
