@@ -10,28 +10,46 @@ interface SubscriptionCardProps {
 
 const TIER_META: Record<
   string,
-  { tagline: string; perks: string[]; isPaid: boolean; borderClass: string; ringClass: string }
+  {
+    tagline: string;
+    perks: string[];
+    isPaid: boolean;
+    bgClass: string;
+    fgClass: string;
+    mutedFgClass: string;
+    iconBgClass: string;
+    bulletClass: string;
+  }
 > = {
   Free: {
     tagline: 'Casual play, no commitment.',
     perks: ['Match Play & Stroke Play', 'Play money wallet', 'Standard handicap tracking'],
     isPaid: false,
-    borderClass: 'border-border',
-    ringClass: '',
+    bgClass: 'bg-muted',
+    fgClass: 'text-foreground',
+    mutedFgClass: 'text-muted-foreground',
+    iconBgClass: 'bg-background/60 text-foreground',
+    bulletClass: 'bg-foreground/40',
   },
   'Local Player': {
     tagline: 'For regulars at your home course.',
     perks: ['Priority match listings', 'Advanced course stats', 'No platform fees on entry'],
     isPaid: true,
-    borderClass: 'border-primary/60',
-    ringClass: 'ring-1 ring-primary/30',
+    bgClass: 'bg-gradient-primary',
+    fgClass: 'text-primary-foreground',
+    mutedFgClass: 'text-primary-foreground/80',
+    iconBgClass: 'bg-primary-foreground/15 text-primary-foreground',
+    bulletClass: 'bg-primary-foreground/70',
   },
   'Tournament Pro': {
     tagline: 'Compete at the highest level.',
     perks: ['Tournament hosting', 'Pro analytics suite', 'Verified handicap badge'],
     isPaid: true,
-    borderClass: 'border-accent/70',
-    ringClass: 'ring-1 ring-accent/40',
+    bgClass: 'bg-gradient-accent',
+    fgClass: 'text-accent-foreground',
+    mutedFgClass: 'text-accent-foreground/80',
+    iconBgClass: 'bg-accent-foreground/15 text-accent-foreground',
+    bulletClass: 'bg-accent-foreground/70',
   },
 };
 
