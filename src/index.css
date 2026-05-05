@@ -104,9 +104,9 @@
     --muted: 220 10% 16%;
     --muted-foreground: 220 8% 70%;
     
-    --accent: 145 100% 48%;
-    --accent-foreground: 220 12% 10%;
-    --accent-glow: 145 100% 58%;
+    --accent: 145 100% 41%;
+    --accent-foreground: 0 0% 100%;
+    --accent-glow: 145 100% 50%;
     
     --destructive: 0 75% 60%;
     --destructive-foreground: 0 0% 98%;
