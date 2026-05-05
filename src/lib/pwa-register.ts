@@ -25,7 +25,21 @@ export async function registerPWA(): Promise<void> {
 
   try {
     const { registerSW } = await import("virtual:pwa-register");
-    registerSW({ immediate: true });
+    const updateSW = registerSW({
+      immediate: true,
+      onNeedRefresh() {
+        // New SW available — activate and reload so updated icons/manifest take effect.
+        void updateSW(true);
+      },
+      onRegisteredSW(_swUrl, registration) {
+        if (!registration) return;
+        // Check for updates immediately and then every 60s while the tab is open.
+        void registration.update();
+        setInterval(() => {
+          void registration.update();
+        }, 60_000);
+      },
+    });
   } catch (err) {
     console.warn("[PWA] registration skipped:", err);
   }
