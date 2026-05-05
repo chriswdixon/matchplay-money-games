@@ -9,7 +9,7 @@ const TycheDashboard = lazy(() => import("./TycheDashboard"));
 
 const RouteFallback = () => (
   <div className="min-h-screen bg-background flex items-center justify-center">
-    <GolfBallLoader />
+    <GolfBallLoader showBrand />
   </div>
 );
 

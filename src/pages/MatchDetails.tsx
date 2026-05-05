@@ -62,7 +62,7 @@ const MatchDetails = () => {
   if (loading || authLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
-        <GolfBallLoader size={64} />
+        <GolfBallLoader size={64} showBrand />
       </div>
     );
   }

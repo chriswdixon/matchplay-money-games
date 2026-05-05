@@ -1,10 +1,18 @@
+import tycheLogo from "@/assets/tyche-logo-green.svg";
+
 interface GolfBallLoaderProps {
   label?: string;
   size?: number;
   className?: string;
+  showBrand?: boolean;
 }
 
-const GolfBallLoader = ({ label = "Loading...", size = 56, className = "" }: GolfBallLoaderProps) => {
+const GolfBallLoader = ({
+  label = "Loading...",
+  size = 56,
+  className = "",
+  showBrand = false,
+}: GolfBallLoaderProps) => {
   // Hex-packed dimple grid – realistic golf ball pattern
   const dimples: Array<[number, number, number]> = [];
   const spacing = 7;
@@ -19,7 +27,6 @@ const GolfBallLoader = ({ label = "Loading...", size = 56, className = "" }: Gol
       const y = (r - (rows - 1) / 2) * (spacing * 0.866);
       const d = Math.hypot(x, y);
       if (d > ballR - 5) continue;
-      // Shrink dimples toward edges to fake sphere curvature
       const t = 1 - d / ballR;
       const radius = 1.1 + t * 0.9;
       dimples.push([cx + x, cy + y, radius]);
@@ -33,6 +40,25 @@ const GolfBallLoader = ({ label = "Loading...", size = 56, className = "" }: Gol
       aria-live="polite"
       aria-label={label}
     >
+      {showBrand && (
+        <>
+          <img
+            src={tycheLogo}
+            alt="Tyche"
+            className="h-12 w-auto mb-1"
+            style={{ maxWidth: "180px" }}
+          />
+          <p
+            className="text-success text-lg tracking-wide mb-1"
+            style={{
+              fontFamily: "'Inter Tight', Inter, system-ui, sans-serif",
+              fontWeight: 800,
+            }}
+          >
+            Match. Play. WIN.
+          </p>
+        </>
+      )}
       <svg
         width={size}
         height={size}
@@ -48,15 +74,11 @@ const GolfBallLoader = ({ label = "Loading...", size = 56, className = "" }: Gol
             <stop offset="100%" stopColor="#d1d5db" />
           </radialGradient>
         </defs>
-        {/* Ball body */}
         <circle cx={cx} cy={cy} r={ballR} fill="url(#ball-shade)" stroke="hsl(var(--success))" strokeWidth="2.5" />
-        {/* Dimples */}
         {dimples.map(([x, y, r], i) => (
           <circle key={i} cx={x} cy={y} r={r} fill="#9ca3af" opacity="0.45" />
         ))}
-        {/* Highlight */}
         <ellipse cx="24" cy="22" rx="6" ry="3.5" fill="#ffffff" opacity="0.55" />
-        {/* Spinning indicator arc */}
         <path
           d="M32 4 a28 28 0 0 1 24 14"
           fill="none"

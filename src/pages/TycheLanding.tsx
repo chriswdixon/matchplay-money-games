@@ -39,7 +39,7 @@ const MatchScorecard = lazy(() => import("@/components/MatchScorecard").then(m =
 // Minimal loading fallback for lazy components
 const TabLoader = () => (
   <div className="flex items-center justify-center py-12">
-    <GolfBallLoader />
+    <GolfBallLoader showBrand />
   </div>
 );
 
