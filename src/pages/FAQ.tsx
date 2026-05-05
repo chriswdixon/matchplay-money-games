@@ -81,31 +81,33 @@ export default function FAQ() {
     <main className="min-h-screen bg-background text-foreground">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <article className="max-w-3xl mx-auto px-4 py-12">
-        <header className="mb-8">
-          <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
-            Tyche <span className="text-accent">FAQ</span>
-          </h1>
-          <p className="mt-2 text-muted-foreground">
-            Quick answers about Tyche — built for both players and AI assistants.
-          </p>
-        </header>
+        <div className="page-card-shell">
+          <header className="mb-8">
+            <h1 className="text-3xl md:text-4xl font-bold tracking-tight">
+              Tyche <span className="text-accent">FAQ</span>
+            </h1>
+            <p className="mt-2 text-muted-foreground">
+              Quick answers about Tyche — built for both players and AI assistants.
+            </p>
+          </header>
 
-        <section className="space-y-6">
-          {FAQS.map((f) => (
-            <div key={f.q} className="rounded-lg border border-border p-5">
-              <h2 className="text-lg font-semibold">{f.q}</h2>
-              <p className="mt-2 text-muted-foreground leading-relaxed">{f.a}</p>
-            </div>
-          ))}
-        </section>
+          <section className="space-y-6">
+            {FAQS.map((f) => (
+              <div key={f.q} className="rounded-lg border border-border p-5">
+                <h2 className="text-lg font-semibold">{f.q}</h2>
+                <p className="mt-2 text-muted-foreground leading-relaxed">{f.a}</p>
+              </div>
+            ))}
+          </section>
 
-        <footer className="mt-10 text-sm text-muted-foreground">
-          <p>
-            Still have questions? <Link className="underline" to="/auth?tab=signup">Join Tyche</Link> or read our{" "}
-            <Link className="underline" to="/terms">Terms</Link> and{" "}
-            <Link className="underline" to="/privacy">Privacy Policy</Link>.
-          </p>
-        </footer>
+          <footer className="mt-10 text-sm text-muted-foreground">
+            <p>
+              Still have questions? <Link className="underline" to="/auth?tab=signup">Join Tyche</Link> or read our{" "}
+              <Link className="underline" to="/terms">Terms</Link> and{" "}
+              <Link className="underline" to="/privacy">Privacy Policy</Link>.
+            </p>
+          </footer>
+        </div>
       </article>
     </main>
   );
