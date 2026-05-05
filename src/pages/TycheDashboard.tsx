@@ -29,9 +29,15 @@ const TabLoader = () => (
 const TycheDashboard = () => {
   const { user } = useAuth();
   const { hasActiveMatch, activeMatchId, activeMatchName } = useActiveMatch();
-  const [currentTab, setCurrentTab] = useState("home");
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [currentTab, setCurrentTab] = useState(() => searchParams.get('tab') || 'home');
   const navigate = useNavigate();
+
+  // Sync ?tab= query param into currentTab when it changes (e.g. navigated from Profile/Wallet)
+  useEffect(() => {
+    const t = searchParams.get('tab');
+    if (t && t !== currentTab) setCurrentTab(t);
+  }, [searchParams]);
 
 
   useEffect(() => {
