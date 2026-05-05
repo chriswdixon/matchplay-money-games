@@ -287,13 +287,12 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     setPage(0);
   }, [filters, showPastMatches, matches.length]);
 
-  const totalPages = isMobile
-    ? Math.max(1, Math.ceil(filteredMatches.length / MOBILE_PAGE_SIZE))
-    : 1;
+  const totalPages = Math.max(1, Math.ceil(filteredMatches.length / PAGE_SIZE));
   const safePage = Math.min(page, totalPages - 1);
-  const visibleMatches = isMobile
-    ? filteredMatches.slice(safePage * MOBILE_PAGE_SIZE, safePage * MOBILE_PAGE_SIZE + MOBILE_PAGE_SIZE)
-    : filteredMatches;
+  const visibleMatches = filteredMatches.slice(
+    safePage * PAGE_SIZE,
+    safePage * PAGE_SIZE + PAGE_SIZE,
+  );
 
   const formatMatchTime = (scheduledTime: string) => {
     const date = new Date(scheduledTime);
