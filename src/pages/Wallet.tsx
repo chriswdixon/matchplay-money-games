@@ -76,8 +76,11 @@ export default function Wallet() {
             </div>
           </div>
         ) : (
-          <div className="page-card-shell text-center text-muted-foreground">
-            Please verify your password to view your wallet and subscription.
+          <div className="page-card-shell text-center space-y-2">
+            <p className="text-base font-semibold">Verify your password to continue</p>
+            <p className="text-sm text-muted-foreground">
+              For your security, we need to confirm it's you before showing your balance, transactions, and membership details.
+            </p>
           </div>
         )}
       </main>
