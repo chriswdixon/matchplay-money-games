@@ -44,6 +44,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
   const { hasAccess } = useFreeTier();
   const isMobile = useIsMobile();
   const MOBILE_PAGE_SIZE = 3;
+  const DESKTOP_PAGE_SIZE = 9;
+  const PAGE_SIZE = isMobile ? MOBILE_PAGE_SIZE : DESKTOP_PAGE_SIZE;
   const [page, setPage] = useState(0);
   const [searchRadius, setSearchRadius] = useState(30);
   const [showFilters, setShowFilters] = useState(false);
