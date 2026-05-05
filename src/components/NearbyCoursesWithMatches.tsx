@@ -90,7 +90,8 @@ const NearbyCoursesWithMatches = () => {
       if (geo) {
         setManualLocation({ latitude: geo.latitude, longitude: geo.longitude, label: term });
         setSearched(true);
-        const nearby = await searchNearbyCourses(geo.latitude, geo.longitude, radius);
+        const r = effectiveRadius(radius);
+        const nearby = await searchNearbyCourses(geo.latitude, geo.longitude, r);
         const results = nearby
           .map((c) => ({
             ...c,
@@ -100,7 +101,7 @@ const NearbyCoursesWithMatches = () => {
                 ? distanceMi(geo.latitude, geo.longitude, c.latitude, c.longitude)
                 : undefined),
           }))
-          .filter((c) => c.distance !== undefined && c.distance <= radius)
+          .filter((c) => c.distance !== undefined && c.distance <= r)
           .sort((a, b) => (a.distance || 0) - (b.distance || 0));
         setCourses(results);
         return;
@@ -115,8 +116,9 @@ const NearbyCoursesWithMatches = () => {
     setSearched(true);
     const lower = term.toLowerCase();
 
+    const r = effectiveRadius(radius);
     // Always start from nearby courses within radius
-    const nearby = await searchNearbyCourses(origin.latitude, origin.longitude, radius);
+    const nearby = await searchNearbyCourses(origin.latitude, origin.longitude, r);
     let results = nearby
       .map((c) => ({
         ...c,
@@ -126,7 +128,7 @@ const NearbyCoursesWithMatches = () => {
             ? distanceMi(origin.latitude, origin.longitude, c.latitude, c.longitude)
             : undefined),
       }))
-      .filter((c) => c.distance !== undefined && c.distance <= radius);
+      .filter((c) => c.distance !== undefined && c.distance <= r);
 
     if (lower.length >= 1) {
       const matchesPrefix = (name: string) => {
@@ -152,7 +154,7 @@ const NearbyCoursesWithMatches = () => {
             (c) =>
               matchesPrefix(c.name) &&
               c.distance !== undefined &&
-              c.distance <= radius,
+              c.distance <= r,
           );
       }
       results = matched;
