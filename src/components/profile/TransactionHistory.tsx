@@ -112,7 +112,7 @@ export function TransactionHistory() {
             </p>
             <div className="flex flex-wrap justify-center gap-2 mt-4">
               <Button asChild size="sm" className="rounded-full">
-                <Link to="/?tab=find">
+                <Link to="/?tab=matches">
                   <Search className="w-4 h-4 mr-1.5" aria-hidden="true" />
                   Find a match
                 </Link>
