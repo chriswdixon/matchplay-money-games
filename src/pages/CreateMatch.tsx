@@ -66,6 +66,7 @@ const CreateMatch = () => {
   const [customSearchTerm, setCustomSearchTerm] = useState('');
   const [loadingCourseDetail, setLoadingCourseDetail] = useState(false);
   const [courseTees, setCourseTees] = useState<any[]>([]);
+  const [coursePrefilled, setCoursePrefilled] = useState(false);
   
   // Validation state
   const [validationErrors, setValidationErrors] = useState({
@@ -146,6 +147,7 @@ const CreateMatch = () => {
       course_name: prefilled.name,
       booking_url: bookingUrl || prev.booking_url,
     }));
+    setCoursePrefilled(true);
 
     // Consume the prefill so it doesn't apply again on later visits
     try {
