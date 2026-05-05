@@ -896,17 +896,15 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                   ? "bg-gradient-accent text-accent-foreground"
                                   : "bg-gradient-primary text-primary-foreground"
                               )}
-                              disabled={isFull || !user}
+                              disabled={isFull || !user || (match.pin && !match.user_joined && requestedJoinIds.has(match.id))}
                               onClick={() => handleMatchAction(match)}
                             >
-                              {!user ? "Sign In to Join" : 
-                               isFull ? "Match Full" : 
-                               match.user_joined ? "Leave Match" : 
-                               match.pin ? (
-                                <>
-                                  Join with PIN
-                                </>
-                               ) : "Join Match"}
+                              {!user ? "Sign In to Join" :
+                               isFull ? "Match Full" :
+                               match.user_joined ? "Leave Match" :
+                               match.pin
+                                 ? (requestedJoinIds.has(match.id) ? "Request Sent" : "Request to Join")
+                                 : "Join Match"}
                             </Button>
                           )}
                         </div>
