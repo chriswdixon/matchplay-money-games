@@ -84,6 +84,18 @@ const handler = async (req: Request): Promise<Response> => {
     const { firstName, lastName, email } = validationResult.data;
     console.log("Invite request received:", { firstName, lastName, email });
 
+    const escapeHtml = (s: string) =>
+      s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#x27;");
+
+    const safeFirst = escapeHtml(firstName);
+    const safeLast = escapeHtml(lastName);
+    const safeEmail = escapeHtml(email);
+
     // Send email to support
     const emailResponse = await sendEmail({
       from: "Tyche Invites <onboarding@resend.dev>",
@@ -93,8 +105,8 @@ const handler = async (req: Request): Promise<Response> => {
         <h1>New Invite Code Request</h1>
         <p>A new user has requested an invite code:</p>
         <ul>
-          <li><strong>Name:</strong> ${firstName} ${lastName}</li>
-          <li><strong>Email:</strong> ${email}</li>
+          <li><strong>Name:</strong> ${safeFirst} ${safeLast}</li>
+          <li><strong>Email:</strong> ${safeEmail}</li>
         </ul>
         <p>Please generate an invite code and send it to the user.</p>
       `,
@@ -109,7 +121,7 @@ const handler = async (req: Request): Promise<Response> => {
       subject: "Invite Request Received - Tyche",
       html: `
         <h1>Thank you for your interest in Tyche!</h1>
-        <p>Hi ${firstName},</p>
+        <p>Hi ${safeFirst},</p>
         <p>We've received your request for an invite code. Our team will review it and get back to you shortly.</p>
         <p>We're excited to have you join our golf matchmaking community!</p>
         <p>Best regards,<br>The Tyche Team</p>
