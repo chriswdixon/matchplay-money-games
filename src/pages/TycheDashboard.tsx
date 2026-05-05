@@ -101,7 +101,7 @@ const TycheDashboard = () => {
               <Button
                 size="lg"
                 onClick={() => navigate('/create-match')}
-                className="h-14 bg-gradient-primary text-primary-foreground hover:shadow-premium font-semibold"
+                className="h-14 bg-gradient-primary text-primary-foreground font-semibold animate-glow-pulse shadow-[0_0_20px_hsl(var(--primary)/0.55),0_0_40px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_28px_hsl(var(--primary)/0.7),0_0_56px_hsl(var(--primary)/0.4)]"
               >
                 <Plus className="w-5 h-5 mr-1" aria-hidden="true" />
                 Create Match
