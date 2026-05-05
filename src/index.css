@@ -382,17 +382,35 @@
     transition: box-shadow 0.25s ease, transform 0.15s ease;
     border-radius: 9999px;
   }
-  nav[aria-label="Primary"] button:hover > span:first-child,
-  nav[aria-label="Primary"] button[aria-current="page"] > span:first-child {
-    box-shadow: 0 0 14px hsl(var(--primary) / 0.6), 0 0 26px hsl(var(--primary) / 0.3);
+  /* Hover: subtle, tight halo that hugs the 40px circle without washing out the icon */
+  nav[aria-label="Primary"] button:hover > span:first-child {
+    box-shadow:
+      0 0 0 2px hsl(var(--primary) / 0.35),
+      0 0 10px hsl(var(--primary) / 0.45);
   }
-  /* Accessible keyboard focus: circular ring around the icon circle, no rectangular artifact */
+  /* Active page: stronger but still contained */
+  nav[aria-label="Primary"] button[aria-current="page"] > span:first-child {
+    box-shadow:
+      0 0 0 2px hsl(var(--primary) / 0.5),
+      0 0 14px hsl(var(--primary) / 0.55);
+  }
+  /* Dark-mode bar (success-tinted): use white halo for icon contrast */
+  .dark nav[aria-label="Primary"] button:hover > span:first-child {
+    box-shadow:
+      0 0 0 2px hsl(0 0% 100% / 0.5),
+      0 0 10px hsl(0 0% 100% / 0.35);
+  }
+  .dark nav[aria-label="Primary"] button[aria-current="page"] > span:first-child {
+    box-shadow:
+      0 0 0 2px hsl(0 0% 100% / 0.7),
+      0 0 14px hsl(0 0% 100% / 0.45);
+  }
+  /* Accessible keyboard focus: circular ring around the icon circle */
   nav[aria-label="Primary"] button:focus-visible > span:first-child {
     box-shadow:
       0 0 0 2px hsl(var(--background)),
       0 0 0 4px hsl(var(--ring)),
-      0 0 14px hsl(var(--primary) / 0.6),
-      0 0 26px hsl(var(--primary) / 0.3);
+      0 0 10px hsl(var(--primary) / 0.45);
   }
 
   button[class*="bg-destructive"]:not(:disabled):hover,
