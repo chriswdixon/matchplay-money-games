@@ -173,24 +173,45 @@ const NearbyCoursesWithMatches = () => {
     runSearch(query);
   };
 
-  // Group open matches by course name
-  const openMatchesByCourse = useMemo(() => {
-    const map = new Map<string, typeof matches>();
+  // Group open matches by course name with fuzzy token-overlap matching so
+  // legacy free-form names (e.g. "Harbor Lakes Drive") still associate with
+  // the canonical course ("Harbor Lakes Golf Club").
+  const normalizeTokens = (s: string): Set<string> => {
+    const stop = new Set(["golf", "club", "course", "the", "at", "of", "and", "links", "country", "cc", "gc"]);
+    return new Set(
+      s
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, " ")
+        .split(/\s+/)
+        .filter((t) => t.length >= 2 && !stop.has(t)),
+    );
+  };
+  const namesMatch = (a: string, b: string): boolean => {
+    const ka = a.toLowerCase().trim();
+    const kb = b.toLowerCase().trim();
+    if (ka === kb) return true;
+    const ta = normalizeTokens(a);
+    const tb = normalizeTokens(b);
+    if (ta.size === 0 || tb.size === 0) return false;
+    let shared = 0;
+    ta.forEach((t) => { if (tb.has(t)) shared++; });
+    // Require at least 2 shared significant tokens, or all tokens of the
+    // shorter name to be present in the longer one.
+    const smaller = Math.min(ta.size, tb.size);
+    return shared >= 2 || (smaller > 0 && shared === smaller);
+  };
+
+  const openMatchesForCourse = useMemo(() => {
     const now = new Date();
-    matches
-      .filter(
-        (m) =>
-          m.status === "open" &&
-          new Date(m.scheduled_time) >= now &&
-          (m.participant_count || 0) < m.max_participants,
-      )
-      .forEach((m) => {
-        const key = m.course_name.toLowerCase().trim();
-        if (!map.has(key)) map.set(key, []);
-        map.get(key)!.push(m);
-      });
-    return map;
+    const open = matches.filter(
+      (m) =>
+        m.status === "open" &&
+        new Date(m.scheduled_time) >= now &&
+        (m.participant_count || 0) < m.max_participants,
+    );
+    return (courseName: string) => open.filter((m) => namesMatch(m.course_name, courseName));
   }, [matches]);
+
 
   const handleCreateAtCourse = (course: GolfCourse) => {
     if (!user) {
@@ -352,8 +373,7 @@ const NearbyCoursesWithMatches = () => {
           </p>
         )}
         {visibleCourses.map((course, i) => {
-          const openMatches =
-            openMatchesByCourse.get(course.name.toLowerCase().trim()) || [];
+          const openMatches = openMatchesForCourse(course.name);
           const hasOpenMatch = openMatches.length > 0;
           const openCourse = () => {
             setSelectedCourse(course);
@@ -450,7 +470,7 @@ const NearbyCoursesWithMatches = () => {
         onOpenChange={setDialogOpen}
         openMatches={
           selectedCourse
-            ? (openMatchesByCourse.get(selectedCourse.name.toLowerCase().trim()) || []).map((m) => ({
+            ? openMatchesForCourse(selectedCourse.name).map((m) => ({
                 id: m.id,
                 participant_count: m.participant_count,
                 max_participants: m.max_participants,
