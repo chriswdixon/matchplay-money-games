@@ -99,14 +99,14 @@ export function MFASettings() {
       <CardContent className="space-y-4">
         {mfaEnabled ? (
           <div className="space-y-4">
-            <div className="rounded-lg border border-green-200 bg-green-50 dark:border-green-900 dark:bg-green-950 p-4">
+            <div className="rounded-lg border border-success/30 bg-success/10 p-4">
               <div className="flex items-start gap-3">
-                <ShieldCheck className="w-5 h-5 text-green-600 dark:text-green-400 mt-0.5" />
+                <ShieldCheck className="w-5 h-5 text-success mt-0.5" />
                 <div>
-                  <p className="font-medium text-green-900 dark:text-green-100">
+                  <p className="font-medium text-success">
                     Your account is protected
                   </p>
-                  <p className="text-sm text-green-700 dark:text-green-300 mt-1">
+                  <p className="text-sm text-success/90 mt-1">
                     Two-factor authentication is currently active on your account. You'll need your authenticator app to sign in.
                   </p>
                 </div>
