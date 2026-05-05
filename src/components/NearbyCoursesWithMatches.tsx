@@ -65,21 +65,10 @@ const NearbyCoursesWithMatches = () => {
     setVisibleCount((c) => Math.min(Math.max(c, 10), Math.max(courses.length, 10)));
   }, [courses.length]);
 
-  // Infinite scroll: expand as the sentinel becomes visible
-  useEffect(() => {
-    const node = sentinelRef.current;
-    if (!node) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setVisibleCount((c) => Math.min(c + getStep(), courses.length));
-        }
-      },
-      { rootMargin: "200px" },
-    );
-    observer.observe(node);
-    return () => observer.disconnect();
-  }, [courses.length, visibleCount]);
+  // Note: pagination is user-driven via the "Load more" button below.
+  // Auto-loading via IntersectionObserver was removed because on desktop
+  // the sentinel is often already in the viewport, which caused all results
+  // to expand at once.
 
   const visibleCourses = courses.slice(0, visibleCount);
 
