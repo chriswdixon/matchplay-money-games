@@ -92,12 +92,72 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
     ? Object.values(SUBSCRIPTION_TIERS).find((t) => t.product_id === productId)
     : null;
 
-  const renewLabel = subscriptionEnd
-    ? `Renews ${new Date(subscriptionEnd).toLocaleDateString()}`
-    : null;
-  const cancelEffectiveLabel = subscriptionEnd
-    ? new Date(subscriptionEnd).toLocaleDateString()
-    : 'the end of your billing period';
+  const dateFormatter = new Intl.DateTimeFormat(undefined, {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const endDate = subscriptionEnd ? new Date(subscriptionEnd) : null;
+  const renewLabel = endDate ? `Renews ${dateFormatter.format(endDate)}` : null;
+  const cancelEffectiveLabel = endDate ? dateFormatter.format(endDate) : 'the end of your billing period';
+
+  // Determine payment status presentation
+  type PaymentTone = 'success' | 'warning' | 'danger' | 'muted';
+  let paymentLabel: string | null = null;
+  let paymentDetail: string | null = null;
+  let paymentTone: PaymentTone = 'muted';
+  let nextBillingLabel: string | null = null;
+
+  if (meta.isPaid && endDate) {
+    if (cancelAtPeriodEnd) {
+      paymentLabel = 'Canceling';
+      paymentDetail = `Access ends ${dateFormatter.format(endDate)}`;
+      paymentTone = 'warning';
+      nextBillingLabel = `Ends ${dateFormatter.format(endDate)}`;
+    } else if (status === 'past_due' || status === 'unpaid') {
+      paymentLabel = 'Payment failed';
+      paymentDetail =
+        latestInvoiceAmountDue && latestInvoiceAmountDue > 0
+          ? `$${(latestInvoiceAmountDue / 100).toFixed(2)} due — update your payment method`
+          : 'Update your payment method to keep access';
+      paymentTone = 'danger';
+      nextBillingLabel = `Retry by ${dateFormatter.format(endDate)}`;
+    } else if (status === 'trialing') {
+      paymentLabel = 'Trial';
+      paymentDetail = `First charge on ${dateFormatter.format(endDate)}`;
+      paymentTone = 'success';
+      nextBillingLabel = `Next charge ${dateFormatter.format(endDate)}`;
+    } else if (status === 'incomplete') {
+      paymentLabel = 'Action required';
+      paymentDetail = 'Finish payment confirmation to activate';
+      paymentTone = 'warning';
+      nextBillingLabel = null;
+    } else {
+      paymentLabel = latestInvoiceStatus === 'paid' ? 'Paid' : 'Active';
+      paymentDetail = `Last payment ${latestInvoiceStatus ?? 'on file'}`;
+      paymentTone = 'success';
+      nextBillingLabel = `Next charge ${dateFormatter.format(endDate)}`;
+    }
+  }
+
+  const toneStyles: Record<PaymentTone, { wrap: string; icon: React.ReactNode }> = {
+    success: {
+      wrap: 'bg-success/10 text-success border-success/20',
+      icon: <CheckCircle2 className="w-4 h-4" aria-hidden="true" />,
+    },
+    warning: {
+      wrap: 'bg-amber-500/10 text-amber-600 border-amber-500/20',
+      icon: <AlertTriangle className="w-4 h-4" aria-hidden="true" />,
+    },
+    danger: {
+      wrap: 'bg-destructive/10 text-destructive border-destructive/20',
+      icon: <XCircle className="w-4 h-4" aria-hidden="true" />,
+    },
+    muted: {
+      wrap: 'bg-muted text-muted-foreground border-border',
+      icon: <CheckCircle2 className="w-4 h-4" aria-hidden="true" />,
+    },
+  };
 
   const openPortal = async (intent: 'change' | 'cancel') => {
     if (!session?.access_token) {
