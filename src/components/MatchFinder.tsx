@@ -443,6 +443,76 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
           />
         )}
 
+        {/* Past Matches Filters */}
+        {showPastMatches && user && (
+          <Card className="bg-muted/30 mb-4">
+            <CardContent className="pt-4">
+              <div className="grid gap-4 md:grid-cols-3">
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm">
+                    <Search className="h-4 w-4" /> Course
+                  </Label>
+                  <Input
+                    list="past-course-options"
+                    placeholder="Any course"
+                    value={pastFilters.course}
+                    onChange={(e) => setPastFilters({ ...pastFilters, course: e.target.value })}
+                  />
+                  <datalist id="past-course-options">
+                    {pastCourseOptions.map(c => <option key={c} value={c} />)}
+                  </datalist>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm">
+                    <Users className="h-4 w-4" /> Match Type
+                  </Label>
+                  <Select
+                    value={pastFilters.format}
+                    onValueChange={(v) => setPastFilters({ ...pastFilters, format: v })}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Any format" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Any Format</SelectItem>
+                      {pastFormatOptions.map(f => (
+                        <SelectItem key={f} value={f}>{f.replace(/-/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div className="space-y-2">
+                  <Label className="flex items-center gap-2 text-sm">
+                    <Calendar className="h-4 w-4" /> Date Range
+                  </Label>
+                  <Select
+                    value={pastFilters.dateRange}
+                    onValueChange={(v) => setPastFilters({ ...pastFilters, dateRange: v as typeof pastFilters.dateRange })}
+                  >
+                    <SelectTrigger><SelectValue placeholder="Any time" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Time</SelectItem>
+                      <SelectItem value="30d">Last 30 days</SelectItem>
+                      <SelectItem value="90d">Last 90 days</SelectItem>
+                      <SelectItem value="1y">Last year</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
+              </div>
+              <div className="flex items-center justify-between mt-4">
+                <p className="text-sm text-muted-foreground">{filteredMatches.length} match{filteredMatches.length === 1 ? '' : 'es'}</p>
+                {hasActivePastFilters && (
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setPastFilters({ course: '', format: 'all', dateRange: 'all' })}
+                  >
+                    <X className="h-4 w-4 mr-1" /> Clear
+                  </Button>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
         {/* Incomplete Matches Section */}
         {!showPastMatches && incompleteMatches.length > 0 && (
           <div className="mb-8 animate-pulse-subtle">
