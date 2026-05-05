@@ -43,7 +43,7 @@ const MyCurrentMatches = () => {
   return (
     <section
       aria-labelledby="current-matches-heading"
-      className="rounded-3xl bg-card text-card-foreground p-4 md:p-6 shadow-card"
+      className="rounded-3xl bg-muted dark:bg-white text-foreground dark:text-slate-900 p-4 md:p-6 shadow-card"
     >
       <div className="flex items-center justify-between mb-4 pb-3 border-b border-border">
         <h2
@@ -77,7 +77,7 @@ const MyCurrentMatches = () => {
                   key={m.id}
                   type="button"
                   onClick={() => navigate(`/match/${m.id}`)}
-                  className="w-full text-left flex items-center gap-3 bg-muted/40 hover:bg-muted/70 rounded-2xl px-3 py-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                   aria-label={`Open ${m.course_name} match`}
                 >
                   <div className="flex-1 min-w-0">
