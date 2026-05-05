@@ -107,12 +107,13 @@ const CreateMatch = () => {
 
           if (incompleteError) throw incompleteError;
 
-          const hasIncomplete = incompleteData?.some((match: any) => {
+          const incompleteMatch = incompleteData?.find((match: any) => {
             const results = match.match_results;
             return !results || (Array.isArray(results) && (results.length === 0 || !results[0]?.finalized_at));
           });
 
-          setHasIncompleteMatches(!!hasIncomplete);
+          setHasIncompleteMatches(!!incompleteMatch);
+          setIncompleteMatchId(incompleteMatch?.id ?? null);
         }
       } catch (error) {
         console.error('Error checking incomplete matches:', error);
