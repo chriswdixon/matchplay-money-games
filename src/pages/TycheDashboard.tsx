@@ -29,7 +29,6 @@ const TycheDashboard = () => {
   const { user } = useAuth();
   const { hasActiveMatch, activeMatchId, activeMatchName } = useActiveMatch();
   const [currentTab, setCurrentTab] = useState("home");
-  const [searchQuery, setSearchQuery] = useState("");
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
