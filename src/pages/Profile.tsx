@@ -199,10 +199,8 @@ export default function Profile() {
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="page-card-shell space-y-6">
-                <ProfileDisplay />
-
-                {/* Action row — moved out of header into the Profile card */}
-                <div className="flex flex-wrap items-center gap-2 pt-4 border-t">
+                {/* Action row at top of Profile card */}
+                <div className="flex flex-wrap items-center gap-2 pb-4 border-b">
                   {hasActiveMatch && (
                     <Button
                       variant="default"
@@ -258,6 +256,8 @@ export default function Profile() {
                     </Button>
                   </div>
                 </div>
+
+                <ProfileDisplay />
 
                 <div className="border-t pt-6">
                   <ProfileForm />
