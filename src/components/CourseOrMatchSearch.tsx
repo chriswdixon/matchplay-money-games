@@ -60,17 +60,22 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     let results: GolfCourse[];
     if (query.trim().length >= 2) {
       const named = await searchCoursesByName(query.trim());
-      results = named
-        .map((c) => ({
-          ...c,
-          distance:
-            c.distance ??
-            (c.latitude && c.longitude
-              ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
-              : undefined),
-        }))
+      const withDistance = named.map((c) => ({
+        ...c,
+        distance:
+          c.distance ??
+          (c.latitude && c.longitude
+            ? distanceMi(location.latitude, location.longitude, c.latitude, c.longitude)
+            : undefined),
+      }));
+      const withinRadius = withDistance
         .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
         .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      // If nothing within the default radius, expand to unlimited so the
+      // searched course is still surfaced (sorted by distance when known).
+      results = withinRadius.length > 0
+        ? withinRadius
+        : withDistance.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
     } else {
       results = await searchNearbyCourses(location.latitude, location.longitude, RADIUS_MI);
     }
