@@ -1288,7 +1288,10 @@ const CreateMatch = () => {
             <>
               <div className="flex-1 flex flex-col px-3 pt-12 pb-24 overflow-hidden">
                 <div className="rounded-3xl shadow-card text-base text-foreground bg-card transition-colors hover:bg-success/10 flex-1 flex flex-col overflow-hidden">
-                  <div className="flex-1 px-4 py-4 space-y-6 overflow-y-auto">
+                  <div className="flex-1 px-4 py-4 space-y-4 overflow-y-auto">
+                    {coursePrefilled && selectedCourse && (
+                      <SelectedCourseCard course={selectedCourse} />
+                    )}
                     {currentStep === 1 && (
                       <>
                         {renderDateTimeStep()}
@@ -1315,6 +1318,9 @@ const CreateMatch = () => {
             </>
           ) : (
             <div className="overflow-y-auto p-6 space-y-6">
+              {coursePrefilled && selectedCourse && (
+                <SelectedCourseCard course={selectedCourse} />
+              )}
               <div className="bg-card text-base rounded-3xl p-6 shadow-card transition-colors hover:bg-success/10 space-y-6">
                 {renderDateTimeStep()}
                 {renderFormatTeesStep()}
