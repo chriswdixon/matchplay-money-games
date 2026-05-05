@@ -358,7 +358,17 @@ serve(async (req) => {
         }
       }
     }
-    
+
+    // Release the optimistic finalization lock so participants can retry.
+    try {
+      await supabaseClient
+        .from('matches')
+        .update({ double_down_finalized: false })
+        .eq('id', matchId);
+    } catch (releaseError: any) {
+      logStep('Failed to release double_down_finalized lock', { error: releaseError.message });
+    }
+
     return new Response(JSON.stringify({
       error: 'Unable to process request.',
       rolledBack: processedPayments.length
