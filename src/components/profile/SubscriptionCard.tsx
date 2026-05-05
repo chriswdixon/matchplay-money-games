@@ -234,6 +234,46 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
         )}
       </div>
 
+      {meta.isPaid && (paymentLabel || nextBillingLabel) && (
+        <div className="grid sm:grid-cols-2 gap-2">
+          {nextBillingLabel && (
+            <div className="flex items-start gap-2 rounded-lg border border-border bg-muted/40 px-3 py-2">
+              <CalendarClock className="w-4 h-4 mt-0.5 text-muted-foreground" aria-hidden="true" />
+              <div className="min-w-0">
+                <p className="text-[11px] uppercase tracking-wide text-muted-foreground">
+                  {cancelAtPeriodEnd ? 'Access ends' : 'Next billing date'}
+                </p>
+                <p className="text-sm font-medium text-foreground truncate">
+                  {endDate ? dateFormatter.format(endDate) : '—'}
+                </p>
+              </div>
+            </div>
+          )}
+          {paymentLabel && (
+            <div
+              className={`flex items-start gap-2 rounded-lg border px-3 py-2 ${toneStyles[paymentTone].wrap}`}
+            >
+              <span className="mt-0.5">{toneStyles[paymentTone].icon}</span>
+              <div className="min-w-0 flex-1">
+                <p className="text-[11px] uppercase tracking-wide opacity-80">Payment status</p>
+                <p className="text-sm font-medium truncate">{paymentLabel}</p>
+                {paymentDetail && <p className="text-xs opacity-90 truncate">{paymentDetail}</p>}
+                {paymentTone === 'danger' && latestInvoiceHostedUrl && (
+                  <a
+                    href={latestInvoiceHostedUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs underline font-medium"
+                  >
+                    Pay invoice
+                  </a>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-4">
         <ul className="text-xs space-y-1.5 flex-1 text-muted-foreground">
           {meta.perks.map((perk) => (
