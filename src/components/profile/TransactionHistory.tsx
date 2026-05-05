@@ -1,12 +1,23 @@
 import { useMemo, useState, Suspense, lazy } from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useAccountTransactions } from '@/hooks/useAccountTransactions';
 import { useIsMobile } from '@/hooks/use-mobile';
-import { History, TrendingDown, CreditCard, Trophy, Ticket, Loader2, LogOut, Zap, ChevronLeft, ChevronRight } from 'lucide-react';
+import { History, TrendingDown, CreditCard, Trophy, Ticket, LogOut, Zap, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 import { format } from 'date-fns';
 
 const MatchInfoDialog = lazy(() =>
   import('@/components/MatchInfoDialog').then((m) => ({ default: m.MatchInfoDialog })),
+);
+
+const TransactionHistoryHeader = () => (
+  <h2 className="flex items-center gap-3 text-lg font-semibold leading-none tracking-tight">
+    <div className="p-2 bg-gradient-primary rounded-lg">
+      <History className="w-5 h-5 text-primary-foreground" />
+    </div>
+    Transaction History
+  </h2>
 );
 
 export function TransactionHistory() {
