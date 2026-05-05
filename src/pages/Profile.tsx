@@ -264,7 +264,7 @@ export default function Profile() {
       <main
         id="profile-main"
         role="main"
-        className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-6 pt-8 md:pt-10 pb-32 md:pb-12"
+        className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-6 pt-8 md:pt-28 pb-32 md:pb-12"
       >
         <div className="space-y-6">
           {activeTab === 'profile' && (
