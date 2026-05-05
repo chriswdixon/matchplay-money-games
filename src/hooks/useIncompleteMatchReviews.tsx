@@ -106,7 +106,7 @@ export function useIncompleteMatchReviews() {
       console.error('Error resolving review:', error);
       toast({
         title: "Error",
-        description: "Failed to resolve review. Please try again.",
+        description: error.message || "Failed to resolve review. Please try again.",
         variant: "destructive"
       });
       return false;
