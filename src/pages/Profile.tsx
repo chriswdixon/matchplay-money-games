@@ -116,8 +116,8 @@ export default function Profile() {
         className={cn(
           'z-30 px-2 pointer-events-none',
           isMobile
-            ? 'sticky top-2 mb-4'
-            : 'sticky top-4 mb-6'
+            ? 'sticky top-2 mt-4 mb-6'
+            : 'sticky top-4 mt-6 mb-8'
         )}
       >
         <div className="mx-auto max-w-3xl pointer-events-auto">

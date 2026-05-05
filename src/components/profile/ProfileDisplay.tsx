@@ -95,13 +95,13 @@ export function ProfileDisplay() {
         </div>
 
         {/* Featured Handicap card */}
-        <div className="rounded-2xl bg-foreground text-background p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full bg-primary/20 flex items-center justify-center shrink-0">
-            <Trophy className="w-6 h-6 text-primary" aria-hidden="true" />
+        <div className="rounded-2xl bg-primary text-primary-foreground p-4 flex items-center gap-4 shadow-card">
+          <div className="w-12 h-12 rounded-full bg-primary-foreground/15 flex items-center justify-center shrink-0">
+            <Trophy className="w-6 h-6 text-primary-foreground" aria-hidden="true" />
           </div>
           <div className="flex-1 min-w-0">
-            <div className="text-xs uppercase tracking-wide text-background/70">Handicap</div>
-            <div className="text-3xl font-bold leading-tight">
+            <div className="text-xs uppercase tracking-wide font-semibold text-primary-foreground/90">Handicap</div>
+            <div className="text-3xl font-bold leading-tight text-primary-foreground">
               {profile?.handicap !== null && profile?.handicap !== undefined ? profile.handicap : '—'}
             </div>
           </div>
