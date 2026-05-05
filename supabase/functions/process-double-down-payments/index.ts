@@ -132,8 +132,21 @@ serve(async (req) => {
 
     logStep('All participants validated', { count: participants.length });
 
-    // Process each participant's payment
-    const processedPayments: any[] = [];
+    // Optimistic lock: claim finalization atomically before charging anyone.
+    // If another concurrent invocation already claimed it, this UPDATE affects 0 rows.
+    const { data: claimed, error: claimError } = await supabaseClient
+      .from('matches')
+      .update({ double_down_finalized: true })
+      .eq('id', matchId)
+      .eq('double_down_finalized', false)
+      .select('id');
+
+    if (claimError) throw claimError;
+    if (!claimed || claimed.length === 0) {
+      throw new Error('Double down already being processed');
+    }
+
+    // Process each participant's payment (uses outer processedPayments — no shadowing)
     const failedPayments: any[] = [];
 
     for (const participant of participants) {
@@ -194,7 +207,7 @@ serve(async (req) => {
             customerId = customer.id;
           }
 
-          // Create payment intent
+          // Create payment intent (idempotent per match+user to prevent double-charge on retries)
           const paymentIntent = await stripe.paymentIntents.create({
             amount: requiredAmount,
             currency: 'usd',
@@ -210,6 +223,8 @@ serve(async (req) => {
               enabled: true,
               allow_redirects: 'never'
             }
+          }, {
+            idempotencyKey: `double_down_${matchId}_${participant.user_id}`
           });
 
           if (paymentIntent.status !== 'succeeded') {
@@ -276,13 +291,7 @@ serve(async (req) => {
       }
     }
 
-    // All payments successful - finalize double down
-    const { error: finalizeError } = await supabaseClient
-      .from('matches')
-      .update({ double_down_finalized: true })
-      .eq('id', matchId);
-
-    if (finalizeError) throw finalizeError;
+    // double_down_finalized was set optimistically before charging — nothing to do here.
 
     logStep('All payments processed successfully', { count: processedPayments.length });
 
@@ -349,7 +358,17 @@ serve(async (req) => {
         }
       }
     }
-    
+
+    // Release the optimistic finalization lock so participants can retry.
+    try {
+      await supabaseClient
+        .from('matches')
+        .update({ double_down_finalized: false })
+        .eq('id', matchId);
+    } catch (releaseError: any) {
+      logStep('Failed to release double_down_finalized lock', { error: releaseError.message });
+    }
+
     return new Response(JSON.stringify({
       error: 'Unable to process request.',
       rolledBack: processedPayments.length

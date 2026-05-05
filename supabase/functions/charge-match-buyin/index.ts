@@ -144,16 +144,19 @@ serve(async (req) => {
     const balance = parseFloat(currentAccount?.balance || '0');
     logStep("Current balance", { balance, buyInAmount });
 
-    if (balance >= buyInAmount) {
-      // Sufficient balance - deduct from account
-      logStep("Sufficient balance, deducting from account");
-      
-      const { error: updateError } = await supabaseClient
-        .from('player_accounts')
-        .update({ balance: balance - buyInAmount })
-        .eq('user_id', user.id);
+    // Atomic conditional debit — only succeeds if balance >= buyInAmount
+    const { data: debitRows, error: debitError } = await supabaseClient
+      .rpc('debit_player_balance', { _user_id: user.id, _amount: buyInAmount });
 
-      if (updateError) throw updateError;
+    if (debitError) {
+      logStep("Atomic debit error", { error: debitError });
+      throw debitError;
+    }
+
+    const debited = Array.isArray(debitRows) && debitRows.length > 0 ? debitRows[0] : null;
+
+    if (debited) {
+      logStep("Sufficient balance, debited atomically", { newBalance: debited.balance });
 
       // Record transaction - unique constraint prevents duplicates
       const { error: txError } = await supabaseClient
@@ -166,12 +169,13 @@ serve(async (req) => {
           match_id: matchId,
           description: `Buy-in for match ${matchId}`
         });
-      
+
       if (txError) {
-        // Check if it's a duplicate transaction error
         if (txError.code === '23505') {
-          logStep("Duplicate transaction detected");
-          return new Response(JSON.stringify({ 
+          // Duplicate buy-in: refund the amount we just debited
+          await supabaseClient.rpc('credit_player_balance', { _user_id: user.id, _amount: buyInAmount });
+          logStep("Duplicate transaction detected, refunded debit");
+          return new Response(JSON.stringify({
             success: true,
             message: "Buy-in already processed",
             chargedFrom: 'balance'
@@ -180,14 +184,16 @@ serve(async (req) => {
             status: 200,
           });
         }
+        // Refund the debit on any other failure
+        await supabaseClient.rpc('credit_player_balance', { _user_id: user.id, _amount: buyInAmount });
         throw txError;
       }
 
       logStep("Buy-in charged from balance");
-      return new Response(JSON.stringify({ 
-        success: true, 
+      return new Response(JSON.stringify({
+        success: true,
         chargedFrom: 'balance',
-        newBalance: balance - buyInAmount 
+        newBalance: debited.balance
       }), {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
         status: 200,

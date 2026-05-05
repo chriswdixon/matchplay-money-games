@@ -145,10 +145,10 @@ serve(async (req) => {
 
     // Credit each winner
     for (const winnerId of winners) {
-      // Get winner's account
+      // Get winner's account (for the account_id reference on the transaction record)
       const { data: account } = await supabaseClient
         .from('player_accounts')
-        .select('*')
+        .select('id')
         .eq('user_id', winnerId)
         .single();
 
@@ -157,21 +157,7 @@ serve(async (req) => {
         continue;
       }
 
-      const currentBalance = parseFloat(account.balance);
-      const newBalance = currentBalance + payoutPerWinner;
-
-      // Credit winnings
-      const { error: updateError } = await supabaseClient
-        .from('player_accounts')
-        .update({ balance: newBalance })
-        .eq('user_id', winnerId);
-
-      if (updateError) {
-        logStep("Error updating balance", { winnerId, error: updateError });
-        throw updateError;
-      }
-
-      // Record transaction - unique constraint prevents duplicates
+      // Insert transaction FIRST so the unique constraint protects against double-payout.
       const { error: txError } = await supabaseClient
         .from('account_transactions')
         .insert({
@@ -181,7 +167,7 @@ serve(async (req) => {
           transaction_type: 'winning',
           match_id: matchId,
           description: `Match winnings for ${matchId}${winners.length > 1 ? ' (split)' : ''}`,
-          metadata: { 
+          metadata: {
             participant_count: participants?.length,
             buy_in_amount: buyInAmount,
             winner_count: winners.length,
@@ -189,9 +175,8 @@ serve(async (req) => {
             is_tie: winners.length > 1 && !isTeamFormat
           }
         });
-      
+
       if (txError) {
-        // Check if it's a duplicate transaction error
         if (txError.code === '23505') {
           logStep("Duplicate winnings credit detected for winner", { winnerId });
           continue;
@@ -199,7 +184,17 @@ serve(async (req) => {
         throw txError;
       }
 
-      logStep("Winnings credited to winner", { winnerId, amount: payoutPerWinner, newBalance });
+      // Now atomically credit the balance
+      const { data: creditRows, error: creditError } = await supabaseClient
+        .rpc('credit_player_balance', { _user_id: winnerId, _amount: payoutPerWinner });
+
+      if (creditError) {
+        logStep("Error crediting balance", { winnerId, error: creditError });
+        throw creditError;
+      }
+
+      const credited = Array.isArray(creditRows) && creditRows.length > 0 ? creditRows[0] : null;
+      logStep("Winnings credited to winner", { winnerId, amount: payoutPerWinner, newBalance: credited?.balance });
     }
 
     return new Response(JSON.stringify({ 
