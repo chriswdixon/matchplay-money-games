@@ -21,8 +21,16 @@ export default function Wallet() {
     if (!loading && !user) navigate('/auth', { replace: true });
   }, [user, loading, navigate]);
 
+  // 15-minute grace window so users browsing their own balance aren't re-prompted constantly.
   useEffect(() => {
-    if (user && !isVerified) setShowPasswordDialog(true);
+    if (!user) return;
+    const key = `tyche-wallet-verified-${user.id}`;
+    const ts = Number(sessionStorage.getItem(key) || 0);
+    if (ts && Date.now() - ts < 15 * 60 * 1000) {
+      setIsVerified(true);
+    } else if (!isVerified) {
+      setShowPasswordDialog(true);
+    }
   }, [user, isVerified]);
 
   if (loading) {
@@ -90,6 +98,9 @@ export default function Wallet() {
         onVerified={() => {
           setIsVerified(true);
           setShowPasswordDialog(false);
+          if (user) {
+            sessionStorage.setItem(`tyche-wallet-verified-${user.id}`, String(Date.now()));
+          }
         }}
         onCancel={() => {
           setShowPasswordDialog(false);
