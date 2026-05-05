@@ -994,7 +994,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                 })
               )}
             </div>
-            {isMobile && filteredMatches.length > MOBILE_PAGE_SIZE && (
+            {filteredMatches.length > PAGE_SIZE && (
               <div className="flex items-center justify-center gap-3 pt-4">
                 <Button
                   type="button"
