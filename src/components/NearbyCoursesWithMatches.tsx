@@ -414,12 +414,15 @@ const NearbyCoursesWithMatches = () => {
                   </Button>
                 ) : (
                   <Button
+                    type="button"
                     size="sm"
+                    onPointerDown={(e) => e.stopPropagation()}
                     onClick={(e) => {
+                      e.preventDefault();
                       e.stopPropagation();
                       handleCreateAtCourse(course);
                     }}
-                    className="shrink-0 bg-success text-success-foreground hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
+                    className="shrink-0 bg-success text-white font-bold dark:text-white dark:font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
                   >
                     Create Match
                   </Button>
