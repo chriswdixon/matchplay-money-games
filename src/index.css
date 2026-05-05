@@ -333,3 +333,15 @@
     height: 0;
   }
 }
+
+@layer utilities {
+  /* In dark mode, ensure all green/success-tinted buttons render with bold white text for legibility (WCAG AA). */
+  .dark button.bg-success,
+  .dark a.bg-success,
+  .dark [role="button"].bg-success,
+  .dark button[class*="bg-success"],
+  .dark a[class*="bg-success"] {
+    color: hsl(0 0% 100%) !important;
+    font-weight: 700 !important;
+  }
+}
