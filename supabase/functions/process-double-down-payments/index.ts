@@ -291,13 +291,7 @@ serve(async (req) => {
       }
     }
 
-    // All payments successful - finalize double down
-    const { error: finalizeError } = await supabaseClient
-      .from('matches')
-      .update({ double_down_finalized: true })
-      .eq('id', matchId);
-
-    if (finalizeError) throw finalizeError;
+    // double_down_finalized was set optimistically before charging — nothing to do here.
 
     logStep('All payments processed successfully', { count: processedPayments.length });
 
