@@ -206,6 +206,18 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       });
     }
 
+    // Handicap range filter (only for current matches; never hide matches the user already joined or created)
+    if (!showPastMatches && userHandicap !== null) {
+      filtered = filtered.filter(match => {
+        if (match.user_joined || match.created_by === user?.id) return true;
+        const min = match.handicap_min;
+        const max = match.handicap_max;
+        if (min != null && userHandicap < min) return false;
+        if (max != null && userHandicap > max) return false;
+        return true;
+      });
+    }
+
     // Past matches: apply past-specific filters
     if (showPastMatches) {
       if (pastFilters.course) {
