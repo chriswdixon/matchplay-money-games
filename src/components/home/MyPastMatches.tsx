@@ -93,13 +93,12 @@ const MyPastMatches = () => {
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button
-              variant="outline"
-              size="sm"
-              className="gap-1.5 relative"
+              variant="default"
+              size="icon"
+              className="relative bg-success text-success-foreground hover:bg-success/90"
               aria-label="Filter past matches"
             >
               <Filter className="w-4 h-4" aria-hidden="true" />
-              Filter
               {filtersActive && (
                 <span
                   className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-primary"
