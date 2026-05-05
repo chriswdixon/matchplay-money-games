@@ -8,7 +8,8 @@ import { ProfileDisplay } from '@/components/profile/ProfileDisplay';
 import { ProfileForm } from '@/components/profile/ProfileForm';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
-import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell, LifeBuoy, LogOut } from 'lucide-react';
+import { User, Settings, CreditCard, Target, Shield, DollarSign, FileText, Trophy, ShieldCheck, Bell, LifeBuoy, LogOut, RefreshCw } from 'lucide-react';
+import { hardResetPwaCaches } from '@/lib/pwa-hard-reset';
 import { SupportRequestDialog } from '@/components/profile/SupportRequestDialog';
 import { InstallPWAButton } from '@/components/InstallPWAButton';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -201,6 +202,24 @@ export default function Profile() {
             </button>
           </TooltipTrigger>
           <TooltipContent side="bottom">Contact Support</TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <button
+              type="button"
+              onClick={() => {
+                if (window.confirm('Reset app cache and reload? This clears cached icons, manifest, and service worker so the latest version loads. You will stay signed in.')) {
+                  void hardResetPwaCaches();
+                }
+              }}
+              aria-label="Reset app cache"
+              className="flex items-center justify-center rounded-full w-9 h-9 shrink-0 bg-muted text-foreground hover:bg-muted/80"
+            >
+              <RefreshCw className="w-4 h-4" aria-hidden="true" />
+            </button>
+          </TooltipTrigger>
+          <TooltipContent side="bottom">Reset app cache</TooltipContent>
         </Tooltip>
 
         <Tooltip>
