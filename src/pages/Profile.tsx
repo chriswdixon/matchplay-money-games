@@ -111,7 +111,8 @@ export default function Profile() {
 
   const ActionIcons = () => (
     <TooltipProvider delayDuration={200}>
-      <div className="flex items-center flex-wrap justify-end gap-1.5">
+      <div className="flex w-full items-center justify-between gap-1.5 flex-wrap">
+        <div className="flex items-center flex-wrap gap-1.5">
         {tabs.map(({ id, label, Icon, badge }) => {
           const active = id === activeTab;
           return (
@@ -143,9 +144,9 @@ export default function Profile() {
               <TooltipContent side="bottom">{label}</TooltipContent>
             </Tooltip>
           );
-        })}
+        </div>
 
-        <span aria-hidden="true" className="mx-1 h-5 w-px bg-border" />
+        <div className="flex items-center flex-wrap gap-1.5">
 
         {hasActiveMatch && (
           <Tooltip>
