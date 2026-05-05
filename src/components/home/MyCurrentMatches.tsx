@@ -22,18 +22,22 @@ const MyCurrentMatches = () => {
   // upcoming (open) or actively in progress (started). Excludes completed/cancelled.
   const myMatches = useMemo(() => {
     if (!user) return [];
+    // Hide matches whose scheduled time is more than 24h in the past — they are
+    // likely stale/abandoned and would otherwise crowd out genuinely upcoming ones.
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
     return matches
       .filter(
         (m) =>
           (m.status === "open" || m.status === "started") &&
-          (m.user_joined || m.created_by === user.id),
+          (m.user_joined || m.created_by === user.id) &&
+          new Date(m.scheduled_time).getTime() >= cutoff,
       )
       .sort(
         (a, b) =>
           new Date(a.scheduled_time).getTime() -
           new Date(b.scheduled_time).getTime(),
       )
-      .slice(0, 4);
+      .slice(0, 8);
   }, [matches, user]);
 
   // Hide entirely when there's nothing relevant to show (don't add empty noise)
