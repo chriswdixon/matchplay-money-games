@@ -80,25 +80,25 @@ export function SubscriptionCard({ onManage }: SubscriptionCardProps) {
 
   return (
     <div className="space-y-4">
-      <h2 className="text-xl font-semibold text-foreground">Subscription</h2>
+      <div className="flex items-center gap-3">
+        <div className="p-2 rounded-lg shrink-0 bg-success text-success-foreground">
+          {meta.isPaid ? (
+            <Crown className="w-5 h-5" aria-hidden="true" />
+          ) : (
+            <Sparkles className="w-5 h-5" aria-hidden="true" />
+          )}
+        </div>
+        <h2 className="text-xl font-semibold text-foreground">Subscription</h2>
+      </div>
       <div className="flex items-start justify-between gap-3 flex-wrap">
-        <div className="flex items-center gap-3 min-w-0">
-          <div className="p-2 rounded-lg shrink-0 bg-success text-success-foreground">
-            {meta.isPaid ? (
-              <Crown className="w-5 h-5" aria-hidden="true" />
-            ) : (
-              <Sparkles className="w-5 h-5" aria-hidden="true" />
-            )}
+        <div className="min-w-0">
+          <div className="flex items-center gap-2 flex-wrap">
+            <h3 className="text-base font-semibold leading-none text-foreground">{currentTier}</h3>
+            <Badge variant="secondary" className="text-[10px]">
+              {meta.isPaid ? 'Active' : 'Current plan'}
+            </Badge>
           </div>
-          <div className="min-w-0">
-            <div className="flex items-center gap-2 flex-wrap">
-              <h3 className="text-base font-semibold leading-none text-foreground">{currentTier}</h3>
-              <Badge variant="secondary" className="text-[10px]">
-                {meta.isPaid ? 'Active' : 'Current plan'}
-              </Badge>
-            </div>
-            <p className="text-xs mt-1 text-muted-foreground">{meta.tagline}</p>
-          </div>
+          <p className="text-xs mt-1 text-muted-foreground">{meta.tagline}</p>
         </div>
 
         {tierEntry && (
