@@ -9,7 +9,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Calendar, MapPin, Users, ArrowRight, Trophy, Filter } from "lucide-react";
+import { Calendar, MapPin, Users, ArrowRight, Trophy, Filter, ChevronLeft, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
 import { useMatches } from "@/hooks/useMatches";
