@@ -15,6 +15,12 @@ import { Slider } from "@/components/ui/slider";
 import LocationStatusBanner from "./LocationStatusBanner";
 
 const DEFAULT_RADIUS_MI = 30;
+// Slider position past the max means "Unlimited" — search anywhere.
+const UNLIMITED_RADIUS_POS = 101;
+const UNLIMITED_RADIUS_MI = 25_000; // > Earth's diameter in miles
+const isUnlimited = (r: number) => r >= UNLIMITED_RADIUS_POS;
+const effectiveRadius = (r: number) => (isUnlimited(r) ? UNLIMITED_RADIUS_MI : r);
+const radiusLabel = (r: number) => (isUnlimited(r) ? "∞" : String(r));
 
 const distanceMi = (lat1: number, lon1: number, lat2: number, lon2: number) => {
   const R = 3959;
@@ -84,7 +90,8 @@ const NearbyCoursesWithMatches = () => {
       if (geo) {
         setManualLocation({ latitude: geo.latitude, longitude: geo.longitude, label: term });
         setSearched(true);
-        const nearby = await searchNearbyCourses(geo.latitude, geo.longitude, radius);
+        const r = effectiveRadius(radius);
+        const nearby = await searchNearbyCourses(geo.latitude, geo.longitude, r);
         const results = nearby
           .map((c) => ({
             ...c,
@@ -94,7 +101,7 @@ const NearbyCoursesWithMatches = () => {
                 ? distanceMi(geo.latitude, geo.longitude, c.latitude, c.longitude)
                 : undefined),
           }))
-          .filter((c) => c.distance !== undefined && c.distance <= radius)
+          .filter((c) => c.distance !== undefined && c.distance <= r)
           .sort((a, b) => (a.distance || 0) - (b.distance || 0));
         setCourses(results);
         return;
@@ -109,8 +116,9 @@ const NearbyCoursesWithMatches = () => {
     setSearched(true);
     const lower = term.toLowerCase();
 
+    const r = effectiveRadius(radius);
     // Always start from nearby courses within radius
-    const nearby = await searchNearbyCourses(origin.latitude, origin.longitude, radius);
+    const nearby = await searchNearbyCourses(origin.latitude, origin.longitude, r);
     let results = nearby
       .map((c) => ({
         ...c,
@@ -120,7 +128,7 @@ const NearbyCoursesWithMatches = () => {
             ? distanceMi(origin.latitude, origin.longitude, c.latitude, c.longitude)
             : undefined),
       }))
-      .filter((c) => c.distance !== undefined && c.distance <= radius);
+      .filter((c) => c.distance !== undefined && c.distance <= r);
 
     if (lower.length >= 1) {
       const matchesPrefix = (name: string) => {
@@ -146,7 +154,7 @@ const NearbyCoursesWithMatches = () => {
             (c) =>
               matchesPrefix(c.name) &&
               c.distance !== undefined &&
-              c.distance <= radius,
+              c.distance <= r,
           );
       }
       results = matched;
@@ -282,29 +290,31 @@ const NearbyCoursesWithMatches = () => {
                 <button
                   type="button"
                   className="font-semibold text-primary underline underline-offset-2 hover:text-primary/80 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring rounded px-1"
-                  aria-label={`Adjust search radius, currently ${radius} miles`}
+                  aria-label={`Adjust search radius, currently ${isUnlimited(radius) ? 'unlimited' : `${radius} miles`}`}
                 >
-                  {radius}
+                  {radiusLabel(radius)}
                 </button>
               </PopoverTrigger>
               <PopoverContent className="w-64" align="start">
                 <div className="space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-sm font-medium">Search radius</span>
-                    <span className="text-sm text-muted-foreground">{radius} mi</span>
+                    <span className="text-sm text-muted-foreground">
+                      {isUnlimited(radius) ? 'Unlimited' : `${radius} mi`}
+                    </span>
                   </div>
                   <Slider
                     value={[radius]}
                     onValueChange={(v) => setRadius(v[0])}
                     min={1}
-                    max={100}
+                    max={UNLIMITED_RADIUS_POS}
                     step={1}
                     aria-label="Search radius in miles"
                   />
                 </div>
               </PopoverContent>
             </Popover>
-            miles
+            {isUnlimited(radius) ? '' : 'miles'}
           </p>
           <Button
             type="button"
