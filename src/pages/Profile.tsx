@@ -198,11 +198,11 @@ export default function Profile() {
       <main
         id="profile-main"
         role="main"
-        className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4 pb-32 md:pb-12"
+        className="flex-1 max-w-3xl w-full mx-auto px-4 md:px-6 pt-8 md:pt-10 pb-32 md:pb-12"
       >
         <SectionTabs />
 
-        <div className="space-y-6 mt-6">
+        <div className="space-y-6 mt-8 md:mt-10">
           {activeTab === 'profile' && (
             <div className="space-y-6">
               <div className="page-card-shell space-y-6">
