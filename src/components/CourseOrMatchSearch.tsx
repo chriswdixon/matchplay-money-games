@@ -135,6 +135,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
             value={query}
             onChange={(e) => {
               setQuery(e.target.value);
+              setCoursePage(1);
               if (mode === "matches") onMatchSearchChange(e.target.value);
             }}
             placeholder={
@@ -163,8 +164,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
               No courses found. Try a different search.
             </p>
           )}
-          {courseResults.map((course, i) => (
-            <Card key={`${course.name}-${i}`} className="bg-foreground text-background border-foreground/20 rounded-2xl">
+          {paginatedCourseResults.map((course, i) => (
+            <Card key={`${course.name}-${courseStartIndex + i}`} className="bg-foreground text-background border-foreground/20 rounded-2xl">
               <CardContent className="p-3 flex items-center justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="font-medium truncate">{course.name}</p>
@@ -188,6 +189,35 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
               </CardContent>
             </Card>
           ))}
+          {courseResults.length > COURSE_PAGE_SIZE && (
+            <nav className="flex items-center justify-between gap-3 pt-1" aria-label="Golf course results pagination">
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCoursePage((page) => Math.max(1, page - 1))}
+                disabled={currentCoursePage === 1}
+                aria-label="Previous golf course results page"
+              >
+                <ChevronLeft className="h-4 w-4" aria-hidden="true" />
+                Previous
+              </Button>
+              <p className="text-sm font-medium text-muted-foreground" aria-live="polite">
+                {courseStartIndex + 1}-{Math.min(courseStartIndex + COURSE_PAGE_SIZE, courseResults.length)} of {courseResults.length}
+              </p>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={() => setCoursePage((page) => Math.min(totalCoursePages, page + 1))}
+                disabled={currentCoursePage === totalCoursePages}
+                aria-label="Next golf course results page"
+              >
+                Next
+                <ChevronRight className="h-4 w-4" aria-hidden="true" />
+              </Button>
+            </nav>
+          )}
           {!location && courseResults.length === 0 && !loading && (
             <>
               <Button
