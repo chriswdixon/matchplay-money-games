@@ -165,24 +165,23 @@ serve(async (req) => {
 
         if (accountError) throw new Error(`Account not found for user ${participant.user_id}`);
 
-        const balanceInCents = parseInt(account.balance.toString());
         const requiredAmount = participant.additional_buyin;
 
         let chargedVia = 'balance';
         let paymentIntentId = null;
 
-        if (balanceInCents >= requiredAmount) {
-          // Sufficient balance - deduct from account
-          const { error: updateError } = await supabaseClient
-            .from('player_accounts')
-            .update({ balance: balanceInCents - requiredAmount })
-            .eq('id', account.id);
+        // Atomic conditional debit — only succeeds if balance >= requiredAmount
+        const { data: debitRows, error: debitError } = await supabaseClient
+          .rpc('debit_player_balance', { _user_id: participant.user_id, _amount: requiredAmount });
 
-          if (updateError) throw updateError;
+        if (debitError) throw debitError;
+        const debited = Array.isArray(debitRows) && debitRows.length > 0 ? debitRows[0] : null;
 
-          logStep('Deducted from balance', { 
-            userId: participant.user_id, 
-            amount: requiredAmount 
+        if (debited) {
+          logStep('Deducted from balance atomically', {
+            userId: participant.user_id,
+            amount: requiredAmount,
+            newBalance: debited.balance,
           });
         } else {
           // Insufficient balance - charge Stripe
@@ -321,18 +320,12 @@ serve(async (req) => {
             });
             logStep('Refunded Stripe payment', { userId: payment.userId });
           } else {
-            // Restore balance deduction
-            const { data: account } = await supabaseClient
-              .from('player_accounts')
-              .select('id, balance')
-              .eq('user_id', payment.userId)
-              .single();
-            
-            if (account) {
-              await supabaseClient
-                .from('player_accounts')
-                .update({ balance: parseInt(account.balance.toString()) + payment.amount })
-                .eq('id', account.id);
+            // Restore balance atomically
+            const { error: creditError } = await supabaseClient
+              .rpc('credit_player_balance', { _user_id: payment.userId, _amount: payment.amount });
+            if (creditError) {
+              logStep('Restore balance failed', { userId: payment.userId, error: creditError.message });
+            } else {
               logStep('Restored balance', { userId: payment.userId, amount: payment.amount });
             }
           }

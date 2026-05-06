@@ -87,6 +87,25 @@ serve(async (req) => {
     if (matchError || !match) throw new Error("Match not found");
     if (match.status !== 'completed') throw new Error("Match not completed");
 
+    // Authorization: only match creator or admin can trigger payout
+    const isCreator = match.created_by === user.id;
+    let isAdmin = false;
+    if (!isCreator) {
+      const { data: roleRow } = await supabaseClient
+        .from('user_roles')
+        .select('role')
+        .eq('user_id', user.id)
+        .eq('role', 'admin')
+        .maybeSingle();
+      isAdmin = !!roleRow;
+    }
+    if (!isCreator && !isAdmin) {
+      return new Response(JSON.stringify({ error: 'Unauthorized', code: 'FORBIDDEN' }), {
+        headers: { ...corsHeaders, "Content-Type": "application/json" },
+        status: 403,
+      });
+    }
+
     // Skip payouts for testing mode (1 player)
     if (match.max_participants === 1) {
       logStep("Testing mode detected - skipping payouts");
