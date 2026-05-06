@@ -320,18 +320,12 @@ serve(async (req) => {
             });
             logStep('Refunded Stripe payment', { userId: payment.userId });
           } else {
-            // Restore balance deduction
-            const { data: account } = await supabaseClient
-              .from('player_accounts')
-              .select('id, balance')
-              .eq('user_id', payment.userId)
-              .single();
-            
-            if (account) {
-              await supabaseClient
-                .from('player_accounts')
-                .update({ balance: parseInt(account.balance.toString()) + payment.amount })
-                .eq('id', account.id);
+            // Restore balance atomically
+            const { error: creditError } = await supabaseClient
+              .rpc('credit_player_balance', { _user_id: payment.userId, _amount: payment.amount });
+            if (creditError) {
+              logStep('Restore balance failed', { userId: payment.userId, error: creditError.message });
+            } else {
               logStep('Restored balance', { userId: payment.userId, amount: payment.amount });
             }
           }
