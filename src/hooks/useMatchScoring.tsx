@@ -85,9 +85,31 @@ export function useMatchScoring(matchId: string) {
   const [confirmations, setConfirmations] = useState<PlayerConfirmation[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [isParticipant, setIsParticipant] = useState<boolean | null>(null);
   const { user } = useAuth();
   const { toast } = useToast();
   const isOnline = useOnlineStatus();
+
+  // Verify participant membership for the current user
+  useEffect(() => {
+    let cancelled = false;
+    const check = async () => {
+      if (!matchId || !user) {
+        setIsParticipant(null);
+        return;
+      }
+      const { data, error } = await supabase
+        .from('match_participants')
+        .select('id')
+        .eq('match_id', matchId)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+      if (!cancelled) setIsParticipant(!error && !!data);
+    };
+    check();
+    return () => { cancelled = true; };
+  }, [matchId, user]);
 
   // Sync offline scores when coming back online
   useEffect(() => {
@@ -871,6 +893,7 @@ export function useMatchScoring(matchId: string) {
     confirmations,
     loading,
     saving,
+    isParticipant,
     startMatch,
     updateScore,
     finalizeResults,
