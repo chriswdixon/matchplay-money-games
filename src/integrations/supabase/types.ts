@@ -1586,6 +1586,16 @@ export type Database = {
         Args: { p_code: string; p_user_id: string }
         Returns: undefined
       }
+      log_score_attempt: {
+        Args: {
+          p_hole_number: number
+          p_match_id: string
+          p_outcome: string
+          p_reason?: string
+          p_strokes: number
+        }
+        Returns: undefined
+      }
       realtime_topic_match_id: { Args: { topic: string }; Returns: string }
       recalculate_player_handicap: {
         Args: { player_user_id: string }
