@@ -40,6 +40,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
     confirmations,
     loading,
     saving,
+    isParticipant,
     updateScore,
     finalizeResults,
     confirmResults,
