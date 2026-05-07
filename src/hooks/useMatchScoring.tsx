@@ -380,6 +380,27 @@ export function useMatchScoring(matchId: string) {
     try {
       setSaving(true);
 
+      // Verify the user is an active participant before accepting any scores.
+      // Without this, non-participants can enter strokes that save to IndexedDB
+      // but silently fail to sync (RLS blocks the insert), creating phantom scores.
+      const { data: participantRow, error: participantError } = await supabase
+        .from('match_participants')
+        .select('id')
+        .eq('match_id', matchId)
+        .eq('user_id', user.id)
+        .eq('status', 'active')
+        .maybeSingle();
+
+      if (participantError || !participantRow) {
+        toast({
+          title: "You're not in this match",
+          description:
+            "Your scores can't be saved because you haven't joined this match. Join the match first, then start scoring.",
+          variant: "destructive",
+        });
+        return false;
+      }
+
       // Optimistically update local state first
       setPlayerScores(prevScores => {
         return prevScores.map(player => {
