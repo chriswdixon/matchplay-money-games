@@ -500,7 +500,34 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           )}
         </div>
 
-        {/* Match Age Warning Banner */}
+        {/* Participant status indicator */}
+        {!readOnly && isParticipant !== null && matchData?.status !== 'cancelled' && matchData?.status !== 'completed' && (
+          isParticipant ? (
+            <div
+              role="status"
+              aria-live="polite"
+              className="mt-4 flex items-center gap-2 rounded-md border border-success/30 bg-success/10 px-3 py-2 text-sm text-success"
+            >
+              <CheckCircle className="w-4 h-4 shrink-0" aria-hidden="true" />
+              <span><span className="font-semibold">Joined:</span> Your scores will be saved to this match.</span>
+            </div>
+          ) : (
+            <div
+              role="alert"
+              aria-live="assertive"
+              className="mt-4 flex items-start gap-2 rounded-md border-2 border-destructive/40 bg-destructive/10 px-3 py-2 text-sm text-destructive"
+            >
+              <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" aria-hidden="true" />
+              <div>
+                <div className="font-semibold">You haven't joined this match</div>
+                <div className="text-destructive/90">
+                  Scoring is disabled. Join the match from its details page before entering strokes.
+                </div>
+              </div>
+            </div>
+          )
+        )}
+
         {matchData?.status === 'started' && matchData?.scheduled_time && (() => {
           const hoursElapsed = Math.floor(
             (new Date().getTime() - new Date(matchData.scheduled_time).getTime()) / (1000 * 60 * 60)
