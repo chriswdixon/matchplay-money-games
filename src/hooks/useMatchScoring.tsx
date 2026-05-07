@@ -414,6 +414,18 @@ export function useMatchScoring(matchId: string) {
         .maybeSingle();
 
       if (participantError || !participantRow) {
+        // Audit: blocked save attempt by non-participant
+        try {
+          await supabase.rpc('log_score_attempt', {
+            p_match_id: matchId,
+            p_hole_number: holeNumber,
+            p_strokes: strokes,
+            p_outcome: 'blocked_not_participant',
+            p_reason: participantError?.message ?? null,
+          });
+        } catch (e) {
+          console.warn('Failed to log score attempt:', e);
+        }
         toast({
           title: "You're not in this match",
           description:
