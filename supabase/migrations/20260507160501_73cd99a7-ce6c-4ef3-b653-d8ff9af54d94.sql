@@ -1,0 +1,2 @@
+REVOKE EXECUTE ON FUNCTION public.log_score_attempt(uuid, integer, integer, text, text) FROM anon, public;
+GRANT EXECUTE ON FUNCTION public.log_score_attempt(uuid, integer, integer, text, text) TO authenticated;

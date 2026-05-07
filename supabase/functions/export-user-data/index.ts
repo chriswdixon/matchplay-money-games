@@ -130,10 +130,11 @@ serve(async (req) => {
       .order('created_at', { ascending: false });
     exportData.consent_records = consents;
 
-    // Matches created
+    // Matches created — explicitly exclude PIN columns (service role bypasses
+    // the column-level REVOKE on pin/team*_pin), so we list safe columns only.
     const { data: matchesCreated } = await supabaseClient
       .from('matches')
-      .select('*')
+      .select('id, created_by, course_name, location, scheduled_time, format, buy_in_amount, handicap_min, handicap_max, max_participants, status, created_at, updated_at, latitude, longitude, address, hole_pars, booking_url, tee_selection_mode, default_tees, holes, is_team_format, double_down_enabled, double_down_amount, double_down_finalized')
       .eq('created_by', user.id)
       .order('created_at', { ascending: false });
     exportData.matches_created = matchesCreated;
