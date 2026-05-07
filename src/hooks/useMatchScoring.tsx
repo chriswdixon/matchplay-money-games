@@ -893,6 +893,7 @@ export function useMatchScoring(matchId: string) {
     confirmations,
     loading,
     saving,
+    isParticipant,
     startMatch,
     updateScore,
     finalizeResults,
