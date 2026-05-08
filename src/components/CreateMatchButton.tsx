@@ -14,7 +14,9 @@ const CreateMatchButton = ({ onMatchCreated }: { onMatchCreated?: () => void }) 
         if (!user) {
           navigate('/auth');
         } else {
-          navigate('/create-match');
+          // Matches must start from a selected course — send users to the
+          // course search first so they can pick one before creating.
+          navigate('/?tab=matches');
         }
       }}
     >
