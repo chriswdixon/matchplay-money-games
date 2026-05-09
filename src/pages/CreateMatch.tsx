@@ -1224,7 +1224,7 @@ const CreateMatch = () => {
           </SelectContent>
         </Select>
         {formData.max_participants === '1' && (
-          <p className="text-xs text-warning">Testing mode: All format restrictions disabled, no payouts</p>
+          <p className="text-xs text-warning">Solo mode: 3 bot opponents will auto-join and score bogey on every hole. Beat them and your buy-in is credited back as play money.</p>
         )}
         {formData.max_participants !== '1' && formData.format === 'Match Play' && (
           <p className="text-xs text-muted-foreground">Match Play requires exactly 2 players</p>
