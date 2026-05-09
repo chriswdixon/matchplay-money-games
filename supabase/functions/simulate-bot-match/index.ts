@@ -57,15 +57,23 @@ serve(async (req) => {
 
     if (mErr || !match) throw new Error("Match not found");
     if (match.created_by !== user.id) throw new Error("Forbidden");
-    if (match.max_participants !== 1) {
-      return new Response(
-        JSON.stringify({ skipped: true, reason: "not_testing_mode" }),
-        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
-      );
-    }
     if (match.status !== "open") {
       return new Response(
         JSON.stringify({ skipped: true, reason: "match_not_open" }),
+        { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
+      );
+    }
+
+    // Verify the creator is the only active participant (true solo scenario)
+    const { count: activeCount, error: countErr } = await supabase
+      .from("match_participants")
+      .select("user_id", { count: "exact", head: true })
+      .eq("match_id", matchId)
+      .eq("status", "active");
+    if (countErr) throw new Error(`Failed to count participants: ${countErr.message}`);
+    if ((activeCount ?? 0) > 1) {
+      return new Response(
+        JSON.stringify({ skipped: true, reason: "match_has_other_players" }),
         { status: 200, headers: { ...corsHeaders, "Content-Type": "application/json" } },
       );
     }
@@ -131,6 +139,16 @@ serve(async (req) => {
       .from("match_participants")
       .upsert(participantsRows, { onConflict: "match_id,user_id" });
     if (pErr) throw new Error(`Failed to add bot participants: ${pErr.message}`);
+
+    // Ensure max_participants accommodates human + bots so start_match can proceed.
+    const requiredMax = 1 + toAdd.length;
+    if ((match.max_participants ?? 0) < requiredMax) {
+      const { error: mUpdErr } = await supabase
+        .from("matches")
+        .update({ max_participants: requiredMax })
+        .eq("id", matchId);
+      if (mUpdErr) throw new Error(`Failed to bump max_participants: ${mUpdErr.message}`);
+    }
 
     // Build par+1 scores per hole
     const holes = match.holes ?? 18;

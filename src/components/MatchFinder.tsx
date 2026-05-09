@@ -432,6 +432,34 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     }
   };
 
+  const handlePlayWithBots = async (match: any) => {
+    if (!user) return;
+    setStartingMatch(match.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('simulate-bot-match', {
+        body: { matchId: match.id },
+      });
+      if (error || (data && data.error)) {
+        console.error('simulate-bot-match failed:', error || data?.error);
+        toast.error('Could not add bots to this match');
+        return;
+      }
+      const { error: startErr } = await supabase.rpc('start_match', { match_id: match.id });
+      if (startErr) {
+        console.error('start_match failed after bot sim:', startErr);
+        toast.error('Bots added but match could not be started');
+        return;
+      }
+      toast.success('3 bots joined — match started!');
+      refetch();
+    } catch (e) {
+      console.error('Play with bots failed:', e);
+      toast.error('Something went wrong starting the bot match');
+    } finally {
+      setStartingMatch(null);
+    }
+  };
+
   const handleViewScorecard = (match: any) => {
     // For past matches view, toggle inline display
     if (showPastMatches) {
@@ -955,6 +983,24 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             >
                               {startingMatch === match.id ? "Starting..." : "Start Match"}
                             </Button>
+                          ) : match.status === 'open' && match.created_by === user?.id && (match.participant_count || 0) === 1 ? (
+                            <>
+                              <Button
+                                className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+                                onClick={() => handlePlayWithBots(match)}
+                                disabled={!user || startingMatch === match.id}
+                              >
+                                {startingMatch === match.id ? "Adding bots..." : "Play vs 3 Bots (Solo)"}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => handleMatchAction(match)}
+                                disabled={!user}
+                              >
+                                Leave Match
+                              </Button>
+                            </>
                           ) : match.status === 'cancelled' ? null : (
                             <Button 
                               className={cn(
