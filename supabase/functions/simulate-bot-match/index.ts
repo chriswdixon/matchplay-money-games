@@ -140,6 +140,16 @@ serve(async (req) => {
       .upsert(participantsRows, { onConflict: "match_id,user_id" });
     if (pErr) throw new Error(`Failed to add bot participants: ${pErr.message}`);
 
+    // Ensure max_participants accommodates human + bots so start_match can proceed.
+    const requiredMax = 1 + toAdd.length;
+    if ((match.max_participants ?? 0) < requiredMax) {
+      const { error: mUpdErr } = await supabase
+        .from("matches")
+        .update({ max_participants: requiredMax })
+        .eq("id", matchId);
+      if (mUpdErr) throw new Error(`Failed to bump max_participants: ${mUpdErr.message}`);
+    }
+
     // Build par+1 scores per hole
     const holes = match.holes ?? 18;
     const holePars = (match.hole_pars ?? {}) as Record<string, number>;
