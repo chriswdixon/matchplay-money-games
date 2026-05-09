@@ -281,6 +281,30 @@ export type Database = {
         }
         Relationships: []
       }
+      bot_users: {
+        Row: {
+          created_at: string
+          display_name: string
+          id: string
+          sort_order: number
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          display_name: string
+          id?: string
+          sort_order: number
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          display_name?: string
+          id?: string
+          sort_order?: number
+          user_id?: string
+        }
+        Relationships: []
+      }
       consent_records: {
         Row: {
           consent_type: string
@@ -1559,6 +1583,7 @@ export type Database = {
         }
         Returns: boolean
       }
+      is_bot_user: { Args: { _user_id: string }; Returns: boolean }
       is_match_creator: { Args: { match_id: string }; Returns: boolean }
       is_match_participant: {
         Args: { match_id: string; user_id: string }

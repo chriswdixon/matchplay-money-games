@@ -106,18 +106,9 @@ serve(async (req) => {
       });
     }
 
-    // Skip payouts for testing mode (1 player)
-    if (match.max_participants === 1) {
-      logStep("Testing mode detected - skipping payouts");
-      return new Response(JSON.stringify({ 
-        success: true,
-        testing_mode: true,
-        message: "Testing mode: No payouts processed"
-      }), {
-        headers: { ...corsHeaders, "Content-Type": "application/json" },
-        status: 200,
-      });
-    }
+    // Note: testing-mode (max_participants === 1) matches still process payouts
+    // when bot opponents have been added by simulate-bot-match. Pot is computed
+    // from active match_participants below.
 
     const matchResults = match.match_results?.[0];
     if (!matchResults) {

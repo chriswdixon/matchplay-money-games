@@ -21,21 +21,15 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
   
-  // Calculate payouts only if not testing mode
-  const totalPot = !isTestingMode ? (buyInAmount / 100) * playerScores.length : 0;
+  // Pot is funded by the human's buy-in (bots in testing mode don't pay).
+  // Real matches: pot = buy-in × number of players. Winner takes everything (split on tie).
+  const totalPot = (buyInAmount / 100) * (isTestingMode ? 1 : playerScores.length);
   
-  // Winner takes 60%, second place 30%, third place 10%
   const payouts: { [playerId: string]: number } = {};
-  if (!isTestingMode) {
-    if (sortedPlayers.length >= 1) {
-      payouts[sortedPlayers[0].player_id] = totalPot * 0.6;
-    }
-    if (sortedPlayers.length >= 2) {
-      payouts[sortedPlayers[1].player_id] = totalPot * 0.3;
-    }
-    if (sortedPlayers.length >= 3) {
-      payouts[sortedPlayers[2].player_id] = totalPot * 0.1;
-    }
+  if (totalPot > 0) {
+    const winners = sortedPlayers.filter(p => p.net_total === sortedPlayers[0]?.net_total && p.total > 0);
+    const share = winners.length > 0 ? totalPot / winners.length : 0;
+    winners.forEach(w => { payouts[w.player_id] = share; });
   }
 
   const getPositionIcon = (index: number) => {
@@ -149,8 +143,8 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
         </div>
       )}
 
-      {/* Pot Summary - Hide in testing mode */}
-      {!isTestingMode && buyInAmount > 0 && (
+      {/* Pot Summary */}
+      {buyInAmount > 0 && (
         <Card className={cn(
           "bg-primary/5",
           !inline && "max-w-4xl mx-auto"
@@ -159,14 +153,18 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <DollarSign className="w-6 h-6 text-primary" />
-                <span className="text-lg font-semibold">Total Pot</span>
+                <span className="text-lg font-semibold">
+                  {isTestingMode ? 'Solo Pot (Play Money)' : 'Total Pot'}
+                </span>
               </div>
               <div className="text-3xl font-bold text-primary">
                 ${totalPot.toFixed(0)}
               </div>
             </div>
             <div className="mt-4 text-sm text-muted-foreground">
-              Buy-in: ${(buyInAmount / 100).toFixed(0)} × {playerScores.length} players
+              {isTestingMode
+                ? `Solo testing match vs 3 bot opponents — winner takes the buy-in back as play money.`
+                : `Buy-in: $${(buyInAmount / 100).toFixed(0)} × ${playerScores.length} players`}
             </div>
           </CardContent>
         </Card>
@@ -181,10 +179,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-2 text-warning">
               <Trophy className="w-6 h-6" />
-              <span className="text-lg font-semibold">Testing Mode - No Payouts Processed</span>
+              <span className="text-lg font-semibold">Solo Testing Match</span>
             </div>
             <div className="mt-2 text-center text-sm text-warning/80">
-              This match was created in testing mode (1 player). Results are recorded but no money transactions occurred.
+              You played against 3 bots that scored bogey (par + 1) on every hole. Beat them and the buy-in is credited back to your play-money balance.
             </div>
           </CardContent>
         </Card>

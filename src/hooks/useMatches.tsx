@@ -388,6 +388,23 @@ export const useMatches = () => {
         }
       }
 
+      // Testing mode: spin up 3 bot opponents so the match can be simulated solo.
+      if (data.max_participants === 1) {
+        try {
+          const { data: { session } } = await supabase.auth.getSession();
+          const { error: botErr } = await supabase.functions.invoke('simulate-bot-match', {
+            body: { matchId: data.id },
+            headers: { Authorization: `Bearer ${session?.access_token}` }
+          });
+          if (botErr) {
+            console.error('simulate-bot-match failed:', botErr);
+            toast.error('Match created, but bot opponents failed to load. You can still play solo.');
+          }
+        } catch (e) {
+          console.error('simulate-bot-match invoke threw:', e);
+        }
+      }
+
       toast.success('Match created successfully!');
       
       return { data, error: null };

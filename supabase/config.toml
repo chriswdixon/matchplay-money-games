@@ -12,6 +12,7 @@ project_id = "rgdegvpfnilzkqpexgij"
 [functions.charge-match-buyin]
 [functions.process-payout]
 [functions.credit-match-winnings]
+[functions.simulate-bot-match]
 [functions.setup-payment-method]
 [functions.create-setup-intent]
 [functions.record-double-down-vote]
