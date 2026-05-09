@@ -432,6 +432,34 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     }
   };
 
+  const handlePlayWithBots = async (match: any) => {
+    if (!user) return;
+    setStartingMatch(match.id);
+    try {
+      const { data, error } = await supabase.functions.invoke('simulate-bot-match', {
+        body: { matchId: match.id },
+      });
+      if (error || (data && data.error)) {
+        console.error('simulate-bot-match failed:', error || data?.error);
+        toast.error('Could not add bots to this match');
+        return;
+      }
+      const { error: startErr } = await supabase.rpc('start_match', { match_id: match.id });
+      if (startErr) {
+        console.error('start_match failed after bot sim:', startErr);
+        toast.error('Bots added but match could not be started');
+        return;
+      }
+      toast.success('3 bots joined — match started!');
+      refetch();
+    } catch (e) {
+      console.error('Play with bots failed:', e);
+      toast.error('Something went wrong starting the bot match');
+    } finally {
+      setStartingMatch(null);
+    }
+  };
+
   const handleViewScorecard = (match: any) => {
     // For past matches view, toggle inline display
     if (showPastMatches) {
