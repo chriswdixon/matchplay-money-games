@@ -21,21 +21,15 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
   
-  // Calculate payouts only if not testing mode
-  const totalPot = !isTestingMode ? (buyInAmount / 100) * playerScores.length : 0;
+  // Pot is funded by the human's buy-in (bots in testing mode don't pay).
+  // Real matches: pot = buy-in × number of players. Winner takes everything (split on tie).
+  const totalPot = (buyInAmount / 100) * (isTestingMode ? 1 : playerScores.length);
   
-  // Winner takes 60%, second place 30%, third place 10%
   const payouts: { [playerId: string]: number } = {};
-  if (!isTestingMode) {
-    if (sortedPlayers.length >= 1) {
-      payouts[sortedPlayers[0].player_id] = totalPot * 0.6;
-    }
-    if (sortedPlayers.length >= 2) {
-      payouts[sortedPlayers[1].player_id] = totalPot * 0.3;
-    }
-    if (sortedPlayers.length >= 3) {
-      payouts[sortedPlayers[2].player_id] = totalPot * 0.1;
-    }
+  if (totalPot > 0) {
+    const winners = sortedPlayers.filter(p => p.net_total === sortedPlayers[0]?.net_total && p.total > 0);
+    const share = winners.length > 0 ? totalPot / winners.length : 0;
+    winners.forEach(w => { payouts[w.player_id] = share; });
   }
 
   const getPositionIcon = (index: number) => {
