@@ -1191,7 +1191,7 @@ const CreateMatch = () => {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="1">1 (Testing - No Payouts)</SelectItem>
+            <SelectItem value="1">1 (Solo vs 3 Bots)</SelectItem>
             {formData.max_participants === '1' ? (
               <>
                 <SelectItem value="2">2</SelectItem>
