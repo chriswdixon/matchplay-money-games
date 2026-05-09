@@ -143,8 +143,8 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
         </div>
       )}
 
-      {/* Pot Summary - Hide in testing mode */}
-      {!isTestingMode && buyInAmount > 0 && (
+      {/* Pot Summary */}
+      {buyInAmount > 0 && (
         <Card className={cn(
           "bg-primary/5",
           !inline && "max-w-4xl mx-auto"
@@ -153,14 +153,18 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <DollarSign className="w-6 h-6 text-primary" />
-                <span className="text-lg font-semibold">Total Pot</span>
+                <span className="text-lg font-semibold">
+                  {isTestingMode ? 'Solo Pot (Play Money)' : 'Total Pot'}
+                </span>
               </div>
               <div className="text-3xl font-bold text-primary">
                 ${totalPot.toFixed(0)}
               </div>
             </div>
             <div className="mt-4 text-sm text-muted-foreground">
-              Buy-in: ${(buyInAmount / 100).toFixed(0)} × {playerScores.length} players
+              {isTestingMode
+                ? `Solo testing match vs 3 bot opponents — winner takes the buy-in back as play money.`
+                : `Buy-in: $${(buyInAmount / 100).toFixed(0)} × ${playerScores.length} players`}
             </div>
           </CardContent>
         </Card>
@@ -175,10 +179,10 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           <CardContent className="p-6">
             <div className="flex items-center justify-center gap-2 text-warning">
               <Trophy className="w-6 h-6" />
-              <span className="text-lg font-semibold">Testing Mode - No Payouts Processed</span>
+              <span className="text-lg font-semibold">Solo Testing Match</span>
             </div>
             <div className="mt-2 text-center text-sm text-warning/80">
-              This match was created in testing mode (1 player). Results are recorded but no money transactions occurred.
+              You played against 3 bots that scored bogey (par + 1) on every hole. Beat them and the buy-in is credited back to your play-money balance.
             </div>
           </CardContent>
         </Card>
