@@ -184,13 +184,19 @@
     @apply bg-background text-foreground font-sans;
   }
 
-  /* Mobile: force white app background */
+  /* Mobile: force white app background and black text */
   @media (max-width: 767px) {
-    :root {
+    :root, .dark {
       --background: 0 0% 100%;
+      --foreground: 220 15% 15%;
+      --card-foreground: 220 15% 15%;
+      --muted-foreground: 220 10% 35%;
     }
     html, body {
       background-color: hsl(0 0% 100%);
+    }
+    .app-page-bg {
+      color: hsl(220 15% 15%);
     }
   }
 
