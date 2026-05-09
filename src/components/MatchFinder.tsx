@@ -983,6 +983,24 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                             >
                               {startingMatch === match.id ? "Starting..." : "Start Match"}
                             </Button>
+                          ) : match.status === 'open' && match.created_by === user?.id && (match.participant_count || 0) === 1 ? (
+                            <>
+                              <Button
+                                className="w-full bg-gradient-primary text-primary-foreground hover:shadow-premium transition-all duration-300"
+                                onClick={() => handlePlayWithBots(match)}
+                                disabled={!user || startingMatch === match.id}
+                              >
+                                {startingMatch === match.id ? "Adding bots..." : "Play vs 3 Bots (Solo)"}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => handleMatchAction(match)}
+                                disabled={!user}
+                              >
+                                Leave Match
+                              </Button>
+                            </>
                           ) : match.status === 'cancelled' ? null : (
                             <Button 
                               className={cn(
