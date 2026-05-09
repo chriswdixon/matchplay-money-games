@@ -602,6 +602,20 @@ export function useMatchScoring(matchId: string) {
         description: "Match results have been calculated",
       });
 
+      // Trigger payout to winners (idempotent on the server).
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const { error: payoutError } = await supabase.functions.invoke('credit-match-winnings', {
+          body: { matchId },
+          headers: { Authorization: `Bearer ${session?.access_token}` }
+        });
+        if (payoutError) {
+          console.error('credit-match-winnings failed:', payoutError);
+        }
+      } catch (e) {
+        console.error('credit-match-winnings invoke threw:', e);
+      }
+
       // Refresh data
       await fetchMatchData();
       return true;
