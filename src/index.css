@@ -198,6 +198,12 @@
     .app-page-bg {
       color: hsl(220 15% 15%);
     }
+    /* Defensive: custom buttons / links with light backgrounds must have dark text */
+    button[class*="bg-background"],
+    [role="button"][class*="bg-background"],
+    a[class*="bg-background"] {
+      color: hsl(220 15% 15%);
+    }
   }
 
   /* WCAG 2.1 AA - Skip link for keyboard navigation */
