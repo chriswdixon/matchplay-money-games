@@ -10,7 +10,15 @@ interface ActiveMatchContextType {
   clearActiveMatch: () => void;
 }
 
-const ActiveMatchContext = createContext<ActiveMatchContextType | undefined>(undefined);
+const defaultActiveMatchContext: ActiveMatchContextType = {
+  activeMatchId: null,
+  activeMatchName: null,
+  hasActiveMatch: false,
+  setActiveMatch: () => {},
+  clearActiveMatch: () => {},
+};
+
+const ActiveMatchContext = createContext<ActiveMatchContextType>(defaultActiveMatchContext);
 
 function ActiveMatchAutoDetector({
   userId,
@@ -92,9 +100,5 @@ export function ActiveMatchProvider({ children }: { children: ReactNode }) {
 }
 
 export function useActiveMatch() {
-  const context = useContext(ActiveMatchContext);
-  if (context === undefined) {
-    throw new Error('useActiveMatch must be used within an ActiveMatchProvider');
-  }
-  return context;
+  return useContext(ActiveMatchContext);
 }
