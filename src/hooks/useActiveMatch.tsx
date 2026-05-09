@@ -100,9 +100,5 @@ export function ActiveMatchProvider({ children }: { children: ReactNode }) {
 }
 
 export function useActiveMatch() {
-  const context = useContext(ActiveMatchContext);
-  if (context === undefined) {
-    throw new Error('useActiveMatch must be used within an ActiveMatchProvider');
-  }
-  return context;
+  return useContext(ActiveMatchContext);
 }
