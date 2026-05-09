@@ -10,7 +10,15 @@ interface ActiveMatchContextType {
   clearActiveMatch: () => void;
 }
 
-const ActiveMatchContext = createContext<ActiveMatchContextType | undefined>(undefined);
+const defaultActiveMatchContext: ActiveMatchContextType = {
+  activeMatchId: null,
+  activeMatchName: null,
+  hasActiveMatch: false,
+  setActiveMatch: () => {},
+  clearActiveMatch: () => {},
+};
+
+const ActiveMatchContext = createContext<ActiveMatchContextType>(defaultActiveMatchContext);
 
 function ActiveMatchAutoDetector({
   userId,
