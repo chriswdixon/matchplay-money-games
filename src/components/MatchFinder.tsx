@@ -364,7 +364,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       if (match.is_team_format && match.max_participants > 2) {
         setSelectedMatchForPin(match);
         setTeamJoinDialogOpen(true);
-      } else if (match.pin) {
+      } else if (match.team1_has_pin) {
         // PIN-protected match: request to join instead of entering PIN
         await handleRequestToJoin(match);
       } else {
@@ -878,7 +878,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           >
                             {formatMatchFormat(match.format)}
                           </Badge>
-                          {match.pin && (
+                          {match.team1_has_pin && (
                             <Badge variant="outline" className="text-xs font-medium border-warning/50 text-warning bg-warning/10">
                               <Lock className="w-3 h-3 mr-1" />
                               PIN Required
@@ -903,25 +903,25 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                     teamPins={[
                                       { 
                                         teamNumber: 1, 
-                                        pin: match.pin || null, 
+                                        pin: null, 
                                         pinCreator: match.team1_pin_creator || null,
                                         canReset: match.team1_pin_creator === user?.id
                                       },
                                       ...(match.is_team_format && match.max_participants >= 4 ? [{
                                         teamNumber: 2,
-                                        pin: match.team2_pin || null,
+                                        pin: null,
                                         pinCreator: match.team2_pin_creator || null,
                                         canReset: match.team2_pin_creator === user?.id
                                       }] : []),
                                       ...(match.is_team_format && match.max_participants >= 6 ? [{
                                         teamNumber: 3,
-                                        pin: match.team3_pin || null,
+                                        pin: null,
                                         pinCreator: match.team3_pin_creator || null,
                                         canReset: match.team3_pin_creator === user?.id
                                       }] : []),
                                       ...(match.is_team_format && match.max_participants === 8 ? [{
                                         teamNumber: 4,
-                                        pin: match.team4_pin || null,
+                                        pin: null,
                                         pinCreator: match.team4_pin_creator || null,
                                         canReset: match.team4_pin_creator === user?.id
                                       }] : [])
@@ -1009,13 +1009,13 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                   ? "bg-gradient-accent text-accent-foreground"
                                   : "bg-gradient-primary text-primary-foreground"
                               )}
-                              disabled={isFull || !user || (match.pin && !match.user_joined && requestedJoinIds.has(match.id))}
+                              disabled={isFull || !user || (match.team1_has_pin && !match.user_joined && requestedJoinIds.has(match.id))}
                               onClick={() => handleMatchAction(match)}
                             >
                               {!user ? "Sign In to Join" :
                                isFull ? "Match Full" :
                                match.user_joined ? "Leave Match" :
-                               match.pin
+                               match.team1_has_pin
                                  ? (requestedJoinIds.has(match.id) ? "Request Sent" : "Request to Join")
                                  : "Join Match"}
                             </Button>

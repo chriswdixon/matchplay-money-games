@@ -923,6 +923,44 @@ export type Database = {
         }
         Relationships: []
       }
+      match_team_pins: {
+        Row: {
+          created_at: string
+          creator_id: string
+          id: string
+          match_id: string
+          pin: string
+          team_number: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          creator_id: string
+          id?: string
+          match_id: string
+          pin: string
+          team_number: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          creator_id?: string
+          id?: string
+          match_id?: string
+          pin?: string
+          team_number?: number
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_team_pins_match_id_fkey"
+            columns: ["match_id"]
+            isOneToOne: false
+            referencedRelation: "matches"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       match_win_posts: {
         Row: {
           course_name: string
@@ -982,15 +1020,15 @@ export type Database = {
           location: string
           longitude: number | null
           max_participants: number
-          pin: string | null
           scheduled_time: string
           status: string
+          team1_has_pin: boolean
           team1_pin_creator: string | null
-          team2_pin: string | null
+          team2_has_pin: boolean
           team2_pin_creator: string | null
-          team3_pin: string | null
+          team3_has_pin: boolean
           team3_pin_creator: string | null
-          team4_pin: string | null
+          team4_has_pin: boolean
           team4_pin_creator: string | null
           tee_data: Json | null
           tee_selection_mode: string
@@ -1018,15 +1056,15 @@ export type Database = {
           location: string
           longitude?: number | null
           max_participants?: number
-          pin?: string | null
           scheduled_time: string
           status?: string
+          team1_has_pin?: boolean
           team1_pin_creator?: string | null
-          team2_pin?: string | null
+          team2_has_pin?: boolean
           team2_pin_creator?: string | null
-          team3_pin?: string | null
+          team3_has_pin?: boolean
           team3_pin_creator?: string | null
-          team4_pin?: string | null
+          team4_has_pin?: boolean
           team4_pin_creator?: string | null
           tee_data?: Json | null
           tee_selection_mode?: string
@@ -1054,15 +1092,15 @@ export type Database = {
           location?: string
           longitude?: number | null
           max_participants?: number
-          pin?: string | null
           scheduled_time?: string
           status?: string
+          team1_has_pin?: boolean
           team1_pin_creator?: string | null
-          team2_pin?: string | null
+          team2_has_pin?: boolean
           team2_pin_creator?: string | null
-          team3_pin?: string | null
+          team3_has_pin?: boolean
           team3_pin_creator?: string | null
-          team4_pin?: string | null
+          team4_has_pin?: boolean
           team4_pin_creator?: string | null
           tee_data?: Json | null
           tee_selection_mode?: string
@@ -1658,6 +1696,10 @@ export type Database = {
         Returns: Json
       }
       sanitize_text_input: { Args: { input_text: string }; Returns: string }
+      set_match_team_pin: {
+        Args: { p_match_id: string; p_pin: string; p_team_number: number }
+        Returns: Json
+      }
       start_match: { Args: { match_id: string }; Returns: boolean }
       user_joined_match: {
         Args: { match_id: string; user_id: string }

@@ -279,7 +279,7 @@ const NearbyCoursesWithMatches = () => {
     // PIN-protected or multi-team matches require the dedicated join dialog
     // on the matches tab (PIN entry / team selection).
     const needsDialog =
-      !!match.pin || (match.is_team_format && match.max_participants > 2);
+      !!match.team1_has_pin || (match.is_team_format && match.max_participants > 2);
     if (needsDialog) {
       navigate("/?tab=matches");
       return;

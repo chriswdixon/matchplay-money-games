@@ -32,10 +32,10 @@ export interface Match {
   default_tees?: string;
   winner_id?: string;
   is_team_format?: boolean;
-  pin?: string;
-  team2_pin?: string;
-  team3_pin?: string;
-  team4_pin?: string;
+  team1_has_pin?: boolean;
+  team2_has_pin?: boolean;
+  team3_has_pin?: boolean;
+  team4_has_pin?: boolean;
   team1_pin_creator?: string;
   team2_pin_creator?: string;
   team3_pin_creator?: string;
@@ -347,8 +347,6 @@ export const useMatches = () => {
           tee_selection_mode: matchData.tee_selection_mode,
           default_tees: matchData.default_tees,
           hole_pars: holeParsValidation.data,
-          pin: (matchData as any).pin || null,
-          team1_pin_creator: (matchData as any).pin ? user.id : null,
           created_by: user.id,
           tee_data: matchData.tee_data || null
         })
@@ -357,6 +355,20 @@ export const useMatches = () => {
 
       if (error) throw error;
       if (!data) throw new Error('Failed to create match - no data returned');
+
+      // If a creator-side PIN was provided, persist it via the secure RPC
+      const creatorPin = (matchData as any).pin as string | undefined;
+      if (creatorPin) {
+        const { error: pinError } = await supabase.rpc('set_match_team_pin', {
+          p_match_id: data.id,
+          p_team_number: 1,
+          p_pin: creatorPin,
+        });
+        if (pinError) {
+          await supabase.from('matches').delete().eq('id', data.id);
+          throw new Error('Failed to set match PIN: ' + pinError.message);
+        }
+      }
 
       // Automatically join the creator to the match FIRST (required for buy-in charge)
       const { error: joinError } = await supabase
