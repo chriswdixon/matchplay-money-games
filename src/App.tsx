@@ -10,6 +10,7 @@ import { GeoBlockingProvider } from "@/hooks/useGeoBlocking";
 
 // Eager load the landing page for fastest initial render
 import Index from "./pages/Index";
+import MobileBottomToolbar from "@/components/MobileBottomToolbar";
 
 // Lazy load non-critical overlays
 const OfflineIndicator = lazy(() => import("@/components/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
