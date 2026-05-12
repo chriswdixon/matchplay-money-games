@@ -175,6 +175,12 @@ const MyMatches = () => {
                   </div>
                 </div>
 
+                <MatchPlayersList
+                  matchId={m.id}
+                  creatorId={m.created_by}
+                  maxParticipants={m.max_participants}
+                />
+
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button
                     size="sm"
