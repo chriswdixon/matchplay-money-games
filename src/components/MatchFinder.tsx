@@ -903,25 +903,25 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                     teamPins={[
                                       { 
                                         teamNumber: 1, 
-                                        pin: match.pin || null, 
+                                        pin: null, 
                                         pinCreator: match.team1_pin_creator || null,
                                         canReset: match.team1_pin_creator === user?.id
                                       },
                                       ...(match.is_team_format && match.max_participants >= 4 ? [{
                                         teamNumber: 2,
-                                        pin: match.team2_pin || null,
+                                        pin: null,
                                         pinCreator: match.team2_pin_creator || null,
                                         canReset: match.team2_pin_creator === user?.id
                                       }] : []),
                                       ...(match.is_team_format && match.max_participants >= 6 ? [{
                                         teamNumber: 3,
-                                        pin: match.team3_pin || null,
+                                        pin: null,
                                         pinCreator: match.team3_pin_creator || null,
                                         canReset: match.team3_pin_creator === user?.id
                                       }] : []),
                                       ...(match.is_team_format && match.max_participants === 8 ? [{
                                         teamNumber: 4,
-                                        pin: match.team4_pin || null,
+                                        pin: null,
                                         pinCreator: match.team4_pin_creator || null,
                                         canReset: match.team4_pin_creator === user?.id
                                       }] : [])
