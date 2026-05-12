@@ -280,6 +280,46 @@ const MyMatches = () => {
                   >
                     <MessageSquare className="w-3.5 h-3.5" /> Chat
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => shareMatch(m)}
+                    className="gap-1.5"
+                  >
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    asChild
+                    className="gap-1.5"
+                  >
+                    <a
+                      href={buildDirectionsUrl(m)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Directions to ${m.course_name}`}
+                    >
+                      <Navigation className="w-3.5 h-3.5" /> Directions
+                    </a>
+                  </Button>
+                  {m.booking_url && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      asChild
+                      className="gap-1.5"
+                    >
+                      <a
+                        href={m.booking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Tee time info for ${m.course_name}`}
+                      >
+                        <CalendarPlus className="w-3.5 h-3.5" /> Tee Times
+                      </a>
+                    </Button>
+                  )}
                   {!isCreator && (
                     <Button
                       size="sm"
