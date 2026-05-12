@@ -32,10 +32,10 @@ export interface Match {
   default_tees?: string;
   winner_id?: string;
   is_team_format?: boolean;
-  pin?: string;
-  team2_pin?: string;
-  team3_pin?: string;
-  team4_pin?: string;
+  team1_has_pin?: boolean;
+  team2_has_pin?: boolean;
+  team3_has_pin?: boolean;
+  team4_has_pin?: boolean;
   team1_pin_creator?: string;
   team2_pin_creator?: string;
   team3_pin_creator?: string;
