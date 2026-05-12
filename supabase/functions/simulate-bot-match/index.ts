@@ -194,9 +194,11 @@ serve(async (req) => {
   } catch (err) {
     const msg = err instanceof Error ? err.message : String(err);
     log("ERROR", { msg });
-    const status = msg === "Unauthorized" ? 401 : msg === "Forbidden" ? 403 : 500;
+    const safeMessages = new Set(["Unauthorized", "Forbidden", "Match not found"]);
+    const status = msg === "Unauthorized" ? 401 : msg === "Forbidden" ? 403 : msg === "Match not found" ? 404 : 500;
+    const safeMsg = safeMessages.has(msg) ? msg : "Unable to simulate match. Please try again.";
     return new Response(
-      JSON.stringify({ error: msg }),
+      JSON.stringify({ error: safeMsg }),
       { status, headers: { ...corsHeaders, "Content-Type": "application/json" } },
     );
   }
