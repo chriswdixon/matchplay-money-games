@@ -3,9 +3,46 @@ import {
   getUnsyncedScores, 
   markScoreSynced, 
   cleanupSyncedScores,
-  getUnsyncedScoreCount 
+  getUnsyncedScoreCount,
+  getUnsyncedMatchIds,
+  deleteOfflineScoresForMatch,
 } from './offlineDb';
 import { toast } from '@/hooks/use-toast';
+
+/**
+ * Remove offline scores tied to matches that no longer exist (deleted/cancelled),
+ * so the "Syncing N scores" indicator doesn't get stuck forever.
+ */
+export async function purgeOrphanedOfflineScores(): Promise<number> {
+  try {
+    const matchIds = await getUnsyncedMatchIds();
+    if (matchIds.length === 0) return 0;
+
+    const { data, error } = await supabase
+      .from('matches')
+      .select('id')
+      .in('id', matchIds);
+
+    if (error) {
+      console.warn('purgeOrphanedOfflineScores: lookup failed', error);
+      return 0;
+    }
+
+    const existingIds = new Set((data ?? []).map((m: { id: string }) => m.id));
+    let purged = 0;
+    for (const id of matchIds) {
+      if (!existingIds.has(id)) {
+        purged += await deleteOfflineScoresForMatch(id);
+        console.log(`🗑️ Purged offline scores for missing match ${id}`);
+      }
+    }
+    return purged;
+  } catch (e) {
+    console.warn('purgeOrphanedOfflineScores error', e);
+    return 0;
+  }
+}
+
 
 export async function syncOfflineScores(matchId: string): Promise<boolean> {
   console.log('🔄 Starting score sync for match:', matchId);
