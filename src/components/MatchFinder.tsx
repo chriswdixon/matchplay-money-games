@@ -878,7 +878,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                           >
                             {formatMatchFormat(match.format)}
                           </Badge>
-                          {match.pin && (
+                          {match.team1_has_pin && (
                             <Badge variant="outline" className="text-xs font-medium border-warning/50 text-warning bg-warning/10">
                               <Lock className="w-3 h-3 mr-1" />
                               PIN Required
