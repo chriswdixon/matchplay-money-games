@@ -1140,7 +1140,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
                       className={cn(
-                        "w-full touch-auto",
+                        "w-full touch-auto rounded-2xl shadow-sm",
                         isActiveHole && "border-2 border-primary bg-primary/5"
                       )}
                     >
