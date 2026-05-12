@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useOnlineStatus } from '@/hooks/useOnlineStatus';
-import { getPendingSyncCount } from '@/lib/scoreSync';
+import { getPendingSyncCount, purgeOrphanedOfflineScores } from '@/lib/scoreSync';
 import { Badge } from '@/components/ui/badge';
 import { WifiOff, Wifi, Upload } from 'lucide-react';
 import { cn } from '@/lib/utils';
@@ -10,16 +10,28 @@ export function OfflineIndicator() {
   const [pendingCount, setPendingCount] = useState(0);
 
   useEffect(() => {
+    let lastPurge = 0;
+
     const updatePendingCount = async () => {
       const count = await getPendingSyncCount();
+      // If we appear stuck with pending scores while online, periodically
+      // purge offline scores tied to matches that no longer exist.
+      if (isOnline && count > 0 && Date.now() - lastPurge > 15000) {
+        lastPurge = Date.now();
+        const purged = await purgeOrphanedOfflineScores();
+        if (purged > 0) {
+          setPendingCount(await getPendingSyncCount());
+          return;
+        }
+      }
       setPendingCount(count);
     };
 
     updatePendingCount();
-    
+
     // Update every 2 seconds
     const interval = setInterval(updatePendingCount, 2000);
-    
+
     return () => clearInterval(interval);
   }, [isOnline]);
 
