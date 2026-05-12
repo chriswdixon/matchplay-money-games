@@ -64,8 +64,8 @@ const WinsFeed = () => {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Avatar className="w-12 h-12 border border-border">
-                      <AvatarImage
-                        src={post.profile_picture_url ?? undefined}
+                      <SignedAvatarImage
+                        src={post.profile_picture_url}
                         alt={`${post.display_name ?? "Player"} avatar`}
                       />
                       <AvatarFallback className="bg-gradient-primary text-primary-foreground">

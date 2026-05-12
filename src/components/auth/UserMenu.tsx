@@ -7,7 +7,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
+import { SignedAvatarImage } from '@/components/profile/SignedAvatarImage';
 import { useAuth } from '@/hooks/useAuth';
 import { useProfile } from '@/hooks/useProfile';
 import { useAdminRole } from '@/hooks/useAdminRole';
@@ -33,7 +34,7 @@ export function UserMenu() {
       <DropdownMenuTrigger asChild>
         <Button variant="ghost" className="relative h-8 w-8 rounded-full">
           <Avatar className="h-8 w-8">
-            <AvatarImage src={profile?.profile_picture_url || undefined} alt={user?.email} />
+            <SignedAvatarImage src={profile?.profile_picture_url} alt={user?.email} />
             <AvatarFallback>
               {user?.email ? getInitials(user.email) : 'MP'}
             </AvatarFallback>

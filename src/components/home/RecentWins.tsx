@@ -58,8 +58,8 @@ const RecentWins = () => {
                 className="flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-3 py-3"
               >
                 <Avatar className="w-10 h-10 border border-border shrink-0">
-                  <AvatarImage
-                    src={post.profile_picture_url ?? undefined}
+                  <SignedAvatarImage
+                    src={post.profile_picture_url}
                     alt={`${post.display_name ?? "Player"} avatar`}
                   />
                   <AvatarFallback className="bg-gradient-primary text-primary-foreground">

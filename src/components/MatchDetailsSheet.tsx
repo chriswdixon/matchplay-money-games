@@ -277,7 +277,7 @@ const MatchDetailsSheet = ({
                   >
                     <Avatar className="w-9 h-9">
                       {p.profile_picture_url && (
-                        <AvatarImage src={p.profile_picture_url} alt="" />
+                        <SignedAvatarImage src={p.profile_picture_url} alt="" />
                       )}
                       <AvatarFallback className="text-xs bg-primary/15 text-primary font-semibold">
                         {initialsOf(p.display_name)}
