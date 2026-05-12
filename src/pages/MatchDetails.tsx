@@ -13,6 +13,7 @@ const MatchScorecard = lazy(() =>
 const MatchResults = lazy(() =>
   import("@/components/MatchResults").then((m) => ({ default: m.MatchResults }))
 );
+const MatchChat = lazy(() => import("@/components/match/MatchChat"));
 
 type MatchRow = { id: string; course_name: string | null; status: string };
 
