@@ -110,11 +110,14 @@ const MatchDetails = () => {
               onClose={handleClose}
             />
           ) : (
-            <MatchScorecard
-              matchId={match.id}
-              matchName={match.course_name || "Match"}
-              onClose={handleClose}
-            />
+            <div className="space-y-6">
+              <MatchScorecard
+                matchId={match.id}
+                matchName={match.course_name || "Match"}
+                onClose={handleClose}
+              />
+              <MatchChat matchId={match.id} />
+            </div>
           )}
         </Suspense>
       </main>
