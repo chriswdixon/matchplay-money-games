@@ -13,6 +13,7 @@ import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
 import RecentWins from "@/components/home/RecentWins";
 import MyCurrentMatches from "@/components/home/MyCurrentMatches";
 import MyPastMatches from "@/components/home/MyPastMatches";
+import OpenMatches from "@/components/home/OpenMatches";
 import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 
 
@@ -102,28 +103,18 @@ const TycheDashboard = () => {
               <HomeProfileCard />
             </div>
 
-            {/* Primary CTAs — orient new users with a single clear next action */}
-            <div className="grid grid-cols-2 gap-3">
-              <Button
-                size="lg"
-                onClick={() => setCurrentTab('matches')}
-                className="h-14 bg-gradient-primary text-primary-foreground font-semibold animate-glow-pulse shadow-[0_0_20px_hsl(var(--primary)/0.55),0_0_40px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_28px_hsl(var(--primary)/0.7),0_0_56px_hsl(var(--primary)/0.4)]"
-              >
-                <Plus className="w-5 h-5 mr-1" aria-hidden="true" />
-                Create Match
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                onClick={() => setCurrentTab('matches')}
-                className="h-14 font-semibold border-2 border-success text-foreground hover:bg-success hover:text-success-foreground"
-              >
-                <Search className="w-5 h-5 mr-1" aria-hidden="true" />
-                Find Matches
-              </Button>
-            </div>
+            {/* Primary CTA — Create Match takes the lead; Find/Open matches lives in its own card below */}
+            <Button
+              size="lg"
+              onClick={() => setCurrentTab('matches')}
+              className="w-full h-14 bg-gradient-primary text-primary-foreground font-semibold animate-glow-pulse shadow-[0_0_20px_hsl(var(--primary)/0.55),0_0_40px_hsl(var(--primary)/0.3)] hover:shadow-[0_0_28px_hsl(var(--primary)/0.7),0_0_56px_hsl(var(--primary)/0.4)]"
+            >
+              <Plus className="w-5 h-5 mr-1" aria-hidden="true" />
+              Create Match
+            </Button>
 
             <MyCurrentMatches />
+            <OpenMatches />
             <RecentlyPlayedCourses onSelect={() => setCurrentTab('matches')} />
             <RecentWins />
           </div>
