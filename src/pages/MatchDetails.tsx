@@ -4,6 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import GolfBallLoader from "@/components/GolfBallLoader";
 import AppHeader from "@/components/AppHeader";
+import BottomTabBar from "@/components/home/BottomTabBar";
+import { useActiveMatch } from "@/hooks/useActiveMatch";
 
 import { toast } from "sonner";
 
@@ -126,7 +128,26 @@ const MatchDetails = () => {
           )}
         </Suspense>
       </main>
+      <MatchDetailsBottomBar />
     </div>
+  );
+};
+
+const MatchDetailsBottomBar = () => {
+  const navigate = useNavigate();
+  const { hasActiveMatch } = useActiveMatch();
+  return (
+    <BottomTabBar
+      activeTab={hasActiveMatch ? "active-match" : "home"}
+      hasActiveMatch={hasActiveMatch}
+      onChange={(tab) => {
+        if (tab === "active-match") return;
+        if (tab === "home") navigate("/");
+        else if (tab === "profile") navigate("/profile");
+        else if (tab === "wallet") navigate("/wallet");
+        else navigate(`/?tab=${tab}`);
+      }}
+    />
   );
 };
 
