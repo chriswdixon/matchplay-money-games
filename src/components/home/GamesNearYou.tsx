@@ -112,7 +112,7 @@ const GamesNearYou = ({
       toast.info("This is a team match. Open Find Matches to choose a team.");
       return;
     }
-    if (match.pin) {
+    if (match.team1_has_pin) {
       toast.info("This match requires a PIN. Open Find Matches to enter it.");
       return;
     }
