@@ -34,9 +34,26 @@ const haversineMi = (lat1: number, lon1: number, lat2: number, lon2: number) => 
 const OpenMatches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { matches, loading } = useMatches();
+  const { matches, loading, joinMatch } = useMatches();
   const { location, requestLocation, loading: locationLoading } = useLocation();
   const [radius, setRadius] = useState<number>(INITIAL_RADIUS_MI);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+
+  const handleJoin = async (m: Match) => {
+    const needsDialog =
+      !!m.pin || (m.is_team_format && m.max_participants > 2);
+    if (needsDialog) {
+      navigate("/?tab=matches");
+      return;
+    }
+    setJoiningId(m.id);
+    try {
+      const result = await joinMatch(m.id);
+      if (!result?.error) navigate(`/match/${m.id}`);
+    } finally {
+      setJoiningId(null);
+    }
+  };
 
   const openMatches = useMemo(() => {
     if (!user) return [];
