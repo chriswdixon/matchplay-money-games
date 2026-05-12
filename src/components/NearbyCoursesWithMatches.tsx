@@ -13,6 +13,13 @@ import CourseDetailDialog from "./CourseDetailDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import LocationStatusBanner from "./LocationStatusBanner";
+import MatchSearchFiltersBar, {
+  DEFAULT_FILTERS,
+  applyMatchFilters,
+  compareBySort,
+  isFilterActive,
+  type MatchSearchFilters,
+} from "./MatchSearchFiltersBar";
 
 const DEFAULT_RADIUS_MI = 30;
 // Slider position past the max means "Unlimited" — search anywhere.
@@ -51,6 +58,8 @@ const NearbyCoursesWithMatches = () => {
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [radius, setRadius] = useState<number>(DEFAULT_RADIUS_MI);
+  const [filters, setFilters] = useState<MatchSearchFilters>(DEFAULT_FILTERS);
+  const filtersActive = isFilterActive(filters);
 
   // Load 10 at a time on both mobile and desktop
   const getStep = () => 10;
@@ -77,7 +86,7 @@ const NearbyCoursesWithMatches = () => {
   // the sentinel is often already in the viewport, which caused all results
   // to expand at once.
 
-  const visibleCourses = courses.slice(0, visibleCount);
+  // visibleCourses computed below after openMatchesForCourse is defined
 
   // Only allow ZIP code searches (US 5-digit, optional +4) — city searches are not supported.
   const isZip = (s: string) => /^\d{5}(-\d{4})?$/.test(s.trim());
@@ -210,8 +219,31 @@ const NearbyCoursesWithMatches = () => {
         new Date(m.scheduled_time) >= now &&
         (m.participant_count || 0) < m.max_participants,
     );
-    return (courseName: string) => open.filter((m) => namesMatch(m.course_name, courseName));
-  }, [matches]);
+    return (courseName: string) => {
+      const forCourse = open.filter((m) => namesMatch(m.course_name, courseName));
+      const filtered = applyMatchFilters(forCourse, filters);
+      if (filters.sort !== "distance") {
+        filtered.sort((a, b) => compareBySort(a, b, filters.sort));
+      } else {
+        filtered.sort(
+          (a, b) =>
+            new Date(a.scheduled_time).getTime() -
+            new Date(b.scheduled_time).getTime(),
+        );
+      }
+      return filtered;
+    };
+  }, [matches, filters]);
+
+  const filteredCourses = useMemo(
+    () =>
+      filtersActive
+        ? courses.filter((c) => openMatchesForCourse(c.name).length > 0)
+        : courses,
+    [courses, filtersActive, openMatchesForCourse],
+  );
+  const visibleCourses = filteredCourses.slice(0, visibleCount);
+
 
 
   const handleCreateAtCourse = (course: GolfCourse) => {
@@ -389,6 +421,17 @@ const NearbyCoursesWithMatches = () => {
         </div>
       )}
 
+      <div className="flex items-center justify-between gap-2 px-1">
+        <p className="text-xs text-muted-foreground">
+          {filtersActive
+            ? `${filteredCourses.length} of ${courses.length} courses match`
+            : courses.length > 0
+              ? `${courses.length} courses found`
+              : ""}
+        </p>
+        <MatchSearchFiltersBar value={filters} onChange={setFilters} />
+      </div>
+
       <div className="space-y-2">
         {loading && courses.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">Searching nearby courses...</p>
@@ -396,6 +439,18 @@ const NearbyCoursesWithMatches = () => {
         {!loading && searched && courses.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">
             No courses found nearby. Try a different search.
+          </p>
+        )}
+        {!loading && searched && courses.length > 0 && filteredCourses.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No matches fit the current filters.{" "}
+            <button
+              type="button"
+              className="underline text-primary"
+              onClick={() => setFilters(DEFAULT_FILTERS)}
+            >
+              Reset filters
+            </button>
           </p>
         )}
         {visibleCourses.map((course, i) => {
@@ -497,14 +552,14 @@ const NearbyCoursesWithMatches = () => {
             </Card>
           );
         })}
-        {visibleCount < courses.length && (
+        {visibleCount < filteredCourses.length && (
           <div ref={sentinelRef} className="py-3 flex flex-col items-center gap-2" aria-live="polite">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), courses.length))}
+              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), filteredCourses.length))}
             >
-              Load more ({courses.length - visibleCount} remaining)
+              Load more ({filteredCourses.length - visibleCount} remaining)
             </Button>
           </div>
         )}
