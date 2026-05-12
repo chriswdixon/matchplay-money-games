@@ -235,6 +235,16 @@ const NearbyCoursesWithMatches = () => {
     };
   }, [matches, filters]);
 
+  const filteredCourses = useMemo(
+    () =>
+      filtersActive
+        ? courses.filter((c) => openMatchesForCourse(c.name).length > 0)
+        : courses,
+    [courses, filtersActive, openMatchesForCourse],
+  );
+  const visibleCourses = filteredCourses.slice(0, visibleCount);
+
+
 
   const handleCreateAtCourse = (course: GolfCourse) => {
     if (!user) {
