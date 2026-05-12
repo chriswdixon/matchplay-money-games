@@ -86,13 +86,7 @@ const NearbyCoursesWithMatches = () => {
   // the sentinel is often already in the viewport, which caused all results
   // to expand at once.
 
-  const filteredCourses = useMemo(() => {
-    if (!filtersActive) return courses;
-    return courses.filter((c) => openMatchesForCourse(c.name).length > 0);
-    // openMatchesForCourse depends on filters, which is included via filtersActive
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [courses, filters]);
-  const visibleCourses = filteredCourses.slice(0, visibleCount);
+  // visibleCourses computed below after openMatchesForCourse is defined
 
   // Only allow ZIP code searches (US 5-digit, optional +4) — city searches are not supported.
   const isZip = (s: string) => /^\d{5}(-\d{4})?$/.test(s.trim());
