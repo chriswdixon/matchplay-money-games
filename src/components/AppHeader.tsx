@@ -23,6 +23,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { hasActiveMatch, activeMatchName } = useActiveMatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const [systemPrefersDark, setSystemPrefersDark] = useState(false);
   
