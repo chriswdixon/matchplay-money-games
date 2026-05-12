@@ -37,6 +37,7 @@ const WinsFeed = lazy(() => import("./pages/WinsFeed"));
 const HandicapCalculatorsPage = lazy(() => import("./pages/HandicapCalculatorsPage"));
 const WalletPage = lazy(() => import("./pages/Wallet"));
 const FAQ = lazy(() => import("./pages/FAQ"));
+const MyMatches = lazy(() => import("./pages/MyMatches"));
 
 // Minimal loading fallback to avoid layout shift
 const PageLoader = () => (
