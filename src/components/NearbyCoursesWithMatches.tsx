@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge";
 import { Search, MapPin, Loader2, Plus, Navigation, Users, Trophy } from "lucide-react";
 import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
-import { useMatches } from "@/hooks/useMatches";
+import { useMatches, type Match } from "@/hooks/useMatches";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 import CourseDetailDialog from "./CourseDetailDialog";
@@ -42,7 +42,8 @@ const NearbyCoursesWithMatches = () => {
   const { location, requestLocation, error: locationError, loading: locationLoading, geocodeAddress } = useLocation();
   const [manualLocation, setManualLocation] = useState<{ latitude: number; longitude: number; label: string } | null>(null);
   const effectiveLocation = location ?? manualLocation;
-  const { matches } = useMatches();
+  const { matches, joinMatch } = useMatches();
+  const [joiningId, setJoiningId] = useState<string | null>(null);
   const navigate = useNavigate();
   const { user } = useAuth();
   const [visibleCount, setVisibleCount] = useState(10);
@@ -233,8 +234,33 @@ const NearbyCoursesWithMatches = () => {
     navigate("/create-match", { state: { prefilledCourse } });
   };
 
-  const handleViewMatch = (matchId: string) => {
-    navigate(`/match/${matchId}`);
+  const handleJoinMatch = async (match: Match) => {
+    if (!user) {
+      navigate("/auth");
+      return;
+    }
+    // Already a participant — just open the scorecard.
+    if (match.user_joined) {
+      navigate(`/match/${match.id}`);
+      return;
+    }
+    // PIN-protected or multi-team matches require the dedicated join dialog
+    // on the matches tab (PIN entry / team selection).
+    const needsDialog =
+      !!match.pin || (match.is_team_format && match.max_participants > 2);
+    if (needsDialog) {
+      navigate("/?tab=matches");
+      return;
+    }
+    setJoiningId(match.id);
+    try {
+      const result = await joinMatch(match.id);
+      if (!result?.error) {
+        navigate(`/match/${match.id}`);
+      }
+    } finally {
+      setJoiningId(null);
+    }
   };
 
   return (
@@ -425,13 +451,18 @@ const NearbyCoursesWithMatches = () => {
                   <div className="flex flex-col gap-1.5 shrink-0">
                     <Button
                       size="sm"
+                      disabled={joiningId === openMatches[0].id}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleViewMatch(openMatches[0].id);
+                        handleJoinMatch(openMatches[0]);
                       }}
                       className="bg-success text-white font-bold hover:bg-success hover:shadow-[0_0_20px_hsl(var(--success)/0.7)] transition-shadow"
                     >
-                      Join Match
+                      {joiningId === openMatches[0].id
+                        ? "Joining…"
+                        : openMatches[0].user_joined
+                          ? "Open Match"
+                          : "Join Match"}
                     </Button>
                     <Button
                       type="button"
