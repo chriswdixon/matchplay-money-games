@@ -13,6 +13,13 @@ import CourseDetailDialog from "./CourseDetailDialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Slider } from "@/components/ui/slider";
 import LocationStatusBanner from "./LocationStatusBanner";
+import MatchSearchFiltersBar, {
+  DEFAULT_FILTERS,
+  applyMatchFilters,
+  compareBySort,
+  isFilterActive,
+  type MatchSearchFilters,
+} from "./MatchSearchFiltersBar";
 
 const DEFAULT_RADIUS_MI = 30;
 // Slider position past the max means "Unlimited" — search anywhere.
