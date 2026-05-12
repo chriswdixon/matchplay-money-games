@@ -58,6 +58,8 @@ const NearbyCoursesWithMatches = () => {
   const [selectedCourse, setSelectedCourse] = useState<GolfCourse | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [radius, setRadius] = useState<number>(DEFAULT_RADIUS_MI);
+  const [filters, setFilters] = useState<MatchSearchFilters>(DEFAULT_FILTERS);
+  const filtersActive = isFilterActive(filters);
 
   // Load 10 at a time on both mobile and desktop
   const getStep = () => 10;
