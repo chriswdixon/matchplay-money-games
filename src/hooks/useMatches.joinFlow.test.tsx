@@ -15,7 +15,7 @@ vi.mock("@/integrations/supabase/client", async () => {
   return {
     supabase: createSupabaseMock({
       user: { id: "user-1", email: "u@e.com" },
-      session: { access_token: "t", user: { id: "user-1" } },
+      session: { access_token: "aaaaa.bbbbb.cccccccccccccccc", user: { id: "user-1" } },
       rpcResults: {
         validate_and_join_match: {
           data: { success: true, message: "ok" },
