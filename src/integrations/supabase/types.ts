@@ -679,6 +679,33 @@ export type Database = {
           },
         ]
       }
+      match_chat_messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          match_id: string
+          sender_id: string
+          updated_at: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          match_id: string
+          sender_id: string
+          updated_at?: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          match_id?: string
+          sender_id?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       match_confirmations: {
         Row: {
           confirmed: boolean

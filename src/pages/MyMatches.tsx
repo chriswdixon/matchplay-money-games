@@ -9,6 +9,7 @@ import {
   Play,
   LogOut,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import { format as formatDate, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { useMatches } from "@/hooks/useMatches";
@@ -17,6 +18,13 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import MatchPlayersList from "@/components/home/MatchPlayersList";
 import LiveScoreProgress from "@/components/home/LiveScoreProgress";
+import MatchChat from "@/components/match/MatchChat";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+} from "@/components/ui/sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -55,6 +63,7 @@ const MyMatches = () => {
   const { matches, loading, leaveMatch } = useMatches();
   const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const [chatTarget, setChatTarget] = useState<{ id: string; name: string } | null>(null);
 
   const myMatches = useMemo(() => {
     if (!user) return [];
@@ -208,6 +217,16 @@ const MyMatches = () => {
                       </>
                     )}
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      setChatTarget({ id: m.id, name: m.course_name })
+                    }
+                    className="gap-1.5"
+                  >
+                    <MessageSquare className="w-3.5 h-3.5" /> Chat
+                  </Button>
                   {!isCreator && (
                     <Button
                       size="sm"
@@ -245,6 +264,28 @@ const MyMatches = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Sheet
+        open={!!chatTarget}
+        onOpenChange={(open) => !open && setChatTarget(null)}
+      >
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-md p-0 flex flex-col"
+          style={{ maxWidth: "calc(100vw - 2rem)" }}
+        >
+          <SheetHeader className="px-4 py-3 border-b border-border">
+            <SheetTitle className="truncate text-base">
+              {chatTarget?.name ?? "Match chat"}
+            </SheetTitle>
+          </SheetHeader>
+          {chatTarget && (
+            <div className="flex-1 min-h-0 p-3">
+              <MatchChat matchId={chatTarget.id} className="h-full" />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
