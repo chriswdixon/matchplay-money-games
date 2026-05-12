@@ -63,6 +63,7 @@ const MyMatches = () => {
   const { matches, loading, leaveMatch } = useMatches();
   const [leaveTarget, setLeaveTarget] = useState<string | null>(null);
   const [leaving, setLeaving] = useState(false);
+  const [chatTarget, setChatTarget] = useState<{ id: string; name: string } | null>(null);
 
   const myMatches = useMemo(() => {
     if (!user) return [];
