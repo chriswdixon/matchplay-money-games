@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import GolfBallLoader from "@/components/GolfBallLoader";
 import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
+
 import { toast } from "sonner";
 
 const MatchScorecard = lazy(() =>
