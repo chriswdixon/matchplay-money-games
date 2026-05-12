@@ -334,10 +334,6 @@ const CreateMatch = () => {
       return;
     }
 
-    if (hasIncompleteMatches) {
-      toast.error('Please complete your current match before creating a new one');
-      return;
-    }
 
     // Course no longer required for submission — it's prefilled from the
     // course card click flow.
