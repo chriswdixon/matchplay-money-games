@@ -68,7 +68,7 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
 
         {/* Center: Toolbar (logged-in only) */}
         {user && (
-          <div className="flex items-center gap-1 mx-auto" role="toolbar" aria-label="Quick actions">
+          <div className="hidden md:flex items-center gap-1 mx-auto" role="toolbar" aria-label="Quick actions">
             {[
               { to: "/create-match", label: "Create", Icon: Plus },
               { to: "/?tab=matches", label: "Find", Icon: Search },
