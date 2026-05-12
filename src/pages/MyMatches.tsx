@@ -61,6 +61,55 @@ const statusBadge = (status: string, scheduled: string) => {
   return { label: "Open", className: "bg-primary text-primary-foreground" };
 };
 
+const buildDirectionsUrl = (m: {
+  latitude?: number | null;
+  longitude?: number | null;
+  location?: string | null;
+  course_name?: string | null;
+}) => {
+  if (m.latitude != null && m.longitude != null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${m.latitude},${m.longitude}`;
+  }
+  const q = encodeURIComponent(
+    [m.course_name, m.location].filter(Boolean).join(", "),
+  );
+  return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+};
+
+const shareMatch = async (m: {
+  id: string;
+  course_name: string;
+  scheduled_time: string;
+  location?: string | null;
+}) => {
+  const url = `${window.location.origin}/match/${m.id}`;
+  const title = `Tyche match at ${m.course_name}`;
+  const when = new Date(m.scheduled_time).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  const text = `Join me at ${m.course_name}${m.location ? ` (${m.location})` : ""} — ${when}`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text, url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    toast.success("Match link copied");
+  } catch (err: any) {
+    if (err?.name === "AbortError") return;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Match link copied");
+    } catch {
+      toast.error("Couldn't share link");
+    }
+  }
+};
+
 const MyMatches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
