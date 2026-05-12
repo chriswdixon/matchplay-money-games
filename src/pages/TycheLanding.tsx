@@ -164,11 +164,7 @@ const TycheLanding = () => {
 
   // Logged-in user experience
   if (user) {
-    // Map currentTab to the new bottom tab system
-    const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap"];
-    const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
-      ? (currentTab as BottomTab)
-      : "home";
+
 
     return (
       <div className="app-page-bg flex flex-col min-h-screen">
