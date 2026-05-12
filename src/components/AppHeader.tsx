@@ -65,6 +65,37 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
             />
           </Link>
         </div>
+
+        {/* Center: Toolbar (logged-in only) */}
+        {user && (
+          <div className="hidden md:flex items-center gap-1 mx-auto" role="toolbar" aria-label="Quick actions">
+            {[
+              { to: "/create-match", label: "Create", Icon: Plus },
+              { to: "/?tab=matches", label: "Find", Icon: Search },
+              { to: "/my-matches", label: "History", Icon: Trophy },
+            ].map(({ to, label, Icon }) => {
+              const path = to.split("?")[0];
+              const active = location.pathname === path && (path !== "/" || location.search.includes("tab=matches"));
+              return (
+                <Button
+                  key={to}
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "gap-2 rounded-full px-4",
+                    active ? "bg-primary/10 text-primary hover:bg-primary/15" : "text-foreground/80 hover:text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Link to={to}>
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    <span>{label}</span>
+                  </Link>
+                </Button>
+              );
+            })}
+          </div>
+        )}
         
         {/* Right Section: Active Match + Hamburger + User Menu */}
         <div className="flex items-center gap-1 md:gap-2 ml-auto shrink-0">
