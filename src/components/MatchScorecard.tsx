@@ -700,6 +700,72 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
               </Card>
             )}
 
+            {/* Match Play live status banner */}
+            {matchPlayState && (() => {
+              const { state, p1, p2 } = matchPlayState;
+              const tone =
+                state.diff > 0
+                  ? "bg-success/10 text-success border-success/30"
+                  : state.diff < 0
+                  ? "bg-destructive/10 text-destructive border-destructive/30"
+                  : "bg-muted text-foreground border-border";
+              return (
+                <Card className="rounded-2xl shadow-sm border-2" aria-label="Match Play status">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-xs uppercase tracking-wide text-muted-foreground">Match Play</div>
+                        <div className="text-sm text-foreground/80">
+                          {p1.player_name} <span className="text-muted-foreground">vs</span> {p2.player_name}
+                        </div>
+                      </div>
+                      <Badge className={cn("text-base px-3 py-1 rounded-full border", tone)}>
+                        {state.isClinched && state.finalText
+                          ? `${p1.player_name} wins ${state.finalText}`
+                          : state.holesPlayed === 0
+                          ? "Not started"
+                          : state.p1StatusText === "AS"
+                          ? "All Square"
+                          : `${p1.player_name} ${state.p1StatusText}`}
+                      </Badge>
+                    </div>
+                    {state.holesPlayed > 0 && (
+                      <div className="mt-3" aria-label="Hole-by-hole results">
+                        <div className="flex flex-wrap gap-1">
+                          {state.holeResults.map((r, i) => {
+                            const cls =
+                              r === "win"
+                                ? "bg-success text-success-foreground"
+                                : r === "loss"
+                                ? "bg-destructive text-destructive-foreground"
+                                : r === "half"
+                                ? "bg-muted text-foreground"
+                                : "bg-background text-muted-foreground border border-border";
+                            return (
+                              <div
+                                key={i}
+                                className={cn(
+                                  "h-6 w-7 rounded-md flex items-center justify-center text-[10px] font-semibold",
+                                  cls,
+                                )}
+                                title={`Hole ${i + 1}: ${r ?? "pending"}`}
+                              >
+                                {i + 1}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          {state.holesPlayed} played · {state.holesRemaining} to play
+                          {state.isClinched && " · Match clinched"}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             {/* Player Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {playerScores.map((player) => {
