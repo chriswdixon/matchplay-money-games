@@ -356,6 +356,20 @@ export const useMatches = () => {
       if (error) throw error;
       if (!data) throw new Error('Failed to create match - no data returned');
 
+      // If a creator-side PIN was provided, persist it via the secure RPC
+      const creatorPin = (matchData as any).pin as string | undefined;
+      if (creatorPin) {
+        const { error: pinError } = await supabase.rpc('set_match_team_pin', {
+          p_match_id: data.id,
+          p_team_number: 1,
+          p_pin: creatorPin,
+        });
+        if (pinError) {
+          await supabase.from('matches').delete().eq('id', data.id);
+          throw new Error('Failed to set match PIN: ' + pinError.message);
+        }
+      }
+
       // Automatically join the creator to the match FIRST (required for buy-in charge)
       const { error: joinError } = await supabase
         .from('match_participants')
