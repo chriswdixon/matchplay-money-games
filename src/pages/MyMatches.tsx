@@ -9,6 +9,7 @@ import {
   Play,
   LogOut,
   ExternalLink,
+  MessageSquare,
 } from "lucide-react";
 import { format as formatDate, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { useMatches } from "@/hooks/useMatches";
