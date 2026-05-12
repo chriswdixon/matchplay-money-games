@@ -20,7 +20,7 @@ const MobileBottomToolbar = () => {
     <nav
       role="toolbar"
       aria-label="Quick actions"
-      className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2"
+      className="fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2"
     >
       <ul className="grid grid-cols-5 gap-1 px-2">
         {items.map(({ to, label, Icon, match }) => {
