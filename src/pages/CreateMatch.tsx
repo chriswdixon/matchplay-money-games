@@ -78,52 +78,7 @@ const CreateMatch = () => {
     handicap_range: ''
   });
 
-  // Check for incomplete matches on mount
-  useEffect(() => {
-    const checkIncompleteMatches = async () => {
-      if (!user) {
-        setCheckingIncomplete(false);
-        return;
-      }
-
-      try {
-        // Check if user has any started matches without finalized results
-        const { data: participantData, error: participantError } = await supabase
-          .from('match_participants')
-          .select('match_id')
-          .eq('user_id', user.id);
-
-        if (participantError) throw participantError;
-
-        if (participantData && participantData.length > 0) {
-          const matchIds = participantData.map(p => p.match_id);
-
-          // Check for started matches without finalized results
-          const { data: incompleteData, error: incompleteError } = await supabase
-            .from('matches')
-            .select('id, match_results!inner(finalized_at)')
-            .in('id', matchIds)
-            .eq('status', 'started');
-
-          if (incompleteError) throw incompleteError;
-
-          const incompleteMatch = incompleteData?.find((match: any) => {
-            const results = match.match_results;
-            return !results || (Array.isArray(results) && (results.length === 0 || !results[0]?.finalized_at));
-          });
-
-          setHasIncompleteMatches(!!incompleteMatch);
-          setIncompleteMatchId(incompleteMatch?.id ?? null);
-        }
-      } catch (error) {
-        console.error('Error checking incomplete matches:', error);
-      } finally {
-        setCheckingIncomplete(false);
-      }
-    };
-
-    checkIncompleteMatches();
-  }, [user]);
+  // Users may participate in multiple matches concurrently — no incomplete-match guardrail.
 
   // Prefill course from navigation state OR sessionStorage (survives refresh).
   useEffect(() => {
