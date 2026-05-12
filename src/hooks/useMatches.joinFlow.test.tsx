@@ -58,11 +58,11 @@ describe("useMatches.joinMatch — secure RPC flow", () => {
   });
 
   it("invokes validate_and_join_match RPC with PIN + team args", async () => {
-    const { result } = renderHook(() => useMatches(), { wrapper });
-    await waitFor(() => expect(result.current).toBeTruthy());
+    const { result } = renderHook(() => useAuthedMatches(), { wrapper });
+    await waitFor(() => expect(result.current.auth.user?.id).toBe("user-1"));
 
     await act(async () => {
-      await result.current.joinMatch("match-123", "1234", 2, "9999");
+      await result.current.matches.joinMatch("match-123", "1234", 2, "9999");
     });
 
     expect(mock.rpc).toHaveBeenCalledWith("validate_and_join_match", {
@@ -74,12 +74,12 @@ describe("useMatches.joinMatch — secure RPC flow", () => {
   });
 
   it("never queries the matches table for PIN columns when joining", async () => {
-    const { result } = renderHook(() => useMatches(), { wrapper });
-    await waitFor(() => expect(result.current).toBeTruthy());
+    const { result } = renderHook(() => useAuthedMatches(), { wrapper });
+    await waitFor(() => expect(result.current.auth.user?.id).toBe("user-1"));
 
     mock.from.mockClear();
     await act(async () => {
-      await result.current.joinMatch("match-123", "1234");
+      await result.current.matches.joinMatch("match-123", "1234");
     });
 
     // Only the RPC should be used to join — no direct matches-table reads
@@ -93,12 +93,12 @@ describe("useMatches.joinMatch — secure RPC flow", () => {
     mock.rpc.mockImplementationOnce(() =>
       Promise.resolve({ data: { error: "Invalid PIN" }, error: null })
     );
-    const { result } = renderHook(() => useMatches(), { wrapper });
-    await waitFor(() => expect(result.current).toBeTruthy());
+    const { result } = renderHook(() => useAuthedMatches(), { wrapper });
+    await waitFor(() => expect(result.current.auth.user?.id).toBe("user-1"));
 
     let res: any;
     await act(async () => {
-      res = await result.current.joinMatch("match-123", "0000");
+      res = await result.current.matches.joinMatch("match-123", "0000");
     });
     expect(res.error).toBe("Invalid PIN");
   });
