@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SignedAvatarImage } from "@/components/profile/SignedAvatarImage";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -64,8 +65,8 @@ const WinsFeed = () => {
                 <CardContent className="p-4">
                   <div className="flex items-start gap-3">
                     <Avatar className="w-12 h-12 border border-border">
-                      <AvatarImage
-                        src={post.profile_picture_url ?? undefined}
+                      <SignedAvatarImage
+                        src={post.profile_picture_url}
                         alt={`${post.display_name ?? "Player"} avatar`}
                       />
                       <AvatarFallback className="bg-gradient-primary text-primary-foreground">

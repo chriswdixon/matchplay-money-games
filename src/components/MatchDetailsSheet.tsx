@@ -10,7 +10,8 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SignedAvatarImage } from "@/components/profile/SignedAvatarImage";
 import {
   Calendar,
   MapPin,
@@ -277,7 +278,7 @@ const MatchDetailsSheet = ({
                   >
                     <Avatar className="w-9 h-9">
                       {p.profile_picture_url && (
-                        <AvatarImage src={p.profile_picture_url} alt="" />
+                        <SignedAvatarImage src={p.profile_picture_url} alt="" />
                       )}
                       <AvatarFallback className="text-xs bg-primary/15 text-primary font-semibold">
                         {initialsOf(p.display_name)}

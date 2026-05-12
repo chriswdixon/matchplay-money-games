@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SignedAvatarImage } from "@/components/profile/SignedAvatarImage";
 import { Star } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { usePlayerAccount } from "@/hooks/usePlayerAccount";
@@ -40,7 +41,7 @@ const HomeProfileCard = () => {
   return (
     <div className="flex items-center gap-4 px-1">
       <Avatar className="h-16 w-16 shrink-0 shadow-card">
-        <AvatarImage src={profile?.profile_picture_url || undefined} alt={displayName} />
+        <SignedAvatarImage src={profile?.profile_picture_url} alt={displayName} />
         <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-lg">
           {initials}
         </AvatarFallback>

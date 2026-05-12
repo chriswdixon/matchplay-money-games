@@ -11,6 +11,7 @@ import {
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
 import { useToast } from '@/hooks/use-toast';
+import { useSignedAvatarUrl } from '@/lib/avatarUrl';
 
 interface AvatarUploadProps {
   currentImageUrl?: string;
@@ -68,18 +69,11 @@ export function AvatarUpload({ currentImageUrl, onImageUpdate, disabled }: Avata
         throw error;
       }
 
-      // Get authenticated URL (bucket is now private for security)
-      const { data: { publicUrl } } = supabase.storage
-        .from('profile-pictures')
-        .getPublicUrl(fileName);
-
-      // Create preview URL for immediate display
+      // Bucket is private — store the storage path; UI resolves to signed URLs.
       const preview = URL.createObjectURL(file);
       setPreviewUrl(preview);
 
-      // Call the update callback with authenticated URL
-      // Note: publicUrl still works for authenticated users due to RLS policies
-      onImageUpdate(publicUrl);
+      onImageUpdate(fileName);
 
       toast({
         title: "Profile picture updated",
@@ -134,7 +128,8 @@ export function AvatarUpload({ currentImageUrl, onImageUpdate, disabled }: Avata
     }
   };
 
-  const displayImageUrl = previewUrl || currentImageUrl;
+  const signedCurrent = useSignedAvatarUrl(currentImageUrl);
+  const displayImageUrl = previewUrl || signedCurrent;
 
   return (
     <div className="flex flex-col items-center gap-4">
