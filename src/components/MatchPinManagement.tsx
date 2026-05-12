@@ -72,17 +72,28 @@ export const MatchPinManagement = ({
     if (!selectedTeam) return;
 
     try {
-      const columnName = `team${selectedTeam}_pin`;
-      const { error } = await supabase
-        .from('matches')
-        .update({ [columnName]: newPin })
-        .eq('id', matchId);
+      const { data, error } = await supabase.rpc('set_match_team_pin', {
+        p_match_id: matchId,
+        p_team_number: selectedTeam,
+        p_pin: newPin,
+      });
 
       if (error) throw error;
+      const result = data as { error?: string; success?: boolean } | null;
+      if (result?.error) throw new Error(result.error);
 
       toast.success(`Team ${selectedTeam} PIN updated successfully`);
       setResetDialogOpen(false);
       setSelectedTeam(null);
+      // Refresh live PINs
+      const { data: refreshed } = await supabase.rpc('get_match_team_pins', { p_match_id: matchId });
+      if (refreshed) {
+        const map: Record<number, string> = {};
+        for (const row of refreshed as Array<{ team_number: number; pin: string }>) {
+          if (row.pin) map[row.team_number] = row.pin;
+        }
+        setLivePins(map);
+      }
       onPinUpdated();
     } catch (error: any) {
       toast.error('Failed to update PIN: ' + error.message);
