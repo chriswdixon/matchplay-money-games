@@ -80,6 +80,7 @@ const App = () => (
             <Route path="/handicap-calculators" element={<HandicapCalculatorsPage />} />
             <Route path="/wallet" element={<WalletPage />} />
             <Route path="/faq" element={<FAQ />} />
+            <Route path="/my-matches" element={<MyMatches />} />
             {/* PWA install flow has been removed — always send /install (and any sub-paths) to NotFound */}
             <Route path="/install" element={<Navigate to="/404" replace />} />
             <Route path="/install/*" element={<Navigate to="/404" replace />} />
