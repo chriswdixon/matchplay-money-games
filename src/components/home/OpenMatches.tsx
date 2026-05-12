@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users, ArrowRight, Search, Navigation, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { useMatches } from "@/hooks/useMatches";
+import { useMatches, type Match } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
 import { format as formatDate, isToday, isTomorrow } from "date-fns";
