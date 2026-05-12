@@ -1232,33 +1232,6 @@ const CreateMatch = () => {
           <X className="h-5 w-5" />
         </button>
 
-        {hasIncompleteMatches && (
-          <div className="absolute inset-0 z-40 flex items-center justify-center bg-background/95 backdrop-blur p-6">
-            <div className="max-w-md w-full bg-card rounded-3xl shadow-premium border border-destructive/30 p-6 text-center space-y-4">
-              <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-destructive" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold mb-2">Finish your active match first</h2>
-                <p className="text-sm text-muted-foreground">
-                  You have a match in progress that hasn't been finalized. Please complete or finalize it before creating a new one.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                {incompleteMatchId && (
-                  <Button
-                    onClick={() => navigate(`/match/${incompleteMatchId}`)}
-                    className="bg-gradient-primary text-primary-foreground"
-                  >
-                    Go to active match
-                  </Button>
-                )}
-                <Button variant="outline" onClick={handleCancel}>Close</Button>
-              </div>
-            </div>
-          </div>
-        )}
-
         <form
           onSubmit={(e) => e.preventDefault()}
           className={cn(
