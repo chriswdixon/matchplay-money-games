@@ -695,7 +695,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 const hasConfirmed = confirmation?.confirmed || false;
                 
                 return (
-                   <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+                   <Card key={player.player_id} className={cn("rounded-2xl shadow-sm", player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card')}>
                     <CardContent className="p-4">
                        <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
