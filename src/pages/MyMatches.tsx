@@ -15,6 +15,7 @@ import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import MatchPlayersList from "@/components/home/MatchPlayersList";
 import {
   AlertDialog,
   AlertDialogAction,
