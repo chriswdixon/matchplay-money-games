@@ -846,17 +846,28 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       )}
 
       {/* Finish Match Button - Shows when current player completed all holes but hasn't finished yet */}
-      {isCurrentPlayerComplete && !hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
+      {(isCurrentPlayerComplete || matchPlayState?.state.isClinched) && !hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
         <div className="flex flex-col items-center gap-4 px-6 py-4">
           <div className="text-center">
-            <h3 className="text-lg font-semibold mb-2">🎉 You've completed all {matchData?.holes || 18} holes!</h3>
-            <p className="text-sm text-muted-foreground">
-              {confirmations.filter(c => c.confirmed).length} of {playerScores.length} players have finished
-            </p>
-            {!canFinalize && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Waiting for other players to complete their round...
-              </p>
+            {matchPlayState?.state.isClinched ? (
+              <>
+                <h3 className="text-lg font-semibold mb-2">🏆 Match clinched — {matchPlayState.state.finalText}</h3>
+                <p className="text-sm text-muted-foreground">
+                  The result is decided. Close out the match to record the win.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold mb-2">🎉 You've completed all {matchData?.holes || 18} holes!</h3>
+                <p className="text-sm text-muted-foreground">
+                  {confirmations.filter(c => c.confirmed).length} of {playerScores.length} players have finished
+                </p>
+                {!canFinalize && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Waiting for other players to complete their round...
+                  </p>
+                )}
+              </>
             )}
           </div>
           <Button
@@ -865,7 +876,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
-            {saving ? "Finishing..." : "Finish the Match"}
+            {saving ? "Finishing..." : matchPlayState?.state.isClinched ? "Close Out Match" : "Finish the Match"}
           </Button>
         </div>
       )}
