@@ -41,7 +41,7 @@ const OpenMatches = () => {
 
   const handleJoin = async (m: Match) => {
     const needsDialog =
-      !!m.pin || (m.is_team_format && m.max_participants > 2);
+      !!m.team1_has_pin || (m.is_team_format && m.max_participants > 2);
     if (needsDialog) {
       navigate("/?tab=matches");
       return;
