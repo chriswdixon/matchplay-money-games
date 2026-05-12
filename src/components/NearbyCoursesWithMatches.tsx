@@ -529,14 +529,14 @@ const NearbyCoursesWithMatches = () => {
             </Card>
           );
         })}
-        {visibleCount < courses.length && (
+        {visibleCount < filteredCourses.length && (
           <div ref={sentinelRef} className="py-3 flex flex-col items-center gap-2" aria-live="polite">
             <Button
               variant="outline"
               size="sm"
-              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), courses.length))}
+              onClick={() => setVisibleCount((c) => Math.min(c + getStep(), filteredCourses.length))}
             >
-              Load more ({courses.length - visibleCount} remaining)
+              Load more ({filteredCourses.length - visibleCount} remaining)
             </Button>
           </div>
         )}
