@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import GolfBallLoader from "@/components/GolfBallLoader";
-import AppHeader from "@/components/AppHeader";
+
 import BottomTabBar from "@/components/home/BottomTabBar";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
 
@@ -95,8 +95,7 @@ const MatchDetails = () => {
 
   return (
     <div className="min-h-screen flex flex-col app-page-bg">
-      <AppHeader />
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6 pb-24 md:pb-6 my-[20px]">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6 pb-24 md:pt-20 my-[20px]">
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-16">
