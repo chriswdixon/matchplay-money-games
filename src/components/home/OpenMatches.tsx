@@ -185,9 +185,10 @@ const OpenMatches = () => {
               <button
                 key={m.id}
                 type="button"
-                onClick={() => navigate(`/match/${m.id}`)}
-                className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 border-2 border-success transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`Open ${m.course_name} match`}
+                disabled={joiningId === m.id}
+                onClick={() => handleJoin(m)}
+                className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 border-2 border-success transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                aria-label={`Join ${m.course_name} match`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
@@ -220,10 +221,14 @@ const OpenMatches = () => {
                     </div>
                   )}
                 </div>
-                <ArrowRight
-                  className="w-4 h-4 text-muted-foreground shrink-0"
-                  aria-hidden="true"
-                />
+                {joiningId === m.id ? (
+                  <Loader2 className="w-4 h-4 text-success shrink-0 animate-spin" aria-hidden="true" />
+                ) : (
+                  <ArrowRight
+                    className="w-4 h-4 text-muted-foreground shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
               </button>
             );
           })
