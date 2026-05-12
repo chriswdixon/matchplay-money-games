@@ -31,13 +31,19 @@ vi.mock("sonner", () => ({
 }));
 
 import { supabase } from "@/integrations/supabase/client";
-import { AuthProvider } from "@/hooks/useAuth";
+import { AuthProvider, useAuth } from "@/hooks/useAuth";
 import { useMatches } from "@/hooks/useMatches";
 
 const mock = supabase as any;
 const wrapper = ({ children }: { children: ReactNode }) => (
   <AuthProvider>{children}</AuthProvider>
 );
+
+function useAuthedMatches() {
+  const auth = useAuth();
+  const matches = useMatches();
+  return { auth, matches };
+}
 
 describe("useMatches.joinMatch — secure RPC flow", () => {
   beforeEach(() => {
