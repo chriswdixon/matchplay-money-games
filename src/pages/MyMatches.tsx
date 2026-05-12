@@ -10,7 +10,11 @@ import {
   LogOut,
   ExternalLink,
   MessageSquare,
+  Share2,
+  Navigation,
+  CalendarPlus,
 } from "lucide-react";
+import { toast } from "sonner";
 import { format as formatDate, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
