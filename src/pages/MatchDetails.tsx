@@ -96,7 +96,7 @@ const MatchDetails = () => {
   return (
     <div className="min-h-screen flex flex-col app-page-bg">
       <AppHeader />
-      <main className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6 pb-24 md:pb-6">
+      <main className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6 pb-24 md:pb-6 my-[20px]">
         <Suspense
           fallback={
             <div className="flex items-center justify-center py-16">
