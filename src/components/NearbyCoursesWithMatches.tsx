@@ -528,7 +528,9 @@ const NearbyCoursesWithMatches = () => {
         }
         onJoinMatch={(id) => {
           setDialogOpen(false);
-          handleViewMatch(id);
+          const m = matches.find((mm) => mm.id === id);
+          if (m) handleJoinMatch(m);
+          else navigate(`/match/${id}`);
         }}
         onCreateMatch={(c) => {
           setDialogOpen(false);
