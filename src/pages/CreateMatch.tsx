@@ -38,9 +38,6 @@ const CreateMatch = () => {
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
-  const [incompleteMatchId, setIncompleteMatchId] = useState<string | null>(null);
-  const [checkingIncomplete, setCheckingIncomplete] = useState(true);
   const [formData, setFormData] = useState({
     course_name: '',
     scheduled_date: null as Date | null,
@@ -78,52 +75,7 @@ const CreateMatch = () => {
     handicap_range: ''
   });
 
-  // Check for incomplete matches on mount
-  useEffect(() => {
-    const checkIncompleteMatches = async () => {
-      if (!user) {
-        setCheckingIncomplete(false);
-        return;
-      }
-
-      try {
-        // Check if user has any started matches without finalized results
-        const { data: participantData, error: participantError } = await supabase
-          .from('match_participants')
-          .select('match_id')
-          .eq('user_id', user.id);
-
-        if (participantError) throw participantError;
-
-        if (participantData && participantData.length > 0) {
-          const matchIds = participantData.map(p => p.match_id);
-
-          // Check for started matches without finalized results
-          const { data: incompleteData, error: incompleteError } = await supabase
-            .from('matches')
-            .select('id, match_results!inner(finalized_at)')
-            .in('id', matchIds)
-            .eq('status', 'started');
-
-          if (incompleteError) throw incompleteError;
-
-          const incompleteMatch = incompleteData?.find((match: any) => {
-            const results = match.match_results;
-            return !results || (Array.isArray(results) && (results.length === 0 || !results[0]?.finalized_at));
-          });
-
-          setHasIncompleteMatches(!!incompleteMatch);
-          setIncompleteMatchId(incompleteMatch?.id ?? null);
-        }
-      } catch (error) {
-        console.error('Error checking incomplete matches:', error);
-      } finally {
-        setCheckingIncomplete(false);
-      }
-    };
-
-    checkIncompleteMatches();
-  }, [user]);
+  // Users may participate in multiple matches concurrently — no incomplete-match guardrail.
 
   // Prefill course from navigation state OR sessionStorage (survives refresh).
   useEffect(() => {
@@ -382,10 +334,6 @@ const CreateMatch = () => {
       return;
     }
 
-    if (hasIncompleteMatches) {
-      toast.error('Please complete your current match before creating a new one');
-      return;
-    }
 
     // Course no longer required for submission — it's prefilled from the
     // course card click flow.
@@ -1279,33 +1227,6 @@ const CreateMatch = () => {
         >
           <X className="h-5 w-5" />
         </button>
-
-        {hasIncompleteMatches && (
-          <div className="absolute inset-0 z-40 flex items-center justify-center bg-background/95 backdrop-blur p-6">
-            <div className="max-w-md w-full bg-card rounded-3xl shadow-premium border border-destructive/30 p-6 text-center space-y-4">
-              <div className="mx-auto w-12 h-12 rounded-full bg-destructive/10 flex items-center justify-center">
-                <AlertCircle className="w-6 h-6 text-destructive" aria-hidden="true" />
-              </div>
-              <div>
-                <h2 className="text-xl font-bold mb-2">Finish your active match first</h2>
-                <p className="text-sm text-muted-foreground">
-                  You have a match in progress that hasn't been finalized. Please complete or finalize it before creating a new one.
-                </p>
-              </div>
-              <div className="flex flex-col gap-2">
-                {incompleteMatchId && (
-                  <Button
-                    onClick={() => navigate(`/match/${incompleteMatchId}`)}
-                    className="bg-gradient-primary text-primary-foreground"
-                  >
-                    Go to active match
-                  </Button>
-                )}
-                <Button variant="outline" onClick={handleCancel}>Close</Button>
-              </div>
-            </div>
-          </div>
-        )}
 
         <form
           onSubmit={(e) => e.preventDefault()}
