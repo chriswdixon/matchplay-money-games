@@ -1,11 +1,13 @@
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Target, Moon, Sun } from "lucide-react";
+import { Menu, Target, Moon, Sun, Plus, Search, Trophy } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/components/ThemeProvider";
+import { cn } from "@/lib/utils";
 import logoLight from "@/assets/logo-light.png";
 import logoDark from "@/assets/logo-dark.png";
 interface AppHeaderProps {
