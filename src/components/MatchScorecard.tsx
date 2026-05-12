@@ -17,6 +17,7 @@ import { useCancellationConfirmations } from '@/hooks/useCancellationConfirmatio
 import { supabase } from '@/integrations/supabase/client';
 import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { computeMatchPlayState } from '@/lib/matchPlay';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 import { CancellationConfirmationDialog } from './CancellationConfirmationDialog';
 import PlayerRatingDialog from './PlayerRatingDialog';
@@ -109,6 +110,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
+
+  // Match Play (head-to-head): compute live UP/DOWN status, with current user as p1
+  const isMatchPlay = matchData?.format === 'match-play' && playerScores.length === 2;
+  const matchPlayState = (() => {
+    if (!isMatchPlay) return null;
+    const p1 = currentUserScore ?? playerScores[0];
+    const p2 = playerScores.find(p => p.player_id !== p1.player_id) ?? playerScores[1];
+    if (!p1 || !p2) return null;
+    const state = computeMatchPlayState(p1.scores, p2.scores, matchData?.holes || 18);
+    return { state, p1, p2 };
+  })();
 
   // Helper function to determine if a hole should be displayed for cancelled matches
   const shouldShowHole = (hole: number): boolean => {
@@ -688,6 +700,72 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
               </Card>
             )}
 
+            {/* Match Play live status banner */}
+            {matchPlayState && (() => {
+              const { state, p1, p2 } = matchPlayState;
+              const tone =
+                state.diff > 0
+                  ? "bg-success/10 text-success border-success/30"
+                  : state.diff < 0
+                  ? "bg-destructive/10 text-destructive border-destructive/30"
+                  : "bg-muted text-foreground border-border";
+              return (
+                <Card className="rounded-2xl shadow-sm border-2" aria-label="Match Play status">
+                  <CardContent className="p-4">
+                    <div className="flex items-center justify-between gap-3">
+                      <div>
+                        <div className="text-xs uppercase tracking-wide text-muted-foreground">Match Play</div>
+                        <div className="text-sm text-foreground/80">
+                          {p1.player_name} <span className="text-muted-foreground">vs</span> {p2.player_name}
+                        </div>
+                      </div>
+                      <Badge className={cn("text-base px-3 py-1 rounded-full border", tone)}>
+                        {state.isClinched && state.finalText
+                          ? `${p1.player_name} wins ${state.finalText}`
+                          : state.holesPlayed === 0
+                          ? "Not started"
+                          : state.p1StatusText === "AS"
+                          ? "All Square"
+                          : `${p1.player_name} ${state.p1StatusText}`}
+                      </Badge>
+                    </div>
+                    {state.holesPlayed > 0 && (
+                      <div className="mt-3" aria-label="Hole-by-hole results">
+                        <div className="flex flex-wrap gap-1">
+                          {state.holeResults.map((r, i) => {
+                            const cls =
+                              r === "win"
+                                ? "bg-success text-success-foreground"
+                                : r === "loss"
+                                ? "bg-destructive text-destructive-foreground"
+                                : r === "half"
+                                ? "bg-muted text-foreground"
+                                : "bg-background text-muted-foreground border border-border";
+                            return (
+                              <div
+                                key={i}
+                                className={cn(
+                                  "h-6 w-7 rounded-md flex items-center justify-center text-[10px] font-semibold",
+                                  cls,
+                                )}
+                                title={`Hole ${i + 1}: ${r ?? "pending"}`}
+                              >
+                                {i + 1}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <div className="mt-2 text-xs text-muted-foreground">
+                          {state.holesPlayed} played · {state.holesRemaining} to play
+                          {state.isClinched && " · Match clinched"}
+                        </div>
+                      </div>
+                    )}
+                  </CardContent>
+                </Card>
+              );
+            })()}
+
             {/* Player Summary */}
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
               {playerScores.map((player) => {
@@ -768,17 +846,28 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
       )}
 
       {/* Finish Match Button - Shows when current player completed all holes but hasn't finished yet */}
-      {isCurrentPlayerComplete && !hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
+      {(isCurrentPlayerComplete || matchPlayState?.state.isClinched) && !hasCurrentPlayerFinished && !matchResult && matchData?.status === 'started' && (
         <div className="flex flex-col items-center gap-4 px-6 py-4">
           <div className="text-center">
-            <h3 className="text-lg font-semibold mb-2">🎉 You've completed all {matchData?.holes || 18} holes!</h3>
-            <p className="text-sm text-muted-foreground">
-              {confirmations.filter(c => c.confirmed).length} of {playerScores.length} players have finished
-            </p>
-            {!canFinalize && (
-              <p className="text-xs text-muted-foreground mt-1">
-                Waiting for other players to complete their round...
-              </p>
+            {matchPlayState?.state.isClinched ? (
+              <>
+                <h3 className="text-lg font-semibold mb-2">🏆 Match clinched — {matchPlayState.state.finalText}</h3>
+                <p className="text-sm text-muted-foreground">
+                  The result is decided. Close out the match to record the win.
+                </p>
+              </>
+            ) : (
+              <>
+                <h3 className="text-lg font-semibold mb-2">🎉 You've completed all {matchData?.holes || 18} holes!</h3>
+                <p className="text-sm text-muted-foreground">
+                  {confirmations.filter(c => c.confirmed).length} of {playerScores.length} players have finished
+                </p>
+                {!canFinalize && (
+                  <p className="text-xs text-muted-foreground mt-1">
+                    Waiting for other players to complete their round...
+                  </p>
+                )}
+              </>
             )}
           </div>
           <Button
@@ -787,7 +876,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
             size="lg"
             className="bg-gradient-primary text-primary-foreground hover:shadow-premium text-base"
           >
-            {saving ? "Finishing..." : "Finish the Match"}
+            {saving ? "Finishing..." : matchPlayState?.state.isClinched ? "Close Out Match" : "Finish the Match"}
           </Button>
         </div>
       )}
