@@ -73,7 +73,7 @@ const MatchDetails = () => {
   if (notFound || !match) {
     return (
       <div className="min-h-screen flex flex-col app-page-bg">
-        <AppHeader />
+        
         <main className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-2xl font-bold mb-2">Match not found</h1>
           <p className="text-muted-foreground mb-6">
