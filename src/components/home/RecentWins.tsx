@@ -1,4 +1,5 @@
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { SignedAvatarImage } from "@/components/profile/SignedAvatarImage";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Trophy, MapPin, Users, ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
