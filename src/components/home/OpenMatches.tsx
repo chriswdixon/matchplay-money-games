@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Calendar, MapPin, Users, ArrowRight, Search, Navigation, Loader2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { useMemo, useState } from "react";
-import { useMatches } from "@/hooks/useMatches";
+import { useMatches, type Match } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
 import { useLocation } from "@/hooks/useLocation";
 import { format as formatDate, isToday, isTomorrow } from "date-fns";
@@ -34,9 +34,26 @@ const haversineMi = (lat1: number, lon1: number, lat2: number, lon2: number) => 
 const OpenMatches = () => {
   const navigate = useNavigate();
   const { user } = useAuth();
-  const { matches, loading } = useMatches();
+  const { matches, loading, joinMatch } = useMatches();
   const { location, requestLocation, loading: locationLoading } = useLocation();
   const [radius, setRadius] = useState<number>(INITIAL_RADIUS_MI);
+  const [joiningId, setJoiningId] = useState<string | null>(null);
+
+  const handleJoin = async (m: Match) => {
+    const needsDialog =
+      !!m.pin || (m.is_team_format && m.max_participants > 2);
+    if (needsDialog) {
+      navigate("/?tab=matches");
+      return;
+    }
+    setJoiningId(m.id);
+    try {
+      const result = await joinMatch(m.id);
+      if (!result?.error) navigate(`/match/${m.id}`);
+    } finally {
+      setJoiningId(null);
+    }
+  };
 
   const openMatches = useMemo(() => {
     if (!user) return [];
@@ -168,9 +185,10 @@ const OpenMatches = () => {
               <button
                 key={m.id}
                 type="button"
-                onClick={() => navigate(`/match/${m.id}`)}
-                className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 border-2 border-success transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                aria-label={`Open ${m.course_name} match`}
+                disabled={joiningId === m.id}
+                onClick={() => handleJoin(m)}
+                className="w-full text-left flex items-center gap-3 bg-background/60 dark:bg-slate-100 hover:bg-background dark:hover:bg-slate-200 rounded-2xl px-3 py-3 border-2 border-success transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:opacity-60"
+                aria-label={`Join ${m.course_name} match`}
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-0.5">
@@ -203,10 +221,14 @@ const OpenMatches = () => {
                     </div>
                   )}
                 </div>
-                <ArrowRight
-                  className="w-4 h-4 text-muted-foreground shrink-0"
-                  aria-hidden="true"
-                />
+                {joiningId === m.id ? (
+                  <Loader2 className="w-4 h-4 text-success shrink-0 animate-spin" aria-hidden="true" />
+                ) : (
+                  <ArrowRight
+                    className="w-4 h-4 text-muted-foreground shrink-0"
+                    aria-hidden="true"
+                  />
+                )}
               </button>
             );
           })
