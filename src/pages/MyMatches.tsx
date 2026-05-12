@@ -10,7 +10,11 @@ import {
   LogOut,
   ExternalLink,
   MessageSquare,
+  Share2,
+  Navigation,
+  CalendarPlus,
 } from "lucide-react";
+import { toast } from "sonner";
 import { format as formatDate, isToday, isTomorrow, formatDistanceToNow } from "date-fns";
 import { useMatches } from "@/hooks/useMatches";
 import { useAuth } from "@/hooks/useAuth";
@@ -55,6 +59,55 @@ const statusBadge = (status: string, scheduled: string) => {
     return { label: "Starts soon", className: "bg-warning text-warning-foreground" };
   }
   return { label: "Open", className: "bg-primary text-primary-foreground" };
+};
+
+const buildDirectionsUrl = (m: {
+  latitude?: number | null;
+  longitude?: number | null;
+  location?: string | null;
+  course_name?: string | null;
+}) => {
+  if (m.latitude != null && m.longitude != null) {
+    return `https://www.google.com/maps/dir/?api=1&destination=${m.latitude},${m.longitude}`;
+  }
+  const q = encodeURIComponent(
+    [m.course_name, m.location].filter(Boolean).join(", "),
+  );
+  return `https://www.google.com/maps/dir/?api=1&destination=${q}`;
+};
+
+const shareMatch = async (m: {
+  id: string;
+  course_name: string;
+  scheduled_time: string;
+  location?: string | null;
+}) => {
+  const url = `${window.location.origin}/match/${m.id}`;
+  const title = `Tyche match at ${m.course_name}`;
+  const when = new Date(m.scheduled_time).toLocaleString(undefined, {
+    weekday: "short",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit",
+  });
+  const text = `Join me at ${m.course_name}${m.location ? ` (${m.location})` : ""} — ${when}`;
+  try {
+    if (navigator.share) {
+      await navigator.share({ title, text, url });
+      return;
+    }
+    await navigator.clipboard.writeText(url);
+    toast.success("Match link copied");
+  } catch (err: any) {
+    if (err?.name === "AbortError") return;
+    try {
+      await navigator.clipboard.writeText(url);
+      toast.success("Match link copied");
+    } catch {
+      toast.error("Couldn't share link");
+    }
+  }
 };
 
 const MyMatches = () => {
@@ -227,6 +280,46 @@ const MyMatches = () => {
                   >
                     <MessageSquare className="w-3.5 h-3.5" /> Chat
                   </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => shareMatch(m)}
+                    className="gap-1.5"
+                  >
+                    <Share2 className="w-3.5 h-3.5" /> Share
+                  </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    asChild
+                    className="gap-1.5"
+                  >
+                    <a
+                      href={buildDirectionsUrl(m)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      aria-label={`Directions to ${m.course_name}`}
+                    >
+                      <Navigation className="w-3.5 h-3.5" /> Directions
+                    </a>
+                  </Button>
+                  {m.booking_url && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      asChild
+                      className="gap-1.5"
+                    >
+                      <a
+                        href={m.booking_url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label={`Tee time info for ${m.course_name}`}
+                      >
+                        <CalendarPlus className="w-3.5 h-3.5" /> Tee Times
+                      </a>
+                    </Button>
+                  )}
                   {!isCreator && (
                     <Button
                       size="sm"
