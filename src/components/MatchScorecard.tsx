@@ -17,6 +17,7 @@ import { useCancellationConfirmations } from '@/hooks/useCancellationConfirmatio
 import { supabase } from '@/integrations/supabase/client';
 import { Target, Trophy, Clock, CheckCircle, Users, ChevronDown, DollarSign, Menu, X, Check, AlertTriangle, Star } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { computeMatchPlayState } from '@/lib/matchPlay';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 import { CancellationConfirmationDialog } from './CancellationConfirmationDialog';
 import PlayerRatingDialog from './PlayerRatingDialog';
@@ -109,6 +110,17 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
   const currentUserScore = playerScores.find(p => p.player_id === user?.id);
   const otherPlayers = playerScores.filter(p => p.player_id !== user?.id);
+
+  // Match Play (head-to-head): compute live UP/DOWN status, with current user as p1
+  const isMatchPlay = matchData?.format === 'match-play' && playerScores.length === 2;
+  const matchPlayState = (() => {
+    if (!isMatchPlay) return null;
+    const p1 = currentUserScore ?? playerScores[0];
+    const p2 = playerScores.find(p => p.player_id !== p1.player_id) ?? playerScores[1];
+    if (!p1 || !p2) return null;
+    const state = computeMatchPlayState(p1.scores, p2.scores, matchData?.holes || 18);
+    return { state, p1, p2 };
+  })();
 
   // Helper function to determine if a hole should be displayed for cancelled matches
   const shouldShowHole = (hole: number): boolean => {
