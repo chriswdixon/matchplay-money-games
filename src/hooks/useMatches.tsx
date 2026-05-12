@@ -347,8 +347,6 @@ export const useMatches = () => {
           tee_selection_mode: matchData.tee_selection_mode,
           default_tees: matchData.default_tees,
           hole_pars: holeParsValidation.data,
-          pin: (matchData as any).pin || null,
-          team1_pin_creator: (matchData as any).pin ? user.id : null,
           created_by: user.id,
           tee_data: matchData.tee_data || null
         })
