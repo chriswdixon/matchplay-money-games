@@ -38,9 +38,6 @@ const CreateMatch = () => {
   const { favorites, addFavorite, removeFavorite, isFavorite, getFavoriteId } = useFavoriteCourses();
 
   const [currentStep, setCurrentStep] = useState(1);
-  const [hasIncompleteMatches, setHasIncompleteMatches] = useState(false);
-  const [incompleteMatchId, setIncompleteMatchId] = useState<string | null>(null);
-  const [checkingIncomplete, setCheckingIncomplete] = useState(true);
   const [formData, setFormData] = useState({
     course_name: '',
     scheduled_date: null as Date | null,
