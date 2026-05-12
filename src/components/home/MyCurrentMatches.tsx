@@ -61,10 +61,10 @@ const MyCurrentMatches = () => {
         </h2>
         <button
           type="button"
-          onClick={() => navigate("/?tab=matches")}
+          onClick={() => navigate("/my-matches")}
           className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-primary !text-white hover:bg-primary/90 focus:outline-none focus-visible:ring-2 focus-visible:ring-ring transition-colors"
-          aria-label="Find more matches"
-          title="Find more matches"
+          aria-label="View all my active matches"
+          title="View all my active matches"
         >
           <ArrowRight className="w-4 h-4 text-white" aria-hidden="true" />
         </button>
