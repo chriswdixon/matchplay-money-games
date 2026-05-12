@@ -264,6 +264,28 @@ const MyMatches = () => {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      <Sheet
+        open={!!chatTarget}
+        onOpenChange={(open) => !open && setChatTarget(null)}
+      >
+        <SheetContent
+          side="right"
+          className="w-full sm:max-w-md p-0 flex flex-col"
+          style={{ maxWidth: "calc(100vw - 2rem)" }}
+        >
+          <SheetHeader className="px-4 py-3 border-b border-border">
+            <SheetTitle className="truncate text-base">
+              {chatTarget?.name ?? "Match chat"}
+            </SheetTitle>
+          </SheetHeader>
+          {chatTarget && (
+            <div className="flex-1 min-h-0 p-3">
+              <MatchChat matchId={chatTarget.id} className="h-full" />
+            </div>
+          )}
+        </SheetContent>
+      </Sheet>
     </div>
   );
 };
