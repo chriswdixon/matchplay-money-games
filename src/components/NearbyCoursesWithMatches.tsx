@@ -421,6 +421,17 @@ const NearbyCoursesWithMatches = () => {
         </div>
       )}
 
+      <div className="flex items-center justify-between gap-2 px-1">
+        <p className="text-xs text-muted-foreground">
+          {filtersActive
+            ? `${filteredCourses.length} of ${courses.length} courses match`
+            : courses.length > 0
+              ? `${courses.length} courses found`
+              : ""}
+        </p>
+        <MatchSearchFiltersBar value={filters} onChange={setFilters} />
+      </div>
+
       <div className="space-y-2">
         {loading && courses.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">Searching nearby courses...</p>
@@ -428,6 +439,18 @@ const NearbyCoursesWithMatches = () => {
         {!loading && searched && courses.length === 0 && (
           <p className="text-sm text-muted-foreground text-center py-4">
             No courses found nearby. Try a different search.
+          </p>
+        )}
+        {!loading && searched && courses.length > 0 && filteredCourses.length === 0 && (
+          <p className="text-sm text-muted-foreground text-center py-4">
+            No matches fit the current filters.{" "}
+            <button
+              type="button"
+              className="underline text-primary"
+              onClick={() => setFilters(DEFAULT_FILTERS)}
+            >
+              Reset filters
+            </button>
           </p>
         )}
         {visibleCourses.map((course, i) => {
