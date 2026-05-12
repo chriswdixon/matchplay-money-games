@@ -16,6 +16,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import MatchPlayersList from "@/components/home/MatchPlayersList";
+import LiveScoreProgress from "@/components/home/LiveScoreProgress";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -180,6 +181,16 @@ const MyMatches = () => {
                   creatorId={m.created_by}
                   maxParticipants={m.max_participants}
                 />
+
+                {isLive && (
+                  <LiveScoreProgress
+                    matchId={m.id}
+                    creatorId={m.created_by}
+                    totalHoles={(m as any).holes ?? 18}
+                    holePars={(m as any).hole_pars ?? null}
+                    currentUserId={user?.id}
+                  />
+                )}
 
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button
