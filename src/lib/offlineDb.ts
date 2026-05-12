@@ -119,3 +119,28 @@ export async function getUnsyncedScoreCount(): Promise<number> {
   const allScores = await db.getAll('scores');
   return (allScores as OfflineScore[]).filter(s => !s.synced).length;
 }
+
+// Get distinct match IDs across all unsynced scores
+export async function getUnsyncedMatchIds(): Promise<string[]> {
+  const db = await getOfflineDB();
+  const allScores = (await db.getAll('scores')) as OfflineScore[];
+  const ids = new Set<string>();
+  for (const s of allScores) {
+    if (!s.synced) ids.add(s.matchId);
+  }
+  return Array.from(ids);
+}
+
+// Delete all offline scores (synced or not) for a given match
+export async function deleteOfflineScoresForMatch(matchId: string): Promise<number> {
+  const db = await getOfflineDB();
+  const scores = (await db.getAllFromIndex('scores', 'by-match', matchId)) as OfflineScore[];
+  let deleted = 0;
+  for (const s of scores) {
+    if (s.id != null) {
+      await db.delete('scores', s.id);
+      deleted++;
+    }
+  }
+  return deleted;
+}
