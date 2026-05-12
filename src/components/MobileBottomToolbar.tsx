@@ -32,14 +32,14 @@ const MobileBottomToolbar = () => {
                 aria-label={label}
                 aria-current={active ? "page" : undefined}
                 className={cn(
-                  "flex flex-1 flex-col items-center justify-center gap-1 rounded-xl py-1.5 text-[11px] font-medium transition-colors",
+                  "flex flex-1 flex-col items-center justify-center gap-1 rounded-full py-2 text-[11px] font-medium transition-colors",
                   active
-                    ? "text-primary bg-primary/10"
-                    : "text-foreground/70 hover:text-foreground"
+                    ? "bg-primary/10 text-primary hover:bg-primary/15"
+                    : "text-primary/80 hover:text-primary hover:bg-muted"
                 )}
               >
                 <Icon className="h-5 w-5" aria-hidden="true" />
-                <span>{label}</span>
+                <span className="sr-only">{label}</span>
               </Link>
             </li>
           );
