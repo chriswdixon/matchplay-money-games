@@ -182,6 +182,16 @@ const MyMatches = () => {
                   maxParticipants={m.max_participants}
                 />
 
+                {isLive && (
+                  <LiveScoreProgress
+                    matchId={m.id}
+                    creatorId={m.created_by}
+                    totalHoles={(m as any).holes ?? 18}
+                    holePars={(m as any).hole_pars ?? null}
+                    currentUserId={user?.id}
+                  />
+                )}
+
                 <div className="flex flex-wrap gap-2 pt-1">
                   <Button
                     size="sm"
