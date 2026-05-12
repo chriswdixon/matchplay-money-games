@@ -1,11 +1,13 @@
 import { UserMenu } from "@/components/auth/UserMenu";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
-import { Menu, Target, Moon, Sun } from "lucide-react";
+import { Menu, Target, Moon, Sun, Plus, Search, Trophy } from "lucide-react";
 import { useState, useMemo, useEffect } from "react";
 import { useActiveMatch } from "@/hooks/useActiveMatch";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/components/ThemeProvider";
+import { cn } from "@/lib/utils";
 import logoLight from "@/assets/logo-light.png";
 import logoDark from "@/assets/logo-dark.png";
 interface AppHeaderProps {
@@ -21,6 +23,8 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { hasActiveMatch, activeMatchName } = useActiveMatch();
   const navigate = useNavigate();
+  const location = useLocation();
+  const { user } = useAuth();
   const { theme, setTheme } = useTheme();
   const [systemPrefersDark, setSystemPrefersDark] = useState(false);
   
@@ -61,6 +65,37 @@ const AppHeader = ({ showNavMenu, onNavSelect, currentTab, navItems, onReturnToM
             />
           </Link>
         </div>
+
+        {/* Center: Toolbar (logged-in only) */}
+        {user && (
+          <div className="flex items-center gap-1 mx-auto" role="toolbar" aria-label="Quick actions">
+            {[
+              { to: "/create-match", label: "Create", Icon: Plus },
+              { to: "/?tab=matches", label: "Find", Icon: Search },
+              { to: "/my-matches", label: "History", Icon: Trophy },
+            ].map(({ to, label, Icon }) => {
+              const path = to.split("?")[0];
+              const active = location.pathname === path && (path !== "/" || location.search.includes("tab=matches"));
+              return (
+                <Button
+                  key={to}
+                  asChild
+                  variant="ghost"
+                  size="sm"
+                  className={cn(
+                    "gap-2 rounded-full px-2 sm:px-4",
+                    active ? "bg-primary/10 text-primary hover:bg-primary/15" : "text-foreground/80 hover:text-foreground hover:bg-muted"
+                  )}
+                >
+                  <Link to={to} aria-label={label}>
+                    <Icon className="h-4 w-4" aria-hidden="true" />
+                    <span className="hidden sm:inline">{label}</span>
+                  </Link>
+                </Button>
+              );
+            })}
+          </div>
+        )}
         
         {/* Right Section: Active Match + Hamburger + User Menu */}
         <div className="flex items-center gap-1 md:gap-2 ml-auto shrink-0">

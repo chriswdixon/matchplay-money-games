@@ -603,7 +603,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           <CollapsibleContent className="mt-4 space-y-4">
             {/* Match Info Grid */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-              <Card className="bg-card/50">
+              <Card className="bg-muted/40 rounded-2xl border-border/60 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Clock className="w-4 h-4 text-primary" />
@@ -613,7 +613,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 </CardContent>
               </Card>
               
-              <Card className="bg-card/50">
+              <Card className="bg-muted/40 rounded-2xl border-border/60 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Users className="w-4 h-4 text-primary" />
@@ -623,7 +623,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 </CardContent>
               </Card>
               
-              <Card className="bg-card/50">
+              <Card className="bg-muted/40 rounded-2xl border-border/60 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <DollarSign className="w-4 h-4 text-primary" />
@@ -633,7 +633,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 </CardContent>
               </Card>
               
-              <Card className="bg-card/50">
+              <Card className="bg-muted/40 rounded-2xl border-border/60 shadow-sm">
                 <CardContent className="p-3">
                   <div className="flex items-center gap-2 mb-1">
                     <Trophy className="w-4 h-4 text-primary" />
@@ -646,7 +646,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
             {/* Tee Information Banner */}
             {matchData && (
-              <Card className="bg-muted/50 border-primary/20">
+              <Card className="bg-muted/50 border-primary/20 rounded-2xl shadow-sm">
                 <CardContent className="p-4">
                   <div className="flex flex-col gap-2">
                     <div className="flex items-center gap-2 text-sm">
@@ -695,7 +695,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                 const hasConfirmed = confirmation?.confirmed || false;
                 
                 return (
-                   <Card key={player.player_id} className={player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card'}>
+                   <Card key={player.player_id} className={cn("rounded-2xl shadow-sm", player.player_id === user?.id ? 'ring-2 ring-primary bg-primary/5' : 'bg-card')}>
                     <CardContent className="p-4">
                        <div className="flex items-center justify-between">
                         <div className="flex items-center gap-2">
@@ -881,10 +881,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
       {/* Scorecard */}
       {(!matchResult || !showResults) && (
-        <Card className={cn(
-          "w-full border-0 md:border",
-          !onClose && "shadow-none"
-        )}>
+        <Card className="w-full border-0 bg-transparent shadow-none rounded-2xl">
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Sticky Tabs Header */}
@@ -1084,7 +1081,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
               <div className="md:hidden">
                 {/* Front 9 Total Card - Sticky below tabs */}
                 <div className="sticky top-[56px] z-10 bg-background pb-4 px-2">
-                  <Card className="bg-accent/10 border-accent">
+                  <Card className="bg-accent/10 border-accent rounded-2xl shadow-sm">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
@@ -1143,7 +1140,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
                       className={cn(
-                        "w-full touch-auto",
+                        "w-full touch-auto rounded-2xl shadow-sm",
                         isActiveHole && "border-2 border-primary bg-primary/5"
                       )}
                     >
@@ -1414,7 +1411,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
               <div className="md:hidden">
                 {/* Back 9 Total Card - Sticky below tabs */}
                 <div className="sticky top-[56px] z-10 bg-background pb-4 px-2">
-                  <Card className="bg-accent/10 border-accent">
+                  <Card className="bg-accent/10 border-accent rounded-2xl shadow-sm">
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between">
                         <div>
@@ -1473,7 +1470,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
                       key={hole} 
                       ref={isActiveHole ? activeHoleRef : null}
                       className={cn(
-                        "w-full touch-auto",
+                        "w-full touch-auto rounded-2xl shadow-sm",
                         isActiveHole && "border-2 border-primary bg-primary/5"
                       )}
                     >

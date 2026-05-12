@@ -4,7 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import GolfBallLoader from "@/components/GolfBallLoader";
 import AppHeader from "@/components/AppHeader";
-import AppFooter from "@/components/AppFooter";
+
 import { toast } from "sonner";
 
 const MatchScorecard = lazy(() =>
@@ -70,7 +70,7 @@ const MatchDetails = () => {
 
   if (notFound || !match) {
     return (
-      <div className="min-h-screen flex flex-col bg-background">
+      <div className="min-h-screen flex flex-col app-page-bg">
         <AppHeader />
         <main className="flex-1 flex flex-col items-center justify-center p-8 text-center">
           <h1 className="text-2xl font-bold mb-2">Match not found</h1>
@@ -84,7 +84,6 @@ const MatchDetails = () => {
             Back to home
           </button>
         </main>
-        <AppFooter />
       </div>
     );
   }
@@ -93,7 +92,7 @@ const MatchDetails = () => {
   const showResults = match.status === "completed";
 
   return (
-    <div className="min-h-screen flex flex-col bg-background">
+    <div className="min-h-screen flex flex-col app-page-bg">
       <AppHeader />
       <main className="flex-1 max-w-5xl w-full mx-auto px-4 md:px-6 py-6">
         <Suspense
@@ -104,24 +103,29 @@ const MatchDetails = () => {
           }
         >
           {showResults ? (
-            <MatchResults
-              matchId={match.id}
-              matchName={match.course_name || "Match"}
-              onClose={handleClose}
-            />
-          ) : (
-            <div className="space-y-6">
-              <MatchScorecard
+            <div className="page-card-shell">
+              <MatchResults
                 matchId={match.id}
                 matchName={match.course_name || "Match"}
                 onClose={handleClose}
               />
-              <MatchChat matchId={match.id} />
+            </div>
+          ) : (
+            <div className="space-y-6">
+              <div className="page-card-shell">
+                <MatchScorecard
+                  matchId={match.id}
+                  matchName={match.course_name || "Match"}
+                  onClose={handleClose}
+                />
+              </div>
+              <div className="page-card-shell">
+                <MatchChat matchId={match.id} />
+              </div>
             </div>
           )}
         </Suspense>
       </main>
-      <AppFooter />
     </div>
   );
 };

@@ -24,7 +24,7 @@ import RecentWins from "@/components/home/RecentWins";
 import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 import MyCurrentMatches from "@/components/home/MyCurrentMatches";
 
-import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
+
 
 
 // Lazy load components for better initial load performance
@@ -164,31 +164,33 @@ const TycheLanding = () => {
 
   // Logged-in user experience
   if (user) {
-    // Map currentTab to the new bottom tab system
-    const allTabs: BottomTab[] = ["home", "matches", "active-match", "past", "handicap"];
-    const activeBottomTab: BottomTab = allTabs.includes(currentTab as BottomTab)
-      ? (currentTab as BottomTab)
-      : "home";
+
 
     return (
-      <div className="app-page-bg flex flex-col">
+      <div className="app-page-bg flex flex-col min-h-screen">
         {/* WCAG 2.1 AA - Skip to main content link */}
         <a href="#main-content" className="skip-link">
           Skip to main content
         </a>
 
+        <AppHeader
+          onReturnToMatch={hasActiveMatch ? handleReturnToMatch : undefined}
+        />
+
         <main
           id="main-content"
-          className="flex-1 pb-32 md:pb-8 md:pt-20 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4"
+          className="flex-1 pb-8 max-w-3xl w-full mx-auto px-4 md:px-6 pt-4 md:pt-6"
           role="main"
         >
           {/* Active match banner takes priority */}
           {currentTab === "active-match" && hasActiveMatch && (
             <Suspense fallback={<TabLoader />}>
-              <MatchScorecard
-                matchId={activeMatchId!}
-                matchName={activeMatchName || "Active Match"}
-              />
+              <div className="page-card-shell">
+                <MatchScorecard
+                  matchId={activeMatchId!}
+                  matchName={activeMatchName || "Active Match"}
+                />
+              </div>
             </Suspense>
           )}
 
@@ -209,7 +211,7 @@ const TycheLanding = () => {
           )}
 
           {currentTab === "matches" && (
-            <div className="py-4">
+            <div className="page-card-shell">
               <h2 className="text-2xl font-bold mb-4">Find Matches & Courses</h2>
               <NearbyCoursesWithMatches />
             </div>
@@ -229,16 +231,7 @@ const TycheLanding = () => {
               </div>
             </div>
           )}
-
-
-
         </main>
-
-        <BottomTabBar
-          activeTab={activeBottomTab}
-          onChange={(tab) => setCurrentTab(tab)}
-          hasActiveMatch={hasActiveMatch}
-        />
       </div>
     );
   }
