@@ -10,6 +10,7 @@ import { GeoBlockingProvider } from "@/hooks/useGeoBlocking";
 
 // Eager load the landing page for fastest initial render
 import Index from "./pages/Index";
+import MobileBottomToolbar from "@/components/MobileBottomToolbar";
 
 // Lazy load non-critical overlays
 const OfflineIndicator = lazy(() => import("@/components/OfflineIndicator").then(m => ({ default: m.OfflineIndicator })));
@@ -88,6 +89,7 @@ const App = () => (
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
+          <MobileBottomToolbar />
         </Suspense>
       </TooltipProvider>
     </ActiveMatchProvider>
