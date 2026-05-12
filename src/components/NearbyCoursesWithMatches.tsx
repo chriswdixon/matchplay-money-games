@@ -219,8 +219,21 @@ const NearbyCoursesWithMatches = () => {
         new Date(m.scheduled_time) >= now &&
         (m.participant_count || 0) < m.max_participants,
     );
-    return (courseName: string) => open.filter((m) => namesMatch(m.course_name, courseName));
-  }, [matches]);
+    return (courseName: string) => {
+      const forCourse = open.filter((m) => namesMatch(m.course_name, courseName));
+      const filtered = applyMatchFilters(forCourse, filters);
+      if (filters.sort !== "distance") {
+        filtered.sort((a, b) => compareBySort(a, b, filters.sort));
+      } else {
+        filtered.sort(
+          (a, b) =>
+            new Date(a.scheduled_time).getTime() -
+            new Date(b.scheduled_time).getTime(),
+        );
+      }
+      return filtered;
+    };
+  }, [matches, filters]);
 
 
   const handleCreateAtCourse = (course: GolfCourse) => {
