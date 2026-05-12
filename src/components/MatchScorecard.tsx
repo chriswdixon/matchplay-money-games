@@ -881,10 +881,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
 
       {/* Scorecard */}
       {(!matchResult || !showResults) && (
-        <Card className={cn(
-          "w-full border-0 md:border",
-          !onClose && "shadow-none"
-        )}>
+        <Card className="w-full border-0 bg-transparent shadow-none rounded-2xl">
         <CardContent className="px-0 md:px-2 py-4">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             {/* Sticky Tabs Header */}
