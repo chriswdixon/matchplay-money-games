@@ -364,7 +364,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
       if (match.is_team_format && match.max_participants > 2) {
         setSelectedMatchForPin(match);
         setTeamJoinDialogOpen(true);
-      } else if (match.pin) {
+      } else if (match.team1_has_pin) {
         // PIN-protected match: request to join instead of entering PIN
         await handleRequestToJoin(match);
       } else {
