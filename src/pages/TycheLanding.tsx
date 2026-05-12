@@ -24,7 +24,7 @@ import RecentWins from "@/components/home/RecentWins";
 import NearbyCoursesWithMatches from "@/components/NearbyCoursesWithMatches";
 import MyCurrentMatches from "@/components/home/MyCurrentMatches";
 
-import BottomTabBar, { type BottomTab } from "@/components/home/BottomTabBar";
+
 
 
 // Lazy load components for better initial load performance
