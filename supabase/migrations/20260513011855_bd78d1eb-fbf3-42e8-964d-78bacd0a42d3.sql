@@ -1,0 +1,1 @@
+UPDATE public.matches SET status='started', updated_at=now() WHERE id='f09c6673-9bb7-446d-a7d6-f65c774f061e' AND status='open';
