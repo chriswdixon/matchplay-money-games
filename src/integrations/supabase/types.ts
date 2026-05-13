@@ -1680,6 +1680,7 @@ export type Database = {
         Args: { p_match_id: string; p_reason: string; p_user_id: string }
         Returns: Json
       }
+      leave_match_with_refund: { Args: { p_match_id: string }; Returns: Json }
       link_invite_to_user: {
         Args: { p_code: string; p_user_id: string }
         Returns: undefined
