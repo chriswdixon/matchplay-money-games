@@ -16,6 +16,9 @@ const MatchResults = lazy(() =>
   import("@/components/MatchResults").then((m) => ({ default: m.MatchResults }))
 );
 const MatchChat = lazy(() => import("@/components/match/MatchChat"));
+const PayoutStatusPanel = lazy(() =>
+  import("@/components/match/PayoutStatusPanel").then((m) => ({ default: m.PayoutStatusPanel }))
+);
 
 type MatchRow = { id: string; course_name: string | null; status: string };
 
