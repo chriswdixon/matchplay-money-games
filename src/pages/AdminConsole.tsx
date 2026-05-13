@@ -196,6 +196,10 @@ const AdminConsole = () => {
               <SupportRequests />
             </TabsContent>
 
+            <TabsContent value="funds">
+              <FundsAuditLog />
+            </TabsContent>
+
             <TabsContent value="audit" className="space-y-6">
               <AuditAlerts />
               <AuditLog />
