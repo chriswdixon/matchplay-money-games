@@ -1704,6 +1704,13 @@ export type Database = {
         Args: { p_lookback_hours?: number }
         Returns: Json
       }
+      reconcile_match_buyins: {
+        Args: never
+        Returns: {
+          alerts_created: number
+          matches_checked: number
+        }[]
+      }
       reconcile_match_payouts: {
         Args: never
         Returns: {
