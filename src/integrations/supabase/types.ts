@@ -1526,6 +1526,14 @@ export type Database = {
         }
         Returns: string
       }
+      credit_match_winnings_for: {
+        Args: { _match_id: string }
+        Returns: {
+          credited_count: number
+          payout: number
+          pot: number
+        }[]
+      }
       credit_player_balance: {
         Args: { _amount: number; _user_id: string }
         Returns: {
@@ -1694,6 +1702,14 @@ export type Database = {
       reconcile_audit_log: {
         Args: { p_lookback_hours?: number }
         Returns: Json
+      }
+      reconcile_match_payouts: {
+        Args: never
+        Returns: {
+          credited: number
+          match_id: string
+          status: string
+        }[]
       }
       sanitize_text_input: { Args: { input_text: string }; Returns: string }
       set_match_team_pin: {
