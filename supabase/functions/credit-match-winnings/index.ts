@@ -221,7 +221,38 @@ serve(async (req) => {
   } catch (error: any) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     logStep("ERROR", { message: errorMessage });
-    
+
+    // Persist failure to audit_log_alerts so admins are notified.
+    // Best-effort: never let alerting failures shadow the original error.
+    try {
+      const adminClient = createClient(
+        Deno.env.get("SUPABASE_URL") ?? "",
+        Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? "",
+        { auth: { persistSession: false } }
+      );
+      let matchIdForAlert: string | null = null;
+      try {
+        const cloned = await req.clone().json();
+        if (cloned && typeof cloned.matchId === "string") matchIdForAlert = cloned.matchId;
+      } catch (_) { /* body unavailable */ }
+
+      await adminClient.from("audit_log_alerts").insert({
+        match_id: matchIdForAlert,
+        expected_event: "match_payout",
+        severity: error instanceof z.ZodError ? "warning" : "critical",
+        source_table: "match_results",
+        status: "open",
+        details: {
+          source: "credit-match-winnings",
+          error: errorMessage,
+          error_kind: error instanceof z.ZodError ? "validation" : "runtime",
+          at: new Date().toISOString(),
+        },
+      });
+    } catch (alertErr) {
+      console.error("[CREDIT-WINNINGS] Failed to write audit alert", alertErr);
+    }
+
     // Handle Zod validation errors
     if (error instanceof z.ZodError) {
       return new Response(JSON.stringify({ 
