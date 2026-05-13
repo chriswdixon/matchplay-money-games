@@ -473,16 +473,18 @@ export const useMatches = () => {
     }
 
     try {
-      const { error } = await supabase
-        .from('match_participants')
-        .delete()
-        .eq('match_id', matchId)
-        .eq('user_id', user.id);
+      const { data, error } = await supabase.rpc('leave_match_with_refund', {
+        p_match_id: matchId,
+      });
 
       if (error) throw error;
+      const result = data as { error?: string; success?: boolean; refunded?: boolean } | null;
+      if (result?.error) {
+        toast.error(result.error);
+        return { error: result.error };
+      }
 
-      toast.success('Left the match successfully');
-      // Refresh the list with a small delay to ensure data consistency
+      toast.success(result?.refunded ? 'Left the match — buy-in refunded' : 'Left the match successfully');
       setTimeout(() => fetchMatches(), 500);
       return { error: null };
     } catch (error) {
