@@ -1685,6 +1685,16 @@ export type Database = {
         Args: { p_code: string; p_user_id: string }
         Returns: undefined
       }
+      log_match_join_audit: {
+        Args: {
+          p_event_type: string
+          p_match_id: string
+          p_payload?: Json
+          p_summary: string
+          p_user_id: string
+        }
+        Returns: undefined
+      }
       log_score_attempt: {
         Args: {
           p_hole_number: number
