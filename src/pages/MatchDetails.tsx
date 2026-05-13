@@ -16,6 +16,9 @@ const MatchResults = lazy(() =>
   import("@/components/MatchResults").then((m) => ({ default: m.MatchResults }))
 );
 const MatchChat = lazy(() => import("@/components/match/MatchChat"));
+const PayoutStatusPanel = lazy(() =>
+  import("@/components/match/PayoutStatusPanel").then((m) => ({ default: m.PayoutStatusPanel }))
+);
 
 type MatchRow = { id: string; course_name: string | null; status: string };
 
@@ -104,12 +107,17 @@ const MatchDetails = () => {
           }
         >
           {showResults ? (
-            <div className="page-card-shell">
-              <MatchResults
-                matchId={match.id}
-                matchName={match.course_name || "Match"}
-                onClose={handleClose}
-              />
+            <div className="space-y-6">
+              <div className="page-card-shell">
+                <MatchResults
+                  matchId={match.id}
+                  matchName={match.course_name || "Match"}
+                  onClose={handleClose}
+                />
+              </div>
+              <div className="page-card-shell">
+                <PayoutStatusPanel matchId={match.id} />
+              </div>
             </div>
           ) : (
             <div className="space-y-6">
