@@ -6,9 +6,10 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Tabs, TabsContent } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
-import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck, LifeBuoy, X } from "lucide-react";
+import { Users, Ticket, BarChart3, AlertCircle, Mail, Database, Share2, TrendingUp, Trash2, Globe, ShieldCheck, LifeBuoy, Wallet, X } from "lucide-react";
 import { SupportRequests } from "@/components/admin/SupportRequests";
 import { AuditLog } from "@/components/admin/AuditLog";
+import { FundsAuditLog } from "@/components/admin/FundsAuditLog";
 import { PageTitleCard } from "@/components/ui/page-title-card";
 import { AuditAlerts } from "@/components/admin/AuditAlerts";
 import UserManagement from "@/components/admin/UserManagement";
@@ -103,6 +104,7 @@ const AdminConsole = () => {
                     { id: 'golf-data', label: 'Golf Data', Icon: Database },
                     { id: 'social', label: 'Social', Icon: Share2 },
                     { id: 'support', label: 'Support', Icon: LifeBuoy },
+                    { id: 'funds', label: 'Funds', Icon: Wallet },
                     { id: 'audit', label: 'Audit', Icon: ShieldCheck },
                   ].map(({ id, label, Icon }) => {
                     const active = id === activeTab;
@@ -192,6 +194,10 @@ const AdminConsole = () => {
 
             <TabsContent value="support">
               <SupportRequests />
+            </TabsContent>
+
+            <TabsContent value="funds">
+              <FundsAuditLog />
             </TabsContent>
 
             <TabsContent value="audit" className="space-y-6">
