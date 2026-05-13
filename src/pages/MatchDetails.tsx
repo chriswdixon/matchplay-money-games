@@ -107,12 +107,17 @@ const MatchDetails = () => {
           }
         >
           {showResults ? (
-            <div className="page-card-shell">
-              <MatchResults
-                matchId={match.id}
-                matchName={match.course_name || "Match"}
-                onClose={handleClose}
-              />
+            <div className="space-y-6">
+              <div className="page-card-shell">
+                <MatchResults
+                  matchId={match.id}
+                  matchName={match.course_name || "Match"}
+                  onClose={handleClose}
+                />
+              </div>
+              <div className="page-card-shell">
+                <PayoutStatusPanel matchId={match.id} />
+              </div>
             </div>
           ) : (
             <div className="space-y-6">
