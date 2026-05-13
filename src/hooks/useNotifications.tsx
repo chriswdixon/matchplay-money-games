@@ -43,7 +43,7 @@ export function useNotifications() {
   useEffect(() => {
     if (!user) return;
     const channel = supabase
-      .channel(`notifications:${user.id}`)
+      .channel(`notifications:${user.id}:${Math.random().toString(36).slice(2)}`)
       .on(
         'postgres_changes',
         { event: '*', schema: 'public', table: 'notifications', filter: `user_id=eq.${user.id}` },
@@ -58,19 +58,35 @@ export function useNotifications() {
   const unreadCount = notifications.filter((n) => !n.read_at).length;
 
   const markRead = async (id: string) => {
-    await supabase
+    const now = new Date().toISOString();
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id && !n.read_at ? { ...n, read_at: now } : n)),
+    );
+    const { error } = await supabase
       .from('notifications')
-      .update({ read_at: new Date().toISOString() })
+      .update({ read_at: now })
       .eq('id', id);
+    if (error) {
+      console.error('markRead failed:', error);
+      load();
+    }
   };
 
   const markAllRead = async () => {
     if (!user) return;
-    await supabase
+    const now = new Date().toISOString();
+    setNotifications((prev) =>
+      prev.map((n) => (n.read_at ? n : { ...n, read_at: now })),
+    );
+    const { error } = await supabase
       .from('notifications')
-      .update({ read_at: new Date().toISOString() })
+      .update({ read_at: now })
       .eq('user_id', user.id)
       .is('read_at', null);
+    if (error) {
+      console.error('markAllRead failed:', error);
+      load();
+    }
   };
 
   return { notifications, loading, unreadCount, markRead, markAllRead, refresh: load };
