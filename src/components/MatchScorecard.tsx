@@ -21,6 +21,7 @@ import { computeMatchPlayState } from '@/lib/matchPlay';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 import { CancellationConfirmationDialog } from './CancellationConfirmationDialog';
 import PlayerRatingDialog from './PlayerRatingDialog';
+import { ProjectedPayout } from './match/ProjectedPayout';
 import { toast } from '@/hooks/use-toast';
 
 interface MatchScorecardProps {
