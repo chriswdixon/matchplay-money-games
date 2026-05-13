@@ -432,6 +432,37 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
     }
   };
 
+  const handleStartWithCurrent = async (match: any) => {
+    if (!user) return;
+    const count = match.participant_count || 0;
+    if (count < 2) {
+      toast.error('At least 2 players are required to start');
+      return;
+    }
+    const confirmed = window.confirm(
+      `Start this match now with ${count} player${count === 1 ? '' : 's'}? The match size will be set to ${count} and no one else will be able to join.`
+    );
+    if (!confirmed) return;
+    setStartingMatch(match.id);
+    try {
+      const { error } = await supabase.rpc('start_match_with_current_players', {
+        match_id: match.id,
+      });
+      if (error) {
+        console.error('start_match_with_current_players failed:', error);
+        toast.error(error.message || 'Could not start match');
+        return;
+      }
+      toast.success('Match started!');
+      refetch();
+    } catch (e: any) {
+      console.error('Start with current players failed:', e);
+      toast.error('Something went wrong starting the match');
+    } finally {
+      setStartingMatch(null);
+    }
+  };
+
   const handlePlayWithBots = async (match: any) => {
     if (!user) return;
     setStartingMatch(match.id);
