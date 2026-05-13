@@ -434,12 +434,20 @@ export const useMatches = () => {
     }
 
     try {
+      // Stable idempotency key per join attempt — repeated submissions (network
+      // retries, double-clicks) replay the original result instead of re-charging.
+      const idempotencyKey =
+        (typeof crypto !== 'undefined' && 'randomUUID' in crypto)
+          ? crypto.randomUUID()
+          : `${user.id}-${matchId}-${Date.now()}-${Math.random()}`;
+
       // Call secure server-side function for PIN validation and join
       const { data, error } = await supabase.rpc('validate_and_join_match', {
         p_match_id: matchId,
         p_pin: pin || null,
         p_team_number: teamNumber || null,
-        p_set_team_pin: setTeamPin || null
+        p_set_team_pin: setTeamPin || null,
+        p_idempotency_key: idempotencyKey,
       });
 
       if (error) throw error;

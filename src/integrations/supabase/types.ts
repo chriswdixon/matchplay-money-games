@@ -733,6 +733,36 @@ export type Database = {
         }
         Relationships: []
       }
+      match_join_idempotency: {
+        Row: {
+          completed_at: string | null
+          created_at: string
+          id: string
+          idempotency_key: string
+          match_id: string
+          result: Json | null
+          user_id: string
+        }
+        Insert: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key: string
+          match_id: string
+          result?: Json | null
+          user_id: string
+        }
+        Update: {
+          completed_at?: string | null
+          created_at?: string
+          id?: string
+          idempotency_key?: string
+          match_id?: string
+          result?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
       match_join_requests: {
         Row: {
           created_at: string
@@ -1747,15 +1777,26 @@ export type Database = {
         Args: { p_code: string; p_email: string }
         Returns: Json
       }
-      validate_and_join_match: {
-        Args: {
-          p_match_id: string
-          p_pin?: string
-          p_set_team_pin?: string
-          p_team_number?: number
-        }
-        Returns: Json
-      }
+      validate_and_join_match:
+        | {
+            Args: {
+              p_match_id: string
+              p_pin?: string
+              p_set_team_pin?: string
+              p_team_number?: number
+            }
+            Returns: Json
+          }
+        | {
+            Args: {
+              p_idempotency_key?: string
+              p_match_id: string
+              p_pin?: string
+              p_set_team_pin?: string
+              p_team_number?: number
+            }
+            Returns: Json
+          }
       validate_match_join_token: {
         Args: { p_token: string }
         Returns: {
