@@ -21,6 +21,7 @@ import { computeMatchPlayState } from '@/lib/matchPlay';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 import { CancellationConfirmationDialog } from './CancellationConfirmationDialog';
 import PlayerRatingDialog from './PlayerRatingDialog';
+import { ProjectedPayout } from './match/ProjectedPayout';
 import { toast } from '@/hooks/use-toast';
 
 interface MatchScorecardProps {
@@ -936,6 +937,18 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
               <p className="text-sm text-muted-foreground">
                 Match completed! See the results above.
               </p>
+            )}
+
+            {/* Projected payout — visible as soon as the player has clicked Complete */}
+            {hasCurrentPlayerFinished && !matchResult && (
+              <div className="mt-6 flex justify-center">
+                <ProjectedPayout
+                  playerScores={playerScores}
+                  buyInAmount={matchData?.buy_in_amount}
+                  maxParticipants={matchData?.max_participants}
+                  currentUserId={user?.id}
+                />
+              </div>
             )}
 
             {/* Rate Players - Always show when 2+ players */}
