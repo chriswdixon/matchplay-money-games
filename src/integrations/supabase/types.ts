@@ -1701,6 +1701,10 @@ export type Database = {
         Returns: Json
       }
       start_match: { Args: { match_id: string }; Returns: boolean }
+      start_match_with_current_players: {
+        Args: { match_id: string }
+        Returns: boolean
+      }
       user_joined_match: {
         Args: { match_id: string; user_id: string }
         Returns: boolean
