@@ -104,6 +104,7 @@ const AdminConsole = () => {
                     { id: 'golf-data', label: 'Golf Data', Icon: Database },
                     { id: 'social', label: 'Social', Icon: Share2 },
                     { id: 'support', label: 'Support', Icon: LifeBuoy },
+                    { id: 'funds', label: 'Funds', Icon: Wallet },
                     { id: 'audit', label: 'Audit', Icon: ShieldCheck },
                   ].map(({ id, label, Icon }) => {
                     const active = id === activeTab;
