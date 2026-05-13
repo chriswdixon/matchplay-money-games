@@ -88,9 +88,13 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
   // If match is finalized, show the full results display
   if (matchResult) {
     if (!canViewDetails) {
+      const myScore = playerScores.find((p) => p.player_id === user?.id);
+      const winnerEntry = sortedPlayers[0];
+      const isUserWinner = winnerEntry && user && winnerEntry.player_id === user.id;
+
       return (
-        <div className="max-w-[1400px] mx-auto p-6">
-          <div className="flex items-center justify-between mb-6">
+        <div className="max-w-[1400px] mx-auto p-6 space-y-6">
+          <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="p-2 bg-gradient-primary rounded-lg">
                 <Trophy className="w-5 h-5 text-primary-foreground" />
@@ -104,18 +108,83 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
               Back to Matches
             </Button>
           </div>
-          
+
+          {/* Winner */}
+          {winnerEntry && winnerEntry.total > 0 && (
+            <Card className="border-warning/30 bg-warning/10">
+              <CardContent className="p-6 text-center space-y-1">
+                <Crown className="w-8 h-8 text-warning mx-auto" />
+                <h2 className="text-xl font-bold text-warning">
+                  {isUserWinner ? "🏆 You Won!" : `🏆 Winner: ${winnerEntry.player_name}`}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  Net Score: {winnerEntry.net_total} (Gross: {winnerEntry.total})
+                </p>
+              </CardContent>
+            </Card>
+          )}
+
+          {/* Your scorecard */}
+          {myScore && (
+            <Card>
+              <CardHeader>
+                <CardTitle>Your Results</CardTitle>
+                <CardDescription>Your final scorecard for this match</CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-4">
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold">{myScore.total > 0 ? myScore.total : 'DNF'}</div>
+                    <div className="text-xs text-muted-foreground">Gross</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{myScore.net_total > 0 ? myScore.net_total : 'DNF'}</div>
+                    <div className="text-xs text-muted-foreground">Net</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold">{myScore.course_handicap}</div>
+                    <div className="text-xs text-muted-foreground">Course HCP</div>
+                  </div>
+                </div>
+                <div className="overflow-x-auto">
+                  <table className="w-full text-sm">
+                    <thead>
+                      <tr className="border-b">
+                        <th className="text-left p-2">Hole</th>
+                        {Array.from({ length: 18 }, (_, i) => (
+                          <th key={i + 1} className="text-center p-1 w-8">{i + 1}</th>
+                        ))}
+                        <th className="text-center p-2">Total</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td className="p-2 font-medium">You</td>
+                        {Array.from({ length: 18 }, (_, i) => (
+                          <td key={i + 1} className="text-center p-1">{myScore.scores[i + 1] || '-'}</td>
+                        ))}
+                        <td className="text-center p-2 font-bold">{myScore.total > 0 ? myScore.total : 'DNF'}</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </CardContent>
+            </Card>
+          )}
+
           <Alert>
             <Lock className="h-4 w-4" />
             <AlertDescription>
-              <strong>Upgrade Required</strong>
-              <p className="mt-2">Detailed match results are available for Local Player and Tournament Pro members. Upgrade to view complete scorecards, statistics, and payout information.</p>
+              <strong>Upgrade for full results</strong>
+              <p className="mt-2">
+                Local Player and Tournament Pro members see every player's full scorecard, statistics, and payout breakdown.
+              </p>
             </AlertDescription>
           </Alert>
         </div>
       );
     }
-    
+
     return (
       <div className="max-w-[1400px] mx-auto">
         {/* Header */}
