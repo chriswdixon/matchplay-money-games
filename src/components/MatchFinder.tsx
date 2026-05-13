@@ -1032,6 +1032,26 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                                 Leave Match
                               </Button>
                             </>
+                          ) : match.status === 'open' && match.user_joined && !isFull && (match.participant_count || 0) >= 2 && !match.is_team_format ? (
+                            <>
+                              <Button
+                                className="w-full bg-gradient-accent text-accent-foreground hover:shadow-premium transition-all duration-300"
+                                onClick={() => handleStartWithCurrent(match)}
+                                disabled={!user || startingMatch === match.id}
+                              >
+                                {startingMatch === match.id
+                                  ? "Starting..."
+                                  : `Start Match with ${match.participant_count} Player${match.participant_count === 1 ? '' : 's'}`}
+                              </Button>
+                              <Button
+                                variant="outline"
+                                className="w-full"
+                                onClick={() => handleMatchAction(match)}
+                                disabled={!user}
+                              >
+                                Leave Match
+                              </Button>
+                            </>
                           ) : match.status === 'cancelled' ? null : (
                             <Button 
                               className={cn(
