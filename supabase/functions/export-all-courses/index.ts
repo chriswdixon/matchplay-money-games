@@ -59,7 +59,7 @@ serve(async (req) => {
       console.log(`[EXPORT-ALL-COURSES] Fetching batch: offset=${offset}`);
 
       const response = await fetch(apiUrl, {
-        headers: { 'x-api-key': apiKey, 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Key ${apiKey}`, 'Content-Type': 'application/json' },
       });
 
       if (!response.ok) {
