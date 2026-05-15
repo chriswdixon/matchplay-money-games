@@ -146,27 +146,57 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                     <div className="text-xs text-muted-foreground">Course HCP</div>
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Hole</th>
-                        {Array.from({ length: 18 }, (_, i) => (
-                          <th key={i + 1} className="text-center p-1 w-8">{i + 1}</th>
-                        ))}
-                        <th className="text-center p-2">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="p-2 font-medium">You</td>
-                        {Array.from({ length: 18 }, (_, i) => (
-                          <td key={i + 1} className="text-center p-1">{myScore.scores[i + 1] || '-'}</td>
-                        ))}
-                        <td className="text-center p-2 font-bold">{myScore.total > 0 ? myScore.total : 'DNF'}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="space-y-4">
+                  {/* Front 9 */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-1">Front 9</h4>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Hole</th>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <th key={i + 1} className="text-center p-1 w-8">{i + 1}</th>
+                          ))}
+                          <th className="text-center p-2">F9</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="p-2 font-medium">You</td>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <td key={i + 1} className="text-center p-1">{myScore.scores[i + 1] || '-'}</td>
+                          ))}
+                          <td className="text-center p-2 font-bold">{myScore.front9 || '-'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* Back 9 */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-1">Back 9</h4>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Hole</th>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <th key={i + 10} className="text-center p-1 w-8">{i + 10}</th>
+                          ))}
+                          <th className="text-center p-2">B9</th>
+                          <th className="text-center p-2">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="p-2 font-medium">You</td>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <td key={i + 10} className="text-center p-1">{myScore.scores[i + 10] || '-'}</td>
+                          ))}
+                          <td className="text-center p-2 font-bold">{myScore.back9 || '-'}</td>
+                          <td className="text-center p-2 font-bold">{myScore.total > 0 ? myScore.total : 'DNF'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </CardContent>
             </Card>
