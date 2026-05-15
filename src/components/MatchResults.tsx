@@ -146,27 +146,57 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                     <div className="text-xs text-muted-foreground">Course HCP</div>
                   </div>
                 </div>
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b">
-                        <th className="text-left p-2">Hole</th>
-                        {Array.from({ length: 18 }, (_, i) => (
-                          <th key={i + 1} className="text-center p-1 w-8">{i + 1}</th>
-                        ))}
-                        <th className="text-center p-2">Total</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      <tr>
-                        <td className="p-2 font-medium">You</td>
-                        {Array.from({ length: 18 }, (_, i) => (
-                          <td key={i + 1} className="text-center p-1">{myScore.scores[i + 1] || '-'}</td>
-                        ))}
-                        <td className="text-center p-2 font-bold">{myScore.total > 0 ? myScore.total : 'DNF'}</td>
-                      </tr>
-                    </tbody>
-                  </table>
+                <div className="space-y-4">
+                  {/* Front 9 */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-1">Front 9</h4>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Hole</th>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <th key={i + 1} className="text-center p-1 w-8">{i + 1}</th>
+                          ))}
+                          <th className="text-center p-2">F9</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="p-2 font-medium">You</td>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <td key={i + 1} className="text-center p-1">{myScore.scores[i + 1] || '-'}</td>
+                          ))}
+                          <td className="text-center p-2 font-bold">{myScore.front9 || '-'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                  {/* Back 9 */}
+                  <div>
+                    <h4 className="text-sm font-semibold text-muted-foreground mb-1">Back 9</h4>
+                    <table className="w-full text-sm">
+                      <thead>
+                        <tr className="border-b">
+                          <th className="text-left p-2">Hole</th>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <th key={i + 10} className="text-center p-1 w-8">{i + 10}</th>
+                          ))}
+                          <th className="text-center p-2">B9</th>
+                          <th className="text-center p-2">Total</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="p-2 font-medium">You</td>
+                          {Array.from({ length: 9 }, (_, i) => (
+                            <td key={i + 10} className="text-center p-1">{myScore.scores[i + 10] || '-'}</td>
+                          ))}
+                          <td className="text-center p-2 font-bold">{myScore.back9 || '-'}</td>
+                          <td className="text-center p-2 font-bold">{myScore.total > 0 ? myScore.total : 'DNF'}</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </CardContent>
             </Card>
@@ -317,66 +347,128 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b">
-                  <th className="text-left p-2 font-medium">Player</th>
-                  {Array.from({ length: 18 }, (_, i) => (
-                    <th key={i + 1} className="text-center p-2 font-medium w-12">
-                      {i + 1}
-                    </th>
-                  ))}
-                  <th className="text-center p-2 font-medium">Total</th>
-                </tr>
-              </thead>
-              <tbody>
-                {sortedPlayers.map((player, index) => (
-                  <tr 
-                    key={player.player_id} 
-                    className={`border-b ${
-                      index === 0 ? 'bg-warning/10' : ''
-                    } ${
-                      player.player_id === user?.id ? 'bg-muted/20' : ''
-                    }`}
-                  >
-                    <td className="p-2 font-medium">
-                      <div className="flex items-center gap-2">
-                        {getPositionIcon(index)}
-                        {player.player_name}
-                        {player.player_id === user?.id && (
-                          <Badge variant="secondary" className="text-xs">You</Badge>
-                        )}
-                      </div>
-                    </td>
-                    {Array.from({ length: 18 }, (_, i) => {
-                      const hole = i + 1;
-                      const score = player.scores[hole];
-                      const par = (matchData?.hole_pars as { [key: string]: number } | undefined)?.[hole];
-                      let cellClass = 'bg-background border border-border';
-                      if (score && par) {
-                        if (score < par) cellClass = 'bg-success/15 text-success';
-                        else if (score > par) cellClass = 'bg-destructive/15 text-destructive';
-                        else cellClass = 'bg-muted text-foreground';
-                      } else if (score) {
-                        cellClass = 'bg-muted text-foreground';
-                      }
-
-                      return (
-                        <td key={hole} className="text-center p-2">
-                          <div className={`w-8 h-8 rounded-md flex items-center justify-center ${cellClass}`}>
-                            {score || '-'}
-                          </div>
-                        </td>
-                      );
-                    })}
-                    <td className="text-center p-2 font-bold text-lg">
-                      {player.total > 0 ? player.total : 'DNF'}
-                    </td>
+          <div className="space-y-6">
+            {/* Front 9 */}
+            <div>
+              <h4 className="text-sm font-semibold text-muted-foreground mb-2">Front 9</h4>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2 font-medium">Player</th>
+                    {Array.from({ length: 9 }, (_, i) => (
+                      <th key={i + 1} className="text-center p-2 font-medium w-10">{i + 1}</th>
+                    ))}
+                    <th className="text-center p-2 font-medium">F9</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody>
+                  {sortedPlayers.map((player, index) => (
+                    <tr
+                      key={`${player.player_id}-f9`}
+                      className={`border-b ${
+                        index === 0 ? 'bg-warning/10' : ''
+                      } ${
+                        player.player_id === user?.id ? 'bg-muted/20' : ''
+                      }`}
+                    >
+                      <td className="p-2 font-medium">
+                        <div className="flex items-center gap-2">
+                          {getPositionIcon(index)}
+                          {player.player_name}
+                          {player.player_id === user?.id && (
+                            <Badge variant="secondary" className="text-xs">You</Badge>
+                          )}
+                        </div>
+                      </td>
+                      {Array.from({ length: 9 }, (_, i) => {
+                        const hole = i + 1;
+                        const score = player.scores[hole];
+                        const par = (matchData?.hole_pars as { [key: string]: number } | undefined)?.[hole];
+                        let cellClass = 'bg-background border border-border';
+                        if (score && par) {
+                          if (score < par) cellClass = 'bg-success/15 text-success';
+                          else if (score > par) cellClass = 'bg-destructive/15 text-destructive';
+                          else cellClass = 'bg-muted text-foreground';
+                        } else if (score) {
+                          cellClass = 'bg-muted text-foreground';
+                        }
+
+                        return (
+                          <td key={hole} className="text-center p-2">
+                            <div className={`w-8 h-8 rounded-md flex items-center justify-center ${cellClass}`}>
+                              {score || '-'}
+                            </div>
+                          </td>
+                        );
+                      })}
+                      <td className="text-center p-2 font-bold">{player.front9 || '-'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Back 9 */}
+            <div>
+              <h4 className="text-sm font-semibold text-muted-foreground mb-2">Back 9</h4>
+              <table className="w-full">
+                <thead>
+                  <tr className="border-b">
+                    <th className="text-left p-2 font-medium">Player</th>
+                    {Array.from({ length: 9 }, (_, i) => (
+                      <th key={i + 10} className="text-center p-2 font-medium w-10">{i + 10}</th>
+                    ))}
+                    <th className="text-center p-2 font-medium">B9</th>
+                    <th className="text-center p-2 font-medium">Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {sortedPlayers.map((player, index) => (
+                    <tr
+                      key={`${player.player_id}-b9`}
+                      className={`border-b ${
+                        index === 0 ? 'bg-warning/10' : ''
+                      } ${
+                        player.player_id === user?.id ? 'bg-muted/20' : ''
+                      }`}
+                    >
+                      <td className="p-2 font-medium">
+                        <div className="flex items-center gap-2">
+                          {getPositionIcon(index)}
+                          {player.player_name}
+                          {player.player_id === user?.id && (
+                            <Badge variant="secondary" className="text-xs">You</Badge>
+                          )}
+                        </div>
+                      </td>
+                      {Array.from({ length: 9 }, (_, i) => {
+                        const hole = i + 10;
+                        const score = player.scores[hole];
+                        const par = (matchData?.hole_pars as { [key: string]: number } | undefined)?.[hole];
+                        let cellClass = 'bg-background border border-border';
+                        if (score && par) {
+                          if (score < par) cellClass = 'bg-success/15 text-success';
+                          else if (score > par) cellClass = 'bg-destructive/15 text-destructive';
+                          else cellClass = 'bg-muted text-foreground';
+                        } else if (score) {
+                          cellClass = 'bg-muted text-foreground';
+                        }
+
+                        return (
+                          <td key={hole} className="text-center p-2">
+                            <div className={`w-8 h-8 rounded-md flex items-center justify-center ${cellClass}`}>
+                              {score || '-'}
+                            </div>
+                          </td>
+                        );
+                      })}
+                      <td className="text-center p-2 font-bold">{player.back9 || '-'}</td>
+                      <td className="text-center p-2 font-bold text-lg">{player.total > 0 ? player.total : 'DNF'}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </CardContent>
       </Card>
