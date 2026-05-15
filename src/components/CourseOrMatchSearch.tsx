@@ -63,15 +63,9 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     }
   };
 
-  const handleSubmit = async (e?: React.FormEvent) => {
-    e?.preventDefault();
-    if (mode === "matches") {
-      onMatchSearchChange(query);
-      return;
-    }
+  const runCourseSearch = async (rawQuery: string) => {
     setSearched(true);
-
-    const trimmed = query.trim();
+    const trimmed = rawQuery.trim();
 
     // ZIP code search: geocode, then nearby — works without GPS permission.
     if (ZIP_REGEX.test(trimmed)) {
@@ -107,8 +101,6 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
       const withinRadius = withDistance
         .filter((c) => c.distance !== undefined && c.distance <= RADIUS_MI)
         .sort((a, b) => (a.distance || 0) - (b.distance || 0));
-      // If nothing within the default radius, expand to unlimited so the
-      // searched course is still surfaced (sorted by distance when known).
       results = withinRadius.length > 0
         ? withinRadius
         : withDistance.sort((a, b) => (a.distance ?? Infinity) - (b.distance ?? Infinity));
@@ -118,6 +110,29 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     setCourseResults(results);
     setCoursePage(1);
   };
+
+  const handleSubmit = async (e?: React.FormEvent) => {
+    e?.preventDefault();
+    if (mode === "matches") {
+      onMatchSearchChange(query);
+      return;
+    }
+    await runCourseSearch(query);
+  };
+
+  // Auto-search in courses mode when ZIP is entered or GPS becomes available.
+  useEffect(() => {
+    if (mode !== "courses") return;
+    const trimmed = query.trim();
+    if (ZIP_REGEX.test(trimmed)) {
+      const t = setTimeout(() => { runCourseSearch(trimmed); }, 200);
+      return () => clearTimeout(t);
+    }
+    if (location && trimmed.length === 0) {
+      runCourseSearch("");
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mode, query, location?.latitude, location?.longitude]);
 
   const handleModeChange = (value: string) => {
     if (!value) return;
