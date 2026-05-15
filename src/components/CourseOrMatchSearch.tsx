@@ -3,7 +3,8 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Loader2, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Search, MapPin, Loader2, ChevronLeft, ChevronRight, Navigation, AlertCircle } from "lucide-react";
 import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
 import { useNavigate } from "react-router-dom";
@@ -18,12 +19,32 @@ interface CourseOrMatchSearchProps {
   onMatchSearchChange: (value: string) => void;
 }
 
+/* ---------- Skeleton placeholders while courses load ---------- */
+const CourseSkeleton = () => (
+  <div className="space-y-2">
+    {[1, 2, 3].map((i) => (
+      <div
+        key={i}
+        className="rounded-2xl border border-border/40 bg-card p-4 space-y-2"
+      >
+        <Skeleton className="h-4 w-3/4" />
+        <Skeleton className="h-3 w-1/2" />
+      </div>
+    ))}
+  </div>
+);
+
+/* ---------------------------------------------------------------- */
+
 const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatchSearchProps) => {
   const [mode, setMode] = useState<SearchMode>("matches");
   const [query, setQuery] = useState(matchSearch);
   const [courseResults, setCourseResults] = useState<GolfCourse[]>([]);
   const [coursePage, setCoursePage] = useState(1);
   const [searched, setSearched] = useState(false);
+  const [searchError, setSearchError] = useState<string | null>(null);
+  const [isPending, setIsPending] = useState(false);
+
   const { searchCoursesByName, searchNearbyCourses, loading } = useGolfCourses();
   const { location, requestLocation, error: locationError, loading: locationLoading } = useLocation();
   const navigate = useNavigate();
@@ -64,6 +85,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
   };
 
   const runCourseSearch = async (rawQuery: string) => {
+    setIsPending(false);
+    setSearchError(null);
     setSearched(true);
     const trimmed = rawQuery.trim();
 
@@ -71,6 +94,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     if (ZIP_REGEX.test(trimmed)) {
       const coords = await geocodeZip(trimmed);
       if (!coords) {
+        setSearchError(`Could not locate ZIP code "${trimmed}". Please check and try again.`);
         setCourseResults([]);
         setCoursePage(1);
         return;
@@ -128,9 +152,16 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     const trimmed = query.trim();
     const shouldSearch =
       ZIP_REGEX.test(trimmed) || (!!location && trimmed.length === 0);
-    if (!shouldSearch) return;
+    if (!shouldSearch) {
+      setIsPending(false);
+      return;
+    }
+    setIsPending(true);
     const t = setTimeout(() => { runCourseSearch(trimmed); }, 500);
-    return () => clearTimeout(t);
+    return () => {
+      clearTimeout(t);
+      setIsPending(false);
+    };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, query, location?.latitude, location?.longitude]);
 
@@ -138,6 +169,7 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     if (!value) return;
     setMode(value as SearchMode);
     setSearched(false);
+    setSearchError(null);
     setCourseResults([]);
     setCoursePage(1);
   };
@@ -168,6 +200,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
   const currentCoursePage = Math.min(coursePage, totalCoursePages);
   const courseStartIndex = (currentCoursePage - 1) * COURSE_PAGE_SIZE;
   const paginatedCourseResults = courseResults.slice(courseStartIndex, courseStartIndex + COURSE_PAGE_SIZE);
+
+  const showResultsArea = mode === "courses" && (searched || isPending || loading);
 
   return (
     <div className="space-y-3">
@@ -221,16 +255,51 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
         )}
       </form>
 
-      {mode === "courses" && searched && (
+      {/* ====== Course results area ====== */}
+      {showResultsArea && (
         <div className="space-y-2">
-          {loading && courseResults.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">Searching courses...</p>
+
+          {/* ---- Loading / pending state ---- */}
+          {(isPending || loading) && courseResults.length === 0 && (
+            <div className="space-y-3">
+              <div className="flex items-center justify-center gap-2 py-2" aria-live="polite">
+                <Loader2 className="h-4 w-4 animate-spin text-primary" aria-hidden="true" />
+                <span className="text-sm text-muted-foreground">
+                  {isPending ? "Finishing typing…" : "Searching courses…"}
+                </span>
+              </div>
+              <CourseSkeleton />
+            </div>
           )}
-          {!loading && courseResults.length === 0 && (
-            <p className="text-sm text-muted-foreground text-center py-4">
-              No courses found. Try a different search.
-            </p>
+
+          {/* ---- Error state ---- */}
+          {searchError && !loading && !isPending && (
+            <div className="rounded-2xl border border-destructive/20 bg-destructive/5 p-5 text-center space-y-3">
+              <AlertCircle className="h-8 w-8 text-destructive mx-auto" aria-hidden="true" />
+              <p className="text-sm text-destructive font-medium">{searchError}</p>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => runCourseSearch(query)}
+                className="mx-auto"
+              >
+                Try again
+              </Button>
+            </div>
           )}
+
+          {/* ---- Empty state ---- */}
+          {!isPending && !loading && !searchError && searched && courseResults.length === 0 && (
+            <div className="rounded-2xl border border-border/40 bg-card p-6 text-center space-y-2">
+              <MapPin className="h-8 w-8 text-muted-foreground mx-auto" aria-hidden="true" />
+              <p className="text-sm font-medium text-foreground">No courses found nearby</p>
+              <p className="text-xs text-muted-foreground">
+                Try a different ZIP code, enter a course name, or enable location for better results.
+              </p>
+            </div>
+          )}
+
+          {/* ---- Results list ---- */}
           {paginatedCourseResults.map((course, i) => (
             <Card key={`${course.name}-${courseStartIndex + i}`} className="bg-foreground text-background border-foreground/20 rounded-2xl">
               <CardContent className="p-3 flex items-center justify-between gap-3">
@@ -256,6 +325,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
               </CardContent>
             </Card>
           ))}
+
+          {/* ---- Pagination ---- */}
           {courseResults.length > COURSE_PAGE_SIZE && (
             <nav className="flex items-center justify-between gap-3 pt-1" aria-label="Golf course results pagination">
               <Button
@@ -285,7 +356,9 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
               </Button>
             </nav>
           )}
-          {!location && courseResults.length === 0 && !loading && (
+
+          {/* ---- Enable location CTA (only when no results & no location) ---- */}
+          {!location && courseResults.length === 0 && !loading && !isPending && !searchError && (
             <>
               <Button
                 variant="outline"
