@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/useAuth";
 import { MapPin, History, Star } from "lucide-react";
@@ -14,6 +15,7 @@ interface RecentCourse {
 
 const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) => void }) => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [courses, setCourses] = useState<RecentCourse[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -97,7 +99,7 @@ const RecentlyPlayedCourses = ({ onSelect }: { onSelect?: (courseName: string) =
             <button
               key={c.match_id}
               type="button"
-              onClick={() => onSelect?.(c.course_name)}
+              onClick={() => navigate(`/match/${c.match_id}`)}
               className="w-full flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-3 py-3 text-left hover:bg-background transition-colors"
             >
               <div className="flex-1 min-w-0">
