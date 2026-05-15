@@ -111,21 +111,23 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
   const expected: ExpectedTx[] = useMemo(() => {
     if (!matchRow) return [];
     const list: ExpectedTx[] = [];
-    if (matchRow.buy_in_amount > 0) {
+    // buy_in_amount is stored in cents; account_transactions.amount is in dollars.
+    const buyInDollars = matchRow.buy_in_amount / 100;
+    if (buyInDollars > 0) {
       participants.forEach((p) => {
         list.push({
           user_id: p.user_id,
           display_name: profiles[p.user_id] || p.user_id.slice(0, 8),
           kind: "match_buyin",
-          amount: -matchRow.buy_in_amount,
+          amount: -buyInDollars,
         });
       });
     }
     const winners: string[] =
       (resultRow?.winners as string[] | null) ||
       (resultRow?.winner_id ? [resultRow.winner_id] : []);
-    if (winners.length > 0 && matchRow.buy_in_amount > 0) {
-      const pot = matchRow.buy_in_amount * participants.length;
+    if (winners.length > 0 && buyInDollars > 0) {
+      const pot = buyInDollars * participants.length;
       const payout = Math.floor(pot / winners.length);
       winners.forEach((w) => {
         list.push({
@@ -173,7 +175,7 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
   const winners: string[] =
     (resultRow?.winners as string[] | null) ||
     (resultRow?.winner_id ? [resultRow.winner_id] : []);
-  const pot = matchRow.buy_in_amount * participants.length;
+  const pot = (matchRow.buy_in_amount / 100) * participants.length;
   const allCredited =
     expected.length > 0 &&
     expected.every((e) => getStatus(e) === "credited" || getStatus(e) === "hidden");
