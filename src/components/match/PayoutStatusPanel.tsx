@@ -191,7 +191,7 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
               <AlertTriangle className="h-3 w-3" /> Action needed
             </Badge>
           ) : allCredited && resultRow?.finalized_at ? (
-            <Badge className="gap-1 bg-emerald-600 hover:bg-emerald-600">
+            <Badge className="gap-1 bg-success text-success-foreground hover:bg-success/90">
               <CheckCircle2 className="h-3 w-3" /> Settled
             </Badge>
           ) : (
@@ -251,14 +251,14 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
                 </div>
                 <div
                   className={`col-span-2 text-right ${
-                    e.amount < 0 ? "text-destructive" : "text-emerald-600"
+                    e.amount < 0 ? "text-destructive" : "text-success"
                   }`}
                 >
                   {e.amount < 0 ? `-$${Math.abs(e.amount)}` : `+$${e.amount}`}
                 </div>
                 <div className="col-span-3 flex justify-end">
                   {status === "credited" && (
-                    <Badge className="gap-1 bg-emerald-600 hover:bg-emerald-600">
+                    <Badge className="gap-1 bg-success text-success-foreground hover:bg-success/90">
                       <CheckCircle2 className="h-3 w-3" /> Credited
                     </Badge>
                   )}
