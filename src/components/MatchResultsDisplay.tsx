@@ -36,15 +36,25 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
   const { getRateablePlayersForMatch } = usePlayerRatings();
   const [showRatingDialog, setShowRatingDialog] = useState(false);
   const [unratedPlayers, setUnratedPlayers] = useState<RateablePlayer[]>([]);
+  const [autoPrompted, setAutoPrompted] = useState(false);
 
   useEffect(() => {
     if (!matchId) return;
     const fetchPlayers = async () => {
       const players = await getRateablePlayersForMatch(matchId);
-      setUnratedPlayers(players.filter((p) => !p.already_rated));
+      const unrated = players.filter((p) => !p.already_rated);
+      setUnratedPlayers(unrated);
+      if (!autoPrompted && unrated.length > 0 && matchId) {
+        const key = `tyche-rating-prompted-${matchId}`;
+        if (!sessionStorage.getItem(key)) {
+          sessionStorage.setItem(key, '1');
+          setShowRatingDialog(true);
+        }
+        setAutoPrompted(true);
+      }
     };
     fetchPlayers();
-  }, [matchId, getRateablePlayersForMatch]);
+  }, [matchId, getRateablePlayersForMatch, autoPrompted]);
 
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
