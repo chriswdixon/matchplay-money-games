@@ -284,53 +284,95 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
               </TabsContent>
             </Tabs>
           ) : (
-            // Desktop: Horizontal table layout
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="border-b">
-                    <th className="text-left p-2 font-medium">Player</th>
-                    {Array.from({ length: 18 }, (_, i) => (
-                      <th key={i + 1} className="text-center p-2 font-medium w-10">
-                        {i + 1}
-                      </th>
-                    ))}
-                    <th className="text-center p-2 font-medium">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedPlayers.map((player, index) => (
-                    <tr 
-                      key={player.player_id} 
-                      className={`border-b ${
-                        index === 0 ? 'bg-warning/10' : ''
-                      }`}
-                    >
-                      <td className="p-2 font-medium">
-                        <div className="flex items-center gap-2">
-                          {getPositionIcon(index)}
-                          <span className="text-xs lg:text-sm">{player.player_name}</span>
-                        </div>
-                      </td>
-                      {Array.from({ length: 18 }, (_, i) => {
-                        const hole = i + 1;
-                        const score = player.scores[hole];
-
-                        return (
-                          <td key={hole} className="text-center p-1">
-                            <div className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${getScoreColorClasses(score, holePars?.[hole])}`}>
-                              {score || '-'}
-                            </div>
-                          </td>
-                        );
-                      })}
-                      <td className="text-center p-2 font-bold">
-                        {player.total > 0 ? player.total : 'DNF'}
-                      </td>
+            // Desktop: Front 9 / Back 9 split — no horizontal scrolling
+            <div className="space-y-6">
+              {/* Front 9 */}
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-2">Front 9</h3>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2 font-medium">Player</th>
+                      {Array.from({ length: 9 }, (_, i) => (
+                        <th key={i + 1} className="text-center p-2 font-medium w-10">{i + 1}</th>
+                      ))}
+                      <th className="text-center p-2 font-medium">F9</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody>
+                    {sortedPlayers.map((player, index) => (
+                      <tr
+                        key={`${player.player_id}-f9`}
+                        className={`border-b ${index === 0 ? 'bg-warning/10' : ''}`}
+                      >
+                        <td className="p-2 font-medium">
+                          <div className="flex items-center gap-2">
+                            {getPositionIcon(index)}
+                            <span className="text-xs lg:text-sm">{player.player_name}</span>
+                          </div>
+                        </td>
+                        {Array.from({ length: 9 }, (_, i) => {
+                          const hole = i + 1;
+                          const score = player.scores[hole];
+                          return (
+                            <td key={hole} className="text-center p-1">
+                              <div className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${getScoreColorClasses(score, holePars?.[hole])}`}>
+                                {score || '-'}
+                              </div>
+                            </td>
+                          );
+                        })}
+                        <td className="text-center p-2 font-bold">{player.front9 || '-'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Back 9 */}
+              <div>
+                <h3 className="text-sm font-semibold text-muted-foreground mb-2">Back 9</h3>
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="border-b">
+                      <th className="text-left p-2 font-medium">Player</th>
+                      {Array.from({ length: 9 }, (_, i) => (
+                        <th key={i + 10} className="text-center p-2 font-medium w-10">{i + 10}</th>
+                      ))}
+                      <th className="text-center p-2 font-medium">B9</th>
+                      <th className="text-center p-2 font-medium">Total</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {sortedPlayers.map((player, index) => (
+                      <tr
+                        key={`${player.player_id}-b9`}
+                        className={`border-b ${index === 0 ? 'bg-warning/10' : ''}`}
+                      >
+                        <td className="p-2 font-medium">
+                          <div className="flex items-center gap-2">
+                            {getPositionIcon(index)}
+                            <span className="text-xs lg:text-sm">{player.player_name}</span>
+                          </div>
+                        </td>
+                        {Array.from({ length: 9 }, (_, i) => {
+                          const hole = i + 10;
+                          const score = player.scores[hole];
+                          return (
+                            <td key={hole} className="text-center p-1">
+                              <div className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${getScoreColorClasses(score, holePars?.[hole])}`}>
+                                {score || '-'}
+                              </div>
+                            </td>
+                          );
+                        })}
+                        <td className="text-center p-2 font-bold">{player.back9 || '-'}</td>
+                        <td className="text-center p-2 font-bold">{player.total > 0 ? player.total : 'DNF'}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </CardContent>
