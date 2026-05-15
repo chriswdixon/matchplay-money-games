@@ -76,37 +76,29 @@ serve(async (req) => {
   }
 
   try {
-    // Require authentication
+    // Course search is public data, so allow signed-out landing/preview users.
+    // If a user is signed in, rate-limit by user id; otherwise use request IP.
     const authHeader = req.headers.get('authorization');
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
+    let requesterId = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || 'anonymous';
+    if (authHeader) {
+      const supabase = createClient(
+        Deno.env.get('SUPABASE_URL') ?? '',
+        Deno.env.get('SUPABASE_ANON_KEY') ?? '',
+        { global: { headers: { Authorization: authHeader } } }
       );
+      const { data: { user } } = await supabase.auth.getUser();
+      if (user?.id) requesterId = user.id;
     }
-    const supabase = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    );
-    const { data: { user } } = await supabase.auth.getUser();
-    if (!user) {
-      return new Response(
-        JSON.stringify({ error: 'Unauthorized' }),
-        { headers: { ...corsHeaders, 'Content-Type': 'application/json' }, status: 401 }
-      );
-    }
-    const userId = user.id;
 
     // Rate limiting
     const now = Date.now();
-    const userLimit = rateLimitCache.get(userId);
+    const userLimit = rateLimitCache.get(requesterId);
 
     if (!userLimit || now > userLimit.resetTime) {
-      rateLimitCache.set(userId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
+      rateLimitCache.set(requesterId, { count: 1, resetTime: now + RATE_LIMIT_WINDOW_MS });
     } else if (userLimit.count >= RATE_LIMIT_MAX) {
       const retryAfter = Math.ceil((userLimit.resetTime - now) / 1000);
-      console.warn('[SEARCH-GOLF-COURSES] Rate limit exceeded for user:', userId);
+      console.warn('[SEARCH-GOLF-COURSES] Rate limit exceeded for requester:', requesterId);
       return new Response(
         JSON.stringify({ error: 'Too many requests. Please try again later.', retry_after: retryAfter }),
         { headers: { ...corsHeaders, 'Content-Type': 'application/json', 'Retry-After': String(retryAfter) }, status: 429 }
