@@ -90,9 +90,34 @@ const NearbyCoursesWithMatches = () => {
 
   // Only allow ZIP code searches (US 5-digit, optional +4) — city searches are not supported.
   const isZip = (s: string) => /^\d{5}(-\d{4})?$/.test(s.trim());
+  // Any all-digit input is treated as a (possibly partial) ZIP code, never a course name.
+  const isDigitsOnly = (s: string) => /^\d+$/.test(s.trim());
 
   const runSearch = async (q: string) => {
     const term = q.trim();
+
+    // Numeric input is always a ZIP. If it's not yet a complete ZIP, just
+    // show nearby results without attempting a name search using the digits.
+    if (term && isDigitsOnly(term) && !isZip(term)) {
+      const origin = effectiveLocation;
+      if (!origin) return;
+      setSearched(true);
+      const r = effectiveRadius(radius);
+      const nearby = await searchNearbyCourses(origin.latitude, origin.longitude, r);
+      const results = nearby
+        .map((c) => ({
+          ...c,
+          distance:
+            c.distance ??
+            (c.latitude && c.longitude
+              ? distanceMi(origin.latitude, origin.longitude, c.latitude, c.longitude)
+              : undefined),
+        }))
+        .filter((c) => c.distance !== undefined && c.distance <= r)
+        .sort((a, b) => (a.distance || 0) - (b.distance || 0));
+      setCourses(results);
+      return;
+    }
 
     // If the query is a ZIP and we have no GPS, geocode it as the search origin.
     if (term && isZip(term)) {
