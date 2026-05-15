@@ -7,6 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useNavigate } from "react-router-dom";
 
 const HomeProfileCard = () => {
+  const navigate = useNavigate();
   const { profile, loading: profileLoading } = useProfile();
   const { account, loading: accountLoading } = usePlayerAccount();
 
