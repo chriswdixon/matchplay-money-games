@@ -120,17 +120,17 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     await runCourseSearch(query);
   };
 
-  // Auto-search in courses mode when ZIP is entered or GPS becomes available.
+  // Debounced auto-search in courses mode: waits until typing/GPS settles
+  // (~500ms) before firing, so partial ZIPs and rapid GPS updates don't
+  // trigger a flurry of requests.
   useEffect(() => {
     if (mode !== "courses") return;
     const trimmed = query.trim();
-    if (ZIP_REGEX.test(trimmed)) {
-      const t = setTimeout(() => { runCourseSearch(trimmed); }, 200);
-      return () => clearTimeout(t);
-    }
-    if (location && trimmed.length === 0) {
-      runCourseSearch("");
-    }
+    const shouldSearch =
+      ZIP_REGEX.test(trimmed) || (!!location && trimmed.length === 0);
+    if (!shouldSearch) return;
+    const t = setTimeout(() => { runCourseSearch(trimmed); }, 500);
+    return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, query, location?.latitude, location?.longitude]);
 
