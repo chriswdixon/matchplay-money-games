@@ -175,7 +175,7 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
   const winners: string[] =
     (resultRow?.winners as string[] | null) ||
     (resultRow?.winner_id ? [resultRow.winner_id] : []);
-  const pot = matchRow.buy_in_amount * participants.length;
+  const pot = (matchRow.buy_in_amount / 100) * participants.length;
   const allCredited =
     expected.length > 0 &&
     expected.every((e) => getStatus(e) === "credited" || getStatus(e) === "hidden");
