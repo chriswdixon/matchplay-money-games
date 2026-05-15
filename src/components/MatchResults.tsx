@@ -208,6 +208,7 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
           playerScores={playerScores}
           buyInAmount={matchData?.buy_in_amount}
           maxParticipants={matchData?.max_participants}
+          holePars={matchData?.hole_pars}
         />
       </div>
     );

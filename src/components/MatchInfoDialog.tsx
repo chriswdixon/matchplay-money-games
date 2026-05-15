@@ -123,6 +123,7 @@ export function MatchInfoDialog({ matchId, open, onOpenChange }: MatchInfoDialog
                     playerScores={playerScores}
                     buyInAmount={matchData.buy_in_amount || 0}
                     maxParticipants={matchData.max_participants}
+                    holePars={matchData.hole_pars}
                     inline
                   />
                 </Suspense>
