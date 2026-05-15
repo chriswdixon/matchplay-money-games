@@ -20,16 +20,21 @@ export default {
 		extend: {
 			fontFamily: {
 				sans: [
+					'"Inter Tight"',
 					'-apple-system',
 					'BlinkMacSystemFont',
-					'"SF Pro Text"',
-					'"SF Pro Display"',
 					'"Helvetica Neue"',
 					'Helvetica',
 					'Arial',
 					'sans-serif',
 					'"Apple Color Emoji"',
 					'"Segoe UI Emoji"',
+				],
+				mono: [
+					'"Inter Tight"',
+					'ui-monospace',
+					'SFMono-Regular',
+					'monospace',
 				],
 			},
 			colors: {
