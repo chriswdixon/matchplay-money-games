@@ -93,7 +93,7 @@ export function ProjectedPayout({
                 </div>
                 {totalPot > 0 && (
                   <div className={`text-xs ${isWinner ? 'text-warning font-semibold' : 'text-muted-foreground'}`}>
-                    {isWinner ? `+$${projected.toFixed(2)}` : '—'}
+                    {isWinner ? `+$${Math.round(projected)}` : '—'}
                   </div>
                 )}
               </div>
