@@ -399,25 +399,14 @@ const NearbyCoursesWithMatches = () => {
             </Popover>
             {isUnlimited(radius) ? '' : 'miles'}
           </p>
-          <Button
-            type="button"
-            size="sm"
-            variant="outline"
-            className="shrink-0 h-8 px-3 rounded-full"
-            onClick={async () => {
-              await requestLocation();
-              await runSearch(query);
-            }}
-            disabled={locationLoading}
-            aria-label="Use my current location and refresh nearby courses"
+          <span
+            className="shrink-0 inline-flex items-center gap-1.5 h-8 px-3 rounded-full bg-primary/10 text-primary text-xs font-medium"
+            aria-label="Using your current location"
+            title="Using your current location"
           >
-            {locationLoading ? (
-              <Loader2 className="w-3.5 h-3.5 animate-spin" aria-hidden="true" />
-            ) : (
-              <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
-            )}
-            <span className="ml-1.5 text-xs font-medium">Use my location</span>
-          </Button>
+            <Navigation className="w-3.5 h-3.5" aria-hidden="true" />
+            Location on
+          </span>
         </div>
       )}
 
