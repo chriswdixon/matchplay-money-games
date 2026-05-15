@@ -115,12 +115,6 @@ serve(async (req) => {
       userLimit.count++;
     }
 
-    const apiKey = Deno.env.get('GOLFCOURSEAPI_KEY');
-    if (!apiKey) {
-      console.error('[SEARCH-GOLF-COURSES] API key not configured');
-      throw new Error('Service configuration error');
-    }
-
     const { type, lat, lon, radius, name, courseId } = await req.json();
     const blockedStateCodes = await getBlockedStateCodes();
     const isBlockedCourse = (c: GolfCourse): boolean => {
@@ -143,6 +137,12 @@ serve(async (req) => {
 
     // --- Get course detail by ID ---
     if (type === 'detail' && courseId) {
+      const apiKey = Deno.env.get('GOLFCOURSEAPI_KEY');
+      if (!apiKey) {
+        console.error('[SEARCH-GOLF-COURSES] API key not configured');
+        throw new Error('Service configuration error');
+      }
+
       console.log('[SEARCH-GOLF-COURSES] Fetching course detail for ID:', courseId);
 
       const response = await fetch(`${API_BASE}/v1/courses/${courseId}`, {
@@ -186,6 +186,12 @@ serve(async (req) => {
 
     // --- Search by name ---
     if (type === 'name' && name) {
+      const apiKey = Deno.env.get('GOLFCOURSEAPI_KEY');
+      if (!apiKey) {
+        console.error('[SEARCH-GOLF-COURSES] API key not configured');
+        throw new Error('Service configuration error');
+      }
+
       if (typeof name !== 'string' || name.length === 0) {
         throw new Error('Search term cannot be empty');
       }
