@@ -11,10 +11,19 @@ interface MatchResultsDisplayProps {
   playerScores: PlayerScore[];
   buyInAmount?: number;
   maxParticipants?: number;
+  holePars?: { [hole: string]: number };
   inline?: boolean; // Indicates if displayed inline within a card
 }
 
-export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, inline = false }: MatchResultsDisplayProps) {
+const getScoreColorClasses = (score: number | undefined, par: number | undefined) => {
+  if (!score) return 'bg-muted text-muted-foreground';
+  if (!par) return 'bg-primary/10 text-primary';
+  if (score < par) return 'bg-success/15 text-success';
+  if (score > par) return 'bg-destructive/15 text-destructive';
+  return 'bg-muted text-foreground';
+};
+
+export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, holePars, inline = false }: MatchResultsDisplayProps) {
   const isTestingMode = maxParticipants === 1;
   const isMobile = useIsMobile();
   
