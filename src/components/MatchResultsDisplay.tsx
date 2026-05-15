@@ -1,10 +1,14 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, DollarSign, Medal } from 'lucide-react';
+import { Trophy, DollarSign, Medal, Star } from 'lucide-react';
 import { MatchResult, PlayerScore } from '@/hooks/useMatchScoring';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { usePlayerRatings, RateablePlayer } from '@/hooks/usePlayerRatings';
+import PlayerRatingDialog from './PlayerRatingDialog';
 
 interface MatchResultsDisplayProps {
   matchResult: MatchResult;
@@ -12,7 +16,9 @@ interface MatchResultsDisplayProps {
   buyInAmount?: number;
   maxParticipants?: number;
   holePars?: { [hole: string]: number };
-  inline?: boolean; // Indicates if displayed inline within a card
+  inline?: boolean;
+  matchId?: string;
+  matchName?: string;
 }
 
 const getScoreColorClasses = (score: number | undefined, par: number | undefined) => {
@@ -23,17 +29,30 @@ const getScoreColorClasses = (score: number | undefined, par: number | undefined
   return 'bg-muted text-foreground';
 };
 
-export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, holePars, inline = false }: MatchResultsDisplayProps) {
+export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, holePars, inline = false, matchId, matchName }: MatchResultsDisplayProps) {
   const isTestingMode = maxParticipants === 1;
   const isMobile = useIsMobile();
-  
+
+  const { getRateablePlayersForMatch } = usePlayerRatings();
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [unratedPlayers, setUnratedPlayers] = useState<RateablePlayer[]>([]);
+
+  useEffect(() => {
+    if (!matchId) return;
+    const fetchPlayers = async () => {
+      const players = await getRateablePlayersForMatch(matchId);
+      setUnratedPlayers(players.filter((p) => !p.already_rated));
+    };
+    fetchPlayers();
+  }, [matchId, getRateablePlayersForMatch]);
+
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
-  
+
   // Pot is funded by the human's buy-in (bots in testing mode don't pay).
   // Real matches: pot = buy-in × number of players. Winner takes everything (split on tie).
   const totalPot = (buyInAmount / 100) * (isTestingMode ? 1 : playerScores.length);
-  
+
   const payouts: { [playerId: string]: number } = {};
   if (totalPot > 0) {
     const winners = sortedPlayers.filter(p => p.net_total === sortedPlayers[0]?.net_total && p.total > 0);
@@ -295,6 +314,42 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Player Rating Prompt */}
+      {matchId && unratedPlayers.length > 0 && (
+        <Card className={cn(!inline && "max-w-4xl mx-auto")}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold">Rate Your Opponents</h3>
+                <p className="text-sm text-muted-foreground">
+                  You have {unratedPlayers.length} player{unratedPlayers.length > 1 ? 's' : ''} left to review
+                </p>
+              </div>
+              <Button onClick={() => setShowRatingDialog(true)} className="gap-2 shrink-0">
+                <Star className="w-4 h-4" />
+                Rate Players
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {matchId && (
+        <PlayerRatingDialog
+          open={showRatingDialog}
+          onOpenChange={(open) => {
+            setShowRatingDialog(open);
+            if (!open && matchId) {
+              getRateablePlayersForMatch(matchId).then((players) => {
+                setUnratedPlayers(players.filter((p) => !p.already_rated));
+              });
+            }
+          }}
+          matchId={matchId}
+          matchName={matchName || "Match"}
+        />
+      )}
     </div>
   );
 }

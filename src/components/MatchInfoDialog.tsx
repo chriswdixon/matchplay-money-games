@@ -124,6 +124,8 @@ export function MatchInfoDialog({ matchId, open, onOpenChange }: MatchInfoDialog
                     buyInAmount={matchData.buy_in_amount || 0}
                     maxParticipants={matchData.max_participants}
                     holePars={matchData.hole_pars}
+                    matchId={matchId || undefined}
+                    matchName={matchData?.course_name || "Match"}
                     inline
                   />
                 </Suspense>
