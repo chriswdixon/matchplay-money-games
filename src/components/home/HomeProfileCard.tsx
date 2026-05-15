@@ -4,8 +4,10 @@ import { Star } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { usePlayerAccount } from "@/hooks/usePlayerAccount";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
 
 const HomeProfileCard = () => {
+  const navigate = useNavigate();
   const { profile, loading: profileLoading } = useProfile();
   const { account, loading: accountLoading } = usePlayerAccount();
 
@@ -68,7 +70,11 @@ const HomeProfileCard = () => {
         )}
       </div>
 
-      <div className="text-right shrink-0">
+      <button
+        onClick={() => navigate('/wallet')}
+        className="text-right shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+        aria-label="View wallet and transaction history"
+      >
         {accountLoading ? (
           <Skeleton className="h-6 w-20" />
         ) : (
@@ -76,7 +82,7 @@ const HomeProfileCard = () => {
             {formattedBalance}
           </span>
         )}
-      </div>
+      </button>
     </div>
   );
 };
