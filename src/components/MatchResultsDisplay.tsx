@@ -235,9 +235,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                                   {player.player_name}
                                 </span>
                               </div>
-                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${
-                                score ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                              }`}>
+                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${getScoreColorClasses(score, holePars?.[hole])}`}>
                                 {score || '-'}
                               </div>
                             </div>
@@ -273,9 +271,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                                   {player.player_name}
                                 </span>
                               </div>
-                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${
-                                score ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                              }`}>
+                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${getScoreColorClasses(score, holePars?.[hole])}`}>
                                 {score || '-'}
                               </div>
                             </div>
@@ -322,9 +318,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
                         return (
                           <td key={hole} className="text-center p-1">
-                            <div className={`w-7 h-7 rounded flex items-center justify-center text-xs ${
-                              score ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground'
-                            }`}>
+                            <div className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${getScoreColorClasses(score, holePars?.[hole])}`}>
                               {score || '-'}
                             </div>
                           </td>
