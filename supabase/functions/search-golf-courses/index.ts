@@ -361,7 +361,7 @@ out center tags 100;`;
     for (const endpoint of endpoints) {
       try {
         const controller = new AbortController();
-        const timeoutId = setTimeout(() => controller.abort(), 8000);
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
