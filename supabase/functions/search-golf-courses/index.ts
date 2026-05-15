@@ -360,6 +360,8 @@ out center tags 100;`;
     let lastError: any = null;
     for (const endpoint of endpoints) {
       try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 8000);
         const res = await fetch(endpoint, {
           method: 'POST',
           headers: {
@@ -367,7 +369,9 @@ out center tags 100;`;
             'User-Agent': 'Tyche-Golf-App/1.0',
           },
           body: `data=${encodeURIComponent(overpassQuery)}`,
+          signal: controller.signal,
         });
+        clearTimeout(timeoutId);
         if (!res.ok) {
           lastError = new Error(`Overpass API error: ${res.status}`);
           continue;
@@ -382,7 +386,7 @@ out center tags 100;`;
     }
     if (lastError && elements.length === 0) {
       console.warn('[SEARCH-GOLF-COURSES] Overpass failed:', (lastError as any)?.message);
-      return [];
+      return getKnownRegionalCourses(lat, lon, radius || 30);
     }
 
     const courses: GolfCourse[] = elements
@@ -421,7 +425,7 @@ out center tags 100;`;
     });
 
     console.log('[SEARCH-GOLF-COURSES] Overpass returned', deduped.length, 'unique courses');
-    return deduped;
+    return deduped.length > 0 ? deduped : getKnownRegionalCourses(lat, lon, radius || 30);
   }
 
   let osmUrl: string;
