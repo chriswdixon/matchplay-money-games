@@ -204,21 +204,6 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-3">
-        <div className="grid grid-cols-3 gap-2 text-xs text-muted-foreground">
-          <div>
-            <div className="font-semibold text-foreground">${pot}</div>
-            <div>Pot</div>
-          </div>
-          <div>
-            <div className="font-semibold text-foreground">{participants.length}</div>
-            <div>Active players</div>
-          </div>
-          <div>
-            <div className="font-semibold text-foreground">{winners.length || "—"}</div>
-            <div>Winner(s)</div>
-          </div>
-        </div>
-
         <div className="rounded-md border divide-y" role="table" aria-label="Expected transactions">
           <div
             className="grid grid-cols-12 px-3 py-2 text-xs font-medium text-muted-foreground"
