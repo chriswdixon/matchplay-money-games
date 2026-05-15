@@ -142,6 +142,15 @@ type Toast = Omit<ToasterToast, "id">
 function toast({ ...props }: Toast) {
   const id = genId()
 
+  // Suppress success/informational toasts globally; only show errors (destructive variant).
+  if (props.variant !== "destructive") {
+    return {
+      id,
+      dismiss: () => {},
+      update: () => {},
+    }
+  }
+
   const update = (props: ToasterToast) =>
     dispatch({
       type: "UPDATE_TOAST",

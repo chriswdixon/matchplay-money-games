@@ -11,6 +11,13 @@ import { Toaster } from "@/components/ui/toaster";
 import { runPreviewCacheGuard } from "@/lib/preview-cache-guard";
 import { startDevAutoReload } from "@/lib/dev-auto-reload";
 import { registerPWA } from "@/lib/pwa-register";
+import { toast as sonnerToast } from "sonner";
+
+// Globally suppress success / informational toasts; only errors are surfaced.
+const noop = () => "" as unknown as string | number;
+sonnerToast.success = noop as typeof sonnerToast.success;
+sonnerToast.info = noop as typeof sonnerToast.info;
+sonnerToast.message = noop as typeof sonnerToast.message;
 
 // Clean up legacy SW + caches when running in unsafe contexts (Lovable preview iframes).
 runPreviewCacheGuard();
