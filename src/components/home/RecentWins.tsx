@@ -54,9 +54,12 @@ const RecentWins = () => {
           posts.slice(0, 3).map((post) => {
             const initial = post.display_name?.charAt(0).toUpperCase() ?? "?";
             return (
-              <div
+              <button
                 key={post.id}
-                className="flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-3 py-3"
+                type="button"
+                onClick={() => navigate(`/match/${post.match_id}`)}
+                className="w-full text-left flex items-center gap-3 bg-background/95 text-foreground rounded-2xl px-3 py-3 hover:bg-background transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                aria-label={`Open ${post.course_name} match`}
               >
                 <Avatar className="w-10 h-10 border border-border shrink-0">
                   <SignedAvatarImage
@@ -89,7 +92,7 @@ const RecentWins = () => {
                 <span className="text-xs text-muted-foreground shrink-0">
                   {formatDistanceToNow(new Date(post.created_at), { addSuffix: true })}
                 </span>
-              </div>
+              </button>
             );
           })
         )}
