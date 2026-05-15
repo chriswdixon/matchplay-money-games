@@ -87,8 +87,8 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
 
       const { data: profs } = await supabase
         .from("profiles")
-        .select("id, display_name")
-        .in("id", Array.from(userIds));
+        .select("user_id, display_name")
+        .in("user_id", Array.from(userIds));
 
       if (cancelled) return;
       setIsAdmin(admin);
@@ -98,7 +98,7 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
       setActuals((txs as any[]) || []);
       const map: Record<string, string> = {};
       (profs || []).forEach((row: any) => {
-        map[row.id] = row.display_name || row.id.slice(0, 8);
+        map[row.user_id] = row.display_name || row.user_id.slice(0, 8);
       });
       setProfiles(map);
       setLoading(false);
