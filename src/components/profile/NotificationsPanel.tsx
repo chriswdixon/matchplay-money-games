@@ -66,7 +66,7 @@ export function NotificationsPanel() {
                           variant="ghost"
                           onClick={() => {
                             if (unread) markRead(n.id);
-                            navigate(`/?match=${n.match_id}`);
+                            navigate(`/match/${n.match_id}`);
                           }}
                         >
                           View
