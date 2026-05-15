@@ -43,6 +43,26 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
+  const ZIP_REGEX = /^\d{5}$/;
+
+  const geocodeZip = async (zip: string): Promise<{ lat: number; lon: number } | null> => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=USA&format=json&limit=1`,
+        { headers: { Accept: "application/json" } }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      if (Number.isNaN(lat) || Number.isNaN(lon)) return null;
+      return { lat, lon };
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (mode === "matches") {
@@ -51,6 +71,22 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     }
     setSearched(true);
 
+    const trimmed = query.trim();
+
+    // ZIP code search: geocode, then nearby — works without GPS permission.
+    if (ZIP_REGEX.test(trimmed)) {
+      const coords = await geocodeZip(trimmed);
+      if (!coords) {
+        setCourseResults([]);
+        setCoursePage(1);
+        return;
+      }
+      const results = await searchNearbyCourses(coords.lat, coords.lon, RADIUS_MI);
+      setCourseResults(results);
+      setCoursePage(1);
+      return;
+    }
+
     // Course search requires GPS — only nearby (within 30mi)
     if (!location) {
       await requestLocation();
@@ -58,8 +94,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     }
 
     let results: GolfCourse[];
-    if (query.trim().length >= 2) {
-      const named = await searchCoursesByName(query.trim());
+    if (trimmed.length >= 2) {
+      const named = await searchCoursesByName(trimmed);
       const withDistance = named.map((c) => ({
         ...c,
         distance:
