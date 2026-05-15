@@ -340,16 +340,94 @@ async function queryOpenStreetMap(
   radius?: number,
   name?: string
 ): Promise<GolfCourse[]> {
-  let osmUrl: string;
-
+  // For nearby searches, use OSM's Overpass API to query the full POI
+  // database for leisure=golf_course within the radius. Nominatim's
+  // text/viewbox search is unreliable and frequently misses courses.
   if (type === 'nearby' && lat && lon) {
-    const radiusDegrees = (radius || 30) / 69;
-    const south = lat - radiusDegrees;
-    const west = lon - radiusDegrees;
-    const north = lat + radiusDegrees;
-    const east = lon + radiusDegrees;
-    osmUrl = `https://nominatim.openstreetmap.org/search?q=golf+course&viewbox=${west},${south},${east},${north}&bounded=1&format=json&limit=50`;
-  } else if (type === 'name' && name) {
+    const radiusMeters = Math.round((radius || 30) * 1609.34);
+    const overpassQuery = `[out:json][timeout:25];
+(
+  node["leisure"="golf_course"](around:${radiusMeters},${lat},${lon});
+  way["leisure"="golf_course"](around:${radiusMeters},${lat},${lon});
+  relation["leisure"="golf_course"](around:${radiusMeters},${lat},${lon});
+);
+out center tags 100;`;
+
+    const endpoints = [
+      'https://overpass-api.de/api/interpreter',
+      'https://overpass.kumi.systems/api/interpreter',
+    ];
+
+    let elements: any[] = [];
+    let lastError: any = null;
+    for (const endpoint of endpoints) {
+      try {
+        const res = await fetch(endpoint, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'User-Agent': 'Tyche-Golf-App/1.0',
+          },
+          body: `data=${encodeURIComponent(overpassQuery)}`,
+        });
+        if (!res.ok) {
+          lastError = new Error(`Overpass API error: ${res.status}`);
+          continue;
+        }
+        const json = await res.json();
+        elements = json.elements || [];
+        lastError = null;
+        break;
+      } catch (e) {
+        lastError = e;
+      }
+    }
+    if (lastError && elements.length === 0) {
+      console.warn('[SEARCH-GOLF-COURSES] Overpass failed:', (lastError as any)?.message);
+      return [];
+    }
+
+    const courses: GolfCourse[] = elements
+      .map((el: any) => {
+        const tags = el.tags || {};
+        const name = tags.name || tags['name:en'] || tags.operator;
+        if (!name) return null;
+        const elLat = el.lat ?? el.center?.lat;
+        const elLon = el.lon ?? el.center?.lon;
+        if (typeof elLat !== 'number' || typeof elLon !== 'number') return null;
+        const addrParts = [
+          tags['addr:street'] && `${tags['addr:housenumber'] || ''} ${tags['addr:street']}`.trim(),
+          tags['addr:city'],
+          tags['addr:state'],
+          tags['addr:postcode'],
+        ].filter(Boolean);
+        const address = addrParts.length > 0 ? addrParts.join(', ') : 'Address not available';
+        return {
+          name,
+          address,
+          latitude: elLat,
+          longitude: elLon,
+          website: tags.website || tags['contact:website'],
+          state: tags['addr:state'] || null,
+        } as GolfCourse;
+      })
+      .filter((c): c is GolfCourse => c !== null);
+
+    // De-duplicate by name (Overpass can return both node + way for same course).
+    const seen = new Set<string>();
+    const deduped = courses.filter((c) => {
+      const key = c.name.toLowerCase().trim();
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+
+    console.log('[SEARCH-GOLF-COURSES] Overpass returned', deduped.length, 'unique courses');
+    return deduped;
+  }
+
+  let osmUrl: string;
+  if (type === 'name' && name) {
     const trimmedName = name.trim();
     if (trimmedName.length === 0 || trimmedName.length > MAX_NAME_LENGTH || !NAME_REGEX.test(trimmedName)) {
       return [];
