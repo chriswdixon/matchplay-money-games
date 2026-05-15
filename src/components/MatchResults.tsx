@@ -352,12 +352,19 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                     {Array.from({ length: 18 }, (_, i) => {
                       const hole = i + 1;
                       const score = player.scores[hole];
+                      const par = (matchData?.hole_pars as { [key: string]: number } | undefined)?.[hole];
+                      let cellClass = 'bg-background border border-border';
+                      if (score && par) {
+                        if (score < par) cellClass = 'bg-success/15 text-success';
+                        else if (score > par) cellClass = 'bg-destructive/15 text-destructive';
+                        else cellClass = 'bg-muted text-foreground';
+                      } else if (score) {
+                        cellClass = 'bg-muted text-foreground';
+                      }
 
                       return (
                         <td key={hole} className="text-center p-2">
-                          <div className={`w-8 h-8 rounded-md flex items-center justify-center ${
-                            score ? 'bg-muted text-foreground' : 'bg-background border border-border'
-                          }`}>
+                          <div className={`w-8 h-8 rounded-md flex items-center justify-center ${cellClass}`}>
                             {score || '-'}
                           </div>
                         </td>
