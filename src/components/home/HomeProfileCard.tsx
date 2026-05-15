@@ -4,6 +4,7 @@ import { Star } from "lucide-react";
 import { useProfile } from "@/hooks/useProfile";
 import { usePlayerAccount } from "@/hooks/usePlayerAccount";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useNavigate } from "react-router-dom";
 
 const HomeProfileCard = () => {
   const { profile, loading: profileLoading } = useProfile();
