@@ -314,6 +314,42 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           </Tabs>
         </CardContent>
       </Card>
+
+      {/* Player Rating Prompt */}
+      {matchId && unratedPlayers.length > 0 && (
+        <Card className={cn(!inline && "max-w-4xl mx-auto")}>
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between gap-4">
+              <div>
+                <h3 className="text-lg font-semibold">Rate Your Opponents</h3>
+                <p className="text-sm text-muted-foreground">
+                  You have {unratedPlayers.length} player{unratedPlayers.length > 1 ? 's' : ''} left to review
+                </p>
+              </div>
+              <Button onClick={() => setShowRatingDialog(true)} className="gap-2 shrink-0">
+                <Star className="w-4 h-4" />
+                Rate Players
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {matchId && (
+        <PlayerRatingDialog
+          open={showRatingDialog}
+          onOpenChange={(open) => {
+            setShowRatingDialog(open);
+            if (!open && matchId) {
+              getRateablePlayersForMatch(matchId).then((players) => {
+                setUnratedPlayers(players.filter((p) => !p.already_rated));
+              });
+            }
+          }}
+          matchId={matchId}
+          matchName={matchName || "Match"}
+        />
+      )}
     </div>
   );
 }
