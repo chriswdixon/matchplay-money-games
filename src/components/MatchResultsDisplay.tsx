@@ -11,10 +11,19 @@ interface MatchResultsDisplayProps {
   playerScores: PlayerScore[];
   buyInAmount?: number;
   maxParticipants?: number;
+  holePars?: { [hole: string]: number };
   inline?: boolean; // Indicates if displayed inline within a card
 }
 
-export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, inline = false }: MatchResultsDisplayProps) {
+const getScoreColorClasses = (score: number | undefined, par: number | undefined) => {
+  if (!score) return 'bg-muted text-muted-foreground';
+  if (!par) return 'bg-primary/10 text-primary';
+  if (score < par) return 'bg-success/15 text-success';
+  if (score > par) return 'bg-destructive/15 text-destructive';
+  return 'bg-muted text-foreground';
+};
+
+export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, holePars, inline = false }: MatchResultsDisplayProps) {
   const isTestingMode = maxParticipants === 1;
   const isMobile = useIsMobile();
   
@@ -226,9 +235,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                                   {player.player_name}
                                 </span>
                               </div>
-                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${
-                                score ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                              }`}>
+                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${getScoreColorClasses(score, holePars?.[hole])}`}>
                                 {score || '-'}
                               </div>
                             </div>
@@ -264,9 +271,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
                                   {player.player_name}
                                 </span>
                               </div>
-                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${
-                                score ? 'bg-primary/10 text-primary' : 'bg-muted text-muted-foreground'
-                              }`}>
+                              <div className={`w-10 h-10 rounded flex items-center justify-center font-semibold ${getScoreColorClasses(score, holePars?.[hole])}`}>
                                 {score || '-'}
                               </div>
                             </div>
@@ -313,9 +318,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
                         return (
                           <td key={hole} className="text-center p-1">
-                            <div className={`w-7 h-7 rounded flex items-center justify-center text-xs ${
-                              score ? 'bg-muted text-foreground font-medium' : 'text-muted-foreground'
-                            }`}>
+                            <div className={`w-7 h-7 rounded flex items-center justify-center text-xs font-medium ${getScoreColorClasses(score, holePars?.[hole])}`}>
                               {score || '-'}
                             </div>
                           </td>

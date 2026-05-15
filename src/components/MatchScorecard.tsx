@@ -977,6 +977,7 @@ export function MatchScorecard({ matchId, matchName, onClose, readOnly = false }
           playerScores={playerScores}
           buyInAmount={matchData?.buy_in_amount}
           maxParticipants={matchData?.max_participants}
+          holePars={matchData?.hole_pars}
           inline={!onClose}
         />
       )}
