@@ -1,10 +1,14 @@
+import { useState, useEffect } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Trophy, DollarSign, Medal } from 'lucide-react';
+import { Trophy, DollarSign, Medal, Star } from 'lucide-react';
 import { MatchResult, PlayerScore } from '@/hooks/useMatchScoring';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { cn } from '@/lib/utils';
+import { usePlayerRatings, RateablePlayer } from '@/hooks/usePlayerRatings';
+import PlayerRatingDialog from './PlayerRatingDialog';
 
 interface MatchResultsDisplayProps {
   matchResult: MatchResult;
@@ -12,7 +16,9 @@ interface MatchResultsDisplayProps {
   buyInAmount?: number;
   maxParticipants?: number;
   holePars?: { [hole: string]: number };
-  inline?: boolean; // Indicates if displayed inline within a card
+  inline?: boolean;
+  matchId?: string;
+  matchName?: string;
 }
 
 const getScoreColorClasses = (score: number | undefined, par: number | undefined) => {
