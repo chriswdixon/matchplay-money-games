@@ -331,6 +331,24 @@ function toRad(degrees: number): number {
   return degrees * (Math.PI / 180);
 }
 
+function getKnownRegionalCourses(lat: number, lon: number, radius: number): GolfCourse[] {
+  const courses: GolfCourse[] = [
+    { name: 'Teravista Golf Club', address: '4333 Teravista Club Drive, Round Rock, TX 78665', latitude: 30.5647, longitude: -97.6868, state: 'TX' },
+    { name: 'Berry Creek Country Club', address: '30500 Berry Creek Drive, Georgetown, TX 78628', latitude: 30.7053, longitude: -97.7041, state: 'TX' },
+    { name: 'Legacy Hills Golf Club', address: '301 Del Webb Boulevard, Georgetown, TX 78633', latitude: 30.7176, longitude: -97.7345, state: 'TX' },
+    { name: 'White Wing Golf Club', address: '150 Dove Hollow Trail, Georgetown, TX 78633', latitude: 30.7296, longitude: -97.7379, state: 'TX' },
+    { name: 'Forest Creek Golf Club', address: '99 Twin Ridge Parkway, Round Rock, TX 78664', latitude: 30.5209, longitude: -97.6048, state: 'TX' },
+    { name: 'Cowan Creek Golf Club', address: '1433 Cool Spring Way, Georgetown, TX 78633', latitude: 30.7402, longitude: -97.7369, state: 'TX' },
+    { name: 'Golf Club at Star Ranch', address: '2500 State Highway 130, Hutto, TX 78634', latitude: 30.5064, longitude: -97.5833, state: 'TX' },
+    { name: 'Avery Ranch Golf Club', address: '10500 Avery Club Drive, Austin, TX 78717', latitude: 30.4975, longitude: -97.7786, state: 'TX' },
+    { name: 'Blackhawk Golf Club', address: '2714 Kelly Lane, Pflugerville, TX 78660', latitude: 30.4628, longitude: -97.5718, state: 'TX' },
+    { name: 'Crystal Falls Golf Course', address: '3400 Crystal Falls Parkway, Leander, TX 78641', latitude: 30.5579, longitude: -97.8708, state: 'TX' },
+  ];
+  return courses.map((course) => ({ ...course, distance: calculateDistance(lat, lon, course.latitude!, course.longitude!) }))
+    .filter((course) => course.distance !== undefined && course.distance <= radius)
+    .sort((a, b) => (a.distance || 999) - (b.distance || 999));
+}
+
 async function queryOpenStreetMap(
   type: string,
   lat?: number,
