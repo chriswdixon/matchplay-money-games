@@ -70,7 +70,11 @@ const HomeProfileCard = () => {
         )}
       </div>
 
-      <div className="text-right shrink-0">
+      <button
+        onClick={() => navigate('/wallet')}
+        className="text-right shrink-0 cursor-pointer hover:opacity-80 transition-opacity"
+        aria-label="View wallet and transaction history"
+      >
         {accountLoading ? (
           <Skeleton className="h-6 w-20" />
         ) : (
@@ -78,7 +82,7 @@ const HomeProfileCard = () => {
             {formattedBalance}
           </span>
         )}
-      </div>
+      </button>
     </div>
   );
 };
