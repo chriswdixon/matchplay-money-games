@@ -70,13 +70,13 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
       {/* Podium Display */}
       <div className={cn(
-        "grid grid-cols-1 md:grid-cols-3 gap-4",
+        "flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-4",
         !inline && "max-w-4xl mx-auto"
       )}>
         {sortedPlayers.slice(0, 3).map((player, index) => (
           <Card 
             key={player.player_id}
-            className={`relative ${index === 0 ? 'md:col-start-2 ring-2 ring-yellow-500' : ''}`}
+            className={`relative w-full md:w-72 ${index === 0 ? 'ring-2 ring-yellow-500' : ''}`}
           >
             <CardHeader className="text-center pb-2">
               <div className="flex justify-center mb-2">
