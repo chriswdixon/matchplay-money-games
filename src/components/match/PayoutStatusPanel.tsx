@@ -250,7 +250,7 @@ export const PayoutStatusPanel = ({ matchId }: Props) => {
                   {e.kind === "match_buyin" ? "Buy-in" : "Winnings"}
                 </div>
                 <div
-                  className={`col-span-2 text-right font-mono ${
+                  className={`col-span-2 text-right ${
                     e.amount < 0 ? "text-destructive" : "text-emerald-600"
                   }`}
                 >
