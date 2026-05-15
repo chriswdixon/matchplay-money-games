@@ -60,7 +60,7 @@ export function ProjectedPayout({
         {totalPot > 0 && (
           <div className="flex items-center justify-between text-sm pb-2 border-b">
             <span className="text-muted-foreground">Total pot</span>
-            <span className="font-semibold">${totalPot.toFixed(2)}</span>
+            <span className="font-semibold">${Math.round(totalPot)}</span>
           </div>
         )}
 
