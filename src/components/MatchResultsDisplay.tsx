@@ -29,17 +29,30 @@ const getScoreColorClasses = (score: number | undefined, par: number | undefined
   return 'bg-muted text-foreground';
 };
 
-export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, holePars, inline = false }: MatchResultsDisplayProps) {
+export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0, maxParticipants, holePars, inline = false, matchId, matchName }: MatchResultsDisplayProps) {
   const isTestingMode = maxParticipants === 1;
   const isMobile = useIsMobile();
-  
+
+  const { getRateablePlayersForMatch } = usePlayerRatings();
+  const [showRatingDialog, setShowRatingDialog] = useState(false);
+  const [unratedPlayers, setUnratedPlayers] = useState<RateablePlayer[]>([]);
+
+  useEffect(() => {
+    if (!matchId) return;
+    const fetchPlayers = async () => {
+      const players = await getRateablePlayersForMatch(matchId);
+      setUnratedPlayers(players.filter((p) => !p.already_rated));
+    };
+    fetchPlayers();
+  }, [matchId, getRateablePlayersForMatch]);
+
   // Sort players by net score (lowest to highest)
   const sortedPlayers = [...playerScores].sort((a, b) => a.net_total - b.net_total);
-  
+
   // Pot is funded by the human's buy-in (bots in testing mode don't pay).
   // Real matches: pot = buy-in × number of players. Winner takes everything (split on tie).
   const totalPot = (buyInAmount / 100) * (isTestingMode ? 1 : playerScores.length);
-  
+
   const payouts: { [playerId: string]: number } = {};
   if (totalPot > 0) {
     const winners = sortedPlayers.filter(p => p.net_total === sortedPlayers[0]?.net_total && p.total > 0);
