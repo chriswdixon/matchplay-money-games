@@ -186,9 +186,18 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
                 ? "Search by course or location..."
                 : "Course name or ZIP code"
             }
-            className="pl-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
+            className="pl-10 pr-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
             aria-label={mode === "matches" ? "Search matches" : "Search courses"}
           />
+          {location && (
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-success-foreground/90"
+              title="Using your location"
+              aria-label="Using your location"
+            >
+              <Navigation className="h-4 w-4" aria-hidden="true" />
+            </span>
+          )}
         </div>
         {loading && (
           <div className="flex items-center px-2" aria-live="polite">
