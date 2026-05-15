@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, MapPin, Loader2, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
 import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
 import { useNavigate } from "react-router-dom";
