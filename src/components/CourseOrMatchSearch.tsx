@@ -3,7 +3,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, MapPin, Loader2, ChevronLeft, ChevronRight } from "lucide-react";
+import { Search, MapPin, Loader2, ChevronLeft, ChevronRight, Navigation } from "lucide-react";
 import { useGolfCourses, type GolfCourse } from "@/hooks/useGolfCourses";
 import { useLocation } from "@/hooks/useLocation";
 import { useNavigate } from "react-router-dom";
@@ -43,6 +43,26 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
   };
 
+  const ZIP_REGEX = /^\d{5}$/;
+
+  const geocodeZip = async (zip: string): Promise<{ lat: number; lon: number } | null> => {
+    try {
+      const res = await fetch(
+        `https://nominatim.openstreetmap.org/search?postalcode=${zip}&country=USA&format=json&limit=1`,
+        { headers: { Accept: "application/json" } }
+      );
+      if (!res.ok) return null;
+      const data = await res.json();
+      if (!Array.isArray(data) || data.length === 0) return null;
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      if (Number.isNaN(lat) || Number.isNaN(lon)) return null;
+      return { lat, lon };
+    } catch {
+      return null;
+    }
+  };
+
   const handleSubmit = async (e?: React.FormEvent) => {
     e?.preventDefault();
     if (mode === "matches") {
@@ -51,6 +71,22 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     }
     setSearched(true);
 
+    const trimmed = query.trim();
+
+    // ZIP code search: geocode, then nearby — works without GPS permission.
+    if (ZIP_REGEX.test(trimmed)) {
+      const coords = await geocodeZip(trimmed);
+      if (!coords) {
+        setCourseResults([]);
+        setCoursePage(1);
+        return;
+      }
+      const results = await searchNearbyCourses(coords.lat, coords.lon, RADIUS_MI);
+      setCourseResults(results);
+      setCoursePage(1);
+      return;
+    }
+
     // Course search requires GPS — only nearby (within 30mi)
     if (!location) {
       await requestLocation();
@@ -58,8 +94,8 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
     }
 
     let results: GolfCourse[];
-    if (query.trim().length >= 2) {
-      const named = await searchCoursesByName(query.trim());
+    if (trimmed.length >= 2) {
+      const named = await searchCoursesByName(trimmed);
       const withDistance = named.map((c) => ({
         ...c,
         distance:
@@ -150,9 +186,18 @@ const CourseOrMatchSearch = ({ matchSearch, onMatchSearchChange }: CourseOrMatch
                 ? "Search by course or location..."
                 : "Course name or ZIP code"
             }
-            className="pl-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
+            className="pl-10 pr-10 h-11 bg-success text-success-foreground placeholder:text-success-foreground/70 border-success focus-visible:ring-success"
             aria-label={mode === "matches" ? "Search matches" : "Search courses"}
           />
+          {location && (
+            <span
+              className="absolute right-3 top-1/2 -translate-y-1/2 inline-flex items-center justify-center text-success-foreground/90"
+              title="Using your location"
+              aria-label="Using your location"
+            >
+              <Navigation className="h-4 w-4" aria-hidden="true" />
+            </span>
+          )}
         </div>
         {loading && (
           <div className="flex items-center px-2" aria-live="polite">
