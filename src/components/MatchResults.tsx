@@ -6,7 +6,7 @@ import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useMatchScoring } from '@/hooks/useMatchScoring';
 import { useAuth } from '@/hooks/useAuth';
 import { useFreeTier } from '@/hooks/useFreeTier';
-import { Trophy, Crown, Medal, CheckCircle, Clock, Users, DollarSign, Lock } from 'lucide-react';
+import { Trophy, Crown, Medal, CheckCircle, Clock, Users, DollarSign, Lock, ArrowLeft } from 'lucide-react';
 import { MatchResultsDisplay } from './MatchResultsDisplay';
 
 interface MatchResultsProps {
@@ -104,8 +104,8 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
                 <p className="text-muted-foreground">{matchName}</p>
               </div>
             </div>
-            <Button variant="outline" onClick={onClose}>
-              Back to Matches
+            <Button variant="ghost" size="icon" onClick={onClose} aria-label="Back to matches">
+              <ArrowLeft className="h-5 w-5" />
             </Button>
           </div>
 
@@ -198,8 +198,8 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
               <p className="text-muted-foreground">{matchName}</p>
             </div>
           </div>
-          <Button variant="outline" onClick={onClose}>
-            Back to Matches
+          <Button variant="ghost" size="icon" onClick={onClose} aria-label="Back to matches">
+            <ArrowLeft className="h-5 w-5" />
           </Button>
         </div>
 
@@ -228,8 +228,8 @@ export function MatchResults({ matchId, matchName, onClose }: MatchResultsProps)
             <p className="text-muted-foreground">{matchName}</p>
           </div>
         </div>
-        <Button variant="outline" onClick={onClose}>
-          Back to Matches
+        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Back to matches">
+          <ArrowLeft className="h-5 w-5" />
         </Button>
       </div>
 
