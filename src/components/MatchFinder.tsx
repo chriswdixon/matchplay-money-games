@@ -678,8 +678,8 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         <CardHeader className="pb-3">
                           <div className="flex items-start justify-between gap-2">
                             <div className="flex-1 min-w-0">
-                              <CardTitle className="text-base truncate">{match.course_name}</CardTitle>
-                              <CardDescription className="text-sm truncate">{match.location}</CardDescription>
+                              <CardTitle className="match-card-title">{match.course_name}</CardTitle>
+                              <CardDescription className="match-card-subtitle">{match.location}</CardDescription>
                             </div>
                             <Badge variant="destructive" className="shrink-0">
                               {daysElapsed > 0 ? `${daysElapsed}d ago` : `${hoursElapsed}h ago`}
