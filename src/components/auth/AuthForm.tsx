@@ -513,10 +513,17 @@ export function AuthForm() {
     <div className="min-h-screen flex items-center justify-center bg-muted/40 px-4 py-8">
       <Card className="w-full max-w-md rounded-3xl shadow-card border-border/60">
         <CardHeader className="text-center space-y-2">
-          <CardTitle className="text-2xl font-bold tracking-tight">
-            {showResetForm ? 'Reset Password' : (<>Welcome to <span className="text-accent">Tyche</span></>)}
+          <CardTitle className="text-2xl font-bold tracking-tight text-foreground">
+            {showResetForm ? 'Reset Password' : (
+              <>
+                Welcome to{" "}
+                <span className="bg-gradient-to-r from-primary via-primary-glow to-primary bg-clip-text text-transparent">
+                  Tyche
+                </span>
+              </>
+            )}
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-muted-foreground">
             {showResetForm 
               ? 'Enter your email to receive a password reset link'
               : 'Join the premier golf matchmaking platform'
