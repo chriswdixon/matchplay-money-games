@@ -333,17 +333,17 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
       {/* Player Rating Prompt — always visible to all match players */}
       {matchId && rateablePlayers.length > 0 && (
         <Card className={cn(!inline && "max-w-4xl mx-auto")}>
-          <CardContent className="p-6 space-y-4">
-            <div className="flex items-center justify-between gap-4 flex-wrap">
+          <CardContent className="p-4 sm:p-6 space-y-3 sm:space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
               <div className="min-w-0">
-                <h3 className="text-lg font-semibold">Rate Your Opponents</h3>
-                <p className="text-sm text-muted-foreground">
+                <h3 className="text-base sm:text-lg font-semibold">Rate Your Opponents</h3>
+                <p className="text-xs sm:text-sm text-muted-foreground">
                   {unratedPlayers.length > 0
                     ? `${unratedPlayers.length} of ${rateablePlayers.length} player${rateablePlayers.length > 1 ? 's' : ''} left to review`
                     : `You've reviewed all ${rateablePlayers.length} player${rateablePlayers.length > 1 ? 's' : ''}`}
                 </p>
               </div>
-              <Button onClick={() => setShowRatingDialog(true)} className="gap-2 shrink-0">
+              <Button onClick={() => setShowRatingDialog(true)} className="gap-2 w-full sm:w-auto shrink-0">
                 <Star className="w-4 h-4" />
                 {unratedPlayers.length > 0 ? 'Rate Players' : 'Edit Reviews'}
               </Button>
