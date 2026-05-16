@@ -47,12 +47,11 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
       const players = await getRateablePlayersForMatch(matchId);
       setRateablePlayers(players);
       const unrated = players.filter((p) => !p.already_rated);
-      if (!autoPrompted && unrated.length > 0 && matchId) {
-        const key = `tyche-rating-prompted-${matchId}`;
-        if (!sessionStorage.getItem(key)) {
-          sessionStorage.setItem(key, '1');
-          setShowRatingDialog(true);
-        }
+      // Auto-open the review dialog as soon as results render and there are
+      // still players left to review. Fires once per mount; users can reopen
+      // anytime via the "Rate Players" / "Edit Reviews" button.
+      if (!autoPrompted && unrated.length > 0) {
+        setShowRatingDialog(true);
         setAutoPrompted(true);
       }
     };
