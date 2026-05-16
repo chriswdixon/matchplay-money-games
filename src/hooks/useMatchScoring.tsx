@@ -513,30 +513,23 @@ export function useMatchScoring(matchId: string) {
           return false;
         }
         console.log('✅ Score synced to server');
-        try {
-          await supabase.rpc('log_score_attempt', {
-            p_match_id: matchId,
-            p_hole_number: holeNumber,
-            p_strokes: strokes,
-            p_outcome: 'success',
-            p_reason: null,
-          });
-        } catch (e) {
-          console.warn('Failed to log score attempt:', e);
-        }
+        // Audit success — fire-and-forget so it doesn't add latency to UI.
+        supabase.rpc('log_score_attempt', {
+          p_match_id: matchId,
+          p_hole_number: holeNumber,
+          p_strokes: strokes,
+          p_outcome: 'success',
+          p_reason: null,
+        }).then(undefined, (e) => console.warn('Failed to log score attempt:', e));
       } else {
-        // Offline - score already saved to IndexedDB
-        try {
-          await supabase.rpc('log_score_attempt', {
-            p_match_id: matchId,
-            p_hole_number: holeNumber,
-            p_strokes: strokes,
-            p_outcome: 'offline_only',
-            p_reason: null,
-          });
-        } catch (e) {
-          // Likely offline — that's fine, this is best-effort
-        }
+        // Offline - score already saved to IndexedDB (fire-and-forget audit)
+        supabase.rpc('log_score_attempt', {
+          p_match_id: matchId,
+          p_hole_number: holeNumber,
+          p_strokes: strokes,
+          p_outcome: 'offline_only',
+          p_reason: null,
+        }).then(undefined, () => { /* likely offline — best-effort */ });
         toast({
           title: "Score saved offline",
           description: "Your score will sync when you're back online.",
