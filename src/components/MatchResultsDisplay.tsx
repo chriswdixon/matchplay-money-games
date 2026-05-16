@@ -89,63 +89,63 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
   return (
     <div className={cn(
-      "space-y-6 py-6 w-full overflow-hidden",
-      inline ? "px-2 md:px-4" : "px-4 md:px-6"
+      "space-y-4 sm:space-y-6 py-4 sm:py-6 w-full overflow-hidden",
+      inline ? "px-2 sm:px-3 md:px-4" : "px-3 sm:px-4 md:px-6"
     )}>
-      <div className="text-center space-y-2">
+      <div className="text-center space-y-1 sm:space-y-2">
         <div className="flex items-center justify-center gap-2">
-          <Trophy className="w-8 h-8 text-warning" />
-          <h2 className="text-3xl font-bold">Match Complete!</h2>
+          <Trophy className="w-6 h-6 sm:w-8 sm:h-8 text-warning" />
+          <h2 className="text-2xl sm:text-3xl font-bold">Match Complete!</h2>
         </div>
-        <p className="text-muted-foreground">Final Results</p>
+        <p className="text-sm sm:text-base text-muted-foreground">Final Results</p>
       </div>
 
       {/* Podium Display */}
       <div className={cn(
-        "flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-4",
+        "flex flex-col md:flex-row flex-wrap justify-center items-stretch gap-3 sm:gap-4",
         !inline && "max-w-4xl mx-auto"
       )}>
         {sortedPlayers.slice(0, 3).map((player, index) => (
-          <Card 
+          <Card
             key={player.player_id}
             className={`relative w-full md:w-72 ${index === 0 ? 'ring-2 ring-yellow-500' : ''}`}
           >
-            <CardHeader className="text-center pb-2">
+            <CardHeader className="text-center pb-2 px-3 sm:px-6">
               <div className="flex justify-center mb-2">
                 {getPositionIcon(index)}
               </div>
-              <CardTitle className="text-xl">{player.player_name}</CardTitle>
+              <CardTitle className="text-lg sm:text-xl break-words">{player.player_name}</CardTitle>
               {getPositionBadge(index)}
             </CardHeader>
-            <CardContent className="space-y-3">
+            <CardContent className="space-y-3 px-3 sm:px-6">
               <div className="text-center space-y-1">
-                <div className="text-5xl font-bold text-primary">{player.net_total}</div>
-                <div className="text-sm text-muted-foreground font-semibold">Net Score</div>
-                <div className="text-2xl text-muted-foreground">({player.total})</div>
-                <div className="text-xs text-muted-foreground">Gross Score</div>
+                <div className="text-4xl sm:text-5xl font-bold text-primary leading-none">{player.net_total}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground font-semibold">Net Score</div>
+                <div className="text-xl sm:text-2xl text-muted-foreground">({player.total})</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground">Gross Score</div>
               </div>
-              
+
               <div className="text-center py-2 bg-muted/50 rounded-lg">
-                <div className="text-sm text-muted-foreground">Handicap: {player.handicap_index.toFixed(1)}</div>
-                <div className="text-xs text-muted-foreground">Course Handicap: {player.course_handicap}</div>
+                <div className="text-xs sm:text-sm text-muted-foreground">Handicap: {player.handicap_index.toFixed(1)}</div>
+                <div className="text-[10px] sm:text-xs text-muted-foreground">Course Handicap: {player.course_handicap}</div>
               </div>
-              
+
               <div className="grid grid-cols-2 gap-2 text-center pt-2 border-t">
                 <div>
-                  <div className="text-xl font-semibold">{player.net_front9}</div>
-                  <div className="text-xs text-muted-foreground">Net F9</div>
-                  <div className="text-sm text-muted-foreground">({player.front9})</div>
+                  <div className="text-lg sm:text-xl font-semibold">{player.net_front9}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">Net F9</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">({player.front9})</div>
                 </div>
                 <div>
-                  <div className="text-xl font-semibold">{player.net_back9}</div>
-                  <div className="text-xs text-muted-foreground">Net B9</div>
-                  <div className="text-sm text-muted-foreground">({player.back9})</div>
+                  <div className="text-lg sm:text-xl font-semibold">{player.net_back9}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground">Net B9</div>
+                  <div className="text-xs sm:text-sm text-muted-foreground">({player.back9})</div>
                 </div>
               </div>
 
               {payouts[player.player_id] && (
                 <div className="flex items-center justify-center gap-2 pt-2 border-t bg-success/10 rounded-lg p-2">
-                  <span className="text-2xl font-bold text-success">
+                  <span className="text-xl sm:text-2xl font-bold text-success">
                     ${payouts[player.player_id].toFixed(0)}
                   </span>
                 </div>
