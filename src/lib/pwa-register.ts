@@ -24,20 +24,38 @@ export async function registerPWA(): Promise<void> {
   if (isPreviewHost) return;
 
   try {
-    const { registerSW } = await import("virtual:pwa-register");
+    const [{ registerSW }, { toast }] = await Promise.all([
+      import("virtual:pwa-register"),
+      import("sonner"),
+    ]);
     const updateSW = registerSW({
       immediate: true,
       onNeedRefresh() {
-        // New SW available — activate and reload so updated icons/manifest take effect.
-        void updateSW(true);
+        // Surface an "outdated" notice so installed PWAs know a new version is available.
+        toast("A new version is available", {
+          description: "You're viewing an outdated version of Tyche.",
+          duration: Infinity,
+          important: true,
+          action: {
+            label: "Update now",
+            onClick: () => {
+              void updateSW(true);
+            },
+          },
+        });
       },
       onRegisteredSW(_swUrl, registration) {
         if (!registration) return;
-        // Check for updates immediately and then every 60s while the tab is open.
+        // Check for updates immediately, on focus/visibility, and every 60s.
         void registration.update();
-        setInterval(() => {
+        const check = () => {
           void registration.update();
-        }, 60_000);
+        };
+        window.addEventListener("focus", check);
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") check();
+        });
+        setInterval(check, 60_000);
       },
     });
   } catch (err) {
