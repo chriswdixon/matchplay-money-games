@@ -403,36 +403,36 @@ export function useMatchScoring(matchId: string) {
       setSaving(true);
 
       // Verify the user is an active participant before accepting any scores.
-      // Without this, non-participants can enter strokes that save to IndexedDB
-      // but silently fail to sync (RLS blocks the insert), creating phantom scores.
-      const { data: participantRow, error: participantError } = await supabase
-        .from('match_participants')
-        .select('id')
-        .eq('match_id', matchId)
-        .eq('user_id', user.id)
-        .eq('status', 'active')
-        .maybeSingle();
-
-      if (participantError || !participantRow) {
-        // Audit: blocked save attempt by non-participant
-        try {
-          await supabase.rpc('log_score_attempt', {
+      // We trust the cached `isParticipant` flag when available to avoid an
+      // extra round trip on every stroke (huge win on mobile networks). Only
+      // hit the network if membership is unknown.
+      let participantOk = isParticipant === true;
+      if (!participantOk) {
+        const { data: participantRow, error: participantError } = await supabase
+          .from('match_participants')
+          .select('id')
+          .eq('match_id', matchId)
+          .eq('user_id', user.id)
+          .eq('status', 'active')
+          .maybeSingle();
+        participantOk = !participantError && !!participantRow;
+        if (!participantOk) {
+          // Audit: blocked save attempt by non-participant (fire-and-forget)
+          supabase.rpc('log_score_attempt', {
             p_match_id: matchId,
             p_hole_number: holeNumber,
             p_strokes: strokes,
             p_outcome: 'blocked_not_participant',
             p_reason: participantError?.message ?? null,
+          }).then(undefined, (e) => console.warn('Failed to log score attempt:', e));
+          toast({
+            title: "You're not in this match",
+            description:
+              "Your scores can't be saved because you haven't joined this match. Join the match first, then start scoring.",
+            variant: "destructive",
           });
-        } catch (e) {
-          console.warn('Failed to log score attempt:', e);
+          return false;
         }
-        toast({
-          title: "You're not in this match",
-          description:
-            "Your scores can't be saved because you haven't joined this match. Join the match first, then start scoring.",
-          variant: "destructive",
-        });
-        return false;
       }
 
       // Optimistically update local state first
