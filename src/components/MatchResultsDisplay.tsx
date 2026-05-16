@@ -188,19 +188,19 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           "bg-primary/5",
           !inline && "max-w-4xl mx-auto"
         )}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <DollarSign className="w-6 h-6 text-primary" />
-                <span className="text-lg font-semibold">
-                  {isTestingMode ? 'Solo Pot (Play Money)' : 'Total Pot'}
+          <CardContent className="p-4 sm:p-6">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 min-w-0">
+                <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-primary shrink-0" />
+                <span className="text-base sm:text-lg font-semibold truncate">
+                  {isTestingMode ? 'Solo Pot' : 'Total Pot'}
                 </span>
               </div>
-              <div className="text-3xl font-bold text-primary">
+              <div className="text-2xl sm:text-3xl font-bold text-primary shrink-0">
                 ${totalPot.toFixed(0)}
               </div>
             </div>
-            <div className="mt-4 text-sm text-muted-foreground">
+            <div className="mt-3 sm:mt-4 text-xs sm:text-sm text-muted-foreground">
               {isTestingMode
                 ? `Solo testing match vs 3 bot opponents — winner takes the buy-in back as play money.`
                 : `Buy-in: $${(buyInAmount / 100).toFixed(0)} × ${playerScores.length} players`}
@@ -215,12 +215,12 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           "bg-warning/10 border-warning/30",
           !inline && "max-w-4xl mx-auto"
         )}>
-          <CardContent className="p-6">
+          <CardContent className="p-4 sm:p-6">
             <div className="flex items-center justify-center gap-2 text-warning">
-              <Trophy className="w-6 h-6" />
-              <span className="text-lg font-semibold">Solo Testing Match</span>
+              <Trophy className="w-5 h-5 sm:w-6 sm:h-6" />
+              <span className="text-base sm:text-lg font-semibold">Solo Testing Match</span>
             </div>
-            <div className="mt-2 text-center text-sm text-warning/80">
+            <div className="mt-2 text-center text-xs sm:text-sm text-warning/80">
               You played against 3 bots that scored bogey (par + 1) on every hole. Beat them and the buy-in is credited back to your play-money balance.
             </div>
           </CardContent>
