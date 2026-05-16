@@ -35,15 +35,18 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
 
   const { getRateablePlayersForMatch } = usePlayerRatings();
   const [showRatingDialog, setShowRatingDialog] = useState(false);
-  const [unratedPlayers, setUnratedPlayers] = useState<RateablePlayer[]>([]);
+  const [rateablePlayers, setRateablePlayers] = useState<RateablePlayer[]>([]);
   const [autoPrompted, setAutoPrompted] = useState(false);
+
+  const unratedPlayers = rateablePlayers.filter((p) => !p.already_rated);
+  const ratedPlayers = rateablePlayers.filter((p) => p.already_rated);
 
   useEffect(() => {
     if (!matchId) return;
     const fetchPlayers = async () => {
       const players = await getRateablePlayersForMatch(matchId);
+      setRateablePlayers(players);
       const unrated = players.filter((p) => !p.already_rated);
-      setUnratedPlayers(unrated);
       if (!autoPrompted && unrated.length > 0 && matchId) {
         const key = `tyche-rating-prompted-${matchId}`;
         if (!sessionStorage.getItem(key)) {
