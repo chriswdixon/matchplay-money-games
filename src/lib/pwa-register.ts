@@ -32,10 +32,9 @@ export async function registerPWA(): Promise<void> {
       immediate: true,
       onNeedRefresh() {
         // Surface an "outdated" notice so installed PWAs know a new version is available.
-        toast("A new version is available", {
+        toast.warning("A new version is available", {
           description: "You're viewing an outdated version of Tyche.",
           duration: Infinity,
-          important: true,
           action: {
             label: "Update now",
             onClick: () => {
