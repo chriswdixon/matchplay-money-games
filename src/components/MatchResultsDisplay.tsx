@@ -161,18 +161,16 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
           <h3 className="text-lg font-semibold px-2">Other Finishers</h3>
           {sortedPlayers.slice(3).map((player, index) => (
             <Card key={player.player_id}>
-              <CardContent className="flex items-center justify-between p-4">
-                <div className="flex items-center gap-3">
+              <CardContent className="flex items-center justify-between gap-3 p-3 sm:p-4">
+                <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
                   {getPositionBadge(index + 3)}
-                  <span className="font-medium">{player.player_name}</span>
+                  <span className="font-medium truncate">{player.player_name}</span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-right space-y-1">
-                    <div className="text-2xl font-bold text-primary">{player.net_total}</div>
-                    <div className="text-xs text-muted-foreground">Net ({player.total} gross)</div>
-                    <div className="text-xs text-muted-foreground">
-                      HCP: {player.handicap_index.toFixed(1)} / CH: {player.course_handicap}
-                    </div>
+                <div className="shrink-0 text-right space-y-0.5">
+                  <div className="text-xl sm:text-2xl font-bold text-primary leading-none">{player.net_total}</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">Net ({player.total} gross)</div>
+                  <div className="text-[10px] sm:text-xs text-muted-foreground whitespace-nowrap">
+                    HCP {player.handicap_index.toFixed(1)} / CH {player.course_handicap}
                   </div>
                 </div>
               </CardContent>
