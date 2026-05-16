@@ -196,7 +196,8 @@
       background-color: hsl(0 0% 100%);
     }
     .app-page-bg {
-      color: hsl(220 15% 15%);
+      background-color: hsl(0 0% 100%) !important;
+      color: hsl(220 15% 15%) !important;
     }
     /* Defensive: custom buttons / links with light backgrounds must have dark text */
     button[class*="bg-background"],
