@@ -326,22 +326,41 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
         </CardContent>
       </Card>
 
-      {/* Player Rating Prompt */}
-      {matchId && unratedPlayers.length > 0 && (
+      {/* Player Rating Prompt — always visible to all match players */}
+      {matchId && rateablePlayers.length > 0 && (
         <Card className={cn(!inline && "max-w-4xl mx-auto")}>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between gap-4">
-              <div>
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center justify-between gap-4 flex-wrap">
+              <div className="min-w-0">
                 <h3 className="text-lg font-semibold">Rate Your Opponents</h3>
                 <p className="text-sm text-muted-foreground">
-                  You have {unratedPlayers.length} player{unratedPlayers.length > 1 ? 's' : ''} left to review
+                  {unratedPlayers.length > 0
+                    ? `${unratedPlayers.length} of ${rateablePlayers.length} player${rateablePlayers.length > 1 ? 's' : ''} left to review`
+                    : `You've reviewed all ${rateablePlayers.length} player${rateablePlayers.length > 1 ? 's' : ''}`}
                 </p>
               </div>
               <Button onClick={() => setShowRatingDialog(true)} className="gap-2 shrink-0">
                 <Star className="w-4 h-4" />
-                Rate Players
+                {unratedPlayers.length > 0 ? 'Rate Players' : 'Edit Reviews'}
               </Button>
             </div>
+            <ul className="grid gap-2 sm:grid-cols-2">
+              {rateablePlayers.map((p) => (
+                <li
+                  key={p.user_id}
+                  className="flex items-center justify-between gap-2 rounded-lg border border-border/60 bg-muted/30 px-3 py-2"
+                >
+                  <span className="text-sm font-medium truncate">{p.display_name}</span>
+                  {p.already_rated ? (
+                    <Badge variant="secondary" className="shrink-0 gap-1">
+                      <Star className="w-3 h-3" /> Reviewed
+                    </Badge>
+                  ) : (
+                    <Badge variant="outline" className="shrink-0">Pending</Badge>
+                  )}
+                </li>
+              ))}
+            </ul>
           </CardContent>
         </Card>
       )}
@@ -353,7 +372,7 @@ export function MatchResultsDisplay({ matchResult, playerScores, buyInAmount = 0
             setShowRatingDialog(open);
             if (!open && matchId) {
               getRateablePlayersForMatch(matchId).then((players) => {
-                setUnratedPlayers(players.filter((p) => !p.already_rated));
+                setRateablePlayers(players);
               });
             }
           }}
