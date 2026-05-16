@@ -852,14 +852,14 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                         }}
                         aria-label={`View details for ${match.course_name}`}
                       >
-                        <CardTitle className="text-lg font-semibold text-foreground line-clamp-1">
+                        <CardTitle className="match-card-title text-foreground line-clamp-1">
                           {match.course_name}
                         </CardTitle>
-                        <CardDescription className="flex items-center gap-2">
-                          <MapPin className="w-4 h-4" />
-                          {match.location}
+                        <CardDescription className="match-card-subtitle flex items-center gap-2 min-w-0">
+                          <MapPin className="w-4 h-4 shrink-0" />
+                          <span className="truncate">{match.location}</span>
                           {hasAccess('gps_matching') && match.distance_km && (
-                            <span className="text-primary font-medium">
+                            <span className="text-primary font-medium shrink-0">
                               • {formatDistance(match.distance_km)}
                             </span>
                           )}
@@ -867,7 +867,7 @@ const MatchFinder = ({ hideHowItWorks = false, showPastMatches = false }: { hide
                       </CardHeader>
                       
                       <CardContent className="space-y-4">
-                        <div className="grid grid-cols-2 gap-4 text-sm">
+                        <div className="grid grid-cols-2 gap-3 sm:gap-4 text-fluid-sm">
                           <div className="flex items-center gap-2">
                             <Clock className="w-4 h-4 text-primary" />
                             <span className="text-foreground font-medium">{formatMatchTime(match.scheduled_time)}</span>
