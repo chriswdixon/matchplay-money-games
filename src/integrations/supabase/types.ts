@@ -1635,6 +1635,16 @@ export type Database = {
           scheduled_time: string
         }[]
       }
+      get_pending_review_matches: {
+        Args: { _user_id: string }
+        Returns: {
+          course_name: string
+          finalized_at: string
+          match_id: string
+          pending_count: number
+          scheduled_time: string
+        }[]
+      }
       get_public_profile: {
         Args: { profile_user_id: string }
         Returns: {

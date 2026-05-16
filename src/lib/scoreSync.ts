@@ -122,63 +122,49 @@ export async function syncOfflineScores(matchId: string): Promise<boolean> {
     return true;
   }
 
-  console.log(`📤 Syncing ${unsyncedScores.length} offline score(s)...`);
+  console.log(`📤 Syncing ${unsyncedScores.length} offline score(s) in bulk...`);
 
   let syncedCount = 0;
   let failedCount = 0;
 
-  for (const score of unsyncedScores) {
-    try {
-      // Check if score already exists in database
-      const { data: existingScore } = await supabase
-        .from('match_scores')
-        .select('id, strokes')
-        .eq('match_id', score.matchId)
-        .eq('player_id', score.playerId)
-        .eq('hole_number', score.holeNumber)
-        .maybeSingle();
+  // Per (player, hole) keep only the latest entry so the bulk upsert doesn't
+  // collide with itself in Postgres ("affect row a second time").
+  const latestByKey = new Map<string, typeof unsyncedScores[number]>();
+  for (const s of unsyncedScores) {
+    const key = `${s.playerId}:${s.holeNumber}`;
+    const prev = latestByKey.get(key);
+    if (!prev || s.timestamp > prev.timestamp) latestByKey.set(key, s);
+  }
+  const deduped = Array.from(latestByKey.values());
 
-      if (existingScore) {
-        // Update existing score if different
-        if (existingScore.strokes !== score.strokes) {
-          const { error } = await supabase
-            .from('match_scores')
-            .update({ strokes: score.strokes })
-            .eq('id', existingScore.id);
+  const payload = deduped.map((s) => ({
+    match_id: s.matchId,
+    player_id: s.playerId,
+    hole_number: s.holeNumber,
+    strokes: s.strokes,
+  }));
 
-          if (error) throw error;
-          console.log(`✅ Updated score for hole ${score.holeNumber}`);
-        } else {
-          console.log(`⏭️ Score for hole ${score.holeNumber} already up to date`);
-        }
-      } else {
-        // Insert new score
-        const { error } = await supabase
-          .from('match_scores')
-          .insert({
-            match_id: score.matchId,
-            player_id: score.playerId,
-            hole_number: score.holeNumber,
-            strokes: score.strokes,
-          });
+  try {
+    const { error } = await supabase
+      .from('match_scores')
+      .upsert(payload, { onConflict: 'match_id,player_id,hole_number' });
 
-        if (error) throw error;
-        console.log(`✅ Synced new score for hole ${score.holeNumber}`);
-      }
+    if (error) throw error;
 
-      // Mark as synced
-      if (score.id) {
-        await markScoreSynced(score.id);
-        syncedCount++;
-      }
-    } catch (error) {
-      console.error(`❌ Failed to sync score for hole ${score.holeNumber}:`, error);
-      failedCount++;
-    }
+    // Mark every original unsynced row (including older duplicates) as synced
+    // in parallel — IDB writes are local and fast.
+    await Promise.all(
+      unsyncedScores.map((s) => (s.id != null ? markScoreSynced(s.id) : Promise.resolve())),
+    );
+    syncedCount = deduped.length;
+    console.log(`✅ Bulk-synced ${syncedCount} score(s)`);
+  } catch (error) {
+    console.error('❌ Bulk sync failed:', error);
+    failedCount = deduped.length;
   }
 
-  // Clean up old synced scores
-  await cleanupSyncedScores();
+  // Clean up old synced scores (fire-and-forget — don't block UI)
+  cleanupSyncedScores().catch(() => {});
 
   if (syncedCount > 0) {
     toast({
