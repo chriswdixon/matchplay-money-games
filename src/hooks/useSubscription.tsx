@@ -63,98 +63,29 @@ interface SubscriptionContextType {
 
 const SubscriptionContext = createContext<SubscriptionContextType | undefined>(undefined);
 
+// Pure Play Money system — Stripe removed. All users are granted
+// Tournament Pro tier for free. Tier name is cosmetic only.
+const GRANTED_TIER = SUBSCRIPTION_TIERS.tournament_annual;
+
 export function SubscriptionProvider({ children }: { children: ReactNode }) {
-  const { user, session } = useAuth();
-  const [subscribed, setSubscribed] = useState(false);
-  const [productId, setProductId] = useState<string | null>(null);
-  const [subscriptionEnd, setSubscriptionEnd] = useState<string | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [status, setStatus] = useState<string | null>(null);
-  const [cancelAtPeriodEnd, setCancelAtPeriodEnd] = useState(false);
-  const [latestInvoiceStatus, setLatestInvoiceStatus] = useState<string | null>(null);
-  const [latestInvoiceAmountDue, setLatestInvoiceAmountDue] = useState<number | null>(null);
-  const [latestInvoiceHostedUrl, setLatestInvoiceHostedUrl] = useState<string | null>(null);
+  const { user } = useAuth();
 
-  const resetPaidFields = () => {
-    setProductId(null);
-    setSubscriptionEnd(null);
-    setStatus(null);
-    setCancelAtPeriodEnd(false);
-    setLatestInvoiceStatus(null);
-    setLatestInvoiceAmountDue(null);
-    setLatestInvoiceHostedUrl(null);
+  const value: SubscriptionContextType = {
+    subscribed: true,
+    productId: user ? GRANTED_TIER.product_id : null,
+    subscriptionEnd: null,
+    loading: false,
+    tierName: GRANTED_TIER.name,
+    status: user ? 'active' : null,
+    cancelAtPeriodEnd: false,
+    latestInvoiceStatus: null,
+    latestInvoiceAmountDue: null,
+    latestInvoiceHostedUrl: null,
+    refreshSubscription: async () => {},
   };
-
-  const checkSubscription = async () => {
-    if (!user || !session) {
-      setSubscribed(true); // Default to subscribed (Free tier)
-      resetPaidFields();
-      setLoading(false);
-      return;
-    }
-
-    try {
-      setLoading(true);
-      const { data, error } = await supabase.functions.invoke('check-subscription', {
-        headers: {
-          Authorization: `Bearer ${session.access_token}`,
-        },
-      });
-
-      if (error) {
-        console.error('Error checking subscription:', error);
-        setSubscribed(true); // Default to Free tier on error
-        resetPaidFields();
-      } else {
-        setSubscribed(true);
-        setProductId(data.product_id || null);
-        setSubscriptionEnd(data.subscription_end || null);
-        setStatus(data.status || null);
-        setCancelAtPeriodEnd(!!data.cancel_at_period_end);
-        setLatestInvoiceStatus(data.latest_invoice_status || null);
-        setLatestInvoiceAmountDue(
-          typeof data.latest_invoice_amount_due === 'number' ? data.latest_invoice_amount_due : null,
-        );
-        setLatestInvoiceHostedUrl(data.latest_invoice_hosted_url || null);
-      }
-    } catch (error) {
-      console.error('Exception checking subscription:', error);
-      setSubscribed(true); // Default to Free tier on error
-      resetPaidFields();
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    checkSubscription();
-
-    // Auto-refresh every 60 seconds
-    const interval = setInterval(checkSubscription, 60000);
-    return () => clearInterval(interval);
-  }, [user, session]);
-
-  // Get tier name from product ID, default to Free
-  const tierName = productId
-    ? Object.entries(SUBSCRIPTION_TIERS).find(([_, tier]) => tier.product_id === productId)?.[1]?.name || 'Free'
-    : 'Free';
 
   return (
-    <SubscriptionContext.Provider
-      value={{
-        subscribed,
-        productId,
-        subscriptionEnd,
-        loading,
-        tierName,
-        status,
-        cancelAtPeriodEnd,
-        latestInvoiceStatus,
-        latestInvoiceAmountDue,
-        latestInvoiceHostedUrl,
-        refreshSubscription: checkSubscription,
-      }}
-    >
+    <SubscriptionContext.Provider value={value}>
       {children}
     </SubscriptionContext.Provider>
   );
