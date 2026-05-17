@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import GolfBallLoader from "@/components/GolfBallLoader";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 // Split the two experiences into separate chunks so visitors never download
 // the authenticated dashboard, and vice versa.
@@ -15,6 +16,12 @@ const RouteFallback = () => (
 
 const Index = () => {
   const { user, loading } = useAuth();
+  usePageMeta({
+    title: "Tyche — Competitive Golf, Real Handicaps, Instant Prizes",
+    description:
+      "Join skill-based golf matches, track real handicaps, and get paid instantly in Play Money. Offline scoring, GPS course matching, live leaderboards.",
+    path: "/",
+  });
 
   if (loading) return <RouteFallback />;
 
