@@ -77,5 +77,5 @@ Allow: /
 User-agent: YouBot
 Allow: /
 
-Sitemap: https://match-play.co/sitemap.xml
-Host: https://match-play.co
+Sitemap: https://www.match-play.co/sitemap.xml
+Host: https://www.match-play.co
