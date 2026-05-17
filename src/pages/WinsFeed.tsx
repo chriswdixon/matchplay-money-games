@@ -26,6 +26,12 @@ const WinsFeed = () => {
   const navigate = useNavigate();
   const { hasActiveMatch } = useActiveMatch();
   const { posts, loading } = useWinsFeed(100);
+  usePageMeta({
+    title: "Recent Wins — Tyche",
+    description:
+      "Live feed of recent Tyche match wins: courses played, formats, and Play Money prizes awarded to top competitive golfers.",
+    path: "/wins",
+  });
 
   useEffect(() => {
     if (!authLoading && !user) navigate("/auth");
