@@ -2,9 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Database, Eye, Lock, Globe, Trash2, X } from "lucide-react";
 import { PageTitleCard } from "@/components/ui/page-title-card";
 import { useNavigate } from "react-router-dom";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Privacy = () => {
   const navigate = useNavigate();
+  usePageMeta({
+    title: "Privacy Policy — Tyche",
+    description:
+      "How Tyche collects, uses, and protects your data. GDPR-aligned, RLS-protected Postgres, minimal PII retention, and account deletion on request.",
+    path: "/privacy",
+  });
   const handleClose = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate('/');
