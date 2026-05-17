@@ -16,6 +16,12 @@ const RouteFallback = () => (
 
 const Index = () => {
   const { user, loading } = useAuth();
+  usePageMeta({
+    title: "Tyche — Competitive Golf, Real Handicaps, Instant Prizes",
+    description:
+      "Join skill-based golf matches, track real handicaps, and get paid instantly in Play Money. Offline scoring, GPS course matching, live leaderboards.",
+    path: "/",
+  });
 
   if (loading) return <RouteFallback />;
 
