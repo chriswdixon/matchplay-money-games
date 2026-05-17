@@ -12,6 +12,7 @@ import { useActiveMatch } from "@/hooks/useActiveMatch";
 import { useAuth } from "@/hooks/useAuth";
 import { useWinsFeed } from "@/hooks/useWinsFeed";
 import { formatDistanceToNow } from "date-fns";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const formatLabel = (format: string, isTeam: boolean) => {
   if (isTeam) return "Team Match";
