@@ -2,9 +2,16 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Shield, Users, Trophy, Scale, ScrollText, X } from "lucide-react";
 import { PageTitleCard } from "@/components/ui/page-title-card";
 import { useNavigate } from "react-router-dom";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 const Terms = () => {
   const navigate = useNavigate();
+  usePageMeta({
+    title: "Terms of Service — Tyche",
+    description:
+      "Tyche Terms of Service: rules for skill-based golf competitions, Play Money entry fees, account use, cancellations, and dispute resolution.",
+    path: "/terms",
+  });
   const handleClose = () => {
     if (window.history.length > 1) navigate(-1);
     else navigate('/');
