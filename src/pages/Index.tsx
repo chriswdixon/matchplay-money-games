@@ -1,6 +1,7 @@
 import { lazy, Suspense } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import GolfBallLoader from "@/components/GolfBallLoader";
+import { usePageMeta } from "@/hooks/usePageMeta";
 
 // Split the two experiences into separate chunks so visitors never download
 // the authenticated dashboard, and vice versa.
