@@ -8,9 +8,7 @@ import { AuthProvider } from "@/hooks/useAuth";
 import { SubscriptionProvider } from "@/hooks/useSubscription";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { Toaster } from "@/components/ui/toaster";
-import { runPreviewCacheGuard } from "@/lib/preview-cache-guard";
-import { startDevAutoReload } from "@/lib/dev-auto-reload";
-import { registerPWA } from "@/lib/pwa-register";
+import { cleanupServiceWorkers } from "@/lib/sw-cleanup";
 import { toast as sonnerToast } from "sonner";
 
 // Globally suppress success / informational toasts; only errors are surfaced.
@@ -19,14 +17,8 @@ sonnerToast.success = noop as typeof sonnerToast.success;
 sonnerToast.info = noop as typeof sonnerToast.info;
 sonnerToast.message = noop as typeof sonnerToast.message;
 
-// Clean up legacy SW + caches when running in unsafe contexts (Lovable preview iframes).
-runPreviewCacheGuard();
-
-// Detect new builds in dev/preview and force a single hard refresh.
-startDevAutoReload();
-
-// Register the PWA service worker in production hosts only.
-void registerPWA();
+// Evict any legacy service worker + caches so the app never serves stale HTML.
+cleanupServiceWorkers();
 
 const queryClient = new QueryClient({
   defaultOptions: {
