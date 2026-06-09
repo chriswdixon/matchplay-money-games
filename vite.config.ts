@@ -3,7 +3,6 @@ import react from "@vitejs/plugin-react-swc";
 import path from "path";
 import { componentTagger } from "lovable-tagger";
 import { imagetools } from 'vite-imagetools';
-import { VitePWA } from "vite-plugin-pwa";
 
 const noStorePaths = [
   "/",
@@ -71,82 +70,6 @@ export default defineConfig(({ mode }) => ({
     react(),
     noStoreHtmlHeaders(),
     mode === "development" && componentTagger(),
-    VitePWA({
-      registerType: "autoUpdate",
-      injectRegister: false, // we register manually with host guards
-      devOptions: { enabled: false },
-      includeAssets: [
-        "favicon.png",
-        "manifest.json",
-        "icons/icon-72.png",
-        "icons/icon-96.png",
-        "icons/icon-128.png",
-        "icons/icon-144.png",
-        "icons/icon-152.png",
-        "icons/icon-167.png",
-        "icons/icon-180.png",
-        "icons/icon-192.png",
-        "icons/icon-384.png",
-        "icons/icon-512.png",
-        "icons/icon-192-maskable.png",
-        "icons/icon-512-maskable.png",
-        "icons/apple-touch-icon.png",
-        "icons/splash/*.png",
-      ],
-      manifest: {
-        name: "Tyche - Competitive Golf",
-        short_name: "Tyche",
-        description:
-          "Track golf scores offline on the course. Book matches, track real handicaps, and play.",
-        theme_color: "#00D25D",
-        background_color: "#00D25D",
-        display: "standalone",
-        orientation: "portrait",
-        scope: "/",
-        start_url: "/",
-        icons: [
-          { src: "/icons/icon-72.png", sizes: "72x72", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-96.png", sizes: "96x96", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-128.png", sizes: "128x128", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-144.png", sizes: "144x144", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-152.png", sizes: "152x152", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-167.png", sizes: "167x167", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-180.png", sizes: "180x180", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-384.png", sizes: "384x384", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png", purpose: "any" },
-          { src: "/icons/icon-192-maskable.png", sizes: "192x192", type: "image/png", purpose: "maskable" },
-          { src: "/icons/icon-512-maskable.png", sizes: "512x512", type: "image/png", purpose: "maskable" },
-        ],
-      },
-      workbox: {
-        navigateFallback: "/index.html",
-        navigateFallbackDenylist: [/^\/~oauth/, /^\/api\//, /^\/functions\//],
-        cleanupOutdatedCaches: true,
-        clientsClaim: true,
-        skipWaiting: true,
-        runtimeCaching: [
-          {
-            urlPattern: ({ request }) => request.mode === "navigate",
-            handler: "NetworkFirst",
-            options: { cacheName: "html", networkTimeoutSeconds: 3 },
-          },
-          {
-            urlPattern: ({ request }) => ["style", "script", "worker"].includes(request.destination),
-            handler: "StaleWhileRevalidate",
-            options: { cacheName: "static-assets" },
-          },
-          {
-            urlPattern: ({ request }) => request.destination === "image",
-            handler: "CacheFirst",
-            options: {
-              cacheName: "images",
-              expiration: { maxEntries: 100, maxAgeSeconds: 60 * 60 * 24 * 30 },
-            },
-          },
-        ],
-      },
-    }),
   ].filter(Boolean),
   resolve: {
     alias: {

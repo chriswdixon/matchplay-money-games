@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Check, Star, Crown } from "lucide-react";
+import { CardBrandLogos } from "@/components/CardBrandLogos";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
@@ -214,10 +215,11 @@ const MembershipTiers = () => {
           ))}
         </div>
         
-        <div className="text-center mt-12 p-6 bg-muted/50 rounded-2xl max-w-2xl mx-auto">
+        <div className="text-center mt-12 p-6 bg-muted/50 rounded-2xl max-w-2xl mx-auto space-y-4">
           <p className="text-sm text-muted-foreground">
             🔒 All transactions are protected by bank-level security. Cancel anytime.
           </p>
+          <CardBrandLogos className="pt-1" />
         </div>
       </div>
     </section>

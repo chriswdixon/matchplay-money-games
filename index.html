@@ -3,9 +3,12 @@
   <head>
     <meta charset="UTF-8" />
     <!--
-      Preview cache guard (pre-boot). Runs before any module/script loads.
-      Cleans up legacy SW + Cache Storage from prior PWA builds and forces
-      ONE cache-busted reload if needed. No PWA worker is installed here.
+      Pre-boot service-worker cleanup. Runs before any module/script loads.
+      Tyche no longer ships an offline app-shell worker, so we unregister any
+      legacy worker and clear its Cache Storage to prevent stale HTML. No new
+      worker is installed here and there is no cache-busting reload loop — the
+      kill-switch workers at /sw.js and /service-worker.js reload returning
+      clients exactly once.
     -->
     <script>
       (function () {
@@ -17,17 +20,9 @@
           }
           var swApi = navigator['serviceWorker'];
           if (!swApi || typeof swApi.getRegistrations !== 'function') return;
-          var FLAG = 'tyche-preboot-cache-bust';
           swApi.getRegistrations().then(function (regs) {
-            if (!regs || regs.length === 0) return;
-            Promise.all(regs.map(function (r) {
-              return r['unregister']().catch(function () { return false; });
-            })).then(function () {
-              if (sessionStorage.getItem(FLAG)) return;
-              sessionStorage.setItem(FLAG, '1');
-              var u = new URL(window.location.href);
-              u.searchParams.set('cb', Date.now().toString(36));
-              window.location.replace(u.toString());
+            (regs || []).forEach(function (r) {
+              r['unregister']().catch(function () { return false; });
             });
           }).catch(function () {});
         } catch (e) {}
@@ -42,6 +37,7 @@
     <!-- LCP hero image optimized via fetchPriority="high" and loading="eager" in component -->
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <link rel="icon" type="image/png" href="/favicon.png">
+    <link rel="manifest" href="/manifest.json" />
     <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
     <!-- iOS PWA: enable standalone mode + match status bar to brand green -->
     <meta name="apple-mobile-web-app-capable" content="yes" />

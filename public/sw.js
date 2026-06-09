@@ -1,8 +1,9 @@
 // Kill-switch service worker.
 // Tyche no longer ships an offline app-shell service worker. This file exists
-// only to evict any previously-installed worker that returning browsers may
-// still have registered at /service-worker.js. It deletes the stale caches,
-// reloads open tabs onto fresh assets, then unregisters itself.
+// only to evict any previously-installed Workbox / vite-plugin-pwa worker that
+// returning browsers may still have registered at /sw.js. It deletes the
+// stale app-shell caches, reloads open tabs onto fresh assets, then
+// unregisters itself so nothing keeps serving outdated HTML.
 
 self.addEventListener("install", () => self.skipWaiting());
 

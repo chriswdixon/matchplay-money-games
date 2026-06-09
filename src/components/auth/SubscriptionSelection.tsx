@@ -11,6 +11,7 @@ import { SUBSCRIPTION_TIERS } from '@/hooks/useSubscription';
 import { isOver21 } from '@/lib/validation';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
+import { CardBrandLogos } from '@/components/CardBrandLogos';
 
 interface SubscriptionSelectionProps {
   onComplete: () => void;
@@ -270,13 +271,14 @@ export function SubscriptionSelection({ onComplete }: SubscriptionSelectionProps
         ))}
       </div>
 
-      <div className="text-center p-4 bg-muted/50 rounded-lg">
+      <div className="text-center p-4 bg-muted/50 rounded-lg space-y-3">
         <p className="text-sm text-muted-foreground">
           🔒 <strong>Secure Payment:</strong> All transactions protected by Stripe
         </p>
         <p className="text-sm text-muted-foreground mt-1">
           You can cancel anytime during your trial with no charge
         </p>
+        <CardBrandLogos size="sm" />
       </div>
     </div>
   );
