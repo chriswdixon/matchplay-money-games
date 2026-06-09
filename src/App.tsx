@@ -56,7 +56,6 @@ const App = () => (
         <Sonner />
         <Suspense fallback={null}>
           <GeoBlockingOverlay />
-          <AgeVerificationGate />
         </Suspense>
         <EmailConfirmationBanner />
         <Suspense fallback={null}>
@@ -66,32 +65,33 @@ const App = () => (
           <ScrollProgress />
         </Suspense>
         <Suspense fallback={<PageLoader />}>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/auth" element={<Auth />} />
-            <Route path="/auth/reset-password" element={<ResetPassword />} />
-            <Route path="/verify" element={<VerifyEmail />} />
-            <Route path="/verify-age" element={<VerifyAge />} />
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/admin" element={<AdminRoute><AdminConsole /></AdminRoute>} />
-            <Route path="/create-match" element={<CreateMatch />} />
-            <Route path="/match/:id" element={<MatchDetails />} />
-            
-            <Route path="/terms" element={<Terms />} />
-            <Route path="/privacy" element={<Privacy />} />
-            <Route path="/wins" element={<WinsFeed />} />
-            <Route path="/handicap-calculators" element={<HandicapCalculatorsPage />} />
-            <Route path="/wallet" element={<WalletPage />} />
-            <Route path="/faq" element={<FAQ />} />
-            <Route path="/my-matches" element={<MyMatches />} />
-            {/* PWA install flow has been removed — always send /install (and any sub-paths) to NotFound */}
-            <Route path="/install" element={<Navigate to="/404" replace />} />
-            <Route path="/install/*" element={<Navigate to="/404" replace />} />
-            <Route path="/404" element={<NotFound />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-          
+          <AgeVerificationGate>
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/auth" element={<Auth />} />
+              <Route path="/auth/reset-password" element={<ResetPassword />} />
+              <Route path="/verify" element={<VerifyEmail />} />
+              <Route path="/verify-age" element={<VerifyAge />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/admin" element={<AdminRoute><AdminConsole /></AdminRoute>} />
+              <Route path="/create-match" element={<CreateMatch />} />
+              <Route path="/match/:id" element={<MatchDetails />} />
+
+              <Route path="/terms" element={<Terms />} />
+              <Route path="/privacy" element={<Privacy />} />
+              <Route path="/wins" element={<WinsFeed />} />
+              <Route path="/handicap-calculators" element={<HandicapCalculatorsPage />} />
+              <Route path="/wallet" element={<WalletPage />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/my-matches" element={<MyMatches />} />
+              {/* PWA install flow has been removed — always send /install (and any sub-paths) to NotFound */}
+              <Route path="/install" element={<Navigate to="/404" replace />} />
+              <Route path="/install/*" element={<Navigate to="/404" replace />} />
+              <Route path="/404" element={<NotFound />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AgeVerificationGate>
         </Suspense>
       </TooltipProvider>
     </ActiveMatchProvider>
