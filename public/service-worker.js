@@ -1,36 +1,34 @@
 // Kill-switch service worker.
-// Tyche no longer supports PWA. This worker exists only to remove any
-// previously-installed service worker + caches from devices that registered
-// an older PWA build, then unregister itself.
-self.addEventListener("install", (e) => e.waitUntil(self.skipWaiting()));
-self.addEventListener("activate", (e) =>
-  e.waitUntil(
+// Tyche no longer ships an offline app-shell service worker. This file exists
+// only to evict any previously-installed worker that returning browsers may
+// still have registered at /service-worker.js. It deletes the stale caches,
+// reloads open tabs onto fresh assets, then unregisters itself.
+
+self.addEventListener("install", () => self.skipWaiting());
+
+self.addEventListener("activate", (event) =>
+  event.waitUntil(
     (async () => {
       try {
+        const cacheNames = await caches.keys();
+        await Promise.allSettled(cacheNames.map((name) => caches.delete(name)));
         await self.clients.claim();
-        const names = await caches.keys();
-        await Promise.all(names.map((n) => caches.delete(n)));
-        const clients = await self.clients.matchAll({
-          type: "window",
-          includeUncontrolled: true,
-        });
-        await Promise.all(
-          clients.map((c) => {
+        const windowClients = await self.clients.matchAll({ type: "window" });
+        await Promise.allSettled(
+          windowClients.map((client) => {
             try {
-              const url = new URL(c.url);
-              url.searchParams.set("sw-cleanup", Date.now().toString());
-              return c.navigate(url.toString());
+              return client.navigate(client.url);
             } catch (_) {
               return undefined;
             }
           }),
         );
+      } finally {
         await self.registration.unregister();
-      } catch (_) {
-        // best-effort cleanup; ignore failures
       }
     })(),
   ),
 );
+
 // Pass-through fetch so we never serve a cached shell.
 self.addEventListener("fetch", () => {});
