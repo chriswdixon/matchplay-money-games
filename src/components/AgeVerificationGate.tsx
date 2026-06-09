@@ -10,9 +10,12 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
 import { ShieldCheck, AlertTriangle, Loader2 } from "lucide-react";
+import GolfBallLoader from "@/components/GolfBallLoader";
 
 // Routes that must stay reachable even before age verification so users can
 // read policies, finish auth flows, or complete the email verification link.
+// NOTE: keep this list minimal — anything here can be reached WITHOUT passing
+// the age gate, so it must never expose authenticated app functionality.
 const ALLOWED_PATHS = [
   "/auth",
   "/verify",
@@ -22,7 +25,15 @@ const ALLOWED_PATHS = [
   "/faq",
 ];
 
-export function AgeVerificationGate() {
+/**
+ * AgeVerificationGate WRAPS the entire application. For an authenticated user
+ * who has not confirmed they are 18+, the protected app tree is NOT rendered at
+ * all — only the gate UI is. This makes the gate impossible to bypass by
+ * removing an overlay element, tabbing behind it, or racing a loading flash:
+ * the underlying routes simply do not exist in the DOM until verification
+ * succeeds.
+ */
+export function AgeVerificationGate({ children }: { children: React.ReactNode }) {
   const { user, loading: authLoading, signOut } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,12 +60,24 @@ export function AgeVerificationGate() {
     (p) => location.pathname === p || location.pathname.startsWith(`${p}/`),
   );
 
-  // Don't gate logged-out visitors, essential routes, or while we're still
-  // resolving auth/profile state (prevents a flash of the gate).
-  if (!user || authLoading || onAllowedPath) return null;
-  if (profileLoading || privateLoading) return null;
-  if (profile?.age_verified) return null;
+  // Logged-out visitors and essential public routes get the app as normal.
+  if (!user || authLoading || onAllowedPath) return <>{children}</>;
 
+  // While resolving the verification state, block the app behind a loader.
+  // Rendering the children here would briefly expose protected content, which
+  // is exactly the kind of bypass we must prevent.
+  if (profileLoading || privateLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <GolfBallLoader size={64} showBrand />
+      </div>
+    );
+  }
+
+  // Verified users get full access.
+  if (profile?.age_verified) return <>{children}</>;
+
+  // Otherwise: render ONLY the gate. The app tree is never mounted.
   const handleConfirm = async () => {
     setError(null);
 
@@ -97,7 +120,7 @@ export function AgeVerificationGate() {
 
   return (
     <div
-      className="fixed inset-0 z-[60] flex items-center justify-center overflow-auto bg-background/95 p-4 backdrop-blur-sm"
+      className="fixed inset-0 z-[60] flex items-center justify-center overflow-auto bg-background p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="age-gate-title"
