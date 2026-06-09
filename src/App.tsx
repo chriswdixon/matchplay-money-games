@@ -56,6 +56,7 @@ const App = () => (
         <Sonner />
         <Suspense fallback={null}>
           <GeoBlockingOverlay />
+          <AgeVerificationGate />
         </Suspense>
         <EmailConfirmationBanner />
         <Suspense fallback={null}>
