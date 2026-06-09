@@ -1,5 +1,4 @@
 /// <reference types="vite/client" />
-/// <reference types="vite-plugin-pwa/client" />
 
 // Type declarations for vite-imagetools
 declare module '*?format=webp&quality=80' {
