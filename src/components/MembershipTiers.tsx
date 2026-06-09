@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Badge } from "@/components/ui/badge";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Check, Star, Crown } from "lucide-react";
+import { CardBrandLogos } from "@/components/CardBrandLogos";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
