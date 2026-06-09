@@ -11,6 +11,7 @@ import { SUBSCRIPTION_TIERS } from '@/hooks/useSubscription';
 import { isOver21 } from '@/lib/validation';
 import { Alert, AlertDescription } from '@/components/ui/alert';
 import { usePrivateProfile } from '@/hooks/usePrivateProfile';
+import { CardBrandLogos } from '@/components/CardBrandLogos';
 
 interface SubscriptionSelectionProps {
   onComplete: () => void;
