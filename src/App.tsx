@@ -17,6 +17,7 @@ const OfflineIndicator = lazy(() => import("@/components/OfflineIndicator").then
 
 const CookieConsent = lazy(() => import("@/components/CookieConsent").then(m => ({ default: m.CookieConsent })));
 const GeoBlockingOverlay = lazy(() => import("@/components/GeoBlockingOverlay").then(m => ({ default: m.GeoBlockingOverlay })));
+const AgeVerificationGate = lazy(() => import("@/components/AgeVerificationGate").then(m => ({ default: m.AgeVerificationGate })));
 const PWAInstallOnLogin = lazy(() => import("@/components/PWAInstallOnLogin").then(m => ({ default: m.PWAInstallOnLogin })));
 const ScrollProgress = lazy(() => import("@/components/ScrollProgress").then(m => ({ default: m.ScrollProgress })));
 
