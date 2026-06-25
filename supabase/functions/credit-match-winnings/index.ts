@@ -115,6 +115,13 @@ serve(async (req) => {
       throw new Error("No results found for this match");
     }
 
+    // Defense-in-depth: only pay out results that were finalized by the trusted
+    // server-side finalize flow (finalized_at is set exclusively by
+    // finalize_match_results). This prevents payouts on forged/non-finalized results.
+    if (!matchResults.finalized_at) {
+      throw new Error("Match results have not been finalized");
+    }
+
     const buyInAmount = match.buy_in_amount;
     const isTeamFormat = match.is_team_format || false;
 
