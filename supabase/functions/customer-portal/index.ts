@@ -71,10 +71,12 @@ serve(async (req) => {
     const customerId = customers.data[0].id;
     logStep("Found Stripe customer", { customerId });
 
-    const origin = req.headers.get("origin") || "http://localhost:3000";
+    // Use a server-controlled site URL for the return redirect to avoid
+    // open-redirect via a client-supplied Origin header.
+    const siteUrl = Deno.env.get("SITE_URL") || "https://www.match-play.co";
     const portalSession = await stripe.billingPortal.sessions.create({
       customer: customerId,
-      return_url: `${origin}/`,
+      return_url: `${siteUrl}/`,
     });
     logStep("Customer portal session created", { sessionId: portalSession.id, url: portalSession.url });
 
