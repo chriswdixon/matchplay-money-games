@@ -78,6 +78,10 @@ serve(async (req) => {
       logStep("No existing customer, will create during checkout");
     }
 
+    // Use a server-controlled site URL for redirects to avoid open-redirect via
+    // a client-supplied Origin header.
+    const siteUrl = Deno.env.get("SITE_URL") || "https://www.match-play.co";
+
     const session = await stripe.checkout.sessions.create({
       customer: customerId,
       customer_email: customerId ? undefined : user.email,
@@ -91,8 +95,8 @@ serve(async (req) => {
       subscription_data: {
         trial_period_days: 7,
       },
-      success_url: `${req.headers.get("origin")}/`,
-      cancel_url: `${req.headers.get("origin")}/`,
+      success_url: `${siteUrl}/`,
+      cancel_url: `${siteUrl}/`,
     });
 
     logStep("Checkout session created", { sessionId: session.id, url: session.url });
